@@ -698,25 +698,31 @@ bin/cake bake model Monitors --no-test --no-fixture
 ---
 
 ### TASK-213: Port Checker
-**Status**: 🔴 | **Prioridade**: ⭐ | **Dependências**: TASK-210
-**Estimativa**: 2h
+**Status**: 🟢 **COMPLETO** | **Prioridade**: ⭐ | **Dependências**: TASK-210
+**Estimativa**: 2h | **Tempo Real**: 1.5h
 
 **Descrição**: Implementar checker para verificação de portas TCP/UDP.
 
-**Implementar**:
-- Conexão TCP socket
-- Timeout configurável
-- Medição de tempo de conexão
+**Implementado**:
+- ✅ Conexão TCP socket com stream_socket_client
+- ✅ Timeout configurável por monitor
+- ✅ Medição de tempo de conexão (milliseconds)
+- ✅ Detecção de degraded performance (>80% timeout)
+- ✅ Suporte IPv4 e IPv6
+- ✅ Parse de target host:port e [ipv6]:port
+- ✅ Validação de range de porta (1-65535)
+- ✅ Error messages user-friendly
+- ✅ Testes com mocks e integração
 
-**Arquivos a criar**:
-- `src/Service/Check/PortChecker.php`
-- `tests/TestCase/Service/Check/PortCheckerTest.php`
+**Arquivos criados**:
+- `src/Service/Check/PortChecker.php` - ✅ 260 linhas
+- `tests/TestCase/Service/Check/PortCheckerTest.php` - ✅ 20 testes
 
 **Critérios de Aceite**:
-- [ ] Verifica porta TCP
-- [ ] Timeout funcional
-- [ ] Mede tempo de conexão
-- [ ] Testes passando
+- [x] Verifica porta TCP
+- [x] Timeout funcional
+- [x] Mede tempo de conexão
+- [x] Testes passando (20/20 testes, 50 assertions)
 
 ---
 
