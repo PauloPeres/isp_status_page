@@ -768,8 +768,8 @@ bin/cake bake model Monitors --no-test --no-fixture
 ---
 
 ### TASK-220: Incident Model e Service
-**Status**: 🔴 | **Prioridade**: ⭐ | **Dependências**: TASK-140, TASK-214
-**Estimativa**: 4h
+**Status**: 🟢 | **Prioridade**: ⭐ | **Dependências**: TASK-140, TASK-214
+**Estimativa**: 4h | **Realizado**: 4h
 
 **Descrição**: Criar Model Incident e IncidentService para gestão de incidentes.
 
@@ -780,45 +780,298 @@ bin/cake bake model Monitors --no-test --no-fixture
   - `updateIncident(Incident $incident, string $status)`
   - `resolveIncident(Incident $incident)`
   - `getActiveIncidents()`
+  - `autoResolveIncidents(Monitor $monitor)`
+  - `getActiveIncidentForMonitor(int $monitorId)`
 - Auto-criação quando monitor fica DOWN
 - Auto-resolução quando monitor fica UP
 - Cálculo de duração
 
-**Arquivos a criar**:
-- `src/Model/Entity/Incident.php`
-- `src/Model/Table/IncidentsTable.php`
-- `src/Service/IncidentService.php`
-- `tests/TestCase/Service/IncidentServiceTest.php`
+**Arquivos criados**:
+- `src/Model/Entity/Incident.php` ✅
+- `src/Model/Table/IncidentsTable.php` ✅ (já existia, adicionados custom finders)
+- `src/Service/IncidentService.php` ✅
+- `tests/TestCase/Service/IncidentServiceTest.php` ✅
+
+**Arquivos modificados**:
+- `src/Command/MonitorCheckCommand.php` - Integração com IncidentService
+- `src/Model/Table/IncidentsTable.php` - Adicionados finders: `findActive()`, `findByMonitor()`, `findActiveByMonitor()`
 
 **Critérios de Aceite**:
-- [ ] Incidentes criados automaticamente
-- [ ] Resolvidos automaticamente
-- [ ] Duração calculada corretamente
-- [ ] Testes passando
+- [x] Incidentes criados automaticamente quando monitor fica DOWN
+- [x] Resolvidos automaticamente quando monitor volta UP
+- [x] Duração calculada corretamente em segundos
+- [x] Testes passando (12/12 testes, 100% sucesso)
+
+**Notas de Implementação**:
+- Entity Incident possui constantes para status e severidade
+- Helper methods: `isResolved()`, `isOngoing()`, `getSeverityBadgeClass()`, `getStatusName()`
+- Verificação de incidentes duplicados (não cria se já existe ativo)
+- Logging completo de todas as operações
+- Timestamps: started_at, identified_at, resolved_at
+- Severidade atual: todos como "major" (pronto para expansão futura)
 
 ---
 
 ### TASK-221: Incidents Controller
-**Status**: 🔴 | **Prioridade**: 💡 | **Dependências**: TASK-220
-**Estimativa**: 3h
+**Status**: 🟢 | **Prioridade**: 💡 | **Dependências**: TASK-220
+**Estimativa**: 3h | **Realizado**: 3h
 
 **Descrição**: Controller para visualizar e gerenciar incidentes no admin.
 
 **Implementar**:
-- index: Listar incidentes (filtros por status)
-- view: Ver detalhes e timeline
-- edit: Atualizar status manualmente
-- resolve: Resolver incidente
+- index: Listar incidentes (filtros por status, severidade, monitor, busca)
+- view: Ver detalhes, timeline de eventos e verificações recentes
+- edit: Atualizar status e descrição manualmente
+- resolve: Resolver incidente rapidamente
 
-**Arquivos a criar**:
-- `src/Controller/Admin/IncidentsController.php`
-- `templates/Admin/Incidents/index.php`
-- `templates/Admin/Incidents/view.php`
+**Arquivos criados**:
+- `src/Controller/IncidentsController.php` ✅
+- `templates/Incidents/index.php` ✅
+- `templates/Incidents/view.php` ✅
+
+**Funcionalidades Implementadas**:
+
+**Index (Listagem)**:
+- Filtros: status (com "ativos"), severidade, monitor, auto-criado, busca por título/descrição
+- Cards de estatísticas: Total, Ativos, Resolvidos, Críticos
+- Tabela com badges coloridos por status e severidade
+- Indicador de incidentes auto-criados (🤖)
+- Links para monitores relacionados
+- Duração formatada (segundos, minutos, horas, dias)
+- Paginação integrada
+- Ações: Ver, Editar, Resolver
+
+**View (Detalhes)**:
+- Timeline visual com eventos cronológicos (criação, identificação, resolução)
+- Ícones e cores por tipo de evento (🚨, 🔍, ✅)
+- Informações detalhadas: status, severidade, monitor afetado, timestamps
+- Duração formatada com múltiplas unidades (s, m, h, d)
+- Descrição completa do incidente
+- Grid de verificações recentes do monitor (últimas 20)
+- Status visual de cada check (✅/❌)
+- Ações: Voltar, Editar, Resolver
+
+**Edit e Resolve**:
+- Integração com IncidentService para atualização
+- Confirmação antes de resolver
+- Mensagens de sucesso/erro via Flash
+- Validação de incidentes já resolvidos
+
+**Design e UX**:
+- Layout responsivo (adapta para mobile)
+- Badges coloridos seguindo status e severidade
+- Timeline com marcadores visuais
+- Hover effects e transições suaves
+- Tipografia clara e hierarquia visual
+- Estilos CSS inline para fácil manutenção
 
 **Critérios de Aceite**:
-- [ ] Lista incidentes com filtros
-- [ ] Exibe timeline
-- [ ] Permite atualização manual
+- [x] Lista incidentes com filtros funcionais (status, severidade, monitor, busca)
+- [x] Exibe timeline de eventos com timestamps e descrições
+- [x] Permite atualização manual de status e descrição
+- [x] Resolve incidentes com um clique
+- [x] Interface responsiva e intuitiva
+- [x] Integração completa com IncidentService
+
+**Notas de Implementação**:
+- Controller criado inicialmente em `Admin/` mas movido para raiz para consistência
+- Templates movidos de `Admin/Incidents/` para `Incidents/` (padrão do projeto)
+- URL final: `/incidents` (acessível via menu lateral)
+- 3 incidentes de teste criados para validação da interface
+- Método `buildTimeline()` gera eventos cronológicos automaticamente
+- Método `formatDuration()` formata duração em formato legível
+
+---
+
+### TASK-222: Checks Controller
+**Status**: 🔴 | **Prioridade**: 💡 | **Dependências**: TASK-214
+**Estimativa**: 3h
+
+**Descrição**: Controller para visualizar histórico de verificações de monitores no admin.
+
+**Implementar**:
+- index: Listar todas as verificações com filtros (monitor, status, período)
+- view: Ver detalhes de uma verificação específica
+- Estatísticas de uptime e response time
+- Gráficos de histórico de checks
+
+**Arquivos a criar**:
+- `src/Controller/ChecksController.php`
+- `templates/Checks/index.php`
+- `templates/Checks/view.php`
+
+**Funcionalidades**:
+
+**Index (Listagem)**:
+- Filtros: monitor, status (success/failed), período (24h, 7d, 30d)
+- Cards de estatísticas: Total checks, Success rate, Avg response time
+- Tabela com: timestamp, monitor, status, response time, message
+- Badges coloridos por status (success/failed)
+- Links para monitores relacionados
+- Paginação integrada
+- Export CSV (opcional)
+
+**View (Detalhes)**:
+- Informações completas da verificação
+- Response time detalhado
+- Error message (se houver)
+- Request/Response details (JSON)
+- Link para o monitor
+
+**Critérios de Aceite**:
+- [ ] Lista checks com filtros funcionais (monitor, status, período)
+- [ ] Exibe estatísticas de uptime e performance
+- [ ] Interface responsiva e clara
+- [ ] Paginação eficiente para grandes volumes
+- [ ] Integração com MonitorChecks model
+
+---
+
+### TASK-223: Subscribers Admin Controller
+**Status**: 🔴 | **Prioridade**: 💡 | **Dependências**: TASK-240
+**Estimativa**: 3h
+
+**Descrição**: Controller admin para gerenciar inscritos de notificações por email.
+
+**Implementar**:
+- index: Listar inscritos com filtros (status, data)
+- view: Ver detalhes de um inscrito
+- delete: Remover inscrito manualmente
+- bulk actions: Ativar/desativar múltiplos inscritos
+
+**Arquivos a criar**:
+- `src/Controller/SubscribersController.php` (admin section)
+- `templates/Subscribers/index.php`
+- `templates/Subscribers/view.php`
+
+**Funcionalidades**:
+
+**Index (Listagem)**:
+- Filtros: status (verified/unverified), data de inscrição
+- Cards de estatísticas: Total, Verified, Unverified, Recently added
+- Tabela com: email, status, data de inscrição, última notificação
+- Badges por status de verificação
+- Busca por email
+- Paginação integrada
+- Ações: Ver, Deletar
+
+**View (Detalhes)**:
+- Informações do inscrito: email, status, tokens
+- Histórico de emails enviados
+- Monitores inscritos (subscriptions)
+- Timestamps: created, verified_at
+- Ações: Resend verification, Delete
+
+**Critérios de Aceite**:
+- [ ] Lista inscritos com filtros funcionais
+- [ ] Exibe estatísticas de inscrições
+- [ ] Permite deletar inscritos
+- [ ] Interface clara e intuitiva
+- [ ] Integração com Subscribers model
+
+---
+
+### TASK-224: EmailLogs Controller
+**Status**: 🔴 | **Prioridade**: 💡 | **Dependências**: TASK-300
+**Estimativa**: 3h
+
+**Descrição**: Controller para visualizar logs de emails enviados pelo sistema.
+
+**Implementar**:
+- index: Listar emails enviados com filtros
+- view: Ver detalhes de um email (subject, body, destinatário)
+- resend: Reenviar email (opcional)
+
+**Arquivos a criar**:
+- `src/Controller/EmailLogsController.php`
+- `templates/EmailLogs/index.php`
+- `templates/EmailLogs/view.php`
+
+**Funcionalidades**:
+
+**Index (Listagem)**:
+- Filtros: tipo (incident_created, incident_resolved, verification), status (sent/failed), período
+- Cards de estatísticas: Total sent, Failed, Success rate, Today's emails
+- Tabela com: timestamp, destinatário, assunto, tipo, status
+- Badges por status (sent/failed)
+- Busca por email ou assunto
+- Paginação integrada
+- Ações: Ver detalhes
+
+**View (Detalhes)**:
+- Informações completas: destinatário, assunto, tipo
+- Corpo do email (HTML preview)
+- Status e timestamps (sent_at, failed_at)
+- Error message (se falhou)
+- Related incident/subscriber info
+- Ação: Resend (se falhou)
+
+**Critérios de Aceite**:
+- [ ] Lista emails com filtros funcionais
+- [ ] Exibe estatísticas de envio
+- [ ] Preview do corpo do email
+- [ ] Interface responsiva
+- [ ] Integração com EmailLogs model
+
+---
+
+### TASK-225: Settings Controller
+**Status**: 🔴 | **Prioridade**: 💡 | **Dependências**: TASK-150
+**Estimativa**: 4h
+
+**Descrição**: Controller para gerenciar configurações do sistema no admin.
+
+**Implementar**:
+- index: Página de configurações agrupadas por categoria
+- save: Salvar configurações (validação incluída)
+- Categorias: General, Email, Monitoring, Notifications
+
+**Arquivos a criar**:
+- `src/Controller/SettingsController.php`
+- `templates/Settings/index.php`
+- `src/Model/Entity/Setting.php` (se não existir)
+- `src/Model/Table/SettingsTable.php` (se não existir)
+
+**Funcionalidades**:
+
+**Categorias de Configurações**:
+
+1. **General**:
+   - Site name
+   - Site URL
+   - Timezone
+   - Language
+
+2. **Email**:
+   - SMTP host, port, username, password
+   - From email/name
+   - Test email button
+
+3. **Monitoring**:
+   - Check interval (minutos)
+   - Timeout (segundos)
+   - Max retries
+   - Auto-resolve incidents
+
+4. **Notifications**:
+   - Email on incident created
+   - Email on incident resolved
+   - Email template customization
+
+**Interface**:
+- Abas ou accordion para cada categoria
+- Forms com validação inline
+- Test buttons (ex: test email, test monitor)
+- Save button por categoria
+- Success/error messages via Flash
+
+**Critérios de Aceite**:
+- [ ] Exibe configurações organizadas por categoria
+- [ ] Salva configurações com validação
+- [ ] Test email funcional
+- [ ] Interface intuitiva e clara
+- [ ] Valores carregados do banco ou .env
+- [ ] Integração com Settings model
 
 ---
 
