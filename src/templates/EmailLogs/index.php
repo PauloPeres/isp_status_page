@@ -373,10 +373,7 @@ $this->assign('title', 'Logs de Emails');
                 <?php foreach ($emailLogs as $log): ?>
                     <tr>
                         <td>
-                            <strong><?= h($log->created->i18nFormat('dd/MM/yyyy')) ?></strong><br>
-                            <span style="color: #666; font-size: 13px;">
-                                <?= h($log->created->i18nFormat('HH:mm:ss')) ?>
-                            </span>
+                            <span class="local-datetime" data-utc="<?= $log->created->format('c') ?>"></span>
                         </td>
                         <td>
                             <strong><?= h($log->recipient) ?></strong>
@@ -396,7 +393,7 @@ $this->assign('title', 'Logs de Emails');
                                 <span class="badge badge-success">Enviado</span>
                                 <?php if ($log->sent_at): ?>
                                     <br><span style="color: #999; font-size: 12px;">
-                                        <?= $log->sent_at->i18nFormat('dd/MM HH:mm') ?>
+                                        <span class="local-datetime" data-utc="<?= $log->sent_at->format('c') ?>"></span>
                                     </span>
                                 <?php endif; ?>
                             <?php elseif ($log->status === 'failed'): ?>

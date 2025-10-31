@@ -35,6 +35,7 @@
         </main>
     </div>
 
+    <?= $this->Html->script('datetime-utils') ?>
     <?= $this->fetch('script') ?>
 </body>
 </html>

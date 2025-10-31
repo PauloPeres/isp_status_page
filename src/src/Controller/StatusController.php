@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Service\SettingService;
+
 /**
  * Status Controller
  *
@@ -10,6 +12,23 @@ namespace App\Controller;
  */
 class StatusController extends AppController
 {
+    /**
+     * Setting service instance
+     *
+     * @var \App\Service\SettingService
+     */
+    private SettingService $settingService;
+
+    /**
+     * Initialize method
+     *
+     * @return void
+     */
+    public function initialize(): void
+    {
+        parent::initialize();
+        $this->settingService = new SettingService();
+    }
     /**
      * Before filter callback
      *
@@ -32,6 +51,11 @@ class StatusController extends AppController
     public function index()
     {
         $this->viewBuilder()->setLayout('public');
+
+        // Enable caching for 30 seconds
+        $this->response = $this->response
+            ->withCache('-30 seconds', '+30 seconds')
+            ->withHeader('Cache-Control', 'public, max-age=30');
 
         // Get all active monitors
         $monitors = $this->fetchTable('Monitors')
@@ -87,6 +111,10 @@ class StatusController extends AppController
             ->limit(5)
             ->all();
 
+        // Load settings
+        $siteName = $this->settingService->get('site_name', 'ISP Status');
+        $statusPageTitle = $this->settingService->get('status_page_title', 'Status dos Serviços');
+
         // Set HTTP status code based on system status
         if ($systemStatus === 'major-outage') {
             $this->response = $this->response->withStatus(503); // Service Unavailable
@@ -103,7 +131,9 @@ class StatusController extends AppController
             'onlineMonitors',
             'offlineMonitors',
             'degradedMonitors',
-            'recentIncidents'
+            'recentIncidents',
+            'siteName',
+            'statusPageTitle'
         ));
     }
 

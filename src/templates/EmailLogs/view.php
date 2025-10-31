@@ -41,9 +41,9 @@ $this->assign('title', 'Detalhes do Email');
                 </h2>
                 <p>
                     <?php if ($emailLog->sent_at): ?>
-                        Enviado em <?= $emailLog->sent_at->i18nFormat('dd/MM/yyyy HH:mm:ss') ?>
+                        Enviado em <span class="local-datetime" data-utc="<?= $emailLog->sent_at->format('c') ?>"></span>
                     <?php else: ?>
-                        Criado em <?= $emailLog->created->i18nFormat('dd/MM/yyyy HH:mm:ss') ?>
+                        Criado em <span class="local-datetime" data-utc="<?= $emailLog->created->format('c') ?>"></span>
                     <?php endif; ?>
                 </p>
             </div>
@@ -73,13 +73,13 @@ $this->assign('title', 'Detalhes do Email');
 
             <div class="detail-item">
                 <span class="detail-label">Data de Criação:</span>
-                <span><?= $emailLog->created->format('d/m/Y H:i:s') ?></span>
+                <span class="local-datetime" data-utc="<?= $emailLog->created->format('c') ?>"></span>
             </div>
 
             <?php if ($emailLog->sent_at): ?>
                 <div class="detail-item">
                     <span class="detail-label">Data de Envio:</span>
-                    <span><?= $emailLog->sent_at->format('d/m/Y H:i:s') ?></span>
+                    <span class="local-datetime" data-utc="<?= $emailLog->sent_at->format('c') ?>"></span>
                 </div>
 
                 <div class="detail-item">
@@ -132,9 +132,9 @@ $this->assign('title', 'Detalhes do Email');
                         <p><?= h($emailLog->incident->description) ?></p>
                     <?php endif; ?>
                     <div class="incident-meta">
-                        <span>Iniciado: <?= $emailLog->incident->started_at->format('d/m/Y H:i') ?></span>
+                        <span>Iniciado: <span class="local-datetime" data-utc="<?= $emailLog->incident->started_at->format('c') ?>"></span></span>
                         <?php if ($emailLog->incident->resolved_at): ?>
-                            <span>Resolvido: <?= $emailLog->incident->resolved_at->format('d/m/Y H:i') ?></span>
+                            <span>Resolvido: <span class="local-datetime" data-utc="<?= $emailLog->incident->resolved_at->format('c') ?>"></span></span>
                         <?php endif; ?>
                         <?= $this->Html->link(
                             'Ver Incidente',

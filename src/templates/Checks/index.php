@@ -391,10 +391,7 @@ $this->assign('title', 'Verificações de Monitores');
                 <?php foreach ($checks as $check): ?>
                     <tr>
                         <td>
-                            <strong><?= h($check->checked_at->i18nFormat('dd/MM/yyyy')) ?></strong><br>
-                            <span style="color: #666; font-size: 13px;">
-                                <?= h($check->checked_at->i18nFormat('HH:mm:ss')) ?>
-                            </span>
+                            <span class="local-datetime" data-utc="<?= $check->checked_at->format('c') ?>"></span>
                         </td>
                         <td>
                             <?= $this->Html->link(

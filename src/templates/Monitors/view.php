@@ -117,7 +117,13 @@ $this->assign('title', 'Detalhes do Monitor');
 
             <div class="detail-item">
                 <span class="detail-label">Última Verificação:</span>
-                <span><?= $monitor->last_check ? $monitor->last_check->format('d/m/Y H:i:s') : 'Nunca' ?></span>
+                <span>
+                    <?php if ($monitor->last_check_at): ?>
+                        <span class="local-datetime" data-utc="<?= $monitor->last_check_at->format('c') ?>"></span>
+                    <?php else: ?>
+                        Nunca
+                    <?php endif; ?>
+                </span>
             </div>
 
             <div class="detail-item">
@@ -127,12 +133,12 @@ $this->assign('title', 'Detalhes do Monitor');
 
             <div class="detail-item">
                 <span class="detail-label">Criado em:</span>
-                <span><?= $monitor->created->format('d/m/Y H:i:s') ?></span>
+                <span class="local-datetime" data-utc="<?= $monitor->created->format('c') ?>"></span>
             </div>
 
             <div class="detail-item">
                 <span class="detail-label">Última Atualização:</span>
-                <span><?= $monitor->modified->format('d/m/Y H:i:s') ?></span>
+                <span class="local-datetime" data-utc="<?= $monitor->modified->format('c') ?>"></span>
             </div>
         </div>
     </div>
@@ -161,7 +167,7 @@ $this->assign('title', 'Detalhes do Monitor');
                                 <td>
                                     <span class="status-indicator status-<?= h($check->status) ?>"></span>
                                 </td>
-                                <td><?= $check->created->format('d/m/Y H:i:s') ?></td>
+                                <td><span class="local-datetime" data-utc="<?= $check->created->format('c') ?>"></span></td>
                                 <td>
                                     <?php if ($check->response_time): ?>
                                         <span class="<?= $check->response_time > 1000 ? 'text-error' : ($check->response_time > 500 ? 'text-warning' : 'text-success') ?>">
@@ -218,9 +224,9 @@ $this->assign('title', 'Detalhes do Monitor');
                         </div>
                         <p><?= h($incident->description) ?></p>
                         <div class="incident-meta">
-                            <span>📅 Iniciado: <?= $incident->started_at->format('d/m/Y H:i') ?></span>
+                            <span>📅 Iniciado: <span class="local-datetime" data-utc="<?= $incident->started_at->format('c') ?>"></span></span>
                             <?php if ($incident->resolved_at): ?>
-                                <span>✅ Resolvido: <?= $incident->resolved_at->format('d/m/Y H:i') ?></span>
+                                <span>✅ Resolvido: <span class="local-datetime" data-utc="<?= $incident->resolved_at->format('c') ?>"></span></span>
                                 <span>⏱️ Duração: <?= gmdate('H:i:s', $incident->duration ?? 0) ?></span>
                             <?php endif; ?>
                         </div>

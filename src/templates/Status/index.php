@@ -10,11 +10,19 @@
  * @var int $offlineMonitors
  * @var int $degradedMonitors
  * @var \Cake\Collection\CollectionInterface $recentIncidents
+ * @var string $siteName
+ * @var string $statusPageTitle
  */
-$this->assign('title', 'Status dos Serviços');
+$this->assign('title', $statusPageTitle);
 ?>
 
 <div class="container">
+    <!-- Page Header -->
+    <div class="page-header-status">
+        <h1><?= h($statusPageTitle) ?></h1>
+        <p class="site-name"><?= h($siteName) ?></p>
+    </div>
+
     <!-- System Status Banner -->
     <div class="status-banner <?= $systemStatus ?>">
         <div class="status-icon"><?= $systemIcon ?></div>
@@ -45,6 +53,16 @@ $this->assign('title', 'Status dos Serviços');
                                 <?php if ($monitor->description): ?>
                                     <p class="service-description"><?= h($monitor->description) ?></p>
                                 <?php endif; ?>
+                                <?php if ($monitor->last_check_at): ?>
+                                    <p class="service-last-check">
+                                        Última verificação: <span class="local-datetime" data-utc="<?= $monitor->last_check_at->format('c') ?>"></span>
+                                        (<span class="time-ago" data-utc="<?= $monitor->last_check_at->format('c') ?>"></span>)
+                                    </p>
+                                <?php else: ?>
+                                    <p class="service-last-check">
+                                        Aguardando primeira verificação
+                                    </p>
+                                <?php endif; ?>
                             </div>
                         </div>
                         <span class="service-status-badge <?= $monitor->status === 'up' ? 'operational' : ($monitor->status === 'down' ? 'down' : 'degraded') ?>">
@@ -65,12 +83,6 @@ $this->assign('title', 'Status dos Serviços');
                             <span>🔍</span>
                             <span><?= h(ucfirst($monitor->type)) ?></span>
                         </div>
-                        <?php if ($monitor->last_check): ?>
-                            <div class="service-detail-item">
-                                <span>🕐</span>
-                                <span>Última verificação: <?= $monitor->last_check->timeAgoInWords() ?></span>
-                            </div>
-                        <?php endif; ?>
                         <?php if ($monitor->response_time): ?>
                             <div class="service-detail-item">
                                 <span>⚡</span>
@@ -148,14 +160,65 @@ $this->assign('title', 'Status dos Serviços');
             </button>
         <?= $this->Form->end() ?>
     </div>
+
 </div>
 
-<script>
-// Auto-refresh page every 30 seconds
-setTimeout(function() {
-    location.reload();
-}, 30000);
+<!-- Auto-reload Indicator -->
+<div class="auto-reload-indicator">
+    <span id="reload-message">Próxima atualização em: <strong id="countdown">300</strong> segundos</span>
+</div>
 
-// Show last update time
-console.log('Última atualização: ' + new Date().toLocaleString('pt-BR'));
+<style>
+.auto-reload-indicator {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #666;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+#countdown {
+    color: var(--color-primary);
+    font-weight: 600;
+}
+</style>
+
+<script>
+// Auto-refresh page every 5 minutes (300 seconds)
+const RELOAD_INTERVAL = 300; // seconds
+let secondsRemaining = RELOAD_INTERVAL;
+let countdownInterval;
+
+// Function to update countdown display
+function updateCountdown() {
+    const countdownElement = document.getElementById('countdown');
+    if (countdownElement) {
+        countdownElement.textContent = secondsRemaining;
+    }
+
+    secondsRemaining--;
+
+    if (secondsRemaining < 0) {
+        clearInterval(countdownInterval);
+        location.reload();
+    }
+}
+
+// Start countdown when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Dates are converted automatically by datetime-utils.js
+
+    // Update countdown every second
+    countdownInterval = setInterval(updateCountdown, 1000);
+
+    // Show last update time in console
+    console.log('Última atualização: ' + new Date().toLocaleString('pt-BR'));
+    console.log('Próxima atualização em 5 minutos');
+});
 </script>

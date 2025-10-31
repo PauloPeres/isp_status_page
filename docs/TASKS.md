@@ -1168,8 +1168,8 @@ bin/cake bake model Monitors --no-test --no-fixture
 ---
 
 ### TASK-230: Status Page Controller
-**Status**: 🔴 | **Prioridade**: 🔥 | **Dependências**: TASK-200, TASK-220, TASK-121
-**Estimativa**: 4h
+**Status**: ✅ | **Prioridade**: 🔥 | **Dependências**: TASK-200, TASK-220, TASK-121
+**Estimativa**: 4h | **Concluído em**: 31/10/2025
 
 **Descrição**: Criar página pública de status.
 
@@ -1180,6 +1180,7 @@ bin/cake bake model Monitors --no-test --no-fixture
 - View com todos os monitores
 - Indicadores visuais por status
 - Últimos incidentes
+- Auto Reload (refresh), default de 5 em 5 minutos
 
 **Arquivos a criar**:
 - `src/Controller/StatusController.php`
@@ -1188,11 +1189,21 @@ bin/cake bake model Monitors --no-test --no-fixture
 - `tests/TestCase/Controller/StatusControllerTest.php`
 
 **Critérios de Aceite**:
-- [ ] Retorna 200 quando tudo OK
-- [ ] Retorna 503 quando algo DOWN
-- [ ] Cache funcional
-- [ ] UI clara e informativa
-- [ ] Responsiva
+- [x] Retorna 200 quando tudo OK
+- [x] Retorna 503 quando algo DOWN
+- [x] Cache funcional
+- [x] UI clara e informativa
+- [x] Responsiva
+- [x] Auto reload logic, mostrando que vamos fazer reload da pagina
+
+**Notas de Implementação**:
+- StatusController já existia com toda lógica principal implementada
+- Adicionado cache HTTP de 30 segundos com headers `Cache-Control: public, max-age=30`
+- Controller retorna HTTP 200 (all operational), 500 (partial outage), ou 503 (major outage)
+- Template atualizado com auto-reload de 5 minutos (300 segundos)
+- Implementado contador regressivo visual mostrando segundos até próximo reload
+- Indicador com ícone rotativo e mensagem em português: "Próxima atualização em: X segundos"
+- Todas as funcionalidades testadas e funcionando corretamente
 
 ---
 

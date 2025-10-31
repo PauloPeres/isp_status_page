@@ -4,7 +4,7 @@
     <?= $this->Html->charset() ?>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>
-        <?= $this->fetch('title') ?> - ISP Status
+        <?= $this->fetch('title') ?><?php if (isset($siteName)): ?> - <?= h($siteName) ?><?php else: ?> - ISP Status<?php endif; ?>
     </title>
 
     <!-- Favicon -->
@@ -30,6 +30,7 @@
 
     <?= $this->element('public/footer') ?>
 
+    <?= $this->Html->script('datetime-utils') ?>
     <?= $this->fetch('script') ?>
 </body>
 </html>

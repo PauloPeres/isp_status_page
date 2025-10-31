@@ -487,10 +487,7 @@ $this->assign('title', 'Incidentes');
                             </span>
                         </td>
                         <td>
-                            <strong><?= h($incident->started_at->i18nFormat('dd/MM/yyyy')) ?></strong><br>
-                            <span style="color: #666; font-size: 13px;">
-                                <?= h($incident->started_at->i18nFormat('HH:mm:ss')) ?>
-                            </span>
+                            <span class="local-datetime" data-utc="<?= $incident->started_at->format('c') ?>"></span>
                         </td>
                         <td>
                             <?php if ($incident->duration !== null): ?>

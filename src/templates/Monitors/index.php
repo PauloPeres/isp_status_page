@@ -514,10 +514,7 @@ $this->assign('title', 'Monitores');
                         </td>
                         <td>
                             <?php if ($monitor->last_check_at): ?>
-                                <strong><?= h($monitor->last_check_at->i18nFormat('dd/MM/yyyy')) ?></strong><br>
-                                <span style="color: #666; font-size: 13px;">
-                                    <?= h($monitor->last_check_at->i18nFormat('HH:mm:ss')) ?>
-                                </span>
+                                <span class="local-datetime" data-utc="<?= $monitor->last_check_at->format('c') ?>"></span>
                             <?php else: ?>
                                 <span style="color: #999;">Nunca</span>
                             <?php endif; ?>
