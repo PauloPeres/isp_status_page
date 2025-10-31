@@ -18,20 +18,19 @@
         'url' => ['controller' => 'Subscribers', 'action' => 'subscribe'],
         'class' => 'subscribe-form'
     ]) ?>
-        <div class="form-group">
-            <?= $this->Form->control('email', [
-                'type' => 'email',
-                'placeholder' => 'seu@email.com',
-                'required' => true,
-                'label' => false,
-                'class' => 'subscribe-input',
-                'autocomplete' => 'email'
-            ]) ?>
-            <button type="submit" class="subscribe-button">
-                <span class="button-icon">📬</span>
-                <span class="button-text">Inscrever-se</span>
-            </button>
-        </div>
+        <?= $this->Form->control('email', [
+            'type' => 'email',
+            'placeholder' => 'seu@email.com',
+            'required' => true,
+            'label' => false,
+            'class' => 'subscribe-input',
+            'autocomplete' => 'email'
+        ]) ?>
+
+        <button type="submit" class="subscribe-button">
+            <span class="button-icon">📬</span>
+            <span class="button-text">Inscrever-se</span>
+        </button>
 
         <div class="subscribe-notice">
             <small>

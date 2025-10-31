@@ -1255,8 +1255,8 @@ bin/cake bake model Monitors --no-test --no-fixture
 ---
 
 ### TASK-240: Subscriber Model
-**Status**: 🔴 | **Prioridade**: 💡 | **Dependências**: TASK-150
-**Estimativa**: 2h
+**Status**: ✅ | **Prioridade**: 💡 | **Dependências**: TASK-150
+**Estimativa**: 2h | **Concluído em**: 31/10/2025
 
 **Descrição**: Criar Models Subscriber e Subscription.
 
@@ -1274,9 +1274,32 @@ bin/cake bake model Monitors --no-test --no-fixture
 - `tests/Fixture/SubscribersFixture.php`
 
 **Critérios de Aceite**:
-- [ ] Models com validações
-- [ ] Tokens gerados automaticamente
-- [ ] Associações corretas
+- [x] Models com validações
+- [x] Tokens gerados automaticamente
+- [x] Associações corretas
+
+**Notas de Implementação**:
+- **Subscriber Entity** (src/Model/Entity/Subscriber.php):
+  - Métodos: `generateVerificationToken()`, `generateUnsubscribeToken()`
+  - Helpers: `isVerified()`, `isActive()`, `canReceiveNotifications()`
+  - Tokens gerados com bin2hex(random_bytes(32)) - 64 caracteres hexadecimais
+- **SubscribersTable** (src/Model/Table/SubscribersTable.php):
+  - Validações: email único e obrigatório, name opcional
+  - Validação de tokens (max 255 chars)
+  - Associação: hasMany Subscriptions
+  - Rules: isUnique para email
+- **Subscription Entity** (src/Model/Entity/Subscription.php):
+  - Flags de notificação: notify_on_down, notify_on_up, notify_on_degraded
+  - Suporta subscrição global (monitor_id = null) ou específica
+- **SubscriptionsTable** (src/Model/Table/SubscriptionsTable.php):
+  - Validações para todos os campos booleanos
+  - Associações: belongsTo Subscribers, belongsTo Monitors
+  - Rules: existsIn para integridade referencial
+- **Fixtures de Teste**:
+  - SubscribersFixture.php: 4 registros (verified, unverified, inactive)
+  - SubscriptionsFixture.php: 4 registros (específicos e global)
+- Todos os modelos incluem TimestampBehavior
+- Estrutura pronta para implementar fluxo de subscrição/verificação
 
 ---
 

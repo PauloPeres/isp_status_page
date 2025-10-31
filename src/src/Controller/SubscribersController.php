@@ -7,9 +7,112 @@ namespace App\Controller;
  * Subscribers Controller
  *
  * @property \App\Model\Table\SubscribersTable $Subscribers
+ * @property \App\Model\Table\SubscriptionsTable $Subscriptions
  */
 class SubscribersController extends AppController
 {
+    /**
+     * Before filter callback
+     *
+     * @param \Cake\Event\EventInterface $event The event.
+     * @return \Cake\Http\Response|null|void
+     */
+    public function beforeFilter(\Cake\Event\EventInterface $event)
+    {
+        parent::beforeFilter($event);
+
+        // Allow public access to subscribe actions
+        $this->Authentication->addUnauthenticatedActions(['subscribe', 'verify', 'unsubscribe']);
+    }
+
+    /**
+     * Subscribe method - Public subscription form
+     *
+     * @return \Cake\Http\Response|null Redirects to status page
+     */
+    public function subscribe()
+    {
+        $this->request->allowMethod(['post']);
+
+        $email = $this->request->getData('email');
+
+        if (empty($email)) {
+            $this->Flash->error(__('Por favor, informe um email válido.'));
+            return $this->redirect(['controller' => 'Status', 'action' => 'index']);
+        }
+
+        // Check if subscriber already exists
+        $subscriber = $this->Subscribers->find()
+            ->where(['email' => $email])
+            ->first();
+
+        if ($subscriber) {
+            // Subscriber already exists
+            if ($subscriber->verified && $subscriber->active) {
+                $this->Flash->info(__('Este email já está inscrito e ativo.'));
+                return $this->redirect(['controller' => 'Status', 'action' => 'index']);
+            }
+
+            if (!$subscriber->verified) {
+                // Resend verification
+                if (empty($subscriber->verification_token)) {
+                    $subscriber->generateVerificationToken();
+                }
+                $subscriber->active = true;
+                $this->Subscribers->save($subscriber);
+
+                // TODO: Send verification email
+                $this->Flash->success(__('Um email de verificação foi enviado para {0}.', $email));
+                return $this->redirect(['controller' => 'Status', 'action' => 'index']);
+            }
+
+            if (!$subscriber->active) {
+                // Reactivate
+                $subscriber->active = true;
+                $this->Subscribers->save($subscriber);
+                $this->Flash->success(__('Sua inscrição foi reativada com sucesso!'));
+                return $this->redirect(['controller' => 'Status', 'action' => 'index']);
+            }
+        }
+
+        // Create new subscriber
+        $subscriber = $this->Subscribers->newEntity([
+            'email' => $email,
+            'verified' => false,
+            'active' => true,
+        ]);
+
+        // Generate tokens
+        $subscriber->generateVerificationToken();
+        $subscriber->generateUnsubscribeToken();
+
+        if ($this->Subscribers->save($subscriber)) {
+            // Create global subscription (all monitors)
+            $SubscriptionsTable = $this->fetchTable('Subscriptions');
+            $subscription = $SubscriptionsTable->newEntity([
+                'subscriber_id' => $subscriber->id,
+                'monitor_id' => null, // Global - all monitors
+                'notify_on_down' => true,
+                'notify_on_up' => false,
+                'notify_on_degraded' => true,
+            ]);
+
+            $SubscriptionsTable->save($subscription);
+
+            // TODO: Send verification email when EmailService is ready
+            $this->Flash->success(__('Obrigado por se inscrever! Um email de verificação foi enviado para {0}.', $email));
+        } else {
+            $errors = $subscriber->getErrors();
+            if (isset($errors['email']['unique'])) {
+                $this->Flash->error(__('Este email já está cadastrado.'));
+            } else {
+                $this->Flash->error(__('Não foi possível completar a inscrição. Por favor, tente novamente.'));
+            }
+        }
+
+        return $this->redirect(['controller' => 'Status', 'action' => 'index']);
+    }
+
     /**
      * Index method - List all subscribers with filters
      *
