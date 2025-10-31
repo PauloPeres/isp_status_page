@@ -10,6 +10,9 @@
         </div>
 
         <div class="footer-right">
+            <a href="https://www.datacake.com.br" target="_blank" class="footer-link">
+                Datacake
+            </a>
             <a href="https://github.com/PauloPeres/isp_status_page" target="_blank" class="footer-link">
                 📚 Documentação
             </a>

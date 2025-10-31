@@ -636,28 +636,34 @@ bin/cake bake model Monitors --no-test --no-fixture
 ---
 
 ### TASK-211: HTTP Checker
-**Status**: 🔴 | **Prioridade**: 🔥 | **Dependências**: TASK-210
-**Estimativa**: 3h
+**Status**: 🟢 **COMPLETO** | **Prioridade**: 🔥 | **Dependências**: TASK-210
+**Estimativa**: 3h | **Tempo Real**: 2h
 
 **Descrição**: Implementar checker para monitores HTTP/HTTPS.
 
-**Implementar**:
-- Request HTTP
-- Validação de status code
-- Medição de response time
-- Validação de conteúdo (opcional)
-- Timeout handling
+**Implementado**:
+- ✅ Request HTTP/HTTPS usando Cake\Http\Client
+- ✅ Validação de status code (expected_status_code)
+- ✅ Medição de response time (milliseconds)
+- ✅ Detecção de degraded performance (>80% timeout)
+- ✅ Timeout handling configurável
+- ✅ Headers customizáveis via configuration
+- ✅ SSL verification toggle
+- ✅ Auto-adiciona https:// se URL sem scheme
+- ✅ Validação de URL (rejeita ftp://, javascript:, etc)
+- ✅ Error messages user-friendly
+- ✅ Seguir redirects automático
 
-**Arquivos a criar**:
-- `src/Service/Check/HttpChecker.php`
-- `tests/TestCase/Service/Check/HttpCheckerTest.php`
+**Arquivos criados**:
+- `src/Service/Check/HttpChecker.php` - ✅ 320 linhas
+- `tests/TestCase/Service/Check/HttpCheckerTest.php` - ✅ 14 testes
 
 **Critérios de Aceite**:
-- [ ] Faz request HTTP corretamente
-- [ ] Valida status code
-- [ ] Mede response time
-- [ ] Trata erros e timeouts
-- [ ] Testes com mocks passando
+- [x] Faz request HTTP corretamente
+- [x] Valida status code
+- [x] Mede response time
+- [x] Trata erros e timeouts
+- [x] Testes com mocks passando (14/14 testes, 28 assertions)
 
 ---
 
