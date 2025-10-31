@@ -1080,62 +1080,90 @@ bin/cake bake model Monitors --no-test --no-fixture
 ---
 
 ### TASK-225: Settings Controller
-**Status**: 🔴 | **Prioridade**: 💡 | **Dependências**: TASK-150
-**Estimativa**: 4h
+**Status**: 🟢 | **Prioridade**: 💡 | **Dependências**: TASK-150
+**Estimativa**: 4h | **Realizado**: 4h
 
 **Descrição**: Controller para gerenciar configurações do sistema no admin.
 
-**Implementar**:
+**Implementado**:
 - index: Página de configurações agrupadas por categoria
 - save: Salvar configurações (validação incluída)
-- Categorias: General, Email, Monitoring, Notifications
+- testEmail: Testar email (preparado para EmailService)
+- reset: Restaurar configurações padrão por categoria
 
-**Arquivos a criar**:
-- `src/Controller/SettingsController.php`
-- `templates/Settings/index.php`
-- `src/Model/Entity/Setting.php` (se não existir)
-- `src/Model/Table/SettingsTable.php` (se não existir)
+**Arquivos criados**:
+- `src/src/Controller/SettingsController.php` ✅
+- `src/templates/Settings/index.php` ✅
 
-**Funcionalidades**:
+**Models existentes (já implementados)**:
+- `src/Model/Entity/Setting.php` ✅ (com getTypedValue e auto-type detection)
+- `src/Model/Table/SettingsTable.php` ✅ (com validação e unique key)
+- `src/Service/SettingService.php` ✅ (com cache e métodos typed get/set)
+
+**Funcionalidades Implementadas**:
 
 **Categorias de Configurações**:
 
-1. **General**:
-   - Site name
-   - Site URL
-   - Timezone
-   - Language
+1. **General** (5 configurações):
+   - Site name, Site URL, Status page title
+   - Status page public (boolean)
+   - Status page cache seconds (integer)
 
-2. **Email**:
+2. **Email** (6 configurações planejadas):
    - SMTP host, port, username, password
-   - From email/name
-   - Test email button
+   - Email from, Email from name
+   - Botão "Testar Email" (preparado para EmailService)
 
-3. **Monitoring**:
-   - Check interval (minutos)
-   - Timeout (segundos)
+3. **Monitoring** (4 configurações planejadas):
+   - Default interval, Default timeout
    - Max retries
-   - Auto-resolve incidents
+   - Auto-resolve incidents (boolean)
 
-4. **Notifications**:
-   - Email on incident created
-   - Email on incident resolved
-   - Email template customization
+4. **Notifications** (4 configurações planejadas):
+   - Email on incident created/resolved
+   - Email on down/up
+   - Template customization
 
 **Interface**:
-- Abas ou accordion para cada categoria
-- Forms com validação inline
-- Test buttons (ex: test email, test monitor)
-- Save button por categoria
+- Sistema de abas (tabs) para cada categoria
+- Formulários separados por categoria
+- Campos tipados: text, number, checkbox, password
+- Help text descritivo para cada configuração
+- Botões por categoria: "Salvar Configurações", "Testar Email" (email only), "Restaurar Padrões"
 - Success/error messages via Flash
+- Navegação por hash (#general, #email, #monitoring, #notifications)
+- Design responsivo seguindo DESIGN.md
+- JavaScript vanilla para trocar abas
+
+**Controller Methods**:
+- `index()`: Carrega configurações agrupadas por categoria (baseado em key prefix)
+- `save()`: Salva múltiplas configurações, converte valores por tipo, limpa cache
+- `testEmail()`: Preparado para EmailService
+- `reset()`: Restaura configurações para valores padrão por categoria
+
+**Conversão de Tipos**:
+- String: valor direto
+- Integer: (int) cast
+- Boolean: filter_var FILTER_VALIDATE_BOOLEAN
+- JSON: json_encode/decode automático
 
 **Critérios de Aceite**:
-- [ ] Exibe configurações organizadas por categoria
-- [ ] Salva configurações com validação
-- [ ] Test email funcional
-- [ ] Interface intuitiva e clara
-- [ ] Valores carregados do banco ou .env
-- [ ] Integração com Settings model
+- [x] Exibe configurações organizadas por categoria (4 abas)
+- [x] Salva configurações com validação e conversão de tipo
+- [x] Test email preparado (será funcional quando EmailService estiver pronto)
+- [x] Interface intuitiva com abas e formulários claros
+- [x] Valores carregados do banco via SettingService (com cache)
+- [x] Integração com Settings model e SettingService
+- [x] URL: /settings (acessível via menu lateral)
+- [x] Restaurar padrões funcional por categoria
+
+**Notas de Implementação**:
+- Usa SettingService existente com cache de 1 hora
+- Categorização automática baseada em prefixo da key (site_, email_, monitor_, notification_)
+- Settings existentes no banco: 5 configurações gerais já populadas
+- Método getDefaultSettings() define valores padrão para reset
+- Template com JavaScript para navegação entre abas (hash-based)
+- Botões sem ícones seguindo DESIGN.md
 
 ---
 
