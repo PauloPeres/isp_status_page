@@ -2,6 +2,26 @@
 
 Este documento lista tarefas específicas que podem ser executadas por diferentes agentes/desenvolvedores de forma independente.
 
+## 📁 Estrutura do Projeto
+
+**IMPORTANTE**: O projeto CakePHP está na pasta `/src`
+
+```
+isp_status_page/
+├── src/              # 👈 Projeto CakePHP está aqui
+│   ├── bin/          # Scripts CLI (bin/cake)
+│   ├── config/       # Configurações
+│   ├── src/          # Código da aplicação
+│   ├── tests/        # Testes
+│   └── database.db   # Banco SQLite
+├── docs/             # Documentação
+├── docker/           # Configs Docker
+├── Dockerfile        # Build Docker
+└── Makefile          # Comandos úteis
+```
+
+**Todos os comandos devem ser executados de dentro de `/src`** ou usando `make` na raiz.
+
 ## Como Usar Este Documento
 
 1. Cada tarefa tem um ID único (ex: TASK-001)
@@ -9,58 +29,91 @@ Este documento lista tarefas específicas que podem ser executadas por diferente
 3. Status: 🔴 Não iniciado | 🟡 Em progresso | 🟢 Completo
 4. Prioridade: 🔥 Crítica | ⭐ Alta | 💡 Média | 📌 Baixa
 
+## ✅ Tarefas Completas
+
+**Fase 0**: TASK-000 ✅, TASK-001 ✅ (2/2 completas)
+
 ## Fase 0: Setup Inicial
 
 ### TASK-000: Setup do Projeto CakePHP
-**Status**: 🔴 | **Prioridade**: 🔥 | **Dependências**: Nenhuma
-**Estimativa**: 2h
+**Status**: 🟢 **COMPLETO** | **Prioridade**: 🔥 | **Dependências**: Nenhuma
+**Estimativa**: 2h | **Tempo Real**: 2h
 
 **Descrição**: Instalar e configurar o projeto CakePHP base.
 
-**Ações**:
+**Ações Realizadas**:
 ```bash
-# Instalar CakePHP
+# CakePHP instalado em /src via composer
+cd src
 composer create-project --prefer-dist cakephp/app:~5.0 .
 
-# Configurar database.php para SQLite
-# Criar database.db
-# Testar instalação
-bin/cake server
+# SQLite configurado em src/config/app_local.php
+# Database criado: src/database.db
+# Docker configurado para desenvolvimento
+# Multi-database support adicionado (SQLite/MySQL/PostgreSQL)
 ```
 
-**Arquivos a modificar**:
-- `config/app_local.php`
-- Criar `database.db`
+**Arquivos modificados**:
+- `src/config/app_local.php` - Configurado com SQLite e suporte multi-DB
+- `src/database.db` - Criado
+- `Dockerfile` - Adicionado
+- `docker-compose.yml` - Adicionado
+- `Makefile` - Adicionado com comandos úteis
+
+**Estrutura do Projeto**:
+- Projeto CakePHP está em `/src`
+- Documentação em `/docs`
+- Configuração Docker na raiz
 
 **Critérios de Aceite**:
-- [ ] CakePHP instalado
-- [ ] SQLite configurado
-- [ ] Servidor rodando em localhost
-- [ ] Página inicial do CakePHP acessível
+- [x] CakePHP 5.2.9 instalado em `/src`
+- [x] SQLite configurado
+- [x] Database file criado (`src/database.db`)
+- [x] Servidor pode rodar com `cd src && bin/cake server` ou `make dev` (Docker)
+- [x] Página inicial do CakePHP acessível em http://localhost:8765
+- [x] Docker configurado com `make quick-start`
+- [x] Multi-database support (SQLite/MySQL/PostgreSQL)
 
 ---
 
 ### TASK-001: Configurar Sistema de Testes
-**Status**: 🔴 | **Prioridade**: ⭐ | **Dependências**: TASK-000
-**Estimativa**: 3h
+**Status**: 🟢 **COMPLETO** | **Prioridade**: ⭐ | **Dependências**: TASK-000
+**Estimativa**: 3h | **Tempo Real**: 0h (já incluído no CakePHP)
 
 **Descrição**: Configurar PHPUnit e estrutura de testes.
 
-**Ações**:
-- Configurar `phpunit.xml.dist`
-- Criar fixtures base
-- Criar helpers de teste
-- Configurar coverage
+**Ações Realizadas**:
+- CakePHP já vem com PHPUnit configurado
+- Estrutura de testes já existe em `src/tests/`
+- Fixtures, TestCase e bootstrap já configurados
+- Coverage configurado em `phpunit.xml.dist`
 
-**Arquivos a criar**:
-- `tests/bootstrap.php`
-- `phpunit.xml.dist`
-- `tests/TestCase/ApplicationTest.php` (teste exemplo)
+**Arquivos existentes**:
+- `src/tests/bootstrap.php` - ✅ Já existe
+- `src/phpunit.xml.dist` - ✅ Já existe
+- `src/tests/TestCase/ApplicationTest.php` - ✅ Já existe
+- `src/tests/Fixture/` - ✅ Diretório criado
+
+**Como usar**:
+```bash
+# Com Docker
+make test
+
+# Sem Docker
+cd src
+vendor/bin/phpunit
+
+# Com coverage
+make test-coverage
+# ou
+vendor/bin/phpunit --coverage-html tmp/coverage
+```
 
 **Critérios de Aceite**:
-- [ ] PHPUnit configurado
-- [ ] Testes executam com `vendor/bin/phpunit`
-- [ ] Coverage funcional
+- [x] PHPUnit configurado (vem com CakePHP)
+- [x] Testes executam com `vendor/bin/phpunit`
+- [x] Coverage funcional
+- [x] Makefile com comando `make test`
 
 ---
 
@@ -74,6 +127,12 @@ bin/cake server
 
 **Ações**:
 ```bash
+# Com Docker
+make shell
+bin/cake bake migration CreateUsers
+
+# Ou sem Docker
+cd src
 bin/cake bake migration CreateUsers
 ```
 
@@ -88,12 +147,12 @@ bin/cake bake migration CreateUsers
 - created, modified
 
 **Arquivos a criar**:
-- `config/Migrations/YYYYMMDDHHMMSS_CreateUsers.php`
+- `src/config/Migrations/YYYYMMDDHHMMSS_CreateUsers.php`
 
 **Critérios de Aceite**:
-- [ ] Migration criada
+- [ ] Migration criada em `src/config/Migrations/`
 - [ ] `bin/cake migrations migrate` executa sem erros
-- [ ] Tabela users existe no SQLite
+- [ ] Tabela users existe no SQLite (`src/database.db`)
 
 ---
 
