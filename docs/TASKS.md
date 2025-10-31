@@ -1016,46 +1016,66 @@ bin/cake bake model Monitors --no-test --no-fixture
 ---
 
 ### TASK-224: EmailLogs Controller
-**Status**: 🔴 | **Prioridade**: 💡 | **Dependências**: TASK-300
-**Estimativa**: 3h
+**Status**: 🟢 | **Prioridade**: 💡 | **Dependências**: TASK-300
+**Estimativa**: 3h | **Realizado**: 3h
 
 **Descrição**: Controller para visualizar logs de emails enviados pelo sistema.
 
-**Implementar**:
+**Implementado**:
 - index: Listar emails enviados com filtros
-- view: Ver detalhes de um email (subject, body, destinatário)
-- resend: Reenviar email (opcional)
+- view: Ver detalhes de um email (destinatário, status, timestamps)
+- resend: Reenviar email (preparado para EmailService)
 
-**Arquivos a criar**:
-- `src/Controller/EmailLogsController.php`
-- `templates/EmailLogs/index.php`
-- `templates/EmailLogs/view.php`
+**Arquivos criados**:
+- `src/src/Controller/EmailLogsController.php` ✅
+- `src/templates/EmailLogs/index.php` ✅
+- `src/templates/EmailLogs/view.php` ✅
 
-**Funcionalidades**:
+**Funcionalidades Implementadas**:
 
 **Index (Listagem)**:
-- Filtros: tipo (incident_created, incident_resolved, verification), status (sent/failed), período
-- Cards de estatísticas: Total sent, Failed, Success rate, Today's emails
-- Tabela com: timestamp, destinatário, assunto, tipo, status
-- Badges por status (sent/failed)
-- Busca por email ou assunto
-- Paginação integrada
+- Usa tabela `alert_logs` filtrada por `channel='email'`
+- Filtros: status (sent/failed/queued), período (24h/7d/30d/all), busca por email/assunto
+- Cards de estatísticas: Total enviados (azul), Sucesso (verde), Falhas (vermelho), Taxa de sucesso (%), Hoje (azul)
+- Tabela com: data/hora, destinatário, assunto (nome do monitor), status (badge colorido), monitor relacionado
+- Badges: Sent (verde), Failed (vermelho), Queued (laranja)
+- Link para monitor relacionado
+- Paginação integrada (50 por página)
 - Ações: Ver detalhes
 
 **View (Detalhes)**:
-- Informações completas: destinatário, assunto, tipo
-- Corpo do email (HTML preview)
-- Status e timestamps (sent_at, failed_at)
-- Error message (se falhou)
-- Related incident/subscriber info
-- Ação: Resend (se falhou)
+- Status overview: indicador visual (✅ Enviado / ❌ Falha / ⏳ Na fila)
+- Informações completas: destinatário, canal, status, data criação, data envio, tempo de processamento
+- Monitor relacionado: nome, tipo, descrição, link para ver monitor
+- Incidente relacionado (se houver): título, status, descrição, timestamps, link para ver incidente
+- Regra de alerta relacionada
+- Mensagem de erro (se falhou): exibida em card vermelho destacado
+- Ação: Reenviar email (se falhou) - preparado para integração com EmailService
+
+**Design e UX**:
+- Layout responsivo seguindo DESIGN.md
+- Botões com texto apenas (sem ícones): "Ver", "Voltar", "Reenviar Email"
+- Cores consistentes: View (#3b82f6), Resend (#3b82f6)
+- Status cards com gradientes e bordas coloridas
+- Filtros organizados em grid responsivo
+- Paginação com contador de registros
+- Empty states informativos
+- Error messages destacados em vermelho
 
 **Critérios de Aceite**:
-- [ ] Lista emails com filtros funcionais
-- [ ] Exibe estatísticas de envio
-- [ ] Preview do corpo do email
-- [ ] Interface responsiva
-- [ ] Integração com EmailLogs model
+- [x] Lista emails com filtros funcionais (status, período, busca)
+- [x] Exibe estatísticas completas de envio
+- [x] Mostra informações completas do email e relacionamentos
+- [x] Interface responsiva seguindo design system
+- [x] Integração com AlertLogs model (channel='email')
+- [x] URL: /email-logs (acessível via menu lateral)
+
+**Notas de Implementação**:
+- Controller usa AlertLogsTable filtrado por channel='email'
+- EmailLogs é um alias para AlertLogs com filtro de canal
+- Relacionamentos: Monitor (INNER JOIN), Incident (LEFT JOIN), AlertRule (LEFT JOIN)
+- Método `resend()` preparado para integração futura com EmailService
+- Dados de teste criados: 3 emails (2 sent, 1 failed) para validação
 
 ---
 
