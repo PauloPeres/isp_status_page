@@ -1208,8 +1208,8 @@ bin/cake bake model Monitors --no-test --no-fixture
 ---
 
 ### TASK-231: Status Page - Componentes Visuais
-**Status**: 🔴 | **Prioridade**: ⭐ | **Dependências**: TASK-230
-**Estimativa**: 3h
+**Status**: ✅ | **Prioridade**: ⭐ | **Dependências**: TASK-230
+**Estimativa**: 3h | **Concluído em**: 31/10/2025
 
 **Descrição**: Criar componentes visuais para a status page.
 
@@ -1226,9 +1226,31 @@ bin/cake bake model Monitors --no-test --no-fixture
 - `templates/element/status/subscribe_form.php`
 
 **Critérios de Aceite**:
-- [ ] Componentes reutilizáveis
-- [ ] Visual atraente
-- [ ] Informação clara
+- [x] Componentes reutilizáveis
+- [x] Visual atraente
+- [x] Informação clara
+
+**Notas de Implementação**:
+- Criados 3 elementos reutilizáveis para a status page
+- **monitor_card.php**: Card visual com status indicator, uptime badge, response time colorido
+  - Uptime badge com cores: excellent (≥99%), good (≥95%), poor (<95%)
+  - Response time com cores: fast (<500ms), medium (<1000ms), slow (≥1000ms)
+  - Mostra target, tipo de monitor, última verificação com timezone local
+- **incident_timeline.php**: Timeline visual de incidentes com animações
+  - Linha vertical conectando incidentes
+  - Dots coloridos por status (resolved=verde, investigating=amarelo, ongoing=vermelho)
+  - Animação pulse para incidentes em andamento
+  - Badges de status com ícones
+  - Meta informações com data/hora local e duração
+- **subscribe_form.php**: Formulário de inscrição redesenhado
+  - Background gradient azul
+  - Input com fundo semi-transparente
+  - Botão com ícone e hover effects
+  - Notice informativa
+- Adicionados 370+ linhas de CSS customizado em public.css
+- Template Status/index.php refatorado para usar os elementos
+- Todos componentes são responsivos (mobile-first)
+- Componentes podem ser reutilizados em outras páginas
 
 ---
 
