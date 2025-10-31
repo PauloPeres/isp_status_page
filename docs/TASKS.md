@@ -951,46 +951,67 @@ bin/cake bake model Monitors --no-test --no-fixture
 ---
 
 ### TASK-223: Subscribers Admin Controller
-**Status**: 🔴 | **Prioridade**: 💡 | **Dependências**: TASK-240
-**Estimativa**: 3h
+**Status**: 🟢 | **Prioridade**: 💡 | **Dependências**: TASK-240
+**Estimativa**: 3h | **Realizado**: 3h
 
 **Descrição**: Controller admin para gerenciar inscritos de notificações por email.
 
-**Implementar**:
+**Implementado**:
 - index: Listar inscritos com filtros (status, data)
 - view: Ver detalhes de um inscrito
 - delete: Remover inscrito manualmente
-- bulk actions: Ativar/desativar múltiplos inscritos
+- toggle: Ativar/desativar inscrito individualmente
+- resendVerification: Reenviar email de verificação
 
-**Arquivos a criar**:
-- `src/Controller/SubscribersController.php` (admin section)
-- `templates/Subscribers/index.php`
-- `templates/Subscribers/view.php`
+**Arquivos criados**:
+- `src/src/Controller/SubscribersController.php` ✅
+- `src/templates/Subscribers/index.php` ✅
+- `src/templates/Subscribers/view.php` ✅
 
-**Funcionalidades**:
+**Funcionalidades Implementadas**:
 
 **Index (Listagem)**:
-- Filtros: status (verified/unverified), data de inscrição
-- Cards de estatísticas: Total, Verified, Unverified, Recently added
-- Tabela com: email, status, data de inscrição, última notificação
-- Badges por status de verificação
-- Busca por email
-- Paginação integrada
-- Ações: Ver, Deletar
+- Filtros: status (verified/unverified), active (active/inactive), período (7d/30d/90d/all), busca por email/nome
+- Cards de estatísticas: Total (azul), Verified (verde), Unverified (laranja), Active (verde), Recently Added (azul)
+- Tabela com: email/nome, verificação (badge + timestamp), status ativo (badge), data de inscrição, número de assinaturas
+- Badges coloridos: Verified (verde), Pending (laranja), Active (verde), Inactive (vermelho)
+- Busca por email ou nome
+- Paginação integrada (50 por página)
+- Ações: Ver, Ativar/Desativar, Excluir (confirmação obrigatória)
 
 **View (Detalhes)**:
-- Informações do inscrito: email, status, tokens
-- Histórico de emails enviados
-- Monitores inscritos (subscriptions)
-- Timestamps: created, verified_at
-- Ações: Resend verification, Delete
+- Status overview: indicador visual de status (ativo e verificado / inativo ou não verificado)
+- Cards de estatísticas: Emails recebidos, Monitores inscritos, Status de verificação, Status ativo
+- Informações completas: email, nome, status de verificação, status ativo, timestamps
+- Tokens exibidos (verification_token, unsubscribe_token) para administração
+- Lista de monitores inscritos com detalhes (nome, tipo, descrição, data de inscrição)
+- Ações: Reenviar verificação (se não verificado), Ativar/Desativar, Excluir (confirmação obrigatória)
+
+**Design e UX**:
+- Layout responsivo seguindo DESIGN.md
+- Botões com texto apenas (sem ícones): "Ver", "Ativar", "Desativar", "Excluir", "Reenviar Verificação"
+- Cores consistentes: View (#3b82f6), Toggle (#8b5cf6), Delete (#ef4444)
+- Cards de estatísticas com ícones e cores semânticas
+- Filtros organizados em grid responsivo
+- Paginação com contador de registros
+- Empty states informativos
 
 **Critérios de Aceite**:
-- [ ] Lista inscritos com filtros funcionais
-- [ ] Exibe estatísticas de inscrições
-- [ ] Permite deletar inscritos
-- [ ] Interface clara e intuitiva
-- [ ] Integração com Subscribers model
+- [x] Lista inscritos com filtros funcionais (verificação, ativo, período, busca)
+- [x] Exibe estatísticas completas de inscrições
+- [x] Permite deletar inscritos com confirmação
+- [x] Permite ativar/desativar inscritos individualmente
+- [x] Interface clara e intuitiva seguindo design system
+- [x] Integração com Subscribers model
+- [x] URL: /subscribers (acessível via menu lateral)
+
+**Notas de Implementação**:
+- Controller criado em `src/src/Controller/` (estrutura correta do projeto)
+- Templates criados em `src/templates/Subscribers/` (estrutura correta do projeto)
+- Método `toggle()` para ativar/desativar inscritos
+- Método `resendVerification()` preparado para integração futura com EmailService
+- EmailLogs count incluído no view (preparado para TASK-224)
+- Subscriptions relationship carregada com eager loading (contain)
 
 ---
 
