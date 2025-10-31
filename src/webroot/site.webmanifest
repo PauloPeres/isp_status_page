@@ -1,0 +1,17 @@
+{
+    "name": "ISP Status Page",
+    "short_name": "ISP Status",
+    "description": "Página de status em tempo real dos serviços de internet",
+    "icons": [
+        {
+            "src": "/favicon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
+        }
+    ],
+    "theme_color": "#1E88E5",
+    "background_color": "#ffffff",
+    "display": "standalone",
+    "start_url": "/"
+}

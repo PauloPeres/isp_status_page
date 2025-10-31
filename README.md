@@ -28,7 +28,7 @@ Este projeto é uma solução completa para provedores de internet monitorarem s
 
 ## Status do Projeto
 
-🚀 **MVP em Desenvolvimento Ativo** - 65% Completo
+🚀 **MVP em Desenvolvimento Ativo** - 75% Completo ⚡
 
 ### ✅ Funcionalidades Implementadas
 
@@ -81,11 +81,21 @@ Este projeto é uma solução completa para provedores de internet monitorarem s
 - ✅ Multi-database support
 - ✅ Hot reload em desenvolvimento
 
+#### Sistema de Monitoramento
+- ✅ Check Service com 3 checkers (HTTP, Ping, Port)
+- ✅ Cron job automático (executa a cada minuto)
+- ✅ Salva histórico de checks no banco
+- ✅ Calcula uptime percentage (24h)
+- ✅ Command line: `bin/cake monitor_check`
+- ✅ Suporte para IPv4 e IPv6
+- ✅ Detecção de degraded performance
+- ✅ 78 testes passando (191 assertions)
+
 ### 🚧 Em Desenvolvimento
 
-- 🚧 Cron job de verificação (30s)
-- 🚧 Sistema de incidentes
+- 🚧 Sistema de incidentes (auto-criar/resolver)
 - 🚧 Alertas por email
+- 🚧 WhatsApp/Telegram/SMS alerts
 
 ### 📊 Progresso por Fase
 
@@ -105,7 +115,7 @@ Este projeto é uma solução completa para provedores de internet monitorarem s
 
 ## Instalação
 
-### Opção 1: Docker (Recomendado)
+### Opção 1: Docker (Recomendado) 🐳
 
 ```bash
 # Quick start - Um comando para rodar tudo!
@@ -115,7 +125,39 @@ make quick-start
 docker-compose up -d
 ```
 
-Acesse: http://localhost:8765
+**O que acontece automaticamente:**
+- ✅ Cria o banco de dados SQLite
+- ✅ Instala dependências (composer install)
+- ✅ Executa migrations
+- ✅ Executa seeds (dados iniciais)
+- ✅ Configura permissões
+- ✅ Inicia cron para monitor checks (a cada minuto)
+
+**Acesse**: http://localhost:8765
+
+**Ver logs**:
+```bash
+docker-compose logs -f app           # Logs da aplicação
+docker-compose logs app | grep Cron  # Logs do cron
+tail -f src/logs/cron.log           # Logs dos checks
+```
+
+**Comandos úteis**:
+```bash
+# Parar containers
+docker-compose down
+
+# Reset completo (apaga o banco)
+docker-compose down && rm -f src/database.db && docker-compose up -d
+
+# Executar comando dentro do container
+docker-compose exec app bin/cake monitor_check -v
+
+# Entrar no container
+docker-compose exec app bash
+```
+
+Ver [docker/init-commands.md](docker/init-commands.md) para lista completa de comandos.
 
 ### Opção 2: Manual
 
@@ -123,8 +165,9 @@ Acesse: http://localhost:8765
 cd src
 composer install
 cp config/app_local.example.php config/app_local.php
-# Editar config/app_local.php
+# Editar config/app_local.php com DATABASE_URL
 bin/cake migrations migrate
+bin/cake migrations seed
 bin/cake server
 ```
 

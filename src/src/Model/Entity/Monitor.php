@@ -86,6 +86,13 @@ class Monitor extends Entity
     ];
 
     /**
+     * Virtual fields to expose
+     *
+     * @var array<string>
+     */
+    protected array $_virtual = ['target'];
+
+    /**
      * Get configuration as array
      *
      * @return array
@@ -103,6 +110,27 @@ class Monitor extends Entity
         $decoded = json_decode($this->configuration, true);
 
         return is_array($decoded) ? $decoded : [];
+    }
+
+    /**
+     * Get target from configuration (virtual field)
+     *
+     * Extracts the target/host from configuration based on monitor type
+     *
+     * @return string|null
+     */
+    protected function _getTarget(): ?string
+    {
+        $config = $this->getConfiguration();
+
+        return match ($this->type) {
+            self::TYPE_HTTP => $config['url'] ?? null,
+            self::TYPE_PING => $config['host'] ?? null,
+            self::TYPE_PORT => isset($config['host'], $config['port'])
+                ? "{$config['host']}:{$config['port']}"
+                : null,
+            default => null,
+        };
     }
 
     /**

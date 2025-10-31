@@ -22,25 +22,24 @@ if [ ! -d /var/www/html/vendor ]; then
     composer install --no-interaction --prefer-dist
 fi
 
-# Check if migrations have been run
+# Always run migrations to ensure schema is up to date
+echo "Running database migrations..."
+if [ -d /var/www/html/config/Migrations ]; then
+    bin/cake migrations migrate || echo "Migrations failed"
+else
+    echo "No migrations found. Skipping."
+fi
+
+# Check if we need to run seeds (only on first init)
 TABLES_COUNT=$(sqlite3 /var/www/html/database.db "SELECT COUNT(*) FROM sqlite_master WHERE type='table';" 2>/dev/null || echo "0")
 
-if [ "$TABLES_COUNT" -lt "2" ]; then
-    echo "Database appears empty. Running migrations..."
-
-    # Check if migrations exist
-    if [ -d /var/www/html/config/Migrations ]; then
-        bin/cake migrations migrate --no-interaction || echo "Migrations not yet created or failed"
-    else
-        echo "No migrations found. Will need to create them."
-    fi
-
-    # Run seeds if they exist
+if [ "$TABLES_COUNT" -lt "5" ]; then
+    echo "Database appears empty. Running seeds..."
     if [ -d /var/www/html/config/Seeds ]; then
-        bin/cake migrations seed --no-interaction || echo "Seeds not yet created or failed"
+        bin/cake migrations seed || echo "Seeds failed"
     fi
 else
-    echo "Database already initialized (found $TABLES_COUNT tables)"
+    echo "Database already seeded (found $TABLES_COUNT tables). Skipping seeds."
 fi
 
 # Set proper permissions
@@ -50,10 +49,33 @@ chown -R www-data:www-data /var/www/html/logs
 chmod -R 777 /var/www/html/tmp
 chmod -R 777 /var/www/html/logs
 
-# Start cron daemon in background if crontab exists
-if [ -f /etc/cron.d/isp-status-cron ]; then
+# Configure and start cron if enabled
+if [ "${ENABLE_CRON:-false}" = "true" ]; then
+    echo "Configuring cron for monitor checks..."
+
+    # Create cron job file
+    cat > /etc/cron.d/isp-status-cron <<EOF
+# ISP Status Page - Monitor Check Cron
+# Runs every minute to check all monitors
+* * * * * www-data cd /var/www/html && bin/cake monitor_check >> /var/www/html/logs/cron.log 2>&1
+
+# Empty line required at end of cron file
+EOF
+
+    # Set correct permissions
+    chmod 0644 /etc/cron.d/isp-status-cron
+
+    # Register the cron job
+    crontab /etc/cron.d/isp-status-cron
+
+    # Start cron daemon in background
     echo "Starting cron daemon..."
     cron
+
+    echo "✓ Cron configured - monitor checks will run every minute"
+    echo "  Logs: /var/www/html/logs/cron.log"
+else
+    echo "Cron disabled (set ENABLE_CRON=true to enable)"
 fi
 
 echo "=========================================="
