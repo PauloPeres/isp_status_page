@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  # ISP Status Page Application - Production
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: isp-status-app-prod
+    ports:
+      - "80:80"
+    volumes:
+      # Only persist database and logs (no source code mount)
+      - database:/var/www/html/database.db
+      - logs:/var/www/html/logs
+    environment:
+      - APP_NAME=${APP_NAME:-ISP Status Page}
+      - APP_DEBUG=false
+      - SECURITY_SALT=${SECURITY_SALT}
+      - DATABASE_URL=sqlite:///var/www/html/database.db
+      # Email configuration
+      - EMAIL_HOST=${EMAIL_HOST}
+      - EMAIL_PORT=${EMAIL_PORT:-587}
+      - EMAIL_USERNAME=${EMAIL_USERNAME}
+      - EMAIL_PASSWORD=${EMAIL_PASSWORD}
+      - EMAIL_FROM=${EMAIL_FROM}
+    networks:
+      - isp-status-network
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 40s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Cron service for background tasks - Production
+  cron:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: isp-status-cron-prod
+    volumes:
+      - database:/var/www/html/database.db
+      - logs:/var/www/html/logs
+    environment:
+      - APP_DEBUG=false
+      - DATABASE_URL=sqlite:///var/www/html/database.db
+    networks:
+      - isp-status-network
+    command: >
+      sh -c "
+        echo '* * * * * cd /var/www/html && bin/cake monitor_check >> /var/www/html/logs/cron.log 2>&1' > /etc/cron.d/isp-status &&
+        echo '0 3 * * * cd /var/www/html && bin/cake cleanup >> /var/www/html/logs/cleanup.log 2>&1' >> /etc/cron.d/isp-status &&
+        echo '0 2 * * * cd /var/www/html && bin/cake backup >> /var/www/html/logs/backup.log 2>&1' >> /etc/cron.d/isp-status &&
+        chmod 0644 /etc/cron.d/isp-status &&
+        crontab /etc/cron.d/isp-status &&
+        cron -f
+      "
+    restart: always
+    depends_on:
+      - app
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  isp-status-network:
+    driver: bridge
+
+volumes:
+  database:
+    driver: local
+  logs:
+    driver: local

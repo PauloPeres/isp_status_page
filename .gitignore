@@ -1,8 +1,40 @@
-# CakePHP 3
+# ISP Status Page - Git Ignore
 
-/vendor/*
-/config/app.php
+# ============================================
+# Database Files - NEVER commit databases!
+# ============================================
+*.db
+*.sqlite
+*.sqlite3
+database.db
+src/database.db
+backups/*.db
+backups/*.sqlite
 
+# ============================================
+# Environment and Configuration
+# ============================================
+.env
+.env.local
+.env.docker
+config/app_local.php
+src/config/app_local.php
+
+# ============================================
+# Composer
+# ============================================
+composer.phar
+/vendor/
+src/vendor/
+
+# ============================================
+# CakePHP
+# ============================================
+# Temp files
+/tmp/*
+/src/tmp/*
+!/tmp/.gitkeep
+!/src/tmp/.gitkeep
 /tmp/cache/models/*
 !/tmp/cache/models/empty
 /tmp/cache/persistent/*
@@ -14,12 +46,123 @@
 /tmp/tests/*
 !/tmp/tests/empty
 
+# Logs
 /logs/*
-!/logs/empty
+/src/logs/*
+!/logs/.gitkeep
+!/src/logs/.gitkeep
+*.log
 
-# CakePHP 2
+# Config (sensitive)
+/config/app_local.php
+/src/config/app_local.php
 
-/app/tmp/*
-/app/Config/core.php
-/app/Config/database.php
-/vendors/*
+# ============================================
+# IDE and Editors
+# ============================================
+# VSCode
+.vscode/
+*.code-workspace
+
+# PHPStorm / IntelliJ
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+.*.sw?
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+
+# ============================================
+# OS Files
+# ============================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.directory
+
+# ============================================
+# Node.js (se usar)
+# ============================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# ============================================
+# Testing and Coverage
+# ============================================
+/phpunit.xml
+/src/phpunit.xml
+coverage/
+.phpunit.result.cache
+*.coverage
+
+# ============================================
+# Docker (local overrides)
+# ============================================
+docker-compose.override.yml
+
+# ============================================
+# Build and Distribution
+# ============================================
+/dist/
+/build/
+*.tar.gz
+*.zip
+
+# ============================================
+# Backups
+# ============================================
+*.bak
+*.backup
+*.old
+
+# ============================================
+# Security
+# ============================================
+*.pem
+*.key
+*.crt
+*.cert
+credentials.json
+secrets.json
+
+# ============================================
+# Documentation Build
+# ============================================
+/docs/_build/
+/docs/.doctrees/
+
+# ============================================
+# Misc
+# ============================================
+.cache/
+.sass-cache/
+*.pid

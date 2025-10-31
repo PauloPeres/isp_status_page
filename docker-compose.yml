@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  # ISP Status Page Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: isp-status-app
+    ports:
+      - "8765:80"
+    volumes:
+      # Mount source code for development (hot reload)
+      - ./src:/var/www/html
+      # Persist database
+      - ./src/database.db:/var/www/html/database.db
+      # Persist logs
+      - ./src/logs:/var/www/html/logs
+    environment:
+      - APP_NAME=ISP Status Page
+      - APP_DEBUG=true
+      - SECURITY_SALT=18454403c4173e367f60744ce2db198e5a721ebbc89f4eb3122d5b5b30adafeb
+      - DATABASE_URL=sqlite:///var/www/html/database.db
+    networks:
+      - isp-status-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 40s
+
+  # Cron service for background tasks (monitoring checks)
+  cron:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: isp-status-cron
+    volumes:
+      - ./src:/var/www/html
+      - ./src/database.db:/var/www/html/database.db
+      - ./src/logs:/var/www/html/logs
+    environment:
+      - APP_DEBUG=true
+      - DATABASE_URL=sqlite:///var/www/html/database.db
+    networks:
+      - isp-status-network
+    command: >
+      sh -c "
+        echo '* * * * * cd /var/www/html && bin/cake monitor_check >> /var/www/html/logs/cron.log 2>&1' > /etc/cron.d/isp-status &&
+        chmod 0644 /etc/cron.d/isp-status &&
+        crontab /etc/cron.d/isp-status &&
+        echo 'Cron job configured. Running cron in foreground...' &&
+        cron -f
+      "
+    restart: unless-stopped
+    depends_on:
+      - app
+
+networks:
+  isp-status-network:
+    driver: bridge
+
+volumes:
+  database:
+    driver: local

@@ -37,9 +37,30 @@ Este projeto é uma solução completa para provedores de internet monitorarem s
 
 ## Instalação
 
+### Opção 1: Docker (Recomendado)
+
 ```bash
-# Instruções serão adicionadas durante o desenvolvimento
+# Quick start - Um comando para rodar tudo!
+make quick-start
+
+# Ou manualmente
+docker-compose up -d
 ```
+
+Acesse: http://localhost:8765
+
+### Opção 2: Manual
+
+```bash
+cd src
+composer install
+cp config/app_local.example.php config/app_local.php
+# Editar config/app_local.php
+bin/cake migrations migrate
+bin/cake server
+```
+
+Ver [docs/INSTALL.md](docs/INSTALL.md) e [docs/DOCKER.md](docs/DOCKER.md) para instruções completas.
 
 ## Contribuindo
 

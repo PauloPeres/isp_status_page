@@ -1,0 +1,12 @@
+# ISP Status Page - Cron Configuration
+# Run monitor checks every minute
+
+* * * * * www-data cd /var/www/html && bin/cake monitor_check >> /var/www/html/logs/cron.log 2>&1
+
+# Run cleanup daily at 3 AM
+0 3 * * * www-data cd /var/www/html && bin/cake cleanup >> /var/www/html/logs/cleanup.log 2>&1
+
+# Run backup daily at 2 AM
+0 2 * * * www-data cd /var/www/html && bin/cake backup >> /var/www/html/logs/backup.log 2>&1
+
+# Empty line required at end of file
