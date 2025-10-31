@@ -17,12 +17,12 @@ $this->assign('title', 'Detalhes do Monitor');
         </div>
         <div style="display: flex; gap: 8px;">
             <?= $this->Html->link(
-                '✏️ Editar',
+                'Editar',
                 ['action' => 'edit', $monitor->id],
                 ['class' => 'btn btn-primary']
             ) ?>
             <?= $this->Html->link(
-                '← Voltar',
+                'Voltar',
                 ['action' => 'index'],
                 ['class' => 'btn btn-secondary']
             ) ?>
@@ -235,7 +235,7 @@ $this->assign('title', 'Detalhes do Monitor');
         <div class="card-header">⚙️ Ações</div>
         <div class="actions-grid">
             <?= $this->Form->postLink(
-                $monitor->active ? '⏸️ Pausar Monitoramento' : '▶️ Ativar Monitoramento',
+                $monitor->active ? 'Pausar Monitoramento' : 'Ativar Monitoramento',
                 ['action' => 'toggle', $monitor->id],
                 [
                     'class' => 'btn ' . ($monitor->active ? 'btn-secondary' : 'btn-success'),
@@ -244,13 +244,13 @@ $this->assign('title', 'Detalhes do Monitor');
             ) ?>
 
             <?= $this->Html->link(
-                '✏️ Editar Configurações',
+                'Editar Configurações',
                 ['action' => 'edit', $monitor->id],
                 ['class' => 'btn btn-primary']
             ) ?>
 
             <?= $this->Form->postLink(
-                '🗑️ Excluir Monitor',
+                'Excluir Monitor',
                 ['action' => 'delete', $monitor->id],
                 [
                     'class' => 'btn btn-error',

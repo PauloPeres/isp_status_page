@@ -884,8 +884,8 @@ bin/cake bake model Monitors --no-test --no-fixture
 ---
 
 ### TASK-222: Checks Controller
-**Status**: 🔴 | **Prioridade**: 💡 | **Dependências**: TASK-214
-**Estimativa**: 3h
+**Status**: 🟢 | **Prioridade**: 💡 | **Dependências**: TASK-214
+**Estimativa**: 3h | **Realizado**: 3h
 
 **Descrição**: Controller para visualizar histórico de verificações de monitores no admin.
 
@@ -893,37 +893,60 @@ bin/cake bake model Monitors --no-test --no-fixture
 - index: Listar todas as verificações com filtros (monitor, status, período)
 - view: Ver detalhes de uma verificação específica
 - Estatísticas de uptime e response time
-- Gráficos de histórico de checks
+- Timeline de checks anteriores e posteriores
 
-**Arquivos a criar**:
-- `src/Controller/ChecksController.php`
-- `templates/Checks/index.php`
-- `templates/Checks/view.php`
+**Arquivos criados**:
+- `src/Controller/ChecksController.php` ✅
+- `templates/Checks/index.php` ✅
+- `templates/Checks/view.php` ✅
 
-**Funcionalidades**:
+**Funcionalidades Implementadas**:
 
 **Index (Listagem)**:
-- Filtros: monitor, status (success/failed), período (24h, 7d, 30d)
-- Cards de estatísticas: Total checks, Success rate, Avg response time
-- Tabela com: timestamp, monitor, status, response time, message
-- Badges coloridos por status (success/failed)
+- Filtros: monitor (dropdown com todos os monitores ativos), status (success/failed), período (24h/7d/30d/all)
+- Cards de estatísticas: Total checks, Success count, Failed count, Success rate (%), Avg response time (ms)
+- Tabela com: data/hora, monitor (com tipo), status (badges coloridos), response time, mensagem
+- Badges coloridos por status: ✅ Sucesso (verde), ❌ Falha (vermelho)
 - Links para monitores relacionados
-- Paginação integrada
-- Export CSV (opcional)
+- Paginação integrada (50 checks por página)
+- Botão "Ver" para acessar detalhes de cada check
+- Busca por monitor, status e período com botão "Filtrar" e "Limpar"
 
 **View (Detalhes)**:
-- Informações completas da verificação
-- Response time detalhado
-- Error message (se houver)
-- Request/Response details (JSON)
-- Link para o monitor
+- Banner de status no topo (verde para success, vermelho para failed)
+- Informações completas: monitor, tipo, data/hora, status, response time, status code
+- Message box com mensagem de erro (se houver), destacada em vermelho
+- Response details em JSON formatado (se disponível)
+- Estatísticas do monitor: Total checks, Success checks, Success rate, Avg response time
+- Timeline de contexto: 5 checks anteriores + check atual + 5 checks posteriores
+- Timeline visual com ícones (✅/❌), timestamp e response time
+- Check atual destacado com borda azul e fundo azul claro
+- Links: Voltar para Verificações, Ver Monitor
+- Interface totalmente responsiva
+
+**Design e UX**:
+- Layout responsivo (adapta para mobile)
+- Cards de estatísticas com cores semânticas (success: verde, error: vermelho, info: azul)
+- Badges coloridos seguindo status
+- Timeline com marcadores visuais e hover effects
+- Tipografia clara com hierarquia visual
+- Estilos CSS inline para fácil manutenção
+- Hover effects em tabelas e timeline items
 
 **Critérios de Aceite**:
-- [ ] Lista checks com filtros funcionais (monitor, status, período)
-- [ ] Exibe estatísticas de uptime e performance
-- [ ] Interface responsiva e clara
-- [ ] Paginação eficiente para grandes volumes
-- [ ] Integração com MonitorChecks model
+- [x] Lista checks com filtros funcionais (monitor, status, período)
+- [x] Exibe estatísticas de uptime e performance
+- [x] Interface responsiva e clara
+- [x] Paginação eficiente para grandes volumes (50 por página)
+- [x] Integração com MonitorChecks model via fetchTable()
+
+**Notas de Implementação**:
+- Controller usa `$this->fetchTable('MonitorChecks')` para acessar o model (não há ChecksTable)
+- URL final: `/checks` (acessível via menu lateral)
+- Método `getPeriodStartDate()` converte string de período em DateTime
+- Cálculos de estatísticas usando aggregation functions do CakePHP
+- Timeline mostra contexto temporal (checks antes e depois)
+- Verificação protegida por autenticação (redirect para /users/login se não logado)
 
 ---
 

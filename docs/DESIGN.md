@@ -1,324 +1,769 @@
-# Guia de Design - ISP Status Page
+# Design System - ISP Status Page
 
-Este documento define os padrões visuais, paleta de cores e diretrizes de interface para o ISP Status Page.
+Este documento define o design system e padrões visuais implementados no projeto ISP Status Page.
 
-## 🎨 Paleta de Cores
-
-A paleta foi criada para manter consistência visual, boa legibilidade e profissionalismo, ideal para dashboards, páginas de status e interfaces web modernas.
-
-### 1. Cores Primárias
-
-| Cor | Hex | RGB | Uso |
-|-----|-----|-----|-----|
-| **Azul Principal** | `#1E88E5` | `rgb(30, 136, 229)` | Cabeçalhos, botões principais, links |
-| **Verde Sucesso** | `#43A047` | `rgb(67, 160, 71)` | Status "Online", sucesso em verificações |
-| **Cinza Escuro** | `#263238` | `rgb(38, 50, 56)` | Texto principal e títulos |
-| **Branco** | `#FFFFFF` | `rgb(255, 255, 255)` | Fundo principal, contraste e limpeza visual |
-
-### 2. Cores Secundárias
-
-| Cor | Hex | RGB | Uso |
-|-----|-----|-----|-----|
-| **Azul Claro** | `#90CAF9` | `rgb(144, 202, 249)` | Realces, hover states, gráficos secundários |
-| **Amarelo Alerta** | `#FDD835` | `rgb(253, 216, 53)` | Avisos, "Degradação parcial" |
-| **Vermelho Erro** | `#E53935` | `rgb(229, 57, 53)` | Status "Offline", falhas críticas |
-
-### 3. Tons Neutros
-
-| Cor | Hex | RGB | Uso |
-|-----|-----|-----|-----|
-| **Cinza Claro** | `#ECEFF1` | `rgb(236, 239, 241)` | Fundo de painéis, bordas sutis |
-| **Cinza Médio** | `#B0BEC5` | `rgb(176, 190, 197)` | Ícones, divisores, textos secundários |
+## Índice
+- [Cores](#cores)
+- [Tipografia](#tipografia)
+- [Espaçamentos](#espaçamentos)
+- [Botões](#botões)
+- [Cards](#cards)
+- [Filtros](#filtros)
+- [Tabelas](#tabelas)
+- [Badges](#badges)
+- [Paginação](#paginação)
+- [Responsividade](#responsividade)
 
 ---
 
-## 🧭 Aplicação Visual
+## Cores
 
-### Navbar e Header
-- **Background**: Azul `#1E88E5`
-- **Texto**: Branco `#FFFFFF`
-- **Logo**: Branco ou transparente
-
-### Dashboard Cards
-- **Fundo**: Branco `#FFFFFF`
-- **Bordas**: Cinza Claro `#ECEFF1`
-- **Sombras**: `rgba(0, 0, 0, 0.08)` para depth suave
-
-### Indicadores de Status
-
-| Status | Cor | Hex | Ícone |
-|--------|-----|-----|-------|
-| 🟢 **Online** | Verde | `#43A047` | Círculo preenchido |
-| 🟡 **Degradado** | Amarelo | `#FDD835` | Círculo com alerta |
-| 🔴 **Offline** | Vermelho | `#E53935` | Círculo com X |
-| ⚪ **Desconhecido** | Cinza Médio | `#B0BEC5` | Círculo vazio |
-
-### Botões
-
-#### Botão Primário
+### Cores Principais
 ```css
-background: #1E88E5;
-color: #FFFFFF;
-border: none;
-hover: #1976D2;
+Azul (Primário):    #3b82f6
+Verde (Sucesso):    #22c55e
+Vermelho (Erro):    #ef4444
+Laranja (Warning):  #f59e0b
+Roxo (Toggle):      #8b5cf6
 ```
 
-#### Botão Sucesso
+### Cores Secundárias
 ```css
-background: #43A047;
-color: #FFFFFF;
-border: none;
-hover: #388E3C;
+Cinza Escuro:       #333
+Cinza Médio:        #666
+Cinza Claro:        #999
+Cinza Background:   #f8f9fa
 ```
 
-#### Botão Erro
+### Cores de Borda
 ```css
-background: #E53935;
-color: #FFFFFF;
-border: none;
-hover: #D32F2F;
-```
-
-#### Botão Secundário
-```css
-background: transparent;
-color: #1E88E5;
-border: 2px solid #1E88E5;
-hover: background #ECEFF1;
-```
-
-### Alertas e Notificações
-
-#### Sucesso
-```css
-background: #E8F5E9;
-color: #2E7D32;
-border-left: 4px solid #43A047;
-```
-
-#### Aviso
-```css
-background: #FFFDE7;
-color: #F57F17;
-border-left: 4px solid #FDD835;
-```
-
-#### Erro
-```css
-background: #FFEBEE;
-color: #C62828;
-border-left: 4px solid #E53935;
-```
-
-#### Informação
-```css
-background: #E3F2FD;
-color: #1565C0;
-border-left: 4px solid #1E88E5;
-```
-
----
-
-## 📊 Gráficos e Visualizações
-
-### Uptime Chart
-- **90-100%**: Verde `#43A047`
-- **70-89%**: Amarelo `#FDD835`
-- **0-69%**: Vermelho `#E53935`
-
-### Response Time Chart
-- **Linha**: Azul `#1E88E5`
-- **Área**: Azul Claro `#90CAF9` com opacidade 0.3
-- **Grid**: Cinza Claro `#ECEFF1`
-
----
-
-## 🔤 Typography
-
-### Fontes
-```css
-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-             Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
-```
-
-### Tamanhos e Pesos
-
-| Elemento | Tamanho | Peso | Cor |
-|----------|---------|------|-----|
-| H1 (Page Title) | 32px | 700 (Bold) | `#263238` |
-| H2 (Section) | 24px | 600 (SemiBold) | `#263238` |
-| H3 (Subsection) | 20px | 600 (SemiBold) | `#263238` |
-| Body Text | 15px | 400 (Regular) | `#263238` |
-| Small Text | 13px | 400 (Regular) | `#B0BEC5` |
-| Label | 14px | 600 (SemiBold) | `#263238` |
-
----
-
-## 🎯 Espaçamento e Grid
-
-### Sistema de Espaçamento
-Baseado em múltiplos de 8px:
-
-| Nome | Valor | Uso |
-|------|-------|-----|
-| `xs` | 4px | Espaçamento mínimo |
-| `sm` | 8px | Elementos próximos |
-| `md` | 16px | Padrão entre elementos |
-| `lg` | 24px | Entre seções |
-| `xl` | 32px | Entre blocos principais |
-| `2xl` | 48px | Separação máxima |
-
-### Border Radius
-- **Pequeno**: 4px (badges, tags)
-- **Médio**: 8px (inputs, botões)
-- **Grande**: 12px (cards, modais)
-- **Extra Grande**: 20px (elementos destacados)
-
----
-
-## 📱 Responsividade
-
-### Breakpoints
-```css
-/* Mobile */
-@media (max-width: 640px)
-
-/* Tablet */
-@media (min-width: 641px) and (max-width: 1024px)
-
-/* Desktop */
-@media (min-width: 1025px)
-```
-
-### Container Max-Width
-- Mobile: 100% (com padding 20px)
-- Tablet: 720px
-- Desktop: 1140px
-
----
-
-## ✨ Efeitos e Animações
-
-### Transitions
-```css
-transition: all 0.3s ease;
+Borda Principal:    #e0e0e0
+Borda Clara:        #f0f0f0
+Borda Input:        #d0d0d0
 ```
 
 ### Hover States
-- **Elevação**: `transform: translateY(-2px)`
-- **Sombra**: `box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15)`
-
-### Focus States
 ```css
-outline: none;
-border-color: #1E88E5;
-box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.1);
+Azul Hover:         #2563eb
+Verde Hover:        #16a34a
+Vermelho Hover:     #dc2626
+Laranja Hover:      #d97706
+Roxo Hover:         #7c3aed
+Cinza Hover:        #4b5563
+Background Hover:   #f8f9fa
 ```
 
 ---
 
-## 🖼️ Exemplos de Componentes
+## Tipografia
 
-### Status Card
-```html
-<div style="
-    background: #FFFFFF;
-    border: 1px solid #ECEFF1;
-    border-radius: 12px;
-    padding: 24px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-">
-    <h3 style="color: #263238;">Monitor Name</h3>
-    <span style="
-        display: inline-block;
-        background: #43A047;
-        color: #FFFFFF;
-        padding: 4px 12px;
-        border-radius: 4px;
-        font-size: 13px;
-    ">Online</span>
-</div>
-```
-
-### Monitor List Item
-```html
-<div style="
-    background: #FFFFFF;
-    border-left: 4px solid #43A047;
-    padding: 16px;
-    margin-bottom: 8px;
-    border-radius: 8px;
-">
-    <span style="color: #263238; font-weight: 600;">Service Name</span>
-    <span style="color: #B0BEC5; font-size: 13px;">Last check: 2 min ago</span>
-</div>
-```
-
----
-
-## 📋 Checklist de Implementação
-
-Ao criar novos componentes, certifique-se de:
-
-- [ ] Usar cores da paleta oficial
-- [ ] Aplicar espaçamento consistente (múltiplos de 8px)
-- [ ] Incluir estados de hover/focus/active
-- [ ] Testar em mobile, tablet e desktop
-- [ ] Verificar contraste de cores (WCAG AA mínimo)
-- [ ] Usar border-radius consistente
-- [ ] Aplicar sombras sutis quando apropriado
-- [ ] Garantir texto legível em todos os fundos
-
----
-
-## 🔗 Referências CSS
-
-### Variáveis CSS Recomendadas
-
+### Tamanhos de Fonte
 ```css
-:root {
-    /* Cores Primárias */
-    --color-primary: #1E88E5;
-    --color-success: #43A047;
-    --color-dark: #263238;
-    --color-white: #FFFFFF;
+12px - Labels, badges, botões pequenos
+13px - Descrições secundárias, texto auxiliar
+14px - Corpo de texto padrão
+16px - Títulos de seção
+18px - Subtítulos
+28px - Valores de estatísticas
+```
 
-    /* Cores Secundárias */
-    --color-primary-light: #90CAF9;
-    --color-warning: #FDD835;
-    --color-error: #E53935;
+### Pesos de Fonte
+```css
+400 - Normal (corpo de texto)
+500 - Medium (botões, links importantes)
+600 - Semibold (labels, títulos de card)
+700 - Bold (valores de estatísticas)
+```
 
-    /* Tons Neutros */
-    --color-gray-light: #ECEFF1;
-    --color-gray-medium: #B0BEC5;
+### Text Transform
+```css
+uppercase - Labels de estatísticas, headers de tabela
+capitalize - Badges, status
+normal - Corpo de texto
+```
 
-    /* Hover States */
-    --color-primary-hover: #1976D2;
-    --color-success-hover: #388E3C;
-    --color-error-hover: #D32F2F;
+---
 
-    /* Espaçamento */
-    --space-xs: 4px;
-    --space-sm: 8px;
-    --space-md: 16px;
-    --space-lg: 24px;
-    --space-xl: 32px;
-    --space-2xl: 48px;
+## Espaçamentos
 
-    /* Border Radius */
-    --radius-sm: 4px;
-    --radius-md: 8px;
-    --radius-lg: 12px;
-    --radius-xl: 20px;
+### Sistema de Espaçamento (múltiplos de 4px)
+```css
+4px  - Gap mínimo entre elementos inline
+8px  - Gap entre botões, badges
+12px - Padding interno de elementos pequenos
+16px - Gap entre cards, padding de cards
+20px - Padding de filtros
+24px - Margin entre seções
+32px - Margin bottom de headers
+```
 
-    /* Sombras */
-    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
-    --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
-    --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.15);
+### Aplicações Comuns
+```css
+Gap entre botões:           8px
+Padding de botões:          8px 16px (vertical horizontal)
+Padding de cards:           16px, 20px, 24px
+Margin bottom de sections:  24px
+Grid gap:                   16px
+```
+
+---
+
+## Botões
+
+### ⚠️ REGRA IMPORTANTE: NUNCA USE ÍCONES EM BOTÕES
+
+**Todos os botões devem usar APENAS TEXTO para manter consistência visual.**
+
+❌ **Errado:**
+```php
+'👁️ Ver'
+'✏️ Editar'
+'🗑️ Excluir'
+'← Voltar'
+```
+
+✅ **Correto:**
+```php
+'Ver'
+'Editar'
+'Excluir'
+'Voltar'
+```
+
+### Botões de Ação em Tabelas
+```css
+.btn-action {
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    display: inline-block;
+}
+```
+
+#### Variações de Cores
+```css
+/* Ver */
+.btn-action-view {
+    background: #3b82f6;
+    color: white;
+}
+.btn-action-view:hover {
+    background: #2563eb;
+}
+
+/* Editar */
+.btn-action-edit {
+    background: #f59e0b;
+    color: white;
+}
+.btn-action-edit:hover {
+    background: #d97706;
+}
+
+/* Resolver */
+.btn-action-resolve {
+    background: #22c55e;
+    color: white;
+}
+.btn-action-resolve:hover {
+    background: #16a34a;
+}
+
+/* Ativar/Desativar */
+.btn-action-toggle {
+    background: #8b5cf6;
+    color: white;
+}
+.btn-action-toggle:hover {
+    background: #7c3aed;
+}
+
+/* Excluir */
+.btn-action-danger {
+    background: #ef4444;
+    color: white;
+}
+.btn-action-danger:hover {
+    background: #dc2626;
+}
+```
+
+### Botões Principais (Headers)
+```css
+.btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    display: inline-block;
+}
+
+/* Botão Primário */
+.btn-primary {
+    background: #f59e0b;
+    color: white;
+}
+
+/* Botão Secundário */
+.btn-secondary {
+    background: #6b7280;
+    color: white;
+}
+
+/* Botão Sucesso */
+.btn-success {
+    background: #22c55e;
+    color: white;
+}
+```
+
+### Botões de Filtro
+```css
+.btn-filter {
+    padding: 8px 16px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.btn-clear {
+    padding: 8px 16px;
+    background: white;
+    color: #666;
+    border: 1px solid #d0d0d0;
+    border-radius: 6px;
+    font-size: 14px;
+}
+```
+
+### Container de Botões
+```css
+.action-buttons {
+    display: flex;
+    gap: 4px;
+    justify-content: flex-end;
 }
 ```
 
 ---
 
-**Última atualização**: 31 de Outubro de 2025
-**Versão**: 1.0
+## Cards
+
+### Card Base
+```css
+.card {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+```
+
+### Cards de Estatísticas
+```css
+.stat-card-mini {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #666;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: bold;
+    color: #333;
+}
+
+.stat-value.success { color: #22c55e; }
+.stat-value.error { color: #ef4444; }
+.stat-value.info { color: #3b82f6; }
+.stat-value.warning { color: #f59e0b; }
+```
+
+### Grid de Estatísticas
+```css
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+```
+
+---
+
+## Filtros
+
+### Container de Filtros
+```css
+.filters-card {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 24px;
+}
+
+.filters-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+}
+```
+
+### Grupos de Filtro
+```css
+.filter-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.filter-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 6px;
+}
+
+.filter-group input,
+.filter-group select {
+    padding: 8px 12px;
+    border: 1px solid #d0d0d0;
+    border-radius: 6px;
+    font-size: 14px;
+    background: white;
+}
+```
+
+---
+
+## Tabelas
+
+### Container de Tabela
+```css
+.table-container {
+    width: 100%;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.table-container table {
+    width: 100%;
+    border-collapse: collapse;
+}
+```
+
+### Headers de Tabela
+```css
+.table-container th {
+    background: #f8f9fa;
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 13px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    border-bottom: 2px solid #e0e0e0;
+}
+```
+
+### Células de Tabela
+```css
+.table-container td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+.table-container tr:last-child td {
+    border-bottom: none;
+}
+
+.table-container tbody tr:hover {
+    background: #f8f9fa;
+}
+```
+
+---
+
+## Badges
+
+### Badge Base
+```css
+.badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+```
+
+### Variações de Badge
+```css
+.badge-success {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.badge-danger {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.badge-warning {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.badge-info {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.badge-secondary {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+```
+
+### Badge Large
+```css
+.badge-lg {
+    font-size: 14px;
+    padding: 8px 16px;
+}
+```
+
+---
+
+## Paginação
+
+### Container de Paginação
+```css
+.pagination {
+    margin-top: 24px;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+```
+
+### Links de Paginação
+```css
+.pagination a,
+.pagination span {
+    padding: 8px 12px;
+    border: 1px solid #d0d0d0;
+    border-radius: 4px;
+    color: #666;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.pagination a:hover {
+    background: #f8f9fa;
+    border-color: #3b82f6;
+    color: #3b82f6;
+}
+
+.pagination .active {
+    background: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+}
+
+.pagination .disabled {
+    color: #ccc;
+    cursor: not-allowed;
+}
+```
+
+### Informação de Paginação
+```css
+.pagination-info {
+    text-align: center;
+    margin-top: 12px;
+    font-size: 13px;
+    color: #666;
+}
+```
+
+---
+
+## Border Radius
+
+### Padrões de Border Radius
+```css
+4px  - Pequeno (botões de ação, inputs, badges pequenos)
+6px  - Médio (botões principais, inputs)
+8px  - Grande (cards, containers)
+12px - Extra grande (badges)
+50%  - Circular (indicadores de status, avatares)
+```
+
+---
+
+## Sombras
+
+### Box Shadows
+```css
+/* Sombra Suave (cards) */
+box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+
+/* Sombra de Status (indicadores) */
+box-shadow: 0 0 8px rgba(34, 197, 94, 0.4);  /* Verde */
+box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);  /* Vermelho */
+```
+
+---
+
+## Responsividade
+
+### Breakpoints
+```css
+768px  - Mobile (tablets)
+992px  - Desktop pequeno
+1200px - Desktop grande
+```
+
+### Media Queries Padrão
+```css
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .filters-row {
+        grid-template-columns: 1fr;
+    }
+
+    .table-container {
+        overflow-x: auto;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+}
+```
+
+---
+
+## Estados Especiais
+
+### Empty State
+```css
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+}
+
+.empty-state-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+}
+```
+
+### Status Indicators
+```css
+.status-indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.status-up {
+    background: #22c55e;
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.4);
+}
+
+.status-down {
+    background: #ef4444;
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+}
+
+.status-unknown {
+    background: #999;
+}
+```
+
+### Timeline
+```css
+.timeline {
+    position: relative;
+    padding-left: 40px;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #e0e0e0;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -40px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border: 3px solid #999;
+    z-index: 1;
+}
+```
+
+---
+
+## Regras de Consistência
+
+### 1. ⚠️ NUNCA use ícones em botões
+❌ **Errado:** `'👁️ Ver'`, `'✏️ Editar'`, `'🗑️ Excluir'`, `'← Voltar'`
+✅ **Correto:** `'Ver'`, `'Editar'`, `'Excluir'`, `'Voltar'`
+
+### 2. ✅ SEMPRE use as cores padronizadas
+- **Ver**: Azul (`#3b82f6`)
+- **Editar**: Laranja (`#f59e0b`)
+- **Resolver**: Verde (`#22c55e`)
+- **Ativar/Desativar**: Roxo (`#8b5cf6`)
+- **Excluir**: Vermelho (`#ef4444`)
+
+### 3. ✅ SEMPRE use espaçamentos múltiplos de 4px
+- Gap entre botões: `8px`
+- Padding de cards: `16px`, `20px`, `24px`
+- Margin entre seções: `24px`
+
+### 4. ✅ SEMPRE use border-radius consistente
+- Botões pequenos: `4px`
+- Botões médios: `6px`
+- Cards: `8px`
+- Badges: `12px`
+
+### 5. ✅ SEMPRE implemente hover states
+Todos os elementos interativos devem ter estado hover com escurecimento da cor.
+
+### 6. ✅ SEMPRE use CSS inline nos templates
+Para facilitar manutenção, todo CSS deve estar inline no próprio template `.php`.
+
+### 7. ✅ SEMPRE torne a UI responsiva
+Todas as grids devem adaptar para `1fr` em mobile (`max-width: 768px`).
+
+---
+
+## Exemplos de Uso
+
+### Botões de Ação (Tabelas)
+```php
+<div class="action-buttons">
+    <?= $this->Html->link(
+        'Ver',
+        ['action' => 'view', $id],
+        ['class' => 'btn-action btn-action-view']
+    ) ?>
+    <?= $this->Html->link(
+        'Editar',
+        ['action' => 'edit', $id],
+        ['class' => 'btn-action btn-action-edit']
+    ) ?>
+    <?= $this->Form->postLink(
+        'Excluir',
+        ['action' => 'delete', $id],
+        ['class' => 'btn-action btn-action-danger', 'confirm' => '...']
+    ) ?>
+</div>
+```
+
+### Cards de Estatísticas
+```php
+<div class="stats-grid">
+    <div class="stat-card-mini">
+        <div class="stat-label">Total</div>
+        <div class="stat-value info"><?= number_format($total) ?></div>
+    </div>
+    <div class="stat-card-mini">
+        <div class="stat-label">Ativos</div>
+        <div class="stat-value success"><?= number_format($active) ?></div>
+    </div>
+</div>
+```
+
+### Filtros
+```php
+<div class="filters-card">
+    <?= $this->Form->create(null, ['type' => 'get']) ?>
+    <div class="filters-row">
+        <div class="filter-group">
+            <label>Status</label>
+            <?= $this->Form->control('status', ['label' => false]) ?>
+        </div>
+        <!-- Mais filtros -->
+    </div>
+    <div class="filter-buttons">
+        <?= $this->Form->button('Filtrar', ['class' => 'btn-filter']) ?>
+        <?= $this->Html->link('Limpar', ['action' => 'index'], ['class' => 'btn-clear']) ?>
+    </div>
+    <?= $this->Form->end() ?>
+</div>
+```
+
+---
+
+## Checklist de Implementação
+
+Ao criar uma nova view, certifique-se de:
+
+- [ ] Usar CSS inline no template
+- [ ] Implementar cards de estatísticas se aplicável
+- [ ] Implementar filtros com layout em grid
+- [ ] **Usar botões com texto (SEM ÍCONES)**
+- [ ] Aplicar cores padronizadas aos botões
+- [ ] Implementar hover states em todos os elementos interativos
+- [ ] Adicionar paginação estilizada com contador
+- [ ] Tornar a UI responsiva (mobile-first)
+- [ ] Usar espaçamentos múltiplos de 4px
+- [ ] Aplicar border-radius consistente
+- [ ] Testar em mobile (< 768px)
+
+---
+
+**Última atualização**: 31/10/2025
+**Versão**: 2.0.0
+**Nota**: Este documento reflete o design system IMPLEMENTADO no código, não o planejado inicialmente.
