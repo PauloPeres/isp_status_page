@@ -668,26 +668,32 @@ bin/cake bake model Monitors --no-test --no-fixture
 ---
 
 ### TASK-212: Ping Checker
-**Status**: 🔴 | **Prioridade**: ⭐ | **Dependências**: TASK-210
-**Estimativa**: 3h
+**Status**: 🟢 **COMPLETO** | **Prioridade**: ⭐ | **Dependências**: TASK-210
+**Estimativa**: 3h | **Tempo Real**: 2.5h
 
 **Descrição**: Implementar checker para ping ICMP.
 
-**Implementar**:
-- Execução de ping via shell
-- Parse de resultado
-- Medição de latência
-- Detecção de packet loss
+**Implementado**:
+- ✅ Execução de ping via shell (shell_exec)
+- ✅ Comandos específicos por OS (Linux, macOS, Windows)
+- ✅ Parse de resultado com regex
+- ✅ Medição de latência (min/avg/max)
+- ✅ Detecção de packet loss
+- ✅ Suporte IPv4 e IPv6
+- ✅ Remoção inteligente de scheme/path/port
+- ✅ Detecção de degraded com packet loss
+- ✅ Error messages user-friendly
+- ✅ Configuração de timeout por OS
 
-**Arquivos a criar**:
-- `src/Service/Check/PingChecker.php`
-- `tests/TestCase/Service/Check/PingCheckerTest.php`
+**Arquivos criados**:
+- `src/Service/Check/PingChecker.php` - ✅ 395 linhas
+- `tests/TestCase/Service/Check/PingCheckerTest.php` - ✅ 21 testes
 
 **Critérios de Aceite**:
-- [ ] Ping funciona em Linux/Mac/Windows
-- [ ] Extrai latência corretamente
-- [ ] Detecta packet loss
-- [ ] Testes passando
+- [x] Ping funciona em Linux/Mac/Windows
+- [x] Extrai latência corretamente
+- [x] Detecta packet loss
+- [x] Testes passando (21/21 testes, 56 assertions)
 
 ---
 
