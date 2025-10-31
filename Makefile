@@ -1,7 +1,7 @@
 # ISP Status Page - Makefile
 # Simplifica comandos Docker e desenvolvimento
 
-.PHONY: help dev prod build up down logs shell clean migrate seed test
+.PHONY: help dev prod build up down logs shell clean migrate seed test test-all test-unit test-coverage
 
 # Default target
 .DEFAULT_GOAL := help
@@ -123,13 +123,43 @@ db-reset: ## Reset completo do banco (CUIDADO!)
 	@echo "$(GREEN)✓ Banco resetado!$(NC)"
 
 # Development tools
-test: ## Executa testes
-	@echo "$(BLUE)Executando testes...$(NC)"
+test: ## Executa todos os testes
+	@echo "$(BLUE)Executando todos os testes...$(NC)"
 	docker-compose exec app vendor/bin/phpunit
 	@echo "$(GREEN)✓ Testes completos!$(NC)"
 
-test-coverage: ## Executa testes com coverage
+test-unit: ## Executa apenas testes unitários
+	@echo "$(BLUE)Executando testes unitários...$(NC)"
+	docker-compose exec app vendor/bin/phpunit tests/TestCase/Controller/
+	@echo "$(GREEN)✓ Testes unitários completos!$(NC)"
+
+test-controllers: ## Executa testes de controllers
+	@echo "$(BLUE)Executando testes de controllers...$(NC)"
+	docker-compose exec app vendor/bin/phpunit tests/TestCase/Controller/
+	@echo "$(GREEN)✓ Testes de controllers completos!$(NC)"
+
+test-models: ## Executa testes de models
+	@echo "$(BLUE)Executando testes de models...$(NC)"
+	docker-compose exec app vendor/bin/phpunit tests/TestCase/Model/
+	@echo "$(GREEN)✓ Testes de models completos!$(NC)"
+
+test-specific: ## Executa teste específico - use: make test-specific FILE=UsersControllerTest
+	@echo "$(BLUE)Executando teste específico...$(NC)"
+	docker-compose exec app vendor/bin/phpunit tests/TestCase/Controller/$(FILE).php
+	@echo "$(GREEN)✓ Teste completo!$(NC)"
+
+test-coverage: ## Executa testes com coverage HTML
+	@echo "$(BLUE)Executando testes com coverage...$(NC)"
 	docker-compose exec app vendor/bin/phpunit --coverage-html tmp/coverage
+	@echo "$(GREEN)✓ Coverage gerado em tmp/coverage/index.html$(NC)"
+
+test-coverage-text: ## Executa testes com coverage em texto
+	@echo "$(BLUE)Executando testes com coverage...$(NC)"
+	docker-compose exec app vendor/bin/phpunit --coverage-text
+
+test-watch: ## Executa testes em modo watch (requer phpunit-watcher)
+	@echo "$(BLUE)Executando testes em modo watch...$(NC)"
+	docker-compose exec app vendor/bin/phpunit-watcher watch
 
 cs-check: ## Verifica padrões de código
 	docker-compose exec app vendor/bin/phpcs

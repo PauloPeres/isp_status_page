@@ -105,4 +105,16 @@ class UsersTable extends Table
 
         return $rules;
     }
+
+    /**
+     * Custom finder for authentication
+     * Only returns active users
+     *
+     * @param \Cake\ORM\Query\SelectQuery $query The query
+     * @return \Cake\ORM\Query\SelectQuery
+     */
+    public function findAuth(SelectQuery $query): SelectQuery
+    {
+        return $query->where(['Users.active' => true]);
+    }
 }

@@ -42,11 +42,27 @@ class AppController extends Controller
         parent::initialize();
 
         $this->loadComponent('Flash');
+        $this->loadComponent('Authentication.Authentication');
 
         /*
          * Enable the following component for recommended CakePHP form protection settings.
          * see https://book.cakephp.org/4/en/controllers/components/form-protection.html
          */
         //$this->loadComponent('FormProtection');
+    }
+
+    /**
+     * Before filter callback.
+     *
+     * @param \Cake\Event\EventInterface $event The event.
+     * @return \Cake\Http\Response|null|void
+     */
+    public function beforeFilter(\Cake\Event\EventInterface $event)
+    {
+        parent::beforeFilter($event);
+
+        // Allow public access to the display action (status page)
+        // Login and logout will be configured in UsersController
+        $this->Authentication->addUnauthenticatedActions(['display']);
     }
 }
