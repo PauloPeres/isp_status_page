@@ -33,7 +33,7 @@ isp_status_page/
 
 **Fase 0**: TASK-000 ✅, TASK-001 ✅ (2/2 completas)
 **Fase 1**: TASK-100 ✅, TASK-101 ✅, TASK-102 ✅, TASK-111 ✅, TASK-120 ✅, TASK-121 ✅ (6/? completas)
-**Fase 2**: TASK-200 ✅, TASK-201 ✅ (2/? completas)
+**Fase 2**: TASK-200 ✅, TASK-201 ✅, TASK-210 ✅ (3/? completas)
 
 **Modelos Criados**: User, Setting, Monitor, Incident, MonitorCheck, Subscriber, Subscription, AlertRule, AlertLog, Integration, IntegrationLog (11/11)
 **Controllers**: UsersController, AdminController, StatusController, MonitorsController ✅
@@ -604,28 +604,34 @@ bin/cake bake model Monitors --no-test --no-fixture
 ---
 
 ### TASK-210: Check Service - Interface e Abstract
-**Status**: 🔴 | **Prioridade**: 🔥 | **Dependências**: TASK-200
-**Estimativa**: 2h
+**Status**: 🟢 **COMPLETO** | **Prioridade**: 🔥 | **Dependências**: TASK-200
+**Estimativa**: 2h | **Tempo Real**: 1.5h
 
 **Descrição**: Criar interface e classe abstrata para checkers.
 
-**Ver**: docs/ARCHITECTURE.md - Check Service
+**Arquivos criados**:
+- `src/Service/Check/CheckerInterface.php` ✅
+- `src/Service/Check/AbstractChecker.php` ✅
+- `src/Service/Check/CheckService.php` ✅
+- `tests/TestCase/Service/Check/CheckServiceTest.php` ✅ (11 testes)
+- `tests/TestCase/Service/Check/AbstractCheckerTest.php` ✅ (11 testes)
 
-**Implementar**:
-- `CheckerInterface` com métodos obrigatórios
-- `AbstractChecker` com lógica comum
-- `CheckService` coordenador
-
-**Arquivos a criar**:
-- `src/Service/Check/CheckerInterface.php`
-- `src/Service/Check/AbstractChecker.php`
-- `src/Service/Check/CheckService.php`
-- `tests/TestCase/Service/Check/CheckServiceTest.php`
+**Funcionalidades implementadas**:
+- ✅ Interface CheckerInterface com 4 métodos obrigatórios
+- ✅ AbstractChecker com lógica comum (error handling, logging, timing)
+- ✅ Métodos auxiliares: buildSuccessResult(), buildErrorResult(), buildDegradedResult()
+- ✅ CheckService como registry e factory de checkers
+- ✅ Suporte para múltiplos checkers simultaneamente
+- ✅ Validação de configuração de monitores
+- ✅ Logging completo de todas as operações
+- ✅ Tratamento robusto de erros e exceções
+- ✅ 22 testes passando (100% coverage dos métodos críticos)
 
 **Critérios de Aceite**:
-- [ ] Interface bem definida
-- [ ] Abstract class com métodos comuns
-- [ ] CheckService coordena checkers
+- [x] Interface bem definida
+- [x] Abstract class com métodos comuns
+- [x] CheckService coordena checkers
+- [x] Testes passando com 100% dos assertions
 
 ---
 
