@@ -1388,23 +1388,31 @@ bin/cake bake model Monitors --no-test --no-fixture
 ---
 
 ### TASK-250: Alert Rule Model
-**Status**: 🔴 | **Prioridade**: ⭐ | **Dependências**: TASK-170
-**Estimativa**: 2h
+**Status**: 🟢 **COMPLETO** | **Prioridade**: ⭐ | **Dependências**: TASK-170
+**Estimativa**: 2h | **Tempo Real**: 2h
 
 **Descrição**: Criar Models AlertRule e AlertLog.
 
 **Ver**: docs/DATABASE.md
 
-**Arquivos a criar**:
-- `src/Model/Entity/AlertRule.php`
-- `src/Model/Table/AlertRulesTable.php`
-- `src/Model/Entity/AlertLog.php`
-- `src/Model/Table/AlertLogsTable.php`
+**Arquivos criados**:
+- `src/Model/Entity/AlertRule.php` - Entity com constantes, getters/setters e validações
+- `src/Model/Table/AlertRulesTable.php` - Table com validações e query methods
+- `src/Model/Entity/AlertLog.php` - Entity com constantes e métodos helper
+- `src/Model/Table/AlertLogsTable.php` - Table com validações, query methods e statistics
+- `tests/Fixture/AlertRulesFixture.php` - Fixture para testes
+- `tests/Fixture/AlertLogsFixture.php` - Fixture para testes
+- `tests/TestCase/Model/Table/AlertRulesTableTest.php` - Testes unitários
+- `tests/TestCase/Model/Table/AlertLogsTableTest.php` - Testes unitários
 
 **Critérios de Aceite**:
-- [ ] Models criados
-- [ ] Validações
-- [ ] Associações
+- [x] Models criados com todas as propriedades e constantes
+- [x] Validações implementadas (channels, triggers, status, JSON)
+- [x] Associações configuradas (Monitor, Incident, AlertRule, AlertLog)
+- [x] Métodos helper implementados (shouldTrigger, getChannelName, etc)
+- [x] Query methods úteis (findActive, findByStatus, getStatistics, etc)
+- [x] Fixtures criadas para testes
+- [x] Testes unitários passando (10 testes, 36 assertions)
 
 ---
 

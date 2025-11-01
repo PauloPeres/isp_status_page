@@ -31,13 +31,15 @@ class AlertRule extends Entity
     public const CHANNEL_WHATSAPP = 'whatsapp';
     public const CHANNEL_TELEGRAM = 'telegram';
     public const CHANNEL_SMS = 'sms';
+    public const CHANNEL_PHONE = 'phone';
 
     /**
-     * Trigger events
+     * Trigger types (matching DATABASE.md)
      */
-    public const TRIGGER_DOWN = 'down';
-    public const TRIGGER_UP = 'up';
-    public const TRIGGER_DEGRADED = 'degraded';
+    public const TRIGGER_ON_DOWN = 'on_down';
+    public const TRIGGER_ON_UP = 'on_up';
+    public const TRIGGER_ON_DEGRADED = 'on_degraded';
+    public const TRIGGER_ON_CHANGE = 'on_change';
 
     /**
      * Fields that can be mass assigned using newEntity() or patchEntity().
@@ -108,6 +110,56 @@ class AlertRule extends Entity
     }
 
     /**
+     * Check if channel is email
+     *
+     * @return bool
+     */
+    public function isEmailChannel(): bool
+    {
+        return $this->channel === self::CHANNEL_EMAIL;
+    }
+
+    /**
+     * Check if channel is WhatsApp
+     *
+     * @return bool
+     */
+    public function isWhatsAppChannel(): bool
+    {
+        return $this->channel === self::CHANNEL_WHATSAPP;
+    }
+
+    /**
+     * Check if channel is Telegram
+     *
+     * @return bool
+     */
+    public function isTelegramChannel(): bool
+    {
+        return $this->channel === self::CHANNEL_TELEGRAM;
+    }
+
+    /**
+     * Check if channel is SMS
+     *
+     * @return bool
+     */
+    public function isSmsChannel(): bool
+    {
+        return $this->channel === self::CHANNEL_SMS;
+    }
+
+    /**
+     * Check if channel is Phone
+     *
+     * @return bool
+     */
+    public function isPhoneChannel(): bool
+    {
+        return $this->channel === self::CHANNEL_PHONE;
+    }
+
+    /**
      * Get human-readable channel name
      *
      * @return string
@@ -119,7 +171,52 @@ class AlertRule extends Entity
             self::CHANNEL_WHATSAPP => 'WhatsApp',
             self::CHANNEL_TELEGRAM => 'Telegram',
             self::CHANNEL_SMS => 'SMS',
+            self::CHANNEL_PHONE => 'Phone',
             default => 'Unknown',
+        };
+    }
+
+    /**
+     * Get human-readable trigger name
+     *
+     * @return string
+     */
+    public function getTriggerName(): string
+    {
+        return match ($this->trigger_on) {
+            self::TRIGGER_ON_DOWN => 'When Down',
+            self::TRIGGER_ON_UP => 'When Up',
+            self::TRIGGER_ON_DEGRADED => 'When Degraded',
+            self::TRIGGER_ON_CHANGE => 'On Status Change',
+            default => 'Unknown',
+        };
+    }
+
+    /**
+     * Check if this rule should trigger for a given status change
+     *
+     * @param string $oldStatus Old monitor status
+     * @param string $newStatus New monitor status
+     * @return bool
+     */
+    public function shouldTrigger(string $oldStatus, string $newStatus): bool
+    {
+        // Don't trigger if rule is inactive
+        if (!$this->isActive()) {
+            return false;
+        }
+
+        // No change, don't trigger
+        if ($oldStatus === $newStatus) {
+            return false;
+        }
+
+        return match ($this->trigger_on) {
+            self::TRIGGER_ON_DOWN => $newStatus === Monitor::STATUS_DOWN,
+            self::TRIGGER_ON_UP => $newStatus === Monitor::STATUS_UP,
+            self::TRIGGER_ON_DEGRADED => $newStatus === Monitor::STATUS_DEGRADED,
+            self::TRIGGER_ON_CHANGE => true, // Triggers on any status change
+            default => false,
         };
     }
 }

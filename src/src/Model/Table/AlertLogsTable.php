@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace App\Model\Table;
 
+use App\Model\Entity\AlertLog;
+use App\Model\Entity\AlertRule;
+use Cake\I18n\DateTime;
 use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
@@ -86,7 +89,14 @@ class AlertLogsTable extends Table
             ->scalar('channel')
             ->maxLength('channel', 50)
             ->requirePresence('channel', 'create')
-            ->notEmptyString('channel');
+            ->notEmptyString('channel')
+            ->inList('channel', [
+                AlertRule::CHANNEL_EMAIL,
+                AlertRule::CHANNEL_WHATSAPP,
+                AlertRule::CHANNEL_TELEGRAM,
+                AlertRule::CHANNEL_SMS,
+                AlertRule::CHANNEL_PHONE,
+            ], 'Invalid alert channel');
 
         $validator
             ->scalar('recipient')
@@ -98,7 +108,12 @@ class AlertLogsTable extends Table
             ->scalar('status')
             ->maxLength('status', 20)
             ->requirePresence('status', 'create')
-            ->notEmptyString('status');
+            ->notEmptyString('status')
+            ->inList('status', [
+                AlertLog::STATUS_SENT,
+                AlertLog::STATUS_FAILED,
+                AlertLog::STATUS_QUEUED,
+            ], 'Invalid alert log status');
 
         $validator
             ->dateTime('sent_at')
@@ -125,5 +140,125 @@ class AlertLogsTable extends Table
         $rules->add($rules->existsIn(['monitor_id'], 'Monitors'), ['errorField' => 'monitor_id']);
 
         return $rules;
+    }
+
+    /**
+     * Find alert logs by status
+     *
+     * @param \Cake\ORM\Query\SelectQuery $query Query object
+     * @param string $status Status to filter by
+     * @return \Cake\ORM\Query\SelectQuery
+     */
+    public function findByStatus(SelectQuery $query, string $status): SelectQuery
+    {
+        return $query->where(['AlertLogs.status' => $status]);
+    }
+
+    /**
+     * Find alert logs by channel
+     *
+     * @param \Cake\ORM\Query\SelectQuery $query Query object
+     * @param string $channel Channel to filter by
+     * @return \Cake\ORM\Query\SelectQuery
+     */
+    public function findByChannel(SelectQuery $query, string $channel): SelectQuery
+    {
+        return $query->where(['AlertLogs.channel' => $channel]);
+    }
+
+    /**
+     * Find alert logs by monitor
+     *
+     * @param \Cake\ORM\Query\SelectQuery $query Query object
+     * @param int $monitorId Monitor ID
+     * @return \Cake\ORM\Query\SelectQuery
+     */
+    public function findByMonitor(SelectQuery $query, int $monitorId): SelectQuery
+    {
+        return $query->where(['AlertLogs.monitor_id' => $monitorId]);
+    }
+
+    /**
+     * Find alert logs by incident
+     *
+     * @param \Cake\ORM\Query\SelectQuery $query Query object
+     * @param int $incidentId Incident ID
+     * @return \Cake\ORM\Query\SelectQuery
+     */
+    public function findByIncident(SelectQuery $query, int $incidentId): SelectQuery
+    {
+        return $query->where(['AlertLogs.incident_id' => $incidentId]);
+    }
+
+    /**
+     * Find recent alert logs
+     *
+     * @param \Cake\ORM\Query\SelectQuery $query Query object
+     * @param int $days Number of days to look back
+     * @return \Cake\ORM\Query\SelectQuery
+     */
+    public function findRecent(SelectQuery $query, int $days = 30): SelectQuery
+    {
+        $since = new DateTime("-{$days} days");
+
+        return $query->where(['AlertLogs.created >=' => $since]);
+    }
+
+    /**
+     * Get statistics for alert logs
+     *
+     * @param int|null $monitorId Optional monitor ID to filter by
+     * @param int $days Number of days to look back
+     * @return array
+     */
+    public function getStatistics(?int $monitorId = null, int $days = 30): array
+    {
+        $baseConditions = [];
+        $since = new DateTime("-{$days} days");
+        $baseConditions['AlertLogs.created >='] = $since;
+
+        if ($monitorId !== null) {
+            $baseConditions['monitor_id'] = $monitorId;
+        }
+
+        $total = $this->find()->where($baseConditions)->count();
+        $sent = $this->find()->where(array_merge($baseConditions, ['status' => AlertLog::STATUS_SENT]))->count();
+        $failed = $this->find()->where(array_merge($baseConditions, ['status' => AlertLog::STATUS_FAILED]))->count();
+        $queued = $this->find()->where(array_merge($baseConditions, ['status' => AlertLog::STATUS_QUEUED]))->count();
+
+        return [
+            'total' => $total,
+            'sent' => $sent,
+            'failed' => $failed,
+            'queued' => $queued,
+            'success_rate' => $total > 0 ? round(($sent / $total) * 100, 2) : 0,
+        ];
+    }
+
+    /**
+     * Delete old alert logs (retention policy)
+     *
+     * @param int $days Number of days to keep
+     * @return int Number of deleted records
+     */
+    public function deleteOldLogs(int $days = 30): int
+    {
+        $cutoff = new DateTime("-{$days} days");
+
+        return $this->deleteAll(['created <' => $cutoff]);
+    }
+
+    /**
+     * Get last alert log for a monitor
+     *
+     * @param int $monitorId Monitor ID
+     * @return \App\Model\Entity\AlertLog|null
+     */
+    public function getLastLogForMonitor(int $monitorId): ?AlertLog
+    {
+        return $this->find()
+            ->where(['monitor_id' => $monitorId])
+            ->orderBy(['created' => 'DESC'])
+            ->first();
     }
 }

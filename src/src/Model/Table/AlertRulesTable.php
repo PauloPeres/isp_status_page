@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Model\Table;
 
+use App\Model\Entity\AlertRule;
 use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
@@ -73,22 +74,50 @@ class AlertRulesTable extends Table
             ->scalar('channel')
             ->maxLength('channel', 50)
             ->requirePresence('channel', 'create')
-            ->notEmptyString('channel');
+            ->notEmptyString('channel')
+            ->inList('channel', [
+                AlertRule::CHANNEL_EMAIL,
+                AlertRule::CHANNEL_WHATSAPP,
+                AlertRule::CHANNEL_TELEGRAM,
+                AlertRule::CHANNEL_SMS,
+                AlertRule::CHANNEL_PHONE,
+            ], 'Invalid alert channel');
 
         $validator
             ->scalar('trigger_on')
             ->maxLength('trigger_on', 50)
             ->requirePresence('trigger_on', 'create')
-            ->notEmptyString('trigger_on');
+            ->notEmptyString('trigger_on')
+            ->inList('trigger_on', [
+                AlertRule::TRIGGER_ON_DOWN,
+                AlertRule::TRIGGER_ON_UP,
+                AlertRule::TRIGGER_ON_DEGRADED,
+                AlertRule::TRIGGER_ON_CHANGE,
+            ], 'Invalid trigger type');
 
         $validator
             ->integer('throttle_minutes')
-            ->notEmptyString('throttle_minutes');
+            ->notEmptyString('throttle_minutes')
+            ->greaterThanOrEqual('throttle_minutes', 0, 'Throttle minutes cannot be negative');
 
         $validator
             ->scalar('recipients')
             ->requirePresence('recipients', 'create')
-            ->notEmptyString('recipients');
+            ->notEmptyString('recipients')
+            ->add('recipients', 'validJson', [
+                'rule' => function ($value) {
+                    if (empty($value)) {
+                        return false;
+                    }
+                    $decoded = json_decode($value, true);
+                    if (json_last_error() !== JSON_ERROR_NONE) {
+                        return false;
+                    }
+
+                    return is_array($decoded) && !empty($decoded);
+                },
+                'message' => 'Recipients must be a valid non-empty JSON array',
+            ]);
 
         $validator
             ->scalar('template')
@@ -113,5 +142,75 @@ class AlertRulesTable extends Table
         $rules->add($rules->existsIn(['monitor_id'], 'Monitors'), ['errorField' => 'monitor_id']);
 
         return $rules;
+    }
+
+    /**
+     * Find active alert rules
+     *
+     * @param \Cake\ORM\Query\SelectQuery $query Query object
+     * @return \Cake\ORM\Query\SelectQuery
+     */
+    public function findActive(SelectQuery $query): SelectQuery
+    {
+        return $query->where(['AlertRules.active' => true]);
+    }
+
+    /**
+     * Find alert rules by monitor
+     *
+     * @param \Cake\ORM\Query\SelectQuery $query Query object
+     * @param int $monitorId Monitor ID
+     * @return \Cake\ORM\Query\SelectQuery
+     */
+    public function findByMonitor(SelectQuery $query, int $monitorId): SelectQuery
+    {
+        return $query->where(['AlertRules.monitor_id' => $monitorId]);
+    }
+
+    /**
+     * Find alert rules by channel
+     *
+     * @param \Cake\ORM\Query\SelectQuery $query Query object
+     * @param string $channel Channel name
+     * @return \Cake\ORM\Query\SelectQuery
+     */
+    public function findByChannel(SelectQuery $query, string $channel): SelectQuery
+    {
+        return $query->where(['AlertRules.channel' => $channel]);
+    }
+
+    /**
+     * Get active alert rules for a monitor
+     *
+     * @param int $monitorId Monitor ID
+     * @return array<\App\Model\Entity\AlertRule>
+     */
+    public function getActiveRulesForMonitor(int $monitorId): array
+    {
+        return $this->find()
+            ->where([
+                'AlertRules.monitor_id' => $monitorId,
+                'AlertRules.active' => true,
+            ])
+            ->contain(['Monitors'])
+            ->all()
+            ->toArray();
+    }
+
+    /**
+     * Get alert rules that should trigger for a status change
+     *
+     * @param int $monitorId Monitor ID
+     * @param string $oldStatus Old status
+     * @param string $newStatus New status
+     * @return array<\App\Model\Entity\AlertRule>
+     */
+    public function getRulesForStatusChange(int $monitorId, string $oldStatus, string $newStatus): array
+    {
+        $rules = $this->getActiveRulesForMonitor($monitorId);
+
+        return array_filter($rules, function ($rule) use ($oldStatus, $newStatus) {
+            return $rule->shouldTrigger($oldStatus, $newStatus);
+        });
     }
 }
