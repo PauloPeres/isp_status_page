@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Service\SettingService;
+use App\Service\EmailService;
 use Cake\Http\Exception\BadRequestException;
 
 /**
@@ -140,8 +141,30 @@ class SettingsController extends AppController
     {
         $this->request->allowMethod(['post']);
 
-        // TODO: Implement when EmailService is ready
-        $this->Flash->info(__('Funcionalidade de teste de email será implementada quando o serviço de email estiver configurado.'));
+        $toEmail = $this->request->getData('test_email');
+
+        if (empty($toEmail)) {
+            $this->Flash->error(__('Por favor, informe um endereço de email para o teste.'));
+            return $this->redirect(['action' => 'index', '#' => 'email']);
+        }
+
+        // Validate email format
+        if (!filter_var($toEmail, FILTER_VALIDATE_EMAIL)) {
+            $this->Flash->error(__('Endereço de email inválido.'));
+            return $this->redirect(['action' => 'index', '#' => 'email']);
+        }
+
+        try {
+            $emailService = new EmailService();
+
+            if ($emailService->sendTestEmail($toEmail)) {
+                $this->Flash->success(__('Email de teste enviado para {0}. Verifique sua caixa de entrada.', $toEmail));
+            } else {
+                $this->Flash->error(__('Não foi possível enviar o email de teste. Verifique as configurações de email e os logs de erro.'));
+            }
+        } catch (\Exception $e) {
+            $this->Flash->error(__('Erro ao enviar email de teste: {0}', $e->getMessage()));
+        }
 
         return $this->redirect(['action' => 'index', '#' => 'email']);
     }

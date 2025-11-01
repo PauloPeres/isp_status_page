@@ -1304,8 +1304,8 @@ bin/cake bake model Monitors --no-test --no-fixture
 ---
 
 ### TASK-241: Subscribers Controller - Subscribe Flow
-**Status**: 🔴 | **Prioridade**: 💡 | **Dependências**: TASK-240
-**Estimativa**: 4h
+**Status**: ✅ | **Prioridade**: 💡 | **Dependências**: TASK-240
+**Estimativa**: 4h | **Concluído em**: 31/10/2025
 
 **Descrição**: Implementar fluxo de inscrição pública.
 
@@ -1324,10 +1324,66 @@ bin/cake bake model Monitors --no-test --no-fixture
 - `templates/email/html/verify_subscription.php`
 
 **Critérios de Aceite**:
-- [ ] Form funcional
-- [ ] Email enviado
-- [ ] Verificação funciona
-- [ ] Unsubscribe funciona
+- [x] Form funcional
+- [⏳] Email enviado (aguardando EmailService - TASK-270)
+- [x] Verificação funciona
+- [x] Unsubscribe funciona
+
+**Notas de Implementação**:
+- **SubscribersController** métodos implementados:
+  - `beforeFilter()`: Permite acesso público a subscribe, verify, unsubscribe
+  - `subscribe()`: Fluxo completo de inscrição com validações
+    - Verifica email duplicado
+    - Cria subscriber com tokens de verificação e unsubscribe
+    - Cria subscription global (todos os monitors)
+    - Mensagens flash apropriadas para cada cenário
+  - `verify($token)`: Verificação de email com token
+    - Valida token
+    - Marca subscriber como verified
+    - Define verified_at timestamp
+    - Limpa verification_token após uso
+  - `unsubscribe($token)`: Cancelamento com token
+    - Valida token
+    - Mostra página de confirmação (GET)
+    - Processa cancelamento (POST)
+    - Define subscriber como inactive
+
+- **Templates criados**:
+  - `templates/Subscribers/verify.php`: Página de sucesso após verificação
+    - Layout limpo com ícone animado
+    - Lista de benefícios
+    - Link para voltar ao status
+    - Link para unsubscribe
+  - `templates/Subscribers/unsubscribe.php`: Página de cancelamento
+    - Estado de confirmação (GET)
+    - Estado de sucesso (POST)
+    - Animações e feedback visual
+    - Opção de voltar sem cancelar
+
+- **Formulário de subscribe**:
+  - Implementado em `templates/element/status/subscribe_form.php`
+  - Layout vertical (email, botão, notice)
+  - Validação CSRF automática
+  - Integrado na página de status
+
+- **Fluxo de subscrição**:
+  1. Usuário preenche email na status page
+  2. Sistema cria subscriber (unverified) + subscription global
+  3. Gera tokens de verificação e unsubscribe (64 chars hex)
+  4. [TODO] Envia email de verificação
+  5. Usuário clica no link: `/subscribers/verify/{token}`
+  6. Sistema verifica email e ativa notificações
+  7. Para cancelar: `/subscribers/unsubscribe/{token}`
+
+- **Casos tratados**:
+  - Email já inscrito e ativo
+  - Email já inscrito mas não verificado (reenvia)
+  - Email já inscrito mas inativo (reativa)
+  - Token inválido ou expirado
+  - Email duplicado
+  - Validações de formulário
+
+- Envio de emails aguarda implementação do EmailService (TASK-270)
 
 ---
 

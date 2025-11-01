@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Service\EmailService;
+
 /**
  * Subscribers Controller
  *
@@ -11,6 +13,21 @@ namespace App\Controller;
  */
 class SubscribersController extends AppController
 {
+    /**
+     * Email service instance
+     */
+    private EmailService $emailService;
+
+    /**
+     * Initialize callback
+     *
+     * @return void
+     */
+    public function initialize(): void
+    {
+        parent::initialize();
+        $this->emailService = new EmailService();
+    }
     /**
      * Before filter callback
      *
@@ -61,8 +78,12 @@ class SubscribersController extends AppController
                 $subscriber->active = true;
                 $this->Subscribers->save($subscriber);
 
-                // TODO: Send verification email
-                $this->Flash->success(__('Um email de verificação foi enviado para {0}.', $email));
+                // Send verification email
+                if ($this->emailService->sendVerificationEmail($subscriber)) {
+                    $this->Flash->success(__('Um email de verificação foi enviado para {0}.', $email));
+                } else {
+                    $this->Flash->warning(__('Não foi possível enviar o email de verificação. Por favor, tente novamente mais tarde.'));
+                }
                 return $this->redirect(['controller' => 'Status', 'action' => 'index']);
             }
 
@@ -99,8 +120,12 @@ class SubscribersController extends AppController
 
             $SubscriptionsTable->save($subscription);
 
-            // TODO: Send verification email when EmailService is ready
-            $this->Flash->success(__('Obrigado por se inscrever! Um email de verificação foi enviado para {0}.', $email));
+            // Send verification email
+            if ($this->emailService->sendVerificationEmail($subscriber)) {
+                $this->Flash->success(__('Obrigado por se inscrever! Um email de verificação foi enviado para {0}.', $email));
+            } else {
+                $this->Flash->warning(__('Inscrição realizada, mas não foi possível enviar o email de verificação. Por favor, solicite o reenvio.'));
+            }
         } else {
             $errors = $subscriber->getErrors();
             if (isset($errors['email']['unique'])) {
@@ -111,6 +136,89 @@ class SubscribersController extends AppController
         }
 
         return $this->redirect(['controller' => 'Status', 'action' => 'index']);
+    }
+
+    /**
+     * Verify method - Verify subscriber email with token
+     *
+     * @param string|null $token Verification token
+     * @return \Cake\Http\Response|null|void Renders view
+     */
+    public function verify($token = null)
+    {
+        $this->viewBuilder()->setLayout('public');
+
+        if (empty($token)) {
+            $this->Flash->error(__('Token de verificação inválido.'));
+            return $this->redirect(['controller' => 'Status', 'action' => 'index']);
+        }
+
+        $subscriber = $this->Subscribers->find()
+            ->where(['verification_token' => $token])
+            ->first();
+
+        if (!$subscriber) {
+            $this->Flash->error(__('Token de verificação inválido ou expirado.'));
+            return $this->redirect(['controller' => 'Status', 'action' => 'index']);
+        }
+
+        if ($subscriber->verified) {
+            $this->Flash->info(__('Este email já foi verificado anteriormente.'));
+            return $this->redirect(['controller' => 'Status', 'action' => 'index']);
+        }
+
+        // Verify subscriber
+        $subscriber->verified = true;
+        $subscriber->verified_at = new \DateTime();
+        $subscriber->verification_token = null; // Clear token after use
+
+        if ($this->Subscribers->save($subscriber)) {
+            $this->set('subscriber', $subscriber);
+            $this->Flash->success(__('Email verificado com sucesso! Você começará a receber notificações.'));
+        } else {
+            $this->Flash->error(__('Não foi possível verificar o email. Por favor, tente novamente.'));
+            return $this->redirect(['controller' => 'Status', 'action' => 'index']);
+        }
+    }
+
+    /**
+     * Unsubscribe method - Unsubscribe with token
+     *
+     * @param string|null $token Unsubscribe token
+     * @return \Cake\Http\Response|null|void Renders view
+     */
+    public function unsubscribe($token = null)
+    {
+        $this->viewBuilder()->setLayout('public');
+
+        if (empty($token)) {
+            $this->Flash->error(__('Token de cancelamento inválido.'));
+            return $this->redirect(['controller' => 'Status', 'action' => 'index']);
+        }
+
+        $subscriber = $this->Subscribers->find()
+            ->where(['unsubscribe_token' => $token])
+            ->first();
+
+        if (!$subscriber) {
+            $this->Flash->error(__('Token de cancelamento inválido.'));
+            return $this->redirect(['controller' => 'Status', 'action' => 'index']);
+        }
+
+        if ($this->request->is('post')) {
+            // Confirm unsubscribe
+            $subscriber->active = false;
+
+            if ($this->Subscribers->save($subscriber)) {
+                $this->set('success', true);
+                $this->Flash->success(__('Você foi desinscrito com sucesso. Não receberá mais notificações.'));
+            } else {
+                $this->set('success', false);
+                $this->Flash->error(__('Não foi possível processar o cancelamento. Por favor, tente novamente.'));
+            }
+        }
+
+        $this->set('subscriber', $subscriber);
     }
 
     /**
@@ -278,8 +386,12 @@ class SubscribersController extends AppController
             $this->Subscribers->save($subscriber);
         }
 
-        // TODO: Send verification email when EmailService is implemented
-        $this->Flash->info(__('Email de verificação será enviado quando o serviço de email estiver configurado.'));
+        // Send verification email
+        if ($this->emailService->sendVerificationEmail($subscriber)) {
+            $this->Flash->success(__('Email de verificação enviado para {0}.', $subscriber->email));
+        } else {
+            $this->Flash->error(__('Não foi possível enviar o email de verificação. Por favor, tente novamente.'));
+        }
 
         return $this->redirect($this->referer(['action' => 'view', $id]));
     }
