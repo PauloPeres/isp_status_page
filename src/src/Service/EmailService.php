@@ -6,6 +6,7 @@ namespace App\Service;
 use App\Model\Entity\Subscriber;
 use App\Model\Entity\Incident;
 use Cake\Mailer\Mailer;
+use Cake\Mailer\TransportFactory;
 use Cake\Routing\Router;
 
 /**
@@ -29,6 +30,63 @@ class EmailService
     }
 
     /**
+     * Get SMTP transport configuration from database settings
+     *
+     * @return array SMTP transport configuration
+     */
+    private function getSMTPConfig(): array
+    {
+        // Get SMTP settings from database
+        $host = $this->settingService->get('smtp_host', 'localhost');
+        $port = (int)$this->settingService->get('smtp_port', 587);
+        $username = $this->settingService->get('smtp_username', '');
+        $password = $this->settingService->get('smtp_password', '');
+        $encryption = strtolower($this->settingService->get('smtp_encryption', ''));
+
+        // Build transport configuration
+        $config = [
+            'host' => $host,
+            'port' => $port,
+            'username' => $username,
+            'password' => $password,
+            'className' => 'Smtp',
+            'timeout' => 30,
+        ];
+
+        // Add TLS/SSL if configured
+        if ($encryption === 'tls') {
+            $config['tls'] = true;
+        } elseif ($encryption === 'ssl') {
+            $config['tls'] = true;
+        }
+
+        return $config;
+    }
+
+    /**
+     * Configure a Mailer instance with SMTP settings
+     *
+     * @param \Cake\Mailer\Mailer $mailer Mailer instance to configure
+     * @return \Cake\Mailer\Mailer Configured mailer
+     */
+    private function configureSMTP(Mailer $mailer): Mailer
+    {
+        $config = $this->getSMTPConfig();
+
+        // Create a unique transport configuration name
+        $transportName = 'smtp_dynamic_' . uniqid();
+
+        // Configure the transport factory
+        TransportFactory::setConfig($transportName, $config);
+
+        // Get the transport instance and apply it to the mailer
+        $transport = TransportFactory::get($transportName);
+        $mailer->setTransport($transport);
+
+        return $mailer;
+    }
+
+    /**
      * Send verification email to subscriber
      *
      * @param \App\Model\Entity\Subscriber $subscriber Subscriber entity
@@ -41,7 +99,8 @@ class EmailService
         }
 
         try {
-            $mailer = new Mailer('default');
+            $mailer = new Mailer();
+            $this->configureSMTP($mailer);
 
             // Get site settings
             $siteName = $this->settingService->get('site_name', 'ISP Status');
@@ -109,7 +168,8 @@ class EmailService
     private function sendIncidentEmail(Subscriber $subscriber, Incident $incident): bool
     {
         try {
-            $mailer = new Mailer('default');
+            $mailer = new Mailer();
+            $this->configureSMTP($mailer);
 
             // Get site settings
             $siteName = $this->settingService->get('site_name', 'ISP Status');
@@ -161,34 +221,32 @@ class EmailService
      *
      * @param string $toEmail Email address to send test to
      * @return bool True if test email was sent successfully
+     * @throws \Exception If email fails to send
      */
     public function sendTestEmail(string $toEmail): bool
     {
-        try {
-            $mailer = new Mailer('default');
+        $siteName = $this->settingService->get('site_name', 'ISP Status');
+        $fromEmail = $this->settingService->get('email_from', 'noreply@localhost');
+        $fromName = $this->settingService->get('email_from_name', $siteName);
 
-            $siteName = $this->settingService->get('site_name', 'ISP Status');
-            $fromEmail = $this->settingService->get('email_from', 'noreply@localhost');
-            $fromName = $this->settingService->get('email_from_name', $siteName);
+        // Create and configure mailer
+        $mailer = new Mailer();
+        $this->configureSMTP($mailer);
 
-            $mailer
-                ->setEmailFormat('html')
-                ->setFrom([$fromEmail => $fromName])
-                ->setTo($toEmail)
-                ->setSubject("Test Email - {$siteName}")
-                ->setViewVars([
-                    'siteName' => $siteName,
-                ])
-                ->viewBuilder()
-                    ->setTemplate('test')
-                    ->setLayout('default');
+        $mailer
+            ->setEmailFormat('html')
+            ->setFrom([$fromEmail => $fromName])
+            ->setTo($toEmail)
+            ->setSubject("Test Email - {$siteName}")
+            ->setViewVars([
+                'siteName' => $siteName,
+            ])
+            ->viewBuilder()
+                ->setTemplate('test')
+                ->setLayout('default');
 
-            $mailer->deliver();
+        $mailer->deliver();
 
-            return true;
-        } catch (\Exception $e) {
-            error_log('Error sending test email: ' . $e->getMessage());
-            return false;
-        }
+        return true;
     }
 }

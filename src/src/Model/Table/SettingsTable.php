@@ -69,7 +69,7 @@ class SettingsTable extends Table
             ->scalar('type')
             ->maxLength('type', 20)
             ->notEmptyString('type')
-            ->inList('type', ['string', 'integer', 'boolean', 'json'], 'Invalid type. Must be string, integer, boolean, or json');
+            ->inList('type', ['string', 'integer', 'boolean', 'json'], __('Invalid type. Must be string, integer, boolean, or json'));
 
         $validator
             ->scalar('description')

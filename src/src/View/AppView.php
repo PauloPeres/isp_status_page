@@ -41,5 +41,8 @@ class AppView extends View
 
         // Load Authentication Identity Helper
         $this->loadHelper('Authentication.Identity');
+
+        // Load Language Helper for i18n support
+        $this->loadHelper('Language');
     }
 }

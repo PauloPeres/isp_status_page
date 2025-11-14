@@ -4,7 +4,7 @@
     <?= $this->Html->charset() ?>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>
-        <?= $this->fetch('title') ?> - ISP Status Admin
+        <?= $this->fetch('title') ?> - <?= __('ISP Status Admin') ?>
     </title>
 
     <!-- Favicon -->

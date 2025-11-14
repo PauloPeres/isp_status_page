@@ -1,0 +1,317 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ISP Status Page - Incidents\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: Incidents - Títulos
+msgid "Incidents"
+msgstr "Incidentes"
+
+msgid "Incidentes"
+msgstr "Incidentes"
+
+msgid "Incident List"
+msgstr "Lista de Incidentes"
+
+msgid "Add Incident"
+msgstr "Añadir Incidente"
+
+msgid "Edit Incident"
+msgstr "Editar Incidente"
+
+msgid "Incident Details"
+msgstr "Detalles del Incidente"
+
+msgid "Detalhes do Incidente"
+msgstr "Detalles del Incidente"
+
+msgid "New Incident"
+msgstr "Nuevo Incidente"
+
+#: Incidents - Campos e Labels
+msgid "Incident Title"
+msgstr "Título del Incidente"
+
+msgid "Incident"
+msgstr "Incidente"
+
+msgid "Incidente"
+msgstr "Incidente"
+
+msgid "Monitor"
+msgstr "Monitor"
+
+msgid "Monitor Afetado"
+msgstr "Monitor Afectado"
+
+msgid "Severity"
+msgstr "Severidad"
+
+msgid "Severidade"
+msgstr "Severidad"
+
+msgid "Started"
+msgstr "Iniciado"
+
+msgid "Iniciado"
+msgstr "Iniciado"
+
+msgid "Started At"
+msgstr "Iniciado en"
+
+msgid "Iniciado em"
+msgstr "Iniciado en"
+
+msgid "Resolved At"
+msgstr "Resuelto en"
+
+msgid "Resolvido em"
+msgstr "Resuelto en"
+
+msgid "Identified"
+msgstr "Identificado"
+
+msgid "Identificado em"
+msgstr "Identificado en"
+
+msgid "Duration"
+msgstr "Duración"
+
+msgid "Duração"
+msgstr "Duración"
+
+msgid "Message"
+msgstr "Mensaje"
+
+msgid "Status"
+msgstr "Estado"
+
+msgid "Ações"
+msgstr "Acciones"
+
+msgid "Descrição"
+msgstr "Descripción"
+
+msgid "Criação"
+msgstr "Creación"
+
+#: Incidents - Status
+msgid "Investigating"
+msgstr "Investigando"
+
+msgid "Investigando"
+msgstr "Investigando"
+
+msgid "Monitoring"
+msgstr "Monitoreando"
+
+msgid "Monitorando"
+msgstr "Monitoreando"
+
+msgid "Resolved"
+msgstr "Resuelto"
+
+msgid "Resolvido"
+msgstr "Resuelto"
+
+msgid "Active"
+msgstr "Activo"
+
+msgid "Ativos"
+msgstr "Activos"
+
+msgid "Resolvidos"
+msgstr "Resueltos"
+
+#: Incidents - Severidade
+msgid "Critical"
+msgstr "Crítico"
+
+msgid "Crítica"
+msgstr "Crítica"
+
+msgid "Críticos"
+msgstr "Críticos"
+
+msgid "Major"
+msgstr "Mayor"
+
+msgid "Minor"
+msgstr "Menor"
+
+msgid "Maintenance"
+msgstr "Mantenimiento"
+
+msgid "Manutenção"
+msgstr "Mantenimiento"
+
+msgid "Todas"
+msgstr "Todas"
+
+#: Incidents - Filtros
+msgid "Buscar"
+msgstr "Buscar"
+
+msgid "Título ou descrição..."
+msgstr "Título o descripción..."
+
+msgid "Todos"
+msgstr "Todos"
+
+msgid "Todos os Monitores"
+msgstr "Todos los Monitores"
+
+msgid "Filtrar"
+msgstr "Filtrar"
+
+msgid "Limpar"
+msgstr "Limpiar"
+
+#: Incidents - Estatísticas
+msgid "Total"
+msgstr "Total"
+
+msgid "Total Incidents"
+msgstr "Total de Incidentes"
+
+msgid "Active Incidents"
+msgstr "Incidentes Activos"
+
+msgid "Resolved Incidents"
+msgstr "Incidentes Resueltos"
+
+msgid "Critical Incidents"
+msgstr "Incidentes Críticos"
+
+#: Incidents - Ações
+msgid "Ver"
+msgstr "Ver"
+
+msgid "Ver detalhes"
+msgstr "Ver detalles"
+
+msgid "Editar"
+msgstr "Editar"
+
+msgid "Resolve"
+msgstr "Resolver"
+
+msgid "Resolver"
+msgstr "Resolver"
+
+#: Incidents - Mensagens e Confirmações
+msgid "Tem certeza que deseja resolver este incidente?"
+msgstr "¿Está seguro de que desea resolver este incidente?"
+
+msgid "Incident created successfully."
+msgstr "Incidente creado exitosamente."
+
+msgid "Incident updated successfully."
+msgstr "Incidente actualizado exitosamente."
+
+msgid "Incident deleted successfully."
+msgstr "Incidente eliminado exitosamente."
+
+msgid "Incident resolved successfully."
+msgstr "Incidente resuelto exitosamente."
+
+msgid "Error creating incident."
+msgstr "Error al crear el incidente."
+
+msgid "Error updating incident."
+msgstr "Error al atualizar el incidente."
+
+msgid "Error deleting incident."
+msgstr "Error al eliminar el incidente."
+
+msgid "Nenhum incidente encontrado"
+msgstr "Ningún incidente encontrado"
+
+msgid "Tente ajustar os filtros ou aguarde novos incidentes."
+msgstr "Intente ajustar los filtros o espere nuevos incidentes."
+
+msgid "The incident has been updated."
+msgstr "El incidente ha sido actualizado."
+
+msgid "The incident could not be updated. Please, try again."
+msgstr "No fue posible actualizar el incidente. Por favor, inténtelo de nuevo."
+
+msgid "This incident is already resolved."
+msgstr "Este incidente ya ha sido resuelto."
+
+msgid "The incident has been resolved."
+msgstr "El incidente ha sido resuelto."
+
+msgid "The incident could not be resolved. Please, try again."
+msgstr "No fue posible resolver el incidente. Por favor, inténtelo de nuevo."
+
+#: Incidents - Estados e Textos
+msgid "N/A"
+msgstr "N/A"
+
+msgid "Em andamento"
+msgstr "En progreso"
+
+msgid "⏱️ Em andamento..."
+msgstr "⏱️ En progreso..."
+
+msgid "Incidente resolvido"
+msgstr "Incidente resuelto"
+
+msgid "Incidente ativo"
+msgstr "Incidente activo"
+
+msgid "🤖 Auto-criado"
+msgstr "🤖 Auto-creado"
+
+msgid "👤 Manual"
+msgstr "👤 Manual"
+
+#: Incidents - Detalhes do Incidente
+msgid "← Voltar para Incidentes"
+msgstr "← Volver a Incidentes"
+
+msgid "Ver Monitor"
+msgstr "Ver Monitor"
+
+msgid "Informações Principais"
+msgstr "Información Principal"
+
+msgid "Timeline de Eventos"
+msgstr "Línea de Tiempo de Eventos"
+
+msgid "Verificações Recentes do Monitor"
+msgstr "Verificaciones Recientes del Monitor"
+
+#: Incidents - Unidades de Tempo
+msgid "segundos"
+msgstr "segundos"
+
+msgid "minutos"
+msgstr "minutos"
+
+msgid "horas"
+msgstr "horas"
+
+msgid "dias"
+msgstr "días"
+
+#: Incidents - Paginação
+msgid "« Primeira"
+msgstr "« Primera"
+
+msgid "‹ Anterior"
+msgstr "‹ Anterior"
+
+msgid "Próxima ›"
+msgstr "Siguiente ›"
+
+msgid "Última »"
+msgstr "Última »"
+
+msgid "Página {{page}} de {{pages}}, mostrando {{current}} registro(s) de {{count}} no total"
+msgstr "Página {{page}} de {{pages}}, mostrando {{current}} registro(s) de {{count}} en total"

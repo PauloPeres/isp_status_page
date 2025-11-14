@@ -6,23 +6,23 @@
  * @var float $avgResponseTime
  * @var int $totalChecks
  */
-$this->assign('title', 'Detalhes do Monitor');
+$this->assign('title', __d('monitors', 'Monitor Details'));
 ?>
 
 <div class="monitors-view">
     <div class="page-header">
         <div>
             <h1>🖥️ <?= h($monitor->name) ?></h1>
-            <p><?= h($monitor->description) ?: 'Monitor de serviço' ?></p>
+            <p><?= h($monitor->description) ?: __d('monitors', 'Service monitor') ?></p>
         </div>
         <div style="display: flex; gap: 8px;">
             <?= $this->Html->link(
-                'Editar',
+                __('Edit'),
                 ['action' => 'edit', $monitor->id],
                 ['class' => 'btn btn-primary']
             ) ?>
             <?= $this->Html->link(
-                'Voltar',
+                __('Back'),
                 ['action' => 'index'],
                 ['class' => 'btn btn-secondary']
             ) ?>
@@ -37,7 +37,7 @@ $this->assign('title', 'Detalhes do Monitor');
             </div>
             <div class="status-content">
                 <h2><?= h(ucfirst($monitor->status)) ?></h2>
-                <p><?= $monitor->active ? 'Monitoramento ativo' : 'Monitoramento pausado' ?></p>
+                <p><?= $monitor->active ? __d('monitors', 'Monitoring active') : __d('monitors', 'Monitoring paused') ?></p>
             </div>
         </div>
     </div>
@@ -48,7 +48,7 @@ $this->assign('title', 'Detalhes do Monitor');
             <div class="stat-icon">📈</div>
             <div class="stat-content">
                 <div class="stat-value"><?= number_format($uptime, 2) ?>%</div>
-                <div class="stat-label">Uptime (24h)</div>
+                <div class="stat-label"><?= __d('monitors', 'Uptime (24h)') ?></div>
             </div>
         </div>
 
@@ -56,7 +56,7 @@ $this->assign('title', 'Detalhes do Monitor');
             <div class="stat-icon">⚡</div>
             <div class="stat-content">
                 <div class="stat-value"><?= $avgResponseTime ? number_format($avgResponseTime) . 'ms' : '-' ?></div>
-                <div class="stat-label">Tempo Médio</div>
+                <div class="stat-label"><?= __d('monitors', 'Average Time') ?></div>
             </div>
         </div>
 
@@ -64,7 +64,7 @@ $this->assign('title', 'Detalhes do Monitor');
             <div class="stat-icon">🔍</div>
             <div class="stat-content">
                 <div class="stat-value"><?= number_format($totalChecks) ?></div>
-                <div class="stat-label">Verificações (24h)</div>
+                <div class="stat-label"><?= __d('monitors', 'Checks (24h)') ?></div>
             </div>
         </div>
 
@@ -72,72 +72,72 @@ $this->assign('title', 'Detalhes do Monitor');
             <div class="stat-icon">🕐</div>
             <div class="stat-content">
                 <div class="stat-value"><?= $monitor->interval ?>s</div>
-                <div class="stat-label">Intervalo</div>
+                <div class="stat-label"><?= __d('monitors', 'Interval') ?></div>
             </div>
         </div>
     </div>
 
     <!-- Monitor Details -->
     <div class="card">
-        <div class="card-header">📋 Detalhes do Monitor</div>
+        <div class="card-header">📋 <?= __d('monitors', 'Monitor Details') ?></div>
         <div class="details-grid">
             <div class="detail-item">
-                <span class="detail-label">Tipo:</span>
+                <span class="detail-label"><?= __d('monitors', 'Type') ?>:</span>
                 <span class="badge badge-info"><?= h(strtoupper($monitor->type)) ?></span>
             </div>
 
             <div class="detail-item">
-                <span class="detail-label">Alvo:</span>
+                <span class="detail-label"><?= __d('monitors', 'Target') ?>:</span>
                 <code><?= h($monitor->target) ?></code>
             </div>
 
             <?php if ($monitor->type === 'http' && $monitor->expected_status_code): ?>
                 <div class="detail-item">
-                    <span class="detail-label">Status HTTP Esperado:</span>
+                    <span class="detail-label"><?= __d('monitors', 'Expected HTTP Status') ?>:</span>
                     <code><?= h($monitor->expected_status_code) ?></code>
                 </div>
             <?php endif; ?>
 
             <?php if ($monitor->type === 'port' && $monitor->port): ?>
                 <div class="detail-item">
-                    <span class="detail-label">Porta:</span>
+                    <span class="detail-label"><?= __d('monitors', 'Port') ?>:</span>
                     <code><?= h($monitor->port) ?></code>
                 </div>
             <?php endif; ?>
 
             <div class="detail-item">
-                <span class="detail-label">Intervalo:</span>
-                <span><?= $monitor->interval ?> segundos</span>
+                <span class="detail-label"><?= __d('monitors', 'Interval') ?>:</span>
+                <span><?= __d('monitors', '{0} seconds', $monitor->interval) ?></span>
             </div>
 
             <div class="detail-item">
-                <span class="detail-label">Timeout:</span>
-                <span><?= $monitor->timeout ?> segundos</span>
+                <span class="detail-label"><?= __d('monitors', 'Timeout') ?>:</span>
+                <span><?= __d('monitors', '{0} seconds', $monitor->timeout) ?></span>
             </div>
 
             <div class="detail-item">
-                <span class="detail-label">Última Verificação:</span>
+                <span class="detail-label"><?= __d('monitors', 'Last Check') ?>:</span>
                 <span>
                     <?php if ($monitor->last_check_at): ?>
                         <span class="local-datetime" data-utc="<?= $monitor->last_check_at->format('c') ?>"></span>
                     <?php else: ?>
-                        Nunca
+                        <?= __d('monitors', 'Never') ?>
                     <?php endif; ?>
                 </span>
             </div>
 
             <div class="detail-item">
-                <span class="detail-label">Tempo de Resposta:</span>
+                <span class="detail-label"><?= __d('monitors', 'Response Time') ?>:</span>
                 <span><?= $monitor->response_time ? number_format($monitor->response_time) . ' ms' : '-' ?></span>
             </div>
 
             <div class="detail-item">
-                <span class="detail-label">Criado em:</span>
+                <span class="detail-label"><?= __('Created') ?>:</span>
                 <span class="local-datetime" data-utc="<?= $monitor->created->format('c') ?>"></span>
             </div>
 
             <div class="detail-item">
-                <span class="detail-label">Última Atualização:</span>
+                <span class="detail-label"><?= __('Last Updated') ?>:</span>
                 <span class="local-datetime" data-utc="<?= $monitor->modified->format('c') ?>"></span>
             </div>
         </div>
@@ -147,18 +147,18 @@ $this->assign('title', 'Detalhes do Monitor');
     <?php if ($monitor->monitor_checks && count($monitor->monitor_checks) > 0): ?>
         <div class="card">
             <div class="card-header">
-                <span>📊 Últimas Verificações</span>
-                <span class="badge badge-info"><?= count($monitor->monitor_checks) ?> registros</span>
+                <span>📊 <?= __d('monitors', 'Recent Checks') ?></span>
+                <span class="badge badge-info"><?= __d('monitors', '{0} records', count($monitor->monitor_checks)) ?></span>
             </div>
             <div class="table-responsive">
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Status</th>
-                            <th>Data/Hora</th>
-                            <th>Tempo de Resposta</th>
-                            <th>Código de Status</th>
-                            <th>Mensagem de Erro</th>
+                            <th><?= __('Status') ?></th>
+                            <th><?= __('Date/Time') ?></th>
+                            <th><?= __d('monitors', 'Response Time') ?></th>
+                            <th><?= __d('monitors', 'Status Code') ?></th>
+                            <th><?= __d('monitors', 'Error Message') ?></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -200,8 +200,8 @@ $this->assign('title', 'Detalhes do Monitor');
         <div class="card">
             <div class="empty-state">
                 <div class="empty-state-icon">📊</div>
-                <p>Nenhuma verificação realizada ainda.</p>
-                <small class="text-muted">As verificações começarão automaticamente se o monitor estiver ativo.</small>
+                <p><?= __d('monitors', 'No checks performed yet.') ?></p>
+                <small class="text-muted"><?= __d('monitors', 'Checks will start automatically if the monitor is active.') ?></small>
             </div>
         </div>
     <?php endif; ?>
@@ -210,8 +210,8 @@ $this->assign('title', 'Detalhes do Monitor');
     <?php if ($monitor->incidents && count($monitor->incidents) > 0): ?>
         <div class="card">
             <div class="card-header">
-                <span>🚨 Incidentes Recentes</span>
-                <span class="badge badge-error"><?= count($monitor->incidents) ?> registros</span>
+                <span>🚨 <?= __d('monitors', 'Recent Incidents') ?></span>
+                <span class="badge badge-error"><?= __d('monitors', '{0} records', count($monitor->incidents)) ?></span>
             </div>
             <div class="incidents-list">
                 <?php foreach ($monitor->incidents as $incident): ?>
@@ -224,10 +224,10 @@ $this->assign('title', 'Detalhes do Monitor');
                         </div>
                         <p><?= h($incident->description) ?></p>
                         <div class="incident-meta">
-                            <span>📅 Iniciado: <span class="local-datetime" data-utc="<?= $incident->started_at->format('c') ?>"></span></span>
+                            <span>📅 <?= __d('monitors', 'Started') ?>: <span class="local-datetime" data-utc="<?= $incident->started_at->format('c') ?>"></span></span>
                             <?php if ($incident->resolved_at): ?>
-                                <span>✅ Resolvido: <span class="local-datetime" data-utc="<?= $incident->resolved_at->format('c') ?>"></span></span>
-                                <span>⏱️ Duração: <?= gmdate('H:i:s', $incident->duration ?? 0) ?></span>
+                                <span>✅ <?= __d('monitors', 'Resolved') ?>: <span class="local-datetime" data-utc="<?= $incident->resolved_at->format('c') ?>"></span></span>
+                                <span>⏱️ <?= __d('monitors', 'Duration') ?>: <?= gmdate('H:i:s', $incident->duration ?? 0) ?></span>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -238,29 +238,29 @@ $this->assign('title', 'Detalhes do Monitor');
 
     <!-- Actions -->
     <div class="card">
-        <div class="card-header">⚙️ Ações</div>
+        <div class="card-header">⚙️ <?= __('Actions') ?></div>
         <div class="actions-grid">
             <?= $this->Form->postLink(
-                $monitor->active ? 'Pausar Monitoramento' : 'Ativar Monitoramento',
+                $monitor->active ? __d('monitors', 'Pause Monitoring') : __d('monitors', 'Activate Monitoring'),
                 ['action' => 'toggle', $monitor->id],
                 [
                     'class' => 'btn ' . ($monitor->active ? 'btn-secondary' : 'btn-success'),
-                    'confirm' => 'Tem certeza que deseja ' . ($monitor->active ? 'pausar' : 'ativar') . ' este monitor?'
+                    'confirm' => __d('monitors', 'Are you sure you want to {0} this monitor?', $monitor->active ? __d('monitors', 'pause') : __d('monitors', 'activate'))
                 ]
             ) ?>
 
             <?= $this->Html->link(
-                'Editar Configurações',
+                __d('monitors', 'Edit Settings'),
                 ['action' => 'edit', $monitor->id],
                 ['class' => 'btn btn-primary']
             ) ?>
 
             <?= $this->Form->postLink(
-                'Excluir Monitor',
+                __d('monitors', 'Delete Monitor'),
                 ['action' => 'delete', $monitor->id],
                 [
                     'class' => 'btn btn-error',
-                    'confirm' => 'Tem certeza que deseja excluir este monitor? Esta ação não pode ser desfeita e todos os dados históricos serão perdidos.'
+                    'confirm' => __d('monitors', 'Are you sure you want to delete this monitor? This action cannot be undone and all historical data will be lost.')
                 ]
             ) ?>
         </div>

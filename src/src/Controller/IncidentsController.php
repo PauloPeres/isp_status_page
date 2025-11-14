@@ -175,12 +175,12 @@ class IncidentsController extends AppController
             $updated = $this->incidentService->updateIncident($incident, $newStatus, $description);
 
             if ($updated) {
-                $this->Flash->success(__('The incident has been updated.'));
+                $this->Flash->success(__d('incidents', 'The incident has been updated.'));
 
                 return $this->redirect(['action' => 'view', $id]);
             }
 
-            $this->Flash->error(__('The incident could not be updated. Please, try again.'));
+            $this->Flash->error(__d('incidents', 'The incident could not be updated. Please, try again.'));
         }
 
         $this->set(compact('incident'));
@@ -202,7 +202,7 @@ class IncidentsController extends AppController
         $incident = $this->Incidents->get($id);
 
         if ($incident->isResolved()) {
-            $this->Flash->warning(__('This incident is already resolved.'));
+            $this->Flash->warning(__d('incidents', 'This incident is already resolved.'));
 
             return $this->redirect(['action' => 'view', $id]);
         }
@@ -210,9 +210,9 @@ class IncidentsController extends AppController
         $resolved = $this->incidentService->resolveIncident($incident);
 
         if ($resolved) {
-            $this->Flash->success(__('The incident has been resolved.'));
+            $this->Flash->success(__d('incidents', 'The incident has been resolved.'));
         } else {
-            $this->Flash->error(__('The incident could not be resolved. Please, try again.'));
+            $this->Flash->error(__d('incidents', 'The incident could not be resolved. Please, try again.'));
         }
 
         return $this->redirect(['action' => 'view', $id]);

@@ -1,0 +1,57 @@
+# Email Translations - Portuguese (Brazil)
+msgid ""
+msgstr ""
+"Project-Id-Version: ISP Status Page\n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+# Test Email
+msgid "Email de Teste"
+msgstr "Email de Teste"
+
+msgid "Olá!"
+msgstr "Olá!"
+
+msgid "Este é um email de teste do sistema {0}."
+msgstr "Este é um email de teste do sistema {0}."
+
+msgid "Sucesso!"
+msgstr "Sucesso!"
+
+msgid "Se você está recebendo este email, significa que o sistema de envio de emails está configurado corretamente."
+msgstr "Se você está recebendo este email, significa que o sistema de envio de emails está configurado corretamente."
+
+msgid "Informações do Email:"
+msgstr "Informações do Email:"
+
+msgid "Data/Hora:"
+msgstr "Data/Hora:"
+
+msgid "Fuso horário:"
+msgstr "Fuso horário:"
+
+msgid "Sistema:"
+msgstr "Sistema:"
+
+msgid "Agora você pode começar a enviar notificações aos seus usuários!"
+msgstr "Agora você pode começar a enviar notificações aos seus usuários!"
+
+msgid "Este é um email automático de teste. Não é necessário responder."
+msgstr "Este é um email automático de teste. Não é necessário responder."
+
+msgid "Este é um email automático. Por favor, não responda."
+msgstr "Este é um email automático. Por favor, não responda."
+
+# Email Layout
+msgid "Este é um email automático gerado pelo sistema {0}"
+msgstr "Este é um email automático gerado pelo sistema {0}"
+
+msgid "Por favor, não responda este email."
+msgstr "Por favor, não responda este email."
+
+# Text Email
+msgid "EMAIL DE TESTE"
+msgstr "EMAIL DE TESTE"

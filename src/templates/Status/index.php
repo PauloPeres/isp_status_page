@@ -19,8 +19,14 @@ $this->assign('title', $statusPageTitle);
 <div class="container">
     <!-- Page Header -->
     <div class="page-header-status">
-        <h1><?= h($statusPageTitle) ?></h1>
-        <p class="site-name"><?= h($siteName) ?></p>
+        
+        <?php if (!empty($logoUrl)): ?>
+            <img src="<?= h($logoUrl) ?>" alt="<?= h($siteName) ?>" class="header-custom-logo">
+        <?php else: ?>
+            <h1><?= h($statusPageTitle) ?></h1>
+        <?php endif; ?>
+        
+        
     </div>
 
     <!-- System Status Banner -->
@@ -28,19 +34,19 @@ $this->assign('title', $statusPageTitle);
         <div class="status-icon"><?= $systemIcon ?></div>
         <h2 class="status-title"><?= h($systemMessage) ?></h2>
         <p class="status-description">
-            <?= $onlineMonitors ?> de <?= $totalMonitors ?> serviços operacionais
+            <?= $onlineMonitors ?> <?= __('de') ?> <?= $totalMonitors ?> <?= __('serviços operacionais') ?>
             <?php if ($offlineMonitors > 0): ?>
-                | <?= $offlineMonitors ?> offline
+                | <?= $offlineMonitors ?> <?= __('offline') ?>
             <?php endif; ?>
             <?php if ($degradedMonitors > 0): ?>
-                | <?= $degradedMonitors ?> degradados
+                | <?= $degradedMonitors ?> <?= __('degradados') ?>
             <?php endif; ?>
         </p>
     </div>
 
     <!-- Services List -->
     <div class="services-section">
-        <h3 class="section-title">📊 Status dos Serviços</h3>
+        <h3 class="section-title">📊 <?= __('Status dos Serviços') ?></h3>
 
         <?php if ($monitors->count() > 0): ?>
             <?php foreach ($monitors as $monitor): ?>
@@ -49,7 +55,7 @@ $this->assign('title', $statusPageTitle);
         <?php else: ?>
             <div class="empty-state">
                 <div class="empty-state-icon">📭</div>
-                <p>Nenhum serviço sendo monitorado no momento.</p>
+                <p><?= __('Nenhum serviço sendo monitorado no momento.') ?></p>
             </div>
         <?php endif; ?>
     </div>
@@ -64,7 +70,7 @@ $this->assign('title', $statusPageTitle);
 
 <!-- Auto-reload Indicator -->
 <div class="auto-reload-indicator">
-    <span id="reload-message">Próxima atualização em: <strong id="countdown">300</strong> segundos</span>
+    <span id="reload-message"><?= __('Próxima atualização em:') ?> <strong id="countdown">300</strong> <?= __('segundos') ?></span>
 </div>
 
 <style>
@@ -117,7 +123,22 @@ document.addEventListener('DOMContentLoaded', function() {
     countdownInterval = setInterval(updateCountdown, 1000);
 
     // Show last update time in console
-    console.log('Última atualização: ' + new Date().toLocaleString('pt-BR'));
-    console.log('Próxima atualização em 5 minutos');
+    console.log('<?= __('Última atualização:') ?> ' + new Date().toLocaleString('pt-BR'));
+    console.log('<?= __('Próxima atualização em 5 minutos') ?>');
+
+    // Smooth scroll to subscribe form
+    const subscribeLink = document.querySelector('a[href="#subscribe-form"]');
+    if (subscribeLink) {
+        subscribeLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            const subscribeForm = document.getElementById('subscribe-form');
+            if (subscribeForm) {
+                subscribeForm.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    }
 });
 </script>

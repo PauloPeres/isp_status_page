@@ -1,0 +1,215 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ISP Status Page - Checks\n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: Checks - Títulos
+msgid "Checks"
+msgstr "Verificações"
+
+msgid "Check List"
+msgstr "Lista de Verificações"
+
+msgid "Check Details"
+msgstr "Detalhes da Verificação"
+
+msgid "Recent Checks"
+msgstr "Verificações Recentes"
+
+#: Checks - Campos
+msgid "Check Date"
+msgstr "Data da Verificação"
+
+msgid "Checked At"
+msgstr "Verificado em"
+
+msgid "Check Status"
+msgstr "Status da Verificação"
+
+msgid "Status Code"
+msgstr "Código de Status"
+
+msgid "Error Message"
+msgstr "Mensagem de Erro"
+
+msgid "Details"
+msgstr "Detalhes"
+
+#: Checks - Status
+msgid "Success"
+msgstr "Sucesso"
+
+msgid "Failure"
+msgstr "Falha"
+
+msgid "Timeout"
+msgstr "Timeout"
+
+msgid "Error"
+msgstr "Erro"
+
+#: Checks - Estatísticas
+msgid "Total Checks"
+msgstr "Total de Verificações"
+
+msgid "Successful Checks"
+msgstr "Verificações Bem-sucedidas"
+
+msgid "Failed Checks"
+msgstr "Verificações Falhadas"
+
+msgid "Success Rate"
+msgstr "Taxa de Sucesso"
+
+#: Checks - Template index.php
+msgid "Verificações de Monitores"
+msgstr "Verificações de Monitores"
+
+msgid "Total Checks"
+msgstr "Total de Verificações"
+
+msgid "Sucesso"
+msgstr "Sucesso"
+
+msgid "Falhas"
+msgstr "Falhas"
+
+msgid "Taxa de Sucesso"
+msgstr "Taxa de Sucesso"
+
+msgid "Tempo Médio"
+msgstr "Tempo Médio"
+
+msgid "N/A"
+msgstr "N/A"
+
+msgid "Monitor"
+msgstr "Monitor"
+
+msgid "Todos os Monitores"
+msgstr "Todos os Monitores"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Todos"
+msgstr "Todos"
+
+msgid "Falha"
+msgstr "Falha"
+
+msgid "Período"
+msgstr "Período"
+
+msgid "Últimas 24 horas"
+msgstr "Últimas 24 horas"
+
+msgid "Últimos 7 dias"
+msgstr "Últimos 7 dias"
+
+msgid "Últimos 30 dias"
+msgstr "Últimos 30 dias"
+
+msgid "Filtrar"
+msgstr "Filtrar"
+
+msgid "Limpar"
+msgstr "Limpar"
+
+msgid "Data/Hora"
+msgstr "Data/Hora"
+
+msgid "Tempo Resposta"
+msgstr "Tempo de Resposta"
+
+msgid "Mensagem"
+msgstr "Mensagem"
+
+msgid "Ações"
+msgstr "Ações"
+
+msgid "Ver"
+msgstr "Ver"
+
+msgid "Ver detalhes"
+msgstr "Ver detalhes"
+
+msgid "Nenhuma verificação encontrada"
+msgstr "Nenhuma verificação encontrada"
+
+msgid "Tente ajustar os filtros ou aguarde as próximas verificações."
+msgstr "Tente ajustar os filtros ou aguarde as próximas verificações."
+
+msgid "« Primeira"
+msgstr "« Primeira"
+
+msgid "‹ Anterior"
+msgstr "‹ Anterior"
+
+msgid "Próxima ›"
+msgstr "Próxima ›"
+
+msgid "Última »"
+msgstr "Última »"
+
+msgid "Página {{page}} de {{pages}}, mostrando {{current}} registro(s) de {{count}} no total"
+msgstr "Página {{page}} de {{pages}}, mostrando {{current}} registro(s) de {{count}} no total"
+
+#: Checks - Template view.php
+msgid "Detalhes da Verificação"
+msgstr "Detalhes da Verificação"
+
+msgid "← Voltar"
+msgstr "← Voltar"
+
+msgid "Verificação bem-sucedida"
+msgstr "Verificação bem-sucedida"
+
+msgid "Verificação falhou"
+msgstr "Verificação falhou"
+
+msgid "Informações da Verificação"
+msgstr "Informações da Verificação"
+
+msgid "Tipo"
+msgstr "Tipo"
+
+msgid "Tempo de Resposta"
+msgstr "Tempo de Resposta"
+
+msgid "Status Code"
+msgstr "Código de Status"
+
+msgid "Mensagem de Erro"
+msgstr "Mensagem de Erro"
+
+msgid "Detalhes da Resposta"
+msgstr "Detalhes da Resposta"
+
+msgid "Estatísticas do Monitor"
+msgstr "Estatísticas do Monitor"
+
+msgid "Total de Checks"
+msgstr "Total de Verificações"
+
+msgid "Checks Bem-sucedidos"
+msgstr "Verificações Bem-sucedidas"
+
+msgid "Verificações Próximas"
+msgstr "Verificações Próximas"
+
+msgid "(atual)"
+msgstr "(atual)"
+
+msgid "Não há verificações próximas disponíveis"
+msgstr "Não há verificações próximas disponíveis"
+
+msgid "← Voltar para Verificações"
+msgstr "← Voltar para Verificações"
+
+msgid "Ver Monitor"
+msgstr "Ver Monitor"

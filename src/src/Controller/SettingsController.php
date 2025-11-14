@@ -6,6 +6,8 @@ namespace App\Controller;
 use App\Service\SettingService;
 use App\Service\EmailService;
 use Cake\Http\Exception\BadRequestException;
+use Cake\I18n\I18n;
+use Cake\Cache\Cache;
 
 /**
  * Settings Controller
@@ -58,13 +60,17 @@ class SettingsController extends AppController
 
         foreach ($allSettings as $setting) {
             // Categorize based on key prefix
-            if (str_starts_with($setting->key, 'site_') || str_starts_with($setting->key, 'status_page_')) {
+            if (str_starts_with($setting->key, 'site_') || str_starts_with($setting->key, 'status_page_') || $setting->key === 'support_email') {
                 $settings['general'][] = $setting;
             } elseif (str_starts_with($setting->key, 'email_') || str_starts_with($setting->key, 'smtp_')) {
                 $settings['email'][] = $setting;
             } elseif (str_starts_with($setting->key, 'monitor_') || str_starts_with($setting->key, 'check_')) {
                 $settings['monitoring'][] = $setting;
-            } elseif (str_starts_with($setting->key, 'notification_') || str_starts_with($setting->key, 'alert_')) {
+            } elseif (
+                str_starts_with($setting->key, 'notification_') ||
+                str_starts_with($setting->key, 'alert_') ||
+                str_starts_with($setting->key, 'enable_') && str_contains($setting->key, '_alerts')
+            ) {
                 $settings['notifications'][] = $setting;
             }
         }
@@ -85,12 +91,13 @@ class SettingsController extends AppController
         $data = $this->request->getData('settings');
 
         if (!$data) {
-            $this->Flash->error(__('Nenhuma configuração foi enviada.'));
+            $this->Flash->error(__d('settings', 'Nenhuma configuração foi enviada.'));
             return $this->redirect(['action' => 'index']);
         }
 
         $successCount = 0;
         $errorCount = 0;
+        $languageChanged = false;
 
         foreach ($data as $key => $value) {
             try {
@@ -105,6 +112,12 @@ class SettingsController extends AppController
 
                     if ($this->settingService->set($key, $typedValue, $existing->type)) {
                         $successCount++;
+
+                        // Check if language was changed
+                        if ($key === 'site_language') {
+                            $languageChanged = true;
+                            I18n::setLocale($typedValue);
+                        }
                     } else {
                         $errorCount++;
                     }
@@ -112,6 +125,12 @@ class SettingsController extends AppController
                     // New setting - auto-detect type
                     if ($this->settingService->set($key, $value)) {
                         $successCount++;
+
+                        // Check if language was changed
+                        if ($key === 'site_language') {
+                            $languageChanged = true;
+                            I18n::setLocale($value);
+                        }
                     } else {
                         $errorCount++;
                     }
@@ -121,12 +140,18 @@ class SettingsController extends AppController
             }
         }
 
+        // Clear cache if language was changed
+        if ($languageChanged) {
+            Cache::clear('default');
+            Cache::clear('_cake_core_');
+        }
+
         if ($successCount > 0) {
-            $this->Flash->success(__("{$successCount} configuração(ões) salva(s) com sucesso."));
+            $this->Flash->success(__d('settings', "{$successCount} configuração(ões) salva(s) com sucesso."));
         }
 
         if ($errorCount > 0) {
-            $this->Flash->error(__("{$errorCount} configuração(ões) falharam ao salvar."));
+            $this->Flash->error(__d('settings', "{$errorCount} configuração(ões) falharam ao salvar."));
         }
 
         return $this->redirect(['action' => 'index', '#' => $category ?? '']);
@@ -144,13 +169,13 @@ class SettingsController extends AppController
         $toEmail = $this->request->getData('test_email');
 
         if (empty($toEmail)) {
-            $this->Flash->error(__('Por favor, informe um endereço de email para o teste.'));
+            $this->Flash->error(__d('settings', 'Por favor, informe um endereço de email para o teste.'));
             return $this->redirect(['action' => 'index', '#' => 'email']);
         }
 
         // Validate email format
         if (!filter_var($toEmail, FILTER_VALIDATE_EMAIL)) {
-            $this->Flash->error(__('Endereço de email inválido.'));
+            $this->Flash->error(__d('settings', 'Endereço de email inválido.'));
             return $this->redirect(['action' => 'index', '#' => 'email']);
         }
 
@@ -158,12 +183,12 @@ class SettingsController extends AppController
             $emailService = new EmailService();
 
             if ($emailService->sendTestEmail($toEmail)) {
-                $this->Flash->success(__('Email de teste enviado para {0}. Verifique sua caixa de entrada.', $toEmail));
+                $this->Flash->success(__d('settings', 'Email de teste enviado para {0}. Verifique sua caixa de entrada.', $toEmail));
             } else {
-                $this->Flash->error(__('Não foi possível enviar o email de teste. Verifique as configurações de email e os logs de erro.'));
+                $this->Flash->error(__d('settings', 'Não foi possível enviar o email de teste. Verifique as configurações de email e os logs de erro.'));
             }
         } catch (\Exception $e) {
-            $this->Flash->error(__('Erro ao enviar email de teste: {0}', $e->getMessage()));
+            $this->Flash->error(__d('settings', 'Erro ao enviar email de teste: {0}', $e->getMessage()));
         }
 
         return $this->redirect(['action' => 'index', '#' => 'email']);
@@ -181,7 +206,7 @@ class SettingsController extends AppController
         $category = $this->request->getData('category');
 
         if (!$category) {
-            $this->Flash->error(__('Categoria não especificada.'));
+            $this->Flash->error(__d('settings', 'Categoria não especificada.'));
             return $this->redirect(['action' => 'index']);
         }
 
@@ -196,9 +221,9 @@ class SettingsController extends AppController
         }
 
         if ($resetCount > 0) {
-            $this->Flash->success(__("{$resetCount} configuração(ões) restaurada(s) para o padrão."));
+            $this->Flash->success(__d('settings', "{$resetCount} configuração(ões) restaurada(s) para o padrão."));
         } else {
-            $this->Flash->warning(__('Nenhuma configuração foi restaurada.'));
+            $this->Flash->warning(__d('settings', 'Nenhuma configuração foi restaurada.'));
         }
 
         return $this->redirect(['action' => 'index', '#' => $category]);
@@ -233,9 +258,11 @@ class SettingsController extends AppController
             'general' => [
                 'site_name' => ['value' => 'ISP Status', 'type' => 'string'],
                 'site_url' => ['value' => 'http://localhost:8765', 'type' => 'string'],
+                'site_language' => ['value' => 'pt_BR', 'type' => 'string'],
                 'status_page_title' => ['value' => 'System Status', 'type' => 'string'],
                 'status_page_public' => ['value' => true, 'type' => 'boolean'],
                 'status_page_cache_seconds' => ['value' => 30, 'type' => 'integer'],
+                'support_email' => ['value' => 'support@example.com', 'type' => 'string'],
             ],
             'email' => [
                 'smtp_host' => ['value' => 'localhost', 'type' => 'string'],

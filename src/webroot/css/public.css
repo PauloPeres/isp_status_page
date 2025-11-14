@@ -95,6 +95,14 @@ body {
     border-radius: var(--radius-md);
 }
 
+.header-custom-logo {
+    height: 80px;
+    width: auto;
+    max-width: 350px;
+    object-fit: contain;
+    margin-top: 4px;
+}
+
 .header-title h1 {
     font-size: 24px;
     font-weight: 700;

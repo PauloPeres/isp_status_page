@@ -1,0 +1,57 @@
+# Email Translations - Spanish
+msgid ""
+msgstr ""
+"Project-Id-Version: ISP Status Page\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+# Test Email
+msgid "Email de Teste"
+msgstr "Correo de Prueba"
+
+msgid "Olá!"
+msgstr "¡Hola!"
+
+msgid "Este é um email de teste do sistema {0}."
+msgstr "Este es un correo de prueba del sistema {0}."
+
+msgid "Sucesso!"
+msgstr "¡Éxito!"
+
+msgid "Se você está recebendo este email, significa que o sistema de envio de emails está configurado corretamente."
+msgstr "Si está recibiendo este correo, significa que el sistema de envío de correos está configurado correctamente."
+
+msgid "Informações do Email:"
+msgstr "Información del Correo:"
+
+msgid "Data/Hora:"
+msgstr "Fecha/Hora:"
+
+msgid "Fuso horário:"
+msgstr "Zona horaria:"
+
+msgid "Sistema:"
+msgstr "Sistema:"
+
+msgid "Agora você pode começar a enviar notificações aos seus usuários!"
+msgstr "¡Ahora puede comenzar a enviar notificaciones a sus usuarios!"
+
+msgid "Este é um email automático de teste. Não é necessário responder."
+msgstr "Este es un correo de prueba automático. No es necesario responder."
+
+msgid "Este é um email automático. Por favor, não responda."
+msgstr "Este es un correo automático. Por favor, no responda."
+
+# Email Layout
+msgid "Este é um email automático gerado pelo sistema {0}"
+msgstr "Este es un correo automático generado por el sistema {0}"
+
+msgid "Por favor, não responda este email."
+msgstr "Por favor, no responda a este correo."
+
+# Text Email
+msgid "EMAIL DE TESTE"
+msgstr "CORREO DE PRUEBA"

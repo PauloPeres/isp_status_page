@@ -64,7 +64,7 @@ class UsersTable extends Table
         $validator
             ->scalar('password')
             ->maxLength('password', 255)
-            ->minLength('password', 8, 'Password must be at least 8 characters long')
+            ->minLength('password', 8, __('Password must be at least 8 characters long'))
             ->requirePresence('password', 'create')
             ->notEmptyString('password');
 
@@ -78,7 +78,7 @@ class UsersTable extends Table
             ->scalar('role')
             ->maxLength('role', 20)
             ->notEmptyString('role')
-            ->inList('role', ['admin', 'user', 'viewer'], 'Invalid role. Must be admin, user, or viewer');
+            ->inList('role', ['admin', 'user', 'viewer'], __('Invalid role. Must be admin, user, or viewer'));
 
         $validator
             ->boolean('active')

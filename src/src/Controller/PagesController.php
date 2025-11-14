@@ -32,6 +32,25 @@ use Cake\View\Exception\MissingTemplateException;
 class PagesController extends AppController
 {
     /**
+     * Home page - redirects based on authentication status
+     *
+     * @return \Cake\Http\Response
+     */
+    public function home(): Response
+    {
+        // Check if user is authenticated
+        $identity = $this->Authentication->getIdentity();
+
+        if ($identity) {
+            // User is logged in, redirect to admin dashboard
+            return $this->redirect(['controller' => 'Admin', 'action' => 'index']);
+        }
+
+        // User is not logged in, redirect to login page
+        return $this->redirect(['controller' => 'Users', 'action' => 'login']);
+    }
+
+    /**
      * Displays a view
      *
      * @param string ...$path Path segments.

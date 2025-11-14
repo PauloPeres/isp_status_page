@@ -1,0 +1,215 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ISP Status Page - Checks\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: Checks - Títulos
+msgid "Checks"
+msgstr "Checks"
+
+msgid "Check List"
+msgstr "Check List"
+
+msgid "Check Details"
+msgstr "Check Details"
+
+msgid "Recent Checks"
+msgstr "Recent Checks"
+
+#: Checks - Campos
+msgid "Check Date"
+msgstr "Check Date"
+
+msgid "Checked At"
+msgstr "Checked At"
+
+msgid "Check Status"
+msgstr "Check Status"
+
+msgid "Status Code"
+msgstr "Status Code"
+
+msgid "Error Message"
+msgstr "Error Message"
+
+msgid "Details"
+msgstr "Details"
+
+#: Checks - Status
+msgid "Success"
+msgstr "Success"
+
+msgid "Failure"
+msgstr "Failure"
+
+msgid "Timeout"
+msgstr "Timeout"
+
+msgid "Error"
+msgstr "Error"
+
+#: Checks - Estatísticas
+msgid "Total Checks"
+msgstr "Total Checks"
+
+msgid "Successful Checks"
+msgstr "Successful Checks"
+
+msgid "Failed Checks"
+msgstr "Failed Checks"
+
+msgid "Success Rate"
+msgstr "Success Rate"
+
+#: Checks - Template index.php
+msgid "Verificações de Monitores"
+msgstr "Monitor Checks"
+
+msgid "Total Checks"
+msgstr "Total Checks"
+
+msgid "Sucesso"
+msgstr "Success"
+
+msgid "Falhas"
+msgstr "Failures"
+
+msgid "Taxa de Sucesso"
+msgstr "Success Rate"
+
+msgid "Tempo Médio"
+msgstr "Average Time"
+
+msgid "N/A"
+msgstr "N/A"
+
+msgid "Monitor"
+msgstr "Monitor"
+
+msgid "Todos os Monitores"
+msgstr "All Monitors"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Todos"
+msgstr "All"
+
+msgid "Falha"
+msgstr "Failed"
+
+msgid "Período"
+msgstr "Period"
+
+msgid "Últimas 24 horas"
+msgstr "Last 24 hours"
+
+msgid "Últimos 7 dias"
+msgstr "Last 7 days"
+
+msgid "Últimos 30 dias"
+msgstr "Last 30 days"
+
+msgid "Filtrar"
+msgstr "Filter"
+
+msgid "Limpar"
+msgstr "Clear"
+
+msgid "Data/Hora"
+msgstr "Date/Time"
+
+msgid "Tempo Resposta"
+msgstr "Response Time"
+
+msgid "Mensagem"
+msgstr "Message"
+
+msgid "Ações"
+msgstr "Actions"
+
+msgid "Ver"
+msgstr "View"
+
+msgid "Ver detalhes"
+msgstr "View details"
+
+msgid "Nenhuma verificação encontrada"
+msgstr "No checks found"
+
+msgid "Tente ajustar os filtros ou aguarde as próximas verificações."
+msgstr "Try adjusting the filters or wait for the next checks."
+
+msgid "« Primeira"
+msgstr "« First"
+
+msgid "‹ Anterior"
+msgstr "‹ Previous"
+
+msgid "Próxima ›"
+msgstr "Next ›"
+
+msgid "Última »"
+msgstr "Last »"
+
+msgid "Página {{page}} de {{pages}}, mostrando {{current}} registro(s) de {{count}} no total"
+msgstr "Page {{page}} of {{pages}}, showing {{current}} record(s) of {{count}} total"
+
+#: Checks - Template view.php
+msgid "Detalhes da Verificação"
+msgstr "Check Details"
+
+msgid "← Voltar"
+msgstr "← Back"
+
+msgid "Verificação bem-sucedida"
+msgstr "Successful check"
+
+msgid "Verificação falhou"
+msgstr "Check failed"
+
+msgid "Informações da Verificação"
+msgstr "Check Information"
+
+msgid "Tipo"
+msgstr "Type"
+
+msgid "Tempo de Resposta"
+msgstr "Response Time"
+
+msgid "Status Code"
+msgstr "Status Code"
+
+msgid "Mensagem de Erro"
+msgstr "Error Message"
+
+msgid "Detalhes da Resposta"
+msgstr "Response Details"
+
+msgid "Estatísticas do Monitor"
+msgstr "Monitor Statistics"
+
+msgid "Total de Checks"
+msgstr "Total Checks"
+
+msgid "Checks Bem-sucedidos"
+msgstr "Successful Checks"
+
+msgid "Verificações Próximas"
+msgstr "Nearby Checks"
+
+msgid "(atual)"
+msgstr "(current)"
+
+msgid "Não há verificações próximas disponíveis"
+msgstr "No nearby checks available"
+
+msgid "← Voltar para Verificações"
+msgstr "← Back to Checks"
+
+msgid "Ver Monitor"
+msgstr "View Monitor"

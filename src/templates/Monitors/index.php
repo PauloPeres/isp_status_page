@@ -4,7 +4,7 @@
  * @var \Cake\Collection\CollectionInterface $monitors
  * @var array $stats
  */
-$this->assign('title', 'Monitores');
+$this->assign('title', __d('monitors', 'Monitors'));
 ?>
 
 <style>
@@ -163,6 +163,36 @@ $this->assign('title', 'Monitores');
         color: #666;
         text-transform: uppercase;
         border-bottom: 2px solid #e0e0e0;
+    }
+
+    .monitors-table th a {
+        color: #666;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .monitors-table th a:hover {
+        color: #3b82f6;
+    }
+
+    .monitors-table th a::after {
+        content: '⇅';
+        opacity: 0.3;
+        font-size: 12px;
+    }
+
+    .monitors-table th a.asc::after {
+        content: '↑';
+        opacity: 1;
+        color: #3b82f6;
+    }
+
+    .monitors-table th a.desc::after {
+        content: '↓';
+        opacity: 1;
+        color: #3b82f6;
     }
 
     .monitors-table td {
@@ -379,9 +409,9 @@ $this->assign('title', 'Monitores');
 </style>
 
 <div class="monitors-header">
-    <h2>🖥️ Monitores</h2>
+    <h2>🖥️ <?= __d('monitors', 'Monitors') ?></h2>
     <?= $this->Html->link(
-        '+ Novo Monitor',
+        '+ ' . __d('monitors', 'New Monitor'),
         ['action' => 'add'],
         ['class' => 'btn-add']
     ) ?>
@@ -390,19 +420,19 @@ $this->assign('title', 'Monitores');
 <!-- Statistics Cards -->
 <div class="stats-grid">
     <div class="stat-card-mini">
-        <div class="stat-label">Total</div>
+        <div class="stat-label"><?= __d('monitors', 'Total') ?></div>
         <div class="stat-value info"><?= number_format($stats['total']) ?></div>
     </div>
     <div class="stat-card-mini">
-        <div class="stat-label">Ativos</div>
+        <div class="stat-label"><?= __d('monitors', 'Active') ?></div>
         <div class="stat-value success"><?= number_format($stats['active']) ?></div>
     </div>
     <div class="stat-card-mini">
-        <div class="stat-label">Online</div>
+        <div class="stat-label"><?= __d('monitors', 'Online') ?></div>
         <div class="stat-value success"><?= number_format($stats['online']) ?></div>
     </div>
     <div class="stat-card-mini">
-        <div class="stat-label">Offline</div>
+        <div class="stat-label"><?= __d('monitors', 'Offline') ?></div>
         <div class="stat-value error"><?= number_format($stats['offline']) ?></div>
     </div>
 </div>
@@ -412,21 +442,21 @@ $this->assign('title', 'Monitores');
     <?= $this->Form->create(null, ['type' => 'get', 'id' => 'filters-form']) ?>
     <div class="filters-row">
         <div class="filter-group">
-            <label>Buscar</label>
+            <label><?= __('Search') ?></label>
             <?= $this->Form->control('search', [
                 'label' => false,
-                'placeholder' => 'Nome, alvo ou descrição...',
+                'placeholder' => __d('monitors', 'Name, target or description...'),
                 'value' => $this->request->getQuery('search'),
                 'class' => 'form-control',
             ]) ?>
         </div>
 
         <div class="filter-group">
-            <label>Tipo</label>
+            <label><?= __d('monitors', 'Type') ?></label>
             <?= $this->Form->control('type', [
                 'label' => false,
                 'options' => [
-                    '' => 'Todos',
+                    '' => __('All'),
                     'http' => 'HTTP',
                     'ping' => 'Ping',
                     'port' => 'Port',
@@ -438,14 +468,14 @@ $this->assign('title', 'Monitores');
         </div>
 
         <div class="filter-group">
-            <label>Status</label>
+            <label><?= __('Status') ?></label>
             <?= $this->Form->control('status', [
                 'label' => false,
                 'options' => [
-                    '' => 'Todos',
-                    'up' => 'Online',
-                    'down' => 'Offline',
-                    'unknown' => 'Desconhecido',
+                    '' => __('All'),
+                    'up' => __d('monitors', 'Online'),
+                    'down' => __d('monitors', 'Offline'),
+                    'unknown' => __d('monitors', 'Unknown'),
                 ],
                 'value' => $this->request->getQuery('status'),
                 'empty' => false,
@@ -454,13 +484,13 @@ $this->assign('title', 'Monitores');
         </div>
 
         <div class="filter-group">
-            <label>Estado</label>
+            <label><?= __d('monitors', 'State') ?></label>
             <?= $this->Form->control('active', [
                 'label' => false,
                 'options' => [
-                    '' => 'Todos',
-                    '1' => 'Ativos',
-                    '0' => 'Inativos',
+                    '' => __('All'),
+                    '1' => __d('monitors', 'Active'),
+                    '0' => __d('monitors', 'Inactive'),
                 ],
                 'value' => $this->request->getQuery('active'),
                 'empty' => false,
@@ -470,8 +500,8 @@ $this->assign('title', 'Monitores');
     </div>
 
     <div class="filter-buttons">
-        <?= $this->Form->button('Filtrar', ['type' => 'submit', 'class' => 'btn-filter']) ?>
-        <?= $this->Html->link('Limpar', ['action' => 'index'], ['class' => 'btn-clear']) ?>
+        <?= $this->Form->button(__('Filter'), ['type' => 'submit', 'class' => 'btn-filter']) ?>
+        <?= $this->Html->link(__('Clear'), ['action' => 'index'], ['class' => 'btn-clear']) ?>
     </div>
     <?= $this->Form->end() ?>
 </div>
@@ -482,14 +512,14 @@ $this->assign('title', 'Monitores');
         <table>
             <thead>
                 <tr>
-                    <th>Status</th>
-                    <th>Nome</th>
-                    <th>Tipo</th>
-                    <th>Alvo</th>
-                    <th>Última Verificação</th>
-                    <th>Tempo Resposta</th>
-                    <th>Estado</th>
-                    <th style="text-align: right;">Ações</th>
+                    <th><?= $this->Paginator->sort('status', __('Status')) ?></th>
+                    <th><?= $this->Paginator->sort('name', __d('monitors', 'Name')) ?></th>
+                    <th><?= $this->Paginator->sort('type', __d('monitors', 'Type')) ?></th>
+                    <th><?= $this->Paginator->sort('target', __d('monitors', 'Target')) ?></th>
+                    <th><?= $this->Paginator->sort('last_check_at', __d('monitors', 'Last Check')) ?></th>
+                    <th><?= __d('monitors', 'Response Time') ?></th>
+                    <th><?= $this->Paginator->sort('active', __d('monitors', 'State')) ?></th>
+                    <th style="text-align: right;"><?= __('Actions') ?></th>
                 </tr>
             </thead>
             <tbody>
@@ -516,7 +546,7 @@ $this->assign('title', 'Monitores');
                             <?php if ($monitor->last_check_at): ?>
                                 <span class="local-datetime" data-utc="<?= $monitor->last_check_at->format('c') ?>"></span>
                             <?php else: ?>
-                                <span style="color: #999;">Nunca</span>
+                                <span style="color: #999;"><?= __d('monitors', 'Never') ?></span>
                             <?php endif; ?>
                         </td>
                         <td>
@@ -530,37 +560,37 @@ $this->assign('title', 'Monitores');
                         </td>
                         <td>
                             <?php if ($monitor->active): ?>
-                                <span class="badge badge-success">Ativo</span>
+                                <span class="badge badge-success"><?= __d('monitors', 'Active') ?></span>
                             <?php else: ?>
-                                <span class="badge badge-secondary">Inativo</span>
+                                <span class="badge badge-secondary"><?= __d('monitors', 'Inactive') ?></span>
                             <?php endif; ?>
                         </td>
                         <td>
                             <div class="action-buttons">
                                 <?= $this->Html->link(
-                                    'Ver',
+                                    __('View'),
                                     ['action' => 'view', $monitor->id],
-                                    ['class' => 'btn-action btn-action-view', 'title' => 'Ver detalhes']
+                                    ['class' => 'btn-action btn-action-view', 'title' => __('View details')]
                                 ) ?>
                                 <?= $this->Html->link(
-                                    'Editar',
+                                    __('Edit'),
                                     ['action' => 'edit', $monitor->id],
-                                    ['class' => 'btn-action btn-action-edit', 'title' => 'Editar']
+                                    ['class' => 'btn-action btn-action-edit', 'title' => __('Edit')]
                                 ) ?>
                                 <?= $this->Form->postLink(
-                                    $monitor->active ? 'Desativar' : 'Ativar',
+                                    $monitor->active ? __d('monitors', 'Deactivate') : __d('monitors', 'Activate'),
                                     ['action' => 'toggle', $monitor->id],
                                     [
                                         'class' => 'btn-action btn-action-toggle',
-                                        'confirm' => 'Tem certeza que deseja ' . ($monitor->active ? 'desativar' : 'ativar') . ' este monitor?'
+                                        'confirm' => __d('monitors', 'Are you sure you want to {0} this monitor?', $monitor->active ? __d('monitors', 'deactivate') : __d('monitors', 'activate'))
                                     ]
                                 ) ?>
                                 <?= $this->Form->postLink(
-                                    'Excluir',
+                                    __('Delete'),
                                     ['action' => 'delete', $monitor->id],
                                     [
                                         'class' => 'btn-action btn-action-danger',
-                                        'confirm' => 'Tem certeza que deseja excluir este monitor? Esta ação não pode ser desfeita.'
+                                        'confirm' => __d('monitors', 'Are you sure you want to delete this monitor? This action cannot be undone.')
                                     ]
                                 ) ?>
                             </div>
@@ -572,10 +602,10 @@ $this->assign('title', 'Monitores');
     <?php else: ?>
         <div class="empty-state">
             <div class="empty-state-icon">📭</div>
-            <p style="font-size: 18px; margin-bottom: 8px;">Nenhum monitor encontrado</p>
-            <p style="margin-bottom: 16px;">Tente ajustar os filtros ou crie seu primeiro monitor.</p>
+            <p style="font-size: 18px; margin-bottom: 8px;"><?= __d('monitors', 'No monitors found') ?></p>
+            <p style="margin-bottom: 16px;"><?= __d('monitors', 'Try adjusting the filters or create your first monitor.') ?></p>
             <?= $this->Html->link(
-                'Criar Primeiro Monitor',
+                __d('monitors', 'Create First Monitor'),
                 ['action' => 'add'],
                 ['class' => 'btn-add']
             ) ?>
@@ -586,13 +616,13 @@ $this->assign('title', 'Monitores');
 <!-- Pagination -->
 <?php if ($monitors->count() > 0): ?>
     <div class="pagination">
-        <?= $this->Paginator->first('« Primeira') ?>
-        <?= $this->Paginator->prev('‹ Anterior') ?>
+        <?= $this->Paginator->first('« ' . __('First')) ?>
+        <?= $this->Paginator->prev('‹ ' . __('Previous')) ?>
         <?= $this->Paginator->numbers() ?>
-        <?= $this->Paginator->next('Próxima ›') ?>
-        <?= $this->Paginator->last('Última »') ?>
+        <?= $this->Paginator->next(__('Next') . ' ›') ?>
+        <?= $this->Paginator->last(__('Last') . ' »') ?>
     </div>
     <div class="pagination-info">
-        <?= $this->Paginator->counter('Página {{page}} de {{pages}}, exibindo {{current}} de {{count}} monitores') ?>
+        <?= $this->Paginator->counter(__d('monitors', 'Page {{page}} of {{pages}}, showing {{current}} of {{count}} monitors')) ?>
     </div>
 <?php endif; ?>

@@ -49,8 +49,8 @@ return [
     'App' => [
         'namespace' => 'App',
         'encoding' => env('APP_ENCODING', 'UTF-8'),
-        'defaultLocale' => env('APP_DEFAULT_LOCALE', 'en_US'),
-        'defaultTimezone' => env('APP_DEFAULT_TIMEZONE', 'UTC'),
+        'defaultLocale' => env('APP_DEFAULT_LOCALE', 'pt_BR'),
+        'defaultTimezone' => env('APP_DEFAULT_TIMEZONE', 'America/Sao_Paulo'),
         'base' => false,
         'dir' => 'src',
         'webroot' => 'webroot',
@@ -63,7 +63,7 @@ return [
         'paths' => [
             'plugins' => [ROOT . DS . 'plugins' . DS],
             'templates' => [ROOT . DS . 'templates' . DS],
-            'locales' => [RESOURCES . 'locales' . DS],
+            'locales' => [ROOT . DS . 'src' . DS . 'Locale' . DS],
         ],
     ],
 

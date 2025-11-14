@@ -5,7 +5,7 @@
  * @var array $stats
  * @var string $period
  */
-$this->assign('title', 'Inscritos de Notificações');
+$this->assign('title', __d('subscribers', 'Inscritos de Notificações'));
 ?>
 
 <style>
@@ -140,6 +140,36 @@ $this->assign('title', 'Inscritos de Notificações');
         color: #666;
         text-transform: uppercase;
         border-bottom: 2px solid #e0e0e0;
+    }
+
+    .subscribers-table th a {
+        color: #666;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .subscribers-table th a:hover {
+        color: #3b82f6;
+    }
+
+    .subscribers-table th a::after {
+        content: '⇅';
+        opacity: 0.3;
+        font-size: 12px;
+    }
+
+    .subscribers-table th a.asc::after {
+        content: '↑';
+        opacity: 1;
+        color: #3b82f6;
+    }
+
+    .subscribers-table th a.desc::after {
+        content: '↓';
+        opacity: 1;
+        color: #3b82f6;
     }
 
     .subscribers-table td {
@@ -293,29 +323,29 @@ $this->assign('title', 'Inscritos de Notificações');
 </style>
 
 <div class="subscribers-header">
-    <h2>Inscritos de Notificações</h2>
+    <h2><?= __d('subscribers', 'Inscritos de Notificações') ?></h2>
 </div>
 
 <!-- Statistics Cards -->
 <div class="stats-grid">
     <div class="stat-card-mini">
-        <div class="stat-label">Total de Inscritos</div>
+        <div class="stat-label"><?= __d('subscribers', 'Total de Inscritos') ?></div>
         <div class="stat-value info"><?= number_format($stats['total']) ?></div>
     </div>
     <div class="stat-card-mini">
-        <div class="stat-label">Verificados</div>
+        <div class="stat-label"><?= __d('subscribers', 'Verificados') ?></div>
         <div class="stat-value success"><?= number_format($stats['verified']) ?></div>
     </div>
     <div class="stat-card-mini">
-        <div class="stat-label">Não Verificados</div>
+        <div class="stat-label"><?= __d('subscribers', 'Não Verificados') ?></div>
         <div class="stat-value warning"><?= number_format($stats['unverified']) ?></div>
     </div>
     <div class="stat-card-mini">
-        <div class="stat-label">Ativos</div>
+        <div class="stat-label"><?= __d('subscribers', 'Ativos') ?></div>
         <div class="stat-value success"><?= number_format($stats['active']) ?></div>
     </div>
     <div class="stat-card-mini">
-        <div class="stat-label">Adicionados (7 dias)</div>
+        <div class="stat-label"><?= __d('subscribers', 'Adicionados (7 dias)') ?></div>
         <div class="stat-value info"><?= number_format($stats['recentlyAdded']) ?></div>
     </div>
 </div>
@@ -325,22 +355,22 @@ $this->assign('title', 'Inscritos de Notificações');
     <?= $this->Form->create(null, ['type' => 'get', 'id' => 'filters-form']) ?>
     <div class="filters-row">
         <div class="filter-group">
-            <label>Buscar</label>
+            <label><?= __d('subscribers', 'Buscar') ?></label>
             <?= $this->Form->control('search', [
                 'label' => false,
-                'placeholder' => 'Email ou nome...',
+                'placeholder' => __d('subscribers', 'Email ou nome...'),
                 'value' => $this->request->getQuery('search'),
                 'class' => 'form-control',
             ]) ?>
         </div>
 
         <div class="filter-group">
-            <label>Status de Verificação</label>
+            <label><?= __d('subscribers', 'Status de Verificação') ?></label>
             <?= $this->Form->control('status', [
                 'options' => [
-                    '' => 'Todos',
-                    'verified' => 'Verificados',
-                    'unverified' => 'Não Verificados',
+                    '' => __d('subscribers', 'Todos'),
+                    'verified' => __d('subscribers', 'Verificados'),
+                    'unverified' => __d('subscribers', 'Não Verificados'),
                 ],
                 'default' => $this->request->getQuery('status'),
                 'label' => false,
@@ -349,12 +379,12 @@ $this->assign('title', 'Inscritos de Notificações');
         </div>
 
         <div class="filter-group">
-            <label>Status Ativo</label>
+            <label><?= __d('subscribers', 'Status Ativo') ?></label>
             <?= $this->Form->control('active', [
                 'options' => [
-                    '' => 'Todos',
-                    'active' => 'Ativos',
-                    'inactive' => 'Inativos',
+                    '' => __d('subscribers', 'Todos'),
+                    'active' => __d('subscribers', 'Ativos'),
+                    'inactive' => __d('subscribers', 'Inativos'),
                 ],
                 'default' => $this->request->getQuery('active'),
                 'label' => false,
@@ -363,13 +393,13 @@ $this->assign('title', 'Inscritos de Notificações');
         </div>
 
         <div class="filter-group">
-            <label>Período</label>
+            <label><?= __d('subscribers', 'Período') ?></label>
             <?= $this->Form->control('period', [
                 'options' => [
-                    '7d' => 'Últimos 7 dias',
-                    '30d' => 'Últimos 30 dias',
-                    '90d' => 'Últimos 90 dias',
-                    'all' => 'Todos',
+                    '7d' => __d('subscribers', 'Últimos 7 dias'),
+                    '30d' => __d('subscribers', 'Últimos 30 dias'),
+                    '90d' => __d('subscribers', 'Últimos 90 dias'),
+                    'all' => __d('subscribers', 'Todos'),
                 ],
                 'default' => $period,
                 'label' => false,
@@ -378,8 +408,8 @@ $this->assign('title', 'Inscritos de Notificações');
         </div>
 
         <div class="filter-buttons">
-            <?= $this->Form->button('Filtrar', ['type' => 'submit', 'class' => 'btn-filter']) ?>
-            <?= $this->Html->link('Limpar', ['action' => 'index'], ['class' => 'btn-clear']) ?>
+            <?= $this->Form->button(__d('subscribers', 'Filtrar'), ['type' => 'submit', 'class' => 'btn-filter']) ?>
+            <?= $this->Html->link(__d('subscribers', 'Limpar'), ['action' => 'index'], ['class' => 'btn-clear']) ?>
         </div>
     </div>
     <?= $this->Form->end() ?>
@@ -391,12 +421,12 @@ $this->assign('title', 'Inscritos de Notificações');
         <table>
             <thead>
                 <tr>
-                    <th>Email / Nome</th>
-                    <th>Verificação</th>
-                    <th>Status</th>
-                    <th>Data de Inscrição</th>
-                    <th>Assinaturas</th>
-                    <th style="text-align: right;">Ações</th>
+                    <th><?= $this->Paginator->sort('email', __d('subscribers', 'Email / Nome')) ?></th>
+                    <th><?= $this->Paginator->sort('verified', __d('subscribers', 'Verificação')) ?></th>
+                    <th><?= $this->Paginator->sort('active', __d('subscribers', 'Status')) ?></th>
+                    <th><?= $this->Paginator->sort('created', __d('subscribers', 'Data de Inscrição')) ?></th>
+                    <th><?= __d('subscribers', 'Assinaturas') ?></th>
+                    <th style="text-align: right;"><?= __d('subscribers', 'Ações') ?></th>
                 </tr>
             </thead>
             <tbody>
@@ -413,7 +443,7 @@ $this->assign('title', 'Inscritos de Notificações');
                         </td>
                         <td>
                             <?php if ($subscriber->verified): ?>
-                                <span class="badge badge-success">Verificado</span>
+                                <span class="badge badge-success"><?= __d('subscribers', 'Verificado') ?></span>
                                 <?php if ($subscriber->verified_at): ?>
                                     <br>
                                     <span style="color: #999; font-size: 12px;">
@@ -421,14 +451,14 @@ $this->assign('title', 'Inscritos de Notificações');
                                     </span>
                                 <?php endif; ?>
                             <?php else: ?>
-                                <span class="badge badge-warning">Pendente</span>
+                                <span class="badge badge-warning"><?= __d('subscribers', 'Pendente') ?></span>
                             <?php endif; ?>
                         </td>
                         <td>
                             <?php if ($subscriber->active): ?>
-                                <span class="badge badge-success">Ativo</span>
+                                <span class="badge badge-success"><?= __d('subscribers', 'Ativo') ?></span>
                             <?php else: ?>
-                                <span class="badge badge-danger">Inativo</span>
+                                <span class="badge badge-danger"><?= __d('subscribers', 'Inativo') ?></span>
                             <?php endif; ?>
                         </td>
                         <td>
@@ -441,35 +471,35 @@ $this->assign('title', 'Inscritos de Notificações');
                         <td>
                             <?php if (isset($subscriber->subscriptions) && count($subscriber->subscriptions) > 0): ?>
                                 <span class="badge badge-info">
-                                    <?= count($subscriber->subscriptions) ?> monitor<?= count($subscriber->subscriptions) > 1 ? 'es' : '' ?>
+                                    <?= count($subscriber->subscriptions) ?> <?= count($subscriber->subscriptions) > 1 ? __d('subscribers', 'monitores') : __d('subscribers', 'monitor') ?>
                                 </span>
                             <?php else: ?>
-                                <span style="color: #ccc;">Nenhuma</span>
+                                <span style="color: #ccc;"><?= __d('subscribers', 'Nenhuma') ?></span>
                             <?php endif; ?>
                         </td>
                         <td style="text-align: right;">
                             <div class="action-buttons">
                                 <?= $this->Html->link(
-                                    'Ver',
+                                    __d('subscribers', 'Ver'),
                                     ['action' => 'view', $subscriber->id],
-                                    ['class' => 'btn-action btn-action-view', 'title' => 'Ver detalhes']
+                                    ['class' => 'btn-action btn-action-view', 'title' => __d('subscribers', 'Ver detalhes')]
                                 ) ?>
                                 <?= $this->Form->postLink(
-                                    $subscriber->active ? 'Desativar' : 'Ativar',
+                                    $subscriber->active ? __d('subscribers', 'Desativar') : __d('subscribers', 'Ativar'),
                                     ['action' => 'toggle', $subscriber->id],
                                     [
                                         'class' => 'btn-action btn-action-toggle',
-                                        'title' => $subscriber->active ? 'Desativar inscrito' : 'Ativar inscrito',
-                                        'confirm' => 'Tem certeza que deseja ' . ($subscriber->active ? 'desativar' : 'ativar') . ' este inscrito?'
+                                        'title' => $subscriber->active ? __d('subscribers', 'Desativar inscrito') : __d('subscribers', 'Ativar inscrito'),
+                                        'confirm' => __d('subscribers', 'Tem certeza que deseja {0} este inscrito?', $subscriber->active ? __d('subscribers', 'desativar') : __d('subscribers', 'ativar'))
                                     ]
                                 ) ?>
                                 <?= $this->Form->postLink(
-                                    'Excluir',
+                                    __d('subscribers', 'Excluir'),
                                     ['action' => 'delete', $subscriber->id],
                                     [
                                         'class' => 'btn-action btn-action-danger',
-                                        'title' => 'Excluir inscrito',
-                                        'confirm' => 'Tem certeza que deseja excluir este inscrito? Esta ação não pode ser desfeita.'
+                                        'title' => __d('subscribers', 'Excluir inscrito'),
+                                        'confirm' => __d('subscribers', 'Tem certeza que deseja excluir este inscrito? Esta ação não pode ser desfeita.')
                                     ]
                                 ) ?>
                             </div>
@@ -480,8 +510,8 @@ $this->assign('title', 'Inscritos de Notificações');
         </table>
     <?php else: ?>
         <div class="no-subscribers">
-            <p style="font-size: 18px; margin-bottom: 8px;">Nenhum inscrito encontrado</p>
-            <p>Tente ajustar os filtros ou aguarde novas inscrições.</p>
+            <p style="font-size: 18px; margin-bottom: 8px;"><?= __d('subscribers', 'Nenhum inscrito encontrado') ?></p>
+            <p><?= __d('subscribers', 'Tente ajustar os filtros ou aguarde novas inscrições.') ?></p>
         </div>
     <?php endif; ?>
 </div>
@@ -489,13 +519,13 @@ $this->assign('title', 'Inscritos de Notificações');
 <!-- Pagination -->
 <?php if ($subscribers->count() > 0): ?>
     <div class="pagination">
-        <?= $this->Paginator->first('« Primeira') ?>
-        <?= $this->Paginator->prev('‹ Anterior') ?>
+        <?= $this->Paginator->first(__d('subscribers', '« Primeira')) ?>
+        <?= $this->Paginator->prev(__d('subscribers', '‹ Anterior')) ?>
         <?= $this->Paginator->numbers() ?>
-        <?= $this->Paginator->next('Próxima ›') ?>
-        <?= $this->Paginator->last('Última »') ?>
+        <?= $this->Paginator->next(__d('subscribers', 'Próxima ›')) ?>
+        <?= $this->Paginator->last(__d('subscribers', 'Última »')) ?>
     </div>
     <div class="pagination-info">
-        <?= $this->Paginator->counter('Página {{page}} de {{pages}}, mostrando {{current}} registro(s) de {{count}} no total') ?>
+        <?= $this->Paginator->counter(__d('subscribers', 'Página {{page}} de {{pages}}, mostrando {{current}} registro(s) de {{count}} no total')) ?>
     </div>
 <?php endif; ?>

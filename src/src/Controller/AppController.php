@@ -17,6 +17,8 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use Cake\Controller\Controller;
+use Cake\I18n\I18n;
+use App\Service\SettingService;
 
 /**
  * Application Controller
@@ -44,6 +46,16 @@ class AppController extends Controller
         $this->loadComponent('Flash');
         $this->loadComponent('Authentication.Authentication');
 
+        // Load and apply system language from settings
+        try {
+            $settingService = new SettingService();
+            $language = $settingService->get('site_language', 'pt_BR');
+            I18n::setLocale($language);
+        } catch (\Exception $e) {
+            // Fallback to default language if settings fail to load
+            I18n::setLocale('pt_BR');
+        }
+
         /*
          * Enable the following component for recommended CakePHP form protection settings.
          * see https://book.cakephp.org/4/en/controllers/components/form-protection.html
@@ -61,8 +73,8 @@ class AppController extends Controller
     {
         parent::beforeFilter($event);
 
-        // Allow public access to the display action (status page)
+        // Allow public access to the display action (status page) and home (root redirect)
         // Login and logout will be configured in UsersController
-        $this->Authentication->addUnauthenticatedActions(['display']);
+        $this->Authentication->addUnauthenticatedActions(['display', 'home']);
     }
 }

@@ -1,0 +1,226 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ISP Status Page - Users\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: Users - Títulos
+msgid "Users"
+msgstr "Usuarios"
+
+msgid "User List"
+msgstr "Lista de Usuarios"
+
+msgid "Add User"
+msgstr "Agregar Usuario"
+
+msgid "Edit User"
+msgstr "Editar Usuario"
+
+msgid "User Details"
+msgstr "Detalles del Usuario"
+
+msgid "New User"
+msgstr "Nuevo Usuario"
+
+msgid "My Profile"
+msgstr "Mi Perfil"
+
+msgid "Edit Profile"
+msgstr "Editar Perfil"
+
+#: Users - Campos
+msgid "Username"
+msgstr "Nombre de usuario"
+
+msgid "User Email"
+msgstr "Email del Usuario"
+
+msgid "User Password"
+msgstr "Contraseña del Usuario"
+
+msgid "New Password"
+msgstr "Nueva Contraseña"
+
+msgid "Confirm New Password"
+msgstr "Confirmar Nueva Contraseña"
+
+msgid "Role"
+msgstr "Rol"
+
+msgid "Last Login"
+msgstr "Último Inicio de Sesión"
+
+msgid "Account Created"
+msgstr "Cuenta Creada"
+
+#: Users - Funções
+msgid "Administrator"
+msgstr "Administrador"
+
+msgid "User"
+msgstr "Usuario"
+
+msgid "Viewer"
+msgstr "Visualizador"
+
+msgid "Admin"
+msgstr "Admin"
+
+#: Users - Login
+msgid "Login"
+msgstr "Iniciar sesión"
+
+msgid "Sign In"
+msgstr "Iniciar sesión"
+
+msgid "Sign Out"
+msgstr "Cerrar sesión"
+
+msgid "Remember Me"
+msgstr "Recordarme"
+
+msgid "Forgot Password?"
+msgstr "¿Olvidó su contraseña?"
+
+msgid "Invalid username or password"
+msgstr "Usuario o contraseña inválidos"
+
+msgid "You have been logged out successfully."
+msgstr "Ha cerrado sesión exitosamente."
+
+#: Users - Mensagens
+msgid "User created successfully."
+msgstr "Usuario creado exitosamente."
+
+msgid "User updated successfully."
+msgstr "Usuario actualizado exitosamente."
+
+msgid "Profile updated successfully."
+msgstr "Perfil actualizado exitosamente."
+
+msgid "User deleted successfully."
+msgstr "Usuario eliminado exitosamente."
+
+msgid "Error creating user."
+msgstr "Error al crear usuario."
+
+msgid "Error updating user."
+msgstr "Error al actualizar usuario."
+
+msgid "Error deleting user."
+msgstr "Error al eliminar usuario."
+
+msgid "You do not have permission to edit this user."
+msgstr "No tiene permiso para editar este usuario."
+
+msgid "Password must be at least 8 characters."
+msgstr "La contraseña debe tener al menos 8 caracteres."
+
+#: Users - Estatísticas
+msgid "Total Users"
+msgstr "Total de Usuarios"
+
+msgid "Active Users"
+msgstr "Usuarios Activos"
+
+msgid "Administrators"
+msgstr "Administradores"
+
+msgid "Never"
+msgstr "Nunca"
+
+msgid "No users found"
+msgstr "No se encontraron usuarios"
+
+#: Users - Templates
+msgid "Sign in to your account"
+msgstr "Inicie sesión en su cuenta"
+
+msgid "Invalid username or password. Please try again."
+msgstr "Usuario o contraseña inválidos. Por favor, intente nuevamente."
+
+msgid "Enter your username"
+msgstr "Ingrese su nombre de usuario"
+
+msgid "Enter your password"
+msgstr "Ingrese su contraseña"
+
+msgid "Username or email..."
+msgstr "Nombre de usuario o email..."
+
+msgid "User Information"
+msgstr "Información del Usuario"
+
+msgid "Update Information"
+msgstr "Actualizar Información"
+
+msgid "Basic Information"
+msgstr "Información Básica"
+
+msgid "Enter your email"
+msgstr "Ingrese su email"
+
+msgid "Change Password"
+msgstr "Cambiar Contraseña"
+
+msgid "Leave blank if you do not want to change the password"
+msgstr "Deje en blanco si no desea cambiar la contraseña"
+
+msgid "Minimum 8 characters"
+msgstr "Mínimo 8 caracteres"
+
+msgid "Re-enter password"
+msgstr "Ingrese la contraseña nuevamente"
+
+msgid "Access Data"
+msgstr "Datos de Acceso"
+
+msgid "Enter username"
+msgstr "Ingrese el nombre de usuario"
+
+msgid "Enter email"
+msgstr "Ingrese el email"
+
+msgid "Permissions"
+msgstr "Permisos"
+
+msgid "Select a role"
+msgstr "Seleccione un rol"
+
+msgid "Active user"
+msgstr "Usuario activo"
+
+msgid "Create User"
+msgstr "Crear Usuario"
+
+#: Users - Mensagens Flash do Controller
+msgid "Você saiu com sucesso."
+msgstr "Ha cerrado sesión exitosamente."
+
+msgid "As senhas não coincidem."
+msgstr "Las contraseñas no coinciden."
+
+msgid "Usuário criado com sucesso."
+msgstr "Usuario creado exitosamente."
+
+msgid "Não foi possível criar o usuário. Verifique os erros abaixo."
+msgstr "No se pudo crear el usuario. Verifique los errores a continuación."
+
+msgid "Você não tem permissão para editar este usuário."
+msgstr "No tiene permiso para editar este usuario."
+
+msgid "Perfil atualizado com sucesso."
+msgstr "Perfil actualizado exitosamente."
+
+msgid "Não foi possível atualizar o perfil. Tente novamente."
+msgstr "No se pudo actualizar el perfil. Intente nuevamente."
+
+msgid "Usuário excluído com sucesso."
+msgstr "Usuario eliminado exitosamente."
+
+msgid "Não foi possível excluir o usuário. Tente novamente."
+msgstr "No se pudo eliminar el usuario. Intente nuevamente."

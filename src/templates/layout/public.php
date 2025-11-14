@@ -14,7 +14,7 @@
     <link rel="manifest" href="<?= $this->Url->build('/site.webmanifest') ?>">
     <meta name="theme-color" content="#1E88E5">
 
-    <meta name="description" content="Página de status em tempo real dos serviços de internet">
+    <meta name="description" content="<?= __('Página de status em tempo real dos serviços de internet') ?>">
     <meta name="robots" content="index, follow">
 
     <?= $this->Html->css(['public']) ?>

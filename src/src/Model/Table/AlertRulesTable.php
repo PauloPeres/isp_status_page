@@ -81,7 +81,7 @@ class AlertRulesTable extends Table
                 AlertRule::CHANNEL_TELEGRAM,
                 AlertRule::CHANNEL_SMS,
                 AlertRule::CHANNEL_PHONE,
-            ], 'Invalid alert channel');
+            ], __('Invalid alert channel'));
 
         $validator
             ->scalar('trigger_on')
@@ -93,12 +93,12 @@ class AlertRulesTable extends Table
                 AlertRule::TRIGGER_ON_UP,
                 AlertRule::TRIGGER_ON_DEGRADED,
                 AlertRule::TRIGGER_ON_CHANGE,
-            ], 'Invalid trigger type');
+            ], __('Invalid trigger type'));
 
         $validator
             ->integer('throttle_minutes')
             ->notEmptyString('throttle_minutes')
-            ->greaterThanOrEqual('throttle_minutes', 0, 'Throttle minutes cannot be negative');
+            ->greaterThanOrEqual('throttle_minutes', 0, __('Throttle minutes cannot be negative'));
 
         $validator
             ->scalar('recipients')
@@ -116,7 +116,7 @@ class AlertRulesTable extends Table
 
                     return is_array($decoded) && !empty($decoded);
                 },
-                'message' => 'Recipients must be a valid non-empty JSON array',
+                'message' => __('Recipients must be a valid non-empty JSON array'),
             ]);
 
         $validator

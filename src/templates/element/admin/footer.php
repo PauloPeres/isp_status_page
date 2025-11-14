@@ -5,7 +5,7 @@
                 &copy; <?= date('Y') ?> ISP Status Page
             </span>
             <span class="version">
-                v1.0.0
+                <?= __('Version') ?> 1.0.0
             </span>
         </div>
 
@@ -14,10 +14,10 @@
                 Datacake
             </a>
             <a href="https://github.com/PauloPeres/isp_status_page" target="_blank" class="footer-link">
-                📚 Documentação
+                📚 <?= __('Documentation') ?>
             </a>
             <a href="https://github.com/PauloPeres/isp_status_page/issues" target="_blank" class="footer-link">
-                🐛 Reportar Problema
+                🐛 <?= __('Report Issue') ?>
             </a>
         </div>
     </div>

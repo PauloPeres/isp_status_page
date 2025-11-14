@@ -91,7 +91,7 @@ class MonitorsTable extends Table
             ->maxLength('type', 50)
             ->requirePresence('type', 'create')
             ->notEmptyString('type')
-            ->inList('type', ['http', 'ping', 'port', 'api', 'ixc', 'zabbix'], 'Invalid monitor type');
+            ->inList('type', ['http', 'ping', 'port', 'api', 'ixc', 'zabbix'], __('Invalid monitor type'));
 
         $validator
             ->scalar('configuration')
@@ -105,29 +105,29 @@ class MonitorsTable extends Table
 
                     return json_last_error() === JSON_ERROR_NONE;
                 },
-                'message' => 'Configuration must be valid JSON',
+                'message' => __('Configuration must be valid JSON'),
             ]);
 
         $validator
             ->integer('check_interval')
             ->notEmptyString('check_interval')
-            ->greaterThan('check_interval', 0, 'Check interval must be greater than 0');
+            ->greaterThan('check_interval', 0, __('Check interval must be greater than 0'));
 
         $validator
             ->integer('timeout')
             ->notEmptyString('timeout')
-            ->greaterThan('timeout', 0, 'Timeout must be greater than 0');
+            ->greaterThan('timeout', 0, __('Timeout must be greater than 0'));
 
         $validator
             ->integer('retry_count')
             ->notEmptyString('retry_count')
-            ->greaterThanOrEqual('retry_count', 0, 'Retry count cannot be negative');
+            ->greaterThanOrEqual('retry_count', 0, __('Retry count cannot be negative'));
 
         $validator
             ->scalar('status')
             ->maxLength('status', 20)
             ->notEmptyString('status')
-            ->inList('status', ['up', 'down', 'degraded', 'unknown'], 'Invalid status');
+            ->inList('status', ['up', 'down', 'degraded', 'unknown'], __('Invalid status'));
 
         $validator
             ->dateTime('last_check_at')
@@ -140,7 +140,7 @@ class MonitorsTable extends Table
         $validator
             ->decimal('uptime_percentage')
             ->allowEmptyString('uptime_percentage')
-            ->range('uptime_percentage', [0, 100], 'Uptime percentage must be between 0 and 100');
+            ->range('uptime_percentage', [0, 100], __('Uptime percentage must be between 0 and 100'));
 
         $validator
             ->boolean('active')
@@ -153,7 +153,7 @@ class MonitorsTable extends Table
         $validator
             ->integer('display_order')
             ->notEmptyString('display_order')
-            ->greaterThanOrEqual('display_order', 0, 'Display order cannot be negative');
+            ->greaterThanOrEqual('display_order', 0, __('Display order cannot be negative'));
 
         return $validator;
     }

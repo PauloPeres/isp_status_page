@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Login - ISP Status</title>
+    <title><?= __d('users', 'Login') ?> - ISP Status</title>
     <style>
         :root {
             /* Cores Primárias */
@@ -204,12 +204,12 @@
         <div class="logo-container">
             <img src="/img/icon_isp_status_page.png" alt="ISP Status" class="logo">
             <h1>ISP Status</h1>
-            <p class="subtitle">Entre com sua conta</p>
+            <p class="subtitle"><?= __d('users', 'Sign in to your account') ?></p>
         </div>
 
         <?php if (isset($result) && $result !== null && $this->request->is('post') && !$result->isValid()): ?>
             <div class="alert alert-error">
-                ⚠️ Usuário ou senha inválidos. Tente novamente.
+                ⚠️ <?= __d('users', 'Invalid username or password. Please try again.') ?>
             </div>
         <?php endif; ?>
 
@@ -219,12 +219,12 @@
             <?php endif; ?>
 
             <div class="input-group">
-                <label for="username">Usuário</label>
+                <label for="username"><?= __d('users', 'Username') ?></label>
                 <input
                     type="text"
                     id="username"
                     name="username"
-                    placeholder="Digite seu usuário"
+                    placeholder="<?= __d('users', 'Enter your username') ?>"
                     required
                     autofocus
                     autocomplete="username"
@@ -232,18 +232,18 @@
             </div>
 
             <div class="input-group">
-                <label for="password">Senha</label>
+                <label for="password"><?= __('Password') ?></label>
                 <input
                     type="password"
                     id="password"
                     name="password"
-                    placeholder="Digite sua senha"
+                    placeholder="<?= __d('users', 'Enter your password') ?>"
                     required
                     autocomplete="current-password"
                 >
             </div>
 
-            <button type="submit" class="btn">Entrar</button>
+            <button type="submit" class="btn"><?= __d('users', 'Sign In') ?></button>
         </form>
 
         <div class="footer">

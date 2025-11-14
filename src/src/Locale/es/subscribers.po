@@ -1,0 +1,250 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ISP Status Page - Subscribers\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: Subscribers - Títulos
+msgid "Subscribers"
+msgstr "Suscriptores"
+
+msgid "Subscriber List"
+msgstr "Lista de Suscriptores"
+
+msgid "Add Subscriber"
+msgstr "Agregar Suscriptor"
+
+msgid "Subscriber Details"
+msgstr "Detalles del Suscriptor"
+
+msgid "Subscribe to Updates"
+msgstr "Suscribirse a Actualizaciones"
+
+msgid "Manage Subscription"
+msgstr "Administrar Suscripción"
+
+#: Subscribers - Campos
+msgid "Subscriber Email"
+msgstr "Email del Suscriptor"
+
+msgid "Subscriber Name"
+msgstr "Nombre del Suscriptor"
+
+msgid "Verification"
+msgstr "Verificación"
+
+msgid "Verified"
+msgstr "Verificado"
+
+msgid "Not Verified"
+msgstr "No Verificado"
+
+msgid "Subscription Date"
+msgstr "Fecha de Suscripción"
+
+msgid "Subscriptions"
+msgstr "Suscripciones"
+
+msgid "Verified At"
+msgstr "Verificado el"
+
+#: Subscribers - Ações
+msgid "Subscribe"
+msgstr "Suscribirse"
+
+msgid "Unsubscribe"
+msgstr "Cancelar Suscripción"
+
+msgid "Verify Email"
+msgstr "Verificar Email"
+
+msgid "Resend Verification"
+msgstr "Reenviar Verificación"
+
+#: Subscribers - Mensagens
+msgid "Subscriber added successfully."
+msgstr "Suscriptor agregado exitosamente."
+
+msgid "Subscriber updated successfully."
+msgstr "Suscriptor actualizado exitosamente."
+
+msgid "Subscriber deleted successfully."
+msgstr "Suscriptor eliminado exitosamente."
+
+msgid "Subscription confirmed successfully."
+msgstr "Suscripción confirmada exitosamente."
+
+msgid "You have been unsubscribed successfully."
+msgstr "Su suscripción ha sido cancelada exitosamente."
+
+msgid "Verification email sent."
+msgstr "Email de verificación enviado."
+
+msgid "Error adding subscriber."
+msgstr "Error al agregar suscriptor."
+
+msgid "Invalid verification token."
+msgstr "Token de verificación inválido."
+
+msgid "Email already subscribed."
+msgstr "Email ya suscrito."
+
+#: Subscribers - Estatísticas
+msgid "Total Subscribers"
+msgstr "Total de Suscriptores"
+
+msgid "Verified Subscribers"
+msgstr "Suscriptores Verificados"
+
+msgid "Pending Verification"
+msgstr "Pendiente de Verificación"
+
+#: Subscribers - Mensagens Flash
+msgid "Por favor, informe um email válido."
+msgstr "Por favor, ingrese un email válido."
+
+msgid "Este email já está inscrito e ativo."
+msgstr "Este email ya está suscrito y activo."
+
+msgid "Um email de verificação foi enviado para {0}."
+msgstr "Se envió un email de verificación a {0}."
+
+msgid "Não foi possível enviar o email de verificação. Por favor, tente novamente mais tarde."
+msgstr "No se pudo enviar el email de verificación. Por favor, inténtelo nuevamente más tarde."
+
+msgid "Sua inscrição foi reativada com sucesso!"
+msgstr "¡Su suscripción fue reactivada exitosamente!"
+
+msgid "Obrigado por se inscrever! Um email de verificação foi enviado para {0}."
+msgstr "¡Gracias por suscribirse! Se envió un email de verificación a {0}."
+
+msgid "Inscrição realizada, mas não foi possível enviar o email de verificação. Por favor, solicite o reenvio."
+msgstr "Suscripción realizada, pero no se pudo enviar el email de verificación. Por favor, solicite el reenvío."
+
+msgid "Este email já está cadastrado."
+msgstr "Este email ya está registrado."
+
+msgid "Não foi possível completar a inscrição. Por favor, tente novamente."
+msgstr "No se pudo completar la suscripción. Por favor, inténtelo nuevamente."
+
+msgid "Token de verificação inválido."
+msgstr "Token de verificación inválido."
+
+msgid "Token de verificação inválido ou expirado."
+msgstr "Token de verificación inválido o expirado."
+
+msgid "Este email já foi verificado anteriormente."
+msgstr "Este email ya fue verificado anteriormente."
+
+msgid "Email verificado com sucesso! Você começará a receber notificações."
+msgstr "¡Email verificado exitosamente! Comenzará a recibir notificaciones."
+
+msgid "Não foi possível verificar o email. Por favor, tente novamente."
+msgstr "No se pudo verificar el email. Por favor, inténtelo nuevamente."
+
+msgid "Token de cancelamento inválido."
+msgstr "Token de cancelación inválido."
+
+msgid "Você foi desinscrito com sucesso. Não receberá mais notificações."
+msgstr "Su suscripción ha sido cancelada exitosamente. Ya no recibirá notificaciones."
+
+msgid "Não foi possível processar o cancelamento. Por favor, tente novamente."
+msgstr "No se pudo procesar la cancelación. Por favor, inténtelo nuevamente."
+
+msgid "O inscrito foi excluído com sucesso."
+msgstr "El suscriptor fue eliminado exitosamente."
+
+msgid "Não foi possível excluir o inscrito. Por favor, tente novamente."
+msgstr "No se pudo eliminar el suscriptor. Por favor, inténtelo nuevamente."
+
+msgid "O inscrito foi {$status} com sucesso."
+msgstr "El suscriptor fue {$status} exitosamente."
+
+msgid "Não foi possível atualizar o status. Por favor, tente novamente."
+msgstr "No se pudo actualizar el estado. Por favor, inténtelo nuevamente."
+
+msgid "Este inscrito já está verificado."
+msgstr "Este suscriptor ya está verificado."
+
+msgid "Email de verificação enviado para {0}."
+msgstr "Email de verificación enviado a {0}."
+
+msgid "Não foi possível enviar o email de verificação. Por favor, tente novamente."
+msgstr "No se pudo enviar el email de verificación. Por favor, inténtelo nuevamente."
+
+#: Subscribers - Verify Page
+msgid "Email Verificado"
+msgstr "Email Verificado"
+
+msgid "Email Verificado com Sucesso!"
+msgstr "¡Email Verificado Exitosamente!"
+
+msgid "Obrigado por verificar seu email"
+msgstr "Gracias por verificar su email"
+
+msgid "O que acontece agora?"
+msgstr "¿Qué sucede ahora?"
+
+msgid "Você começará a receber notificações sobre incidentes"
+msgstr "Comenzará a recibir notificaciones sobre incidentes"
+
+msgid "Alertas serão enviados quando serviços ficarem offline"
+msgstr "Se enviarán alertas cuando los servicios estén offline"
+
+msgid "Você será informado quando os problemas forem resolvidos"
+msgstr "Será informado cuando los problemas sean resueltos"
+
+msgid "Voltar para Status"
+msgstr "Volver al Estado"
+
+msgid "Não quer mais receber notificações?"
+msgstr "¿Ya no desea recibir notificaciones?"
+
+msgid "Cancelar inscrição"
+msgstr "Cancelar suscripción"
+
+#: Subscribers - Unsubscribe Page
+msgid "Cancelar Inscrição"
+msgstr "Cancelar Suscripción"
+
+msgid "Inscrição Cancelada"
+msgstr "Suscripción Cancelada"
+
+msgid "Você foi desinscrito com sucesso. Não receberá mais notificações no email"
+msgstr "Su suscripción ha sido cancelada exitosamente. Ya no recibirá notificaciones en el email"
+
+msgid "Sentiremos sua falta! 😢"
+msgstr "¡Lo extrañaremos! 😢"
+
+msgid "Se você mudar de ideia, pode se inscrever novamente a qualquer momento na página de status."
+msgstr "Si cambia de opinión, puede suscribirse nuevamente en cualquier momento en la página de estado."
+
+msgid "Cancelar Inscrição?"
+msgstr "¿Cancelar Suscripción?"
+
+msgid "Tem certeza que deseja cancelar as notificações para"
+msgstr "¿Está seguro que desea cancelar las notificaciones para"
+
+msgid "Você deixará de receber:"
+msgstr "Dejará de recibir:"
+
+msgid "Notificações sobre incidentes"
+msgstr "Notificaciones sobre incidentes"
+
+msgid "Alertas de serviços offline"
+msgstr "Alertas de servicios offline"
+
+msgid "Informações sobre resoluções de problemas"
+msgstr "Información sobre resoluciones de problemas"
+
+msgid "Sim, cancelar inscrição"
+msgstr "Sí, cancelar suscripción"
+
+msgid "Não, manter inscrição"
+msgstr "No, mantener suscripción"
+
+msgid "Você pode se reinscrever a qualquer momento pela página de status."
+msgstr "Puede suscribirse nuevamente en cualquier momento desde la página de estado."

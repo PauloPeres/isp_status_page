@@ -3,18 +3,18 @@
  * @var \App\View\AppView $this
  * @var \App\Model\Entity\AlertLog $emailLog
  */
-$this->assign('title', 'Detalhes do Email');
+$this->assign('title', __('Detalhes do Email'));
 ?>
 
 <div class="email-log-view">
     <div class="page-header">
         <div>
-            <h1>Detalhes do Email</h1>
-            <p>Email #<?= h($emailLog->id) ?> - <?= h($emailLog->recipient) ?></p>
+            <h1><?= __('Detalhes do Email') ?></h1>
+            <p><?= __('Email') ?> #<?= h($emailLog->id) ?> - <?= h($emailLog->recipient) ?></p>
         </div>
         <div style="display: flex; gap: 8px;">
             <?= $this->Html->link(
-                'Voltar',
+                __('Voltar'),
                 ['action' => 'index'],
                 ['class' => 'btn btn-secondary']
             ) ?>
@@ -30,20 +30,20 @@ $this->assign('title', 'Detalhes do Email');
             <div class="status-content">
                 <h2>
                     <?php if ($emailLog->status === 'sent'): ?>
-                        Email Enviado
+                        <?= __('Email Enviado') ?>
                     <?php elseif ($emailLog->status === 'failed'): ?>
-                        Falha no Envio
+                        <?= __('Falha no Envio') ?>
                     <?php elseif ($emailLog->status === 'queued'): ?>
-                        Na Fila de Envio
+                        <?= __('Na Fila de Envio') ?>
                     <?php else: ?>
                         <?= h(ucfirst($emailLog->status)) ?>
                     <?php endif; ?>
                 </h2>
                 <p>
                     <?php if ($emailLog->sent_at): ?>
-                        Enviado em <span class="local-datetime" data-utc="<?= $emailLog->sent_at->format('c') ?>"></span>
+                        <?= __('Enviado em') ?> <span class="local-datetime" data-utc="<?= $emailLog->sent_at->format('c') ?>"></span>
                     <?php else: ?>
-                        Criado em <span class="local-datetime" data-utc="<?= $emailLog->created->format('c') ?>"></span>
+                        <?= __('Criado em') ?> <span class="local-datetime" data-utc="<?= $emailLog->created->format('c') ?>"></span>
                     <?php endif; ?>
                 </p>
             </div>
@@ -52,38 +52,38 @@ $this->assign('title', 'Detalhes do Email');
 
     <!-- Email Details -->
     <div class="card">
-        <div class="card-header">Informações do Email</div>
+        <div class="card-header"><?= __('Informações do Email') ?></div>
         <div class="details-grid">
             <div class="detail-item">
-                <span class="detail-label">Destinatário:</span>
+                <span class="detail-label"><?= __('Destinatário') ?>:</span>
                 <code><?= h($emailLog->recipient) ?></code>
             </div>
 
             <div class="detail-item">
-                <span class="detail-label">Canal:</span>
+                <span class="detail-label"><?= __('Canal') ?>:</span>
                 <span class="badge badge-info"><?= h(strtoupper($emailLog->channel)) ?></span>
             </div>
 
             <div class="detail-item">
-                <span class="detail-label">Status:</span>
+                <span class="detail-label"><?= __('Status') ?>:</span>
                 <span class="badge badge-<?= $emailLog->status === 'sent' ? 'success' : ($emailLog->status === 'failed' ? 'danger' : 'warning') ?>">
                     <?= h(ucfirst($emailLog->status)) ?>
                 </span>
             </div>
 
             <div class="detail-item">
-                <span class="detail-label">Data de Criação:</span>
+                <span class="detail-label"><?= __('Data de Criação') ?>:</span>
                 <span class="local-datetime" data-utc="<?= $emailLog->created->format('c') ?>"></span>
             </div>
 
             <?php if ($emailLog->sent_at): ?>
                 <div class="detail-item">
-                    <span class="detail-label">Data de Envio:</span>
+                    <span class="detail-label"><?= __('Data de Envio') ?>:</span>
                     <span class="local-datetime" data-utc="<?= $emailLog->sent_at->format('c') ?>"></span>
                 </div>
 
                 <div class="detail-item">
-                    <span class="detail-label">Tempo de Processamento:</span>
+                    <span class="detail-label"><?= __('Tempo de Processamento') ?>:</span>
                     <span>
                         <?php
                         $diff = $emailLog->created->diff($emailLog->sent_at);
@@ -98,7 +98,7 @@ $this->assign('title', 'Detalhes do Email');
     <!-- Monitor Information -->
     <?php if (isset($emailLog->monitor)): ?>
         <div class="card">
-            <div class="card-header">Monitor Relacionado</div>
+            <div class="card-header"><?= __('Monitor Relacionado') ?></div>
             <div class="monitor-info">
                 <div class="monitor-item">
                     <h4><?= h($emailLog->monitor->name) ?></h4>
@@ -108,7 +108,7 @@ $this->assign('title', 'Detalhes do Email');
                     <?php endif; ?>
                     <div class="monitor-meta">
                         <?= $this->Html->link(
-                            'Ver Monitor',
+                            __('Ver Monitor'),
                             ['controller' => 'Monitors', 'action' => 'view', $emailLog->monitor->id],
                             ['class' => 'btn-link']
                         ) ?>
@@ -121,7 +121,7 @@ $this->assign('title', 'Detalhes do Email');
     <!-- Incident Information -->
     <?php if (isset($emailLog->incident)): ?>
         <div class="card">
-            <div class="card-header">Incidente Relacionado</div>
+            <div class="card-header"><?= __('Incidente Relacionado') ?></div>
             <div class="incident-info">
                 <div class="incident-item">
                     <h4><?= h($emailLog->incident->title) ?></h4>
@@ -132,12 +132,12 @@ $this->assign('title', 'Detalhes do Email');
                         <p><?= h($emailLog->incident->description) ?></p>
                     <?php endif; ?>
                     <div class="incident-meta">
-                        <span>Iniciado: <span class="local-datetime" data-utc="<?= $emailLog->incident->started_at->format('c') ?>"></span></span>
+                        <span><?= __('Iniciado') ?>: <span class="local-datetime" data-utc="<?= $emailLog->incident->started_at->format('c') ?>"></span></span>
                         <?php if ($emailLog->incident->resolved_at): ?>
-                            <span>Resolvido: <span class="local-datetime" data-utc="<?= $emailLog->incident->resolved_at->format('c') ?>"></span></span>
+                            <span><?= __('Resolvido') ?>: <span class="local-datetime" data-utc="<?= $emailLog->incident->resolved_at->format('c') ?>"></span></span>
                         <?php endif; ?>
                         <?= $this->Html->link(
-                            'Ver Incidente',
+                            __('Ver Incidente'),
                             ['controller' => 'Incidents', 'action' => 'view', $emailLog->incident->id],
                             ['class' => 'btn-link']
                         ) ?>
@@ -150,10 +150,10 @@ $this->assign('title', 'Detalhes do Email');
     <!-- Alert Rule Information -->
     <?php if (isset($emailLog->alert_rule)): ?>
         <div class="card">
-            <div class="card-header">Regra de Alerta</div>
+            <div class="card-header"><?= __('Regra de Alerta') ?></div>
             <div class="details-grid">
                 <div class="detail-item">
-                    <span class="detail-label">Nome:</span>
+                    <span class="detail-label"><?= __('Nome') ?>:</span>
                     <span><?= h($emailLog->alert_rule->name ?? 'N/A') ?></span>
                 </div>
             </div>
@@ -164,7 +164,7 @@ $this->assign('title', 'Detalhes do Email');
     <?php if ($emailLog->error_message): ?>
         <div class="card error-card">
             <div class="card-header" style="background: #fee2e2; color: #dc2626; border-color: #fecaca;">
-                ⚠️ Mensagem de Erro
+                ⚠️ <?= __('Mensagem de Erro') ?>
             </div>
             <div class="error-content">
                 <code style="display: block; padding: 16px; background: #fef2f2; border-radius: 4px; white-space: pre-wrap; word-break: break-word;">
@@ -177,14 +177,14 @@ $this->assign('title', 'Detalhes do Email');
     <!-- Actions -->
     <?php if ($emailLog->status === 'failed'): ?>
         <div class="card">
-            <div class="card-header">Ações</div>
+            <div class="card-header"><?= __('Ações') ?></div>
             <div class="actions-grid">
                 <?= $this->Form->postLink(
-                    'Reenviar Email',
+                    __('Reenviar Email'),
                     ['action' => 'resend', $emailLog->id],
                     [
                         'class' => 'btn btn-primary',
-                        'confirm' => 'Tem certeza que deseja reenviar este email?'
+                        'confirm' => __('Tem certeza que deseja reenviar este email?')
                     ]
                 ) ?>
             </div>

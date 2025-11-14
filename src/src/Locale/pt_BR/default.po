@@ -1,0 +1,798 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ISP Status Page\n"
+"POT-Creation-Date: 2025-11-14 15:55-0300\n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: src/Controller/EmailLogsController.php:129
+#: src/Controller/EmailLogsController.php:151
+msgid "Este não é um log de email."
+msgstr "Este não é um log de email."
+
+#: src/Controller/EmailLogsController.php:156
+msgid ""
+"Funcionalidade de reenvio será implementada quando o serviço de email "
+"estiver configurado."
+msgstr ""
+"Funcionalidade de reenvio será implementada quando o serviço de email "
+"estiver configurado."
+
+#: src/Controller/UsersController.php:70
+msgid "Você saiu com sucesso."
+msgstr "Você saiu com sucesso."
+
+#: src/Controller/UsersController.php:148
+#: src/Controller/UsersController.php:199
+msgid "As senhas não coincidem."
+msgstr "As senhas não coincidem."
+
+#: src/Controller/UsersController.php:160
+msgid "Usuário criado com sucesso."
+msgstr "Usuário criado com sucesso."
+
+#: src/Controller/UsersController.php:165
+msgid "Não foi possível criar o usuário. Verifique os erros abaixo."
+msgstr "Não foi possível criar o usuário. Verifique os erros abaixo."
+
+#: src/Controller/UsersController.php:187
+msgid "Você não tem permissão para editar este usuário."
+msgstr "Você não tem permissão para editar este usuário."
+
+#: src/Controller/UsersController.php:215
+msgid "Perfil atualizado com sucesso."
+msgstr "Perfil atualizado com sucesso."
+
+#: src/Controller/UsersController.php:220
+msgid "Não foi possível atualizar o perfil. Tente novamente."
+msgstr "Não foi possível atualizar o perfil. Tente novamente."
+
+#: src/Controller/UsersController.php:239
+msgid "Usuário excluído com sucesso."
+msgstr "Usuário excluído com sucesso."
+
+#: src/Controller/UsersController.php:241
+msgid "Não foi possível excluir o usuário. Tente novamente."
+msgstr "Não foi possível excluir o usuário. Tente novamente."
+
+#: src/Model/Table/MonitorsTable.php:94
+msgid "Invalid monitor type"
+msgstr "Invalid monitor type"
+
+#: src/Model/Table/MonitorsTable.php:108
+msgid "Configuration must be valid JSON"
+msgstr "Configuration must be valid JSON"
+
+#: src/Model/Table/MonitorsTable.php:114
+msgid "Check interval must be greater than 0"
+msgstr "Check interval must be greater than 0"
+
+#: src/Model/Table/MonitorsTable.php:119
+msgid "Timeout must be greater than 0"
+msgstr "Timeout must be greater than 0"
+
+#: src/Model/Table/MonitorsTable.php:124
+msgid "Retry count cannot be negative"
+msgstr "Retry count cannot be negative"
+
+#: src/Model/Table/MonitorsTable.php:130
+msgid "Invalid status"
+msgstr "Invalid status"
+
+#: src/Model/Table/MonitorsTable.php:143
+msgid "Uptime percentage must be between 0 and 100"
+msgstr "Uptime percentage must be between 0 and 100"
+
+#: src/Model/Table/MonitorsTable.php:156
+msgid "Display order cannot be negative"
+msgstr "Display order cannot be negative"
+
+#: src/Model/Table/UsersTable.php:67
+msgid "Password must be at least 8 characters long"
+msgstr "Password must be at least 8 characters long"
+
+#: src/Model/Table/UsersTable.php:81
+msgid "Invalid role. Must be admin, user, or viewer"
+msgstr "Invalid role. Must be admin, user, or viewer"
+
+#: templates/EmailLogs/index.php:8 templates/EmailLogs/index.php:277
+msgid "Logs de Emails"
+msgstr "Logs de Emails"
+
+#: templates/EmailLogs/index.php:283
+msgid "Total Enviados"
+msgstr "Total Enviados"
+
+#: templates/EmailLogs/index.php:287
+msgid "Sucesso"
+msgstr "Sucesso"
+
+#: templates/EmailLogs/index.php:291 templates/EmailLogs/index.php:326
+msgid "Falhas"
+msgstr "Falhas"
+
+#: templates/EmailLogs/index.php:295
+msgid "Taxa de Sucesso"
+msgstr "Taxa de Sucesso"
+
+#: templates/EmailLogs/index.php:301
+msgid "Hoje"
+msgstr "Hoje"
+
+#: templates/EmailLogs/index.php:311
+msgid "Buscar"
+msgstr "Buscar"
+
+#: templates/EmailLogs/index.php:314
+msgid "Email ou assunto..."
+msgstr "Email ou assunto..."
+
+#: templates/EmailLogs/index.php:321 templates/EmailLogs/index.php:367
+#: templates/Monitors/index.php:471 templates/Monitors/index.php:515
+#: templates/Monitors/view.php:157 templates/Users/add.php:255
+#: templates/Users/index.php:415 templates/Users/index.php:453
+#: templates/Users/view.php:179
+msgid "Status"
+msgstr "Status"
+
+#: templates/EmailLogs/index.php:324 templates/EmailLogs/index.php:342
+msgid "Todos"
+msgstr "Todos"
+
+#: templates/EmailLogs/index.php:325
+msgid "Enviados"
+msgstr "Enviados"
+
+#: templates/EmailLogs/index.php:327 templates/EmailLogs/index.php:402
+msgid "Na Fila"
+msgstr "Na Fila"
+
+#: templates/EmailLogs/index.php:336
+msgid "Período"
+msgstr "Período"
+
+#: templates/EmailLogs/index.php:339
+msgid "Últimas 24 horas"
+msgstr "Últimas 24 horas"
+
+#: templates/EmailLogs/index.php:340
+msgid "Últimos 7 dias"
+msgstr "Últimos 7 dias"
+
+#: templates/EmailLogs/index.php:341
+msgid "Últimos 30 dias"
+msgstr "Últimos 30 dias"
+
+#: templates/EmailLogs/index.php:351
+#, fuzzy
+msgid "Filtrar"
+msgstr "Filtrar"
+
+#: templates/EmailLogs/index.php:352
+msgid "Limpar"
+msgstr "Limpar"
+
+#: templates/EmailLogs/index.php:364
+msgid "Data/Hora"
+msgstr "Data/Hora"
+
+#: templates/EmailLogs/index.php:365
+msgid "Destinatário"
+msgstr "Destinatário"
+
+#: templates/EmailLogs/index.php:366
+msgid "Assunto"
+msgstr "Assunto"
+
+#: templates/EmailLogs/index.php:368
+#, fuzzy
+msgid "Monitor"
+msgstr "Monitores"
+
+#: templates/EmailLogs/index.php:369
+msgid "Ações"
+msgstr "Ações"
+
+#: templates/EmailLogs/index.php:385
+#, fuzzy
+msgid "Incidente"
+msgstr "Incidentes"
+
+#: templates/EmailLogs/index.php:393
+#, fuzzy
+msgid "Enviado"
+msgstr "Iniciado:"
+
+#: templates/EmailLogs/index.php:400
+msgid "Falha"
+msgstr "Falha"
+
+#: templates/EmailLogs/index.php:425
+#, fuzzy
+msgid "Ver"
+msgstr "Versão"
+
+#: templates/EmailLogs/index.php:427
+msgid "Ver detalhes"
+msgstr "Ver detalhes"
+
+#: templates/EmailLogs/index.php:437
+msgid "Nenhum email encontrado"
+msgstr "Nenhum email encontrado"
+
+#: templates/EmailLogs/index.php:438
+msgid "Tente ajustar os filtros ou aguarde o envio de novos emails."
+msgstr "Tente ajustar os filtros ou aguarde o envio de novos emails."
+
+#: templates/EmailLogs/index.php:446
+msgid "« Primeira"
+msgstr "« Primeira"
+
+#: templates/EmailLogs/index.php:447
+msgid "‹ Anterior"
+msgstr "‹ Anterior"
+
+#: templates/EmailLogs/index.php:449
+msgid "Próxima ›"
+msgstr "Próxima ›"
+
+#: templates/EmailLogs/index.php:450
+msgid "Última »"
+msgstr "Última »"
+
+#: templates/EmailLogs/index.php:453
+msgid ""
+"Página {{page}} de {{pages}}, mostrando {{current}} registro(s) de {{count}} "
+"no total"
+msgstr ""
+"Página {{page}} de {{pages}}, mostrando {{current}} registro(s) de {{count}} "
+"no total"
+
+#: templates/Monitors/add.php:16 templates/Monitors/edit.php:22
+#: templates/Monitors/view.php:25 templates/Users/add.php:179
+#: templates/Users/edit.php:164 templates/Users/view.php:152
+#: templates/layout/error.php:36
+msgid "Back"
+msgstr "Voltar"
+
+#: templates/Monitors/add.php:36 templates/Monitors/edit.php:42
+msgid "Description"
+msgstr "Descrição"
+
+#: templates/Monitors/add.php:130 templates/Monitors/edit.php:154
+#: templates/Users/add.php:266 templates/Users/edit.php:229
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: templates/Monitors/edit.php:17
+msgid "View Details"
+msgstr "View Details"
+
+#: templates/Monitors/edit.php:141 templates/Monitors/view.php:135
+#: templates/Users/index.php:455
+msgid "Created"
+msgstr "Criado"
+
+#: templates/Monitors/edit.php:145 templates/Monitors/view.php:140
+#, fuzzy
+msgid "Last Updated"
+msgstr "Atualizar"
+
+#: templates/Monitors/edit.php:159 templates/Monitors/index.php:589
+#: templates/Users/index.php:488
+msgid "Delete"
+msgstr "Excluir"
+
+#: templates/Monitors/index.php:445 templates/Users/index.php:428
+msgid "Search"
+msgstr "Buscar"
+
+#: templates/Monitors/index.php:459 templates/Monitors/index.php:475
+#: templates/Monitors/index.php:491 templates/Users/index.php:403
+#: templates/Users/index.php:417
+msgid "All"
+msgstr "Todos"
+
+#: templates/Monitors/index.php:503 templates/Users/index.php:438
+msgid "Filter"
+msgstr "Filtrar"
+
+#: templates/Monitors/index.php:504 templates/Users/index.php:439
+msgid "Clear"
+msgstr "Limpar"
+
+#: templates/Monitors/index.php:522 templates/Monitors/view.php:241
+#: templates/Users/index.php:456
+msgid "Actions"
+msgstr "Ações"
+
+#: templates/Monitors/index.php:571 templates/Users/index.php:486
+#: templates/element/admin/sidebar.php:112
+msgid "View"
+msgstr "Ver"
+
+#: templates/Monitors/index.php:573
+msgid "View details"
+msgstr "View details"
+
+#: templates/Monitors/index.php:576 templates/Monitors/index.php:578
+#: templates/Monitors/view.php:20 templates/Users/index.php:487
+msgid "Edit"
+msgstr "Editar"
+
+#: templates/Monitors/index.php:619
+msgid "First"
+msgstr "Primeira"
+
+#: templates/Monitors/index.php:620
+msgid "Previous"
+msgstr "Anterior"
+
+#: templates/Monitors/index.php:622
+msgid "Next"
+msgstr "Próxima"
+
+#: templates/Monitors/index.php:623
+msgid "Last"
+msgstr "Última"
+
+#: templates/Monitors/view.php:158
+msgid "Date/Time"
+msgstr "Date/Time"
+
+#: templates/Status/index.php:31
+msgid "de"
+msgstr "de"
+
+#: templates/Status/index.php:31
+msgid "serviços operacionais"
+msgstr "serviços operacionais"
+
+#: templates/Status/index.php:33
+#, fuzzy
+msgid "offline"
+msgstr "Offline"
+
+#: templates/Status/index.php:36
+#, fuzzy
+msgid "degradados"
+msgstr "Degradado"
+
+#: templates/Status/index.php:43 templates/element/public/header.php:18
+msgid "Status dos Serviços"
+msgstr "Status dos Serviços"
+
+#: templates/Status/index.php:52
+msgid "Nenhum serviço sendo monitorado no momento."
+msgstr "Nenhum serviço sendo monitorado no momento."
+
+#: templates/Status/index.php:67
+msgid "Próxima atualização em:"
+msgstr "Próxima atualização em:"
+
+#: templates/Status/index.php:67
+msgid "segundos"
+msgstr "segundos"
+
+#: templates/Status/index.php:120
+#, fuzzy
+msgid "Última atualização:"
+msgstr "Última verificação:"
+
+#: templates/Status/index.php:121
+msgid "Próxima atualização em 5 minutos"
+msgstr "Próxima atualização em 5 minutos"
+
+#: templates/Users/add.php:202 templates/Users/edit.php:187
+#: templates/Users/index.php:451 templates/Users/view.php:165
+msgid "Email"
+msgstr "Email"
+
+#: templates/Users/add.php:214 templates/Users/login.php:235
+msgid "Password"
+msgstr "Senha"
+
+#: templates/Users/add.php:224
+msgid "Confirm Password"
+msgstr "Confirmar Senha"
+
+#: templates/Users/edit.php:228
+msgid "Save Changes"
+msgstr "Salvar Alterações"
+
+#: templates/Users/index.php:381
+msgid "Total"
+msgstr "Total"
+
+#: templates/Users/index.php:386 templates/Users/index.php:418
+#: templates/Users/index.php:471 templates/Users/view.php:182
+msgid "Active"
+msgstr "Ativo"
+
+#: templates/Users/index.php:419 templates/Users/index.php:473
+#: templates/Users/view.php:184
+msgid "Inactive"
+msgstr "Inativo"
+
+#: templates/Users/index.php:489
+msgid "Are you sure you want to delete this user?"
+msgstr "Tem certeza que deseja excluir este usuário?"
+
+#: templates/Users/index.php:510
+msgid "Showing {{start}} to {{end}} of {{count}} entries"
+msgstr "Mostrando {{start}} a {{end}} de {{count}} usuários"
+
+#: templates/Users/view.php:206
+msgid "Last Modified"
+msgstr "Última Modificação"
+
+#: templates/element/admin/footer.php:8
+msgid "Version"
+msgstr "Versão"
+
+#: templates/element/admin/footer.php:17
+msgid "Documentation"
+msgstr "Documentação"
+
+#: templates/element/admin/footer.php:20
+msgid "Report Issue"
+msgstr "Reportar Problema"
+
+#: templates/element/admin/navbar.php:4
+#, fuzzy
+msgid "ISP Status"
+msgstr "ISP Status Admin"
+
+#: templates/element/admin/navbar.php:22
+msgid "Administrator"
+msgstr "Administrador"
+
+#: templates/element/admin/navbar.php:34
+msgid "My Profile"
+msgstr "Meu Perfil"
+
+#: templates/element/admin/navbar.php:39
+#: templates/element/admin/sidebar.php:102
+msgid "Settings"
+msgstr "Configurações"
+
+#: templates/element/admin/navbar.php:45
+msgid "Logout"
+msgstr "Sair"
+
+#: templates/element/admin/sidebar.php:18
+msgid "Admin Panel"
+msgstr "Painel Administrativo"
+
+#: templates/element/admin/sidebar.php:24
+msgid "Main"
+msgstr "Principal"
+
+#: templates/element/admin/sidebar.php:27
+msgid "Dashboard"
+msgstr "Painel"
+
+#: templates/element/admin/sidebar.php:37
+msgid "Monitoring"
+msgstr "Monitoramento"
+
+#: templates/element/admin/sidebar.php:40
+msgid "Monitors"
+msgstr "Monitores"
+
+#: templates/element/admin/sidebar.php:49
+msgid "Checks"
+msgstr "Verificações"
+
+#: templates/element/admin/sidebar.php:58
+msgid "Incidents"
+msgstr "Incidentes"
+
+#: templates/element/admin/sidebar.php:68
+msgid "Communication"
+msgstr "Comunicação"
+
+#: templates/element/admin/sidebar.php:71
+msgid "Subscribers"
+msgstr "Inscritos"
+
+#: templates/element/admin/sidebar.php:80
+msgid "Email Logs"
+msgstr "Logs de Email"
+
+#: templates/element/admin/sidebar.php:90
+msgid "System"
+msgstr "Sistema"
+
+#: templates/element/admin/sidebar.php:93
+msgid "Users"
+msgstr "Usuários"
+
+#: templates/element/admin/sidebar.php:115
+msgid "Public Page"
+msgstr "Página Pública"
+
+#: templates/element/admin/sidebar.php:129
+msgid "System Online"
+msgstr "Sistema Online"
+
+#: templates/element/public/footer.php:12
+msgid "Sobre"
+msgstr "Sobre"
+
+#: templates/element/public/footer.php:14
+msgid ""
+"Esta página mostra o status em tempo real de todos os nossos serviços. "
+"Monitoramos continuamente para garantir a melhor experiência."
+msgstr ""
+"Esta página mostra o status em tempo real de todos os nossos serviços. "
+"Monitoramos continuamente para garantir a melhor experiência."
+
+#: templates/element/public/footer.php:19
+msgid "Links Úteis"
+msgstr "Links Úteis"
+
+#: templates/element/public/footer.php:23
+msgid "Página Inicial"
+msgstr "Página Inicial"
+
+#: templates/element/public/footer.php:29
+msgid "Histórico de Incidentes"
+msgstr "Histórico de Incidentes"
+
+#: templates/element/public/footer.php:35
+msgid "Assinar Notificações"
+msgstr "Assinar Notificações"
+
+#: templates/element/public/footer.php:43
+msgid "Suporte"
+msgstr "Suporte"
+
+#: templates/element/public/footer.php:45
+msgid "Email:"
+msgstr "Email:"
+
+#: templates/element/public/footer.php:49
+msgid "Atualizações automáticas a cada 30 segundos"
+msgstr "Atualizações automáticas a cada 30 segundos"
+
+#: templates/element/public/footer.php:55
+msgid "Todos os direitos reservados."
+msgstr "Todos os direitos reservados."
+
+#: templates/element/public/footer.php:57
+msgid "Powered by"
+msgstr "Powered by"
+
+#: templates/element/public/header.php:24
+msgid "Início"
+msgstr "Início"
+
+#: templates/element/public/header.php:29
+msgid "Histórico"
+msgstr "Histórico"
+
+#: templates/element/public/header.php:34
+msgid "Notificações"
+msgstr "Notificações"
+
+#: templates/element/status/incident_timeline.php:15
+msgid "Incidentes Recentes"
+msgstr "Incidentes Recentes"
+
+#: templates/element/status/incident_timeline.php:29
+msgid "Resolvido"
+msgstr "Resolvido"
+
+#: templates/element/status/incident_timeline.php:31
+msgid "Investigando"
+msgstr "Investigando"
+
+#: templates/element/status/incident_timeline.php:33
+msgid "Identificado"
+msgstr "Identificado"
+
+#: templates/element/status/incident_timeline.php:51
+msgid "Iniciado:"
+msgstr "Iniciado:"
+
+#: templates/element/status/incident_timeline.php:59
+msgid "Resolvido:"
+msgstr "Resolvido:"
+
+#: templates/element/status/incident_timeline.php:67
+msgid "Duração:"
+msgstr "Duração:"
+
+#: templates/element/status/incident_timeline.php:74
+msgid "Em andamento"
+msgstr "Em andamento"
+
+#: templates/element/status/incident_timeline.php:85
+msgid "Ver Histórico Completo"
+msgstr "Ver Histórico Completo"
+
+#: templates/element/status/monitor_card.php:21
+msgid "Última verificação:"
+msgstr "Última verificação:"
+
+#: templates/element/status/monitor_card.php:26
+msgid "Aguardando primeira verificação"
+msgstr "Aguardando primeira verificação"
+
+#: templates/element/status/monitor_card.php:43
+msgid "Operacional"
+msgstr "Operacional"
+
+#: templates/element/status/monitor_card.php:45
+msgid "Offline"
+msgstr "Offline"
+
+#: templates/element/status/monitor_card.php:47
+msgid "Degradado"
+msgstr "Degradado"
+
+#: templates/element/status/subscribe_form.php:11
+msgid "Receba Notificações"
+msgstr "Receba Notificações"
+
+#: templates/element/status/subscribe_form.php:13
+msgid ""
+"Inscreva-se para receber atualizações por email sobre incidentes e "
+"manutenções programadas."
+msgstr ""
+"Inscreva-se para receber atualizações por email sobre incidentes e "
+"manutenções programadas."
+
+#: templates/element/status/subscribe_form.php:23
+msgid "seu@email.com"
+msgstr "seu@email.com"
+
+#: templates/element/status/subscribe_form.php:32
+msgid "Inscrever-se"
+msgstr "Inscrever-se"
+
+#: templates/element/status/subscribe_form.php:37
+msgid ""
+"Você receberá apenas alertas importantes. Pode cancelar a qualquer momento."
+msgstr ""
+"Você receberá apenas alertas importantes. Pode cancelar a qualquer momento."
+
+#: templates/layout/admin.php:7
+msgid "ISP Status Admin"
+msgstr "ISP Status Admin"
+
+#: templates/layout/public.php:17
+msgid "Página de status em tempo real dos serviços de internet"
+msgstr "Página de status em tempo real dos serviços de internet"
+
+#~ msgid "Save"
+#~ msgstr "Salvar"
+
+#~ msgid "Add"
+#~ msgstr "Adicionar"
+
+#~ msgid "Create"
+#~ msgstr "Criar"
+
+#~ msgid "Yes"
+#~ msgstr "Sim"
+
+#~ msgid "No"
+#~ msgstr "Não"
+
+#~ msgid "Online"
+#~ msgstr "Online"
+
+#~ msgid "Up"
+#~ msgstr "Online"
+
+#~ msgid "Down"
+#~ msgstr "Offline"
+
+#~ msgid "Unknown"
+#~ msgstr "Desconhecido"
+
+#~ msgid "Pending"
+#~ msgstr "Pendente"
+
+#~ msgid "Completed"
+#~ msgstr "Concluído"
+
+#~ msgid "Failed"
+#~ msgstr "Falhou"
+
+#~ msgid "Record saved successfully."
+#~ msgstr "Registro salvo com sucesso."
+
+#~ msgid "Record updated successfully."
+#~ msgstr "Registro atualizado com sucesso."
+
+#~ msgid "Record deleted successfully."
+#~ msgstr "Registro excluído com sucesso."
+
+#~ msgid "Error saving record."
+#~ msgstr "Erro ao salvar o registro."
+
+#~ msgid "Error updating record."
+#~ msgstr "Erro ao atualizar o registro."
+
+#~ msgid "Error deleting record."
+#~ msgstr "Erro ao excluir o registro."
+
+#~ msgid "Operation completed successfully."
+#~ msgstr "Operação realizada com sucesso."
+
+#~ msgid "An error occurred. Please try again."
+#~ msgstr "Ocorreu um erro. Por favor, tente novamente."
+
+#~ msgid "Are you sure you want to delete this?"
+#~ msgstr "Tem certeza que deseja excluir isso?"
+
+#~ msgid "No records found."
+#~ msgstr "Nenhum registro encontrado."
+
+#~ msgid "Showing {{start}} to {{end}} of {{count}}"
+#~ msgstr "Mostrando {{start}} a {{end}} de {{count}}"
+
+#~ msgid "Page {{page}} of {{pages}}"
+#~ msgstr "Página {{page}} de {{pages}}"
+
+#~ msgid "Name"
+#~ msgstr "Nome"
+
+#~ msgid "Type"
+#~ msgstr "Tipo"
+
+#~ msgid "Modified"
+#~ msgstr "Modificado"
+
+#~ msgid "Required field"
+#~ msgstr "Campo obrigatório"
+
+#~ msgid "Invalid email address"
+#~ msgstr "Endereço de email inválido"
+
+#~ msgid "Passwords do not match"
+#~ msgstr "As senhas não coincidem"
+
+#~ msgid "Home"
+#~ msgstr "Início"
+
+#~ msgid "Profile"
+#~ msgstr "Perfil"
+
+#: Mensagens Flash do UsersController (usando __() sem domínio)
+msgid "Você saiu com sucesso."
+msgstr "Você saiu com sucesso."
+
+msgid "As senhas não coincidem."
+msgstr "As senhas não coincidem."
+
+msgid "Usuário criado com sucesso."
+msgstr "Usuário criado com sucesso."
+
+msgid "Não foi possível criar o usuário. Verifique os erros abaixo."
+msgstr "Não foi possível criar o usuário. Verifique os erros abaixo."
+
+msgid "Você não tem permissão para editar este usuário."
+msgstr "Você não tem permissão para editar este usuário."
+
+msgid "Perfil atualizado com sucesso."
+msgstr "Perfil atualizado com sucesso."
+
+msgid "Não foi possível atualizar o perfil. Tente novamente."
+msgstr "Não foi possível atualizar o perfil. Tente novamente."
+
+msgid "Usuário excluído com sucesso."
+msgstr "Usuário excluído com sucesso."
+
+msgid "Não foi possível excluir o usuário. Tente novamente."
+msgstr "Não foi possível excluir o usuário. Tente novamente."
+
+# Status Page Access
+msgid "A página de status não está disponível publicamente. Por favor, faça login."
+msgstr "A página de status não está disponível publicamente. Por favor, faça login."

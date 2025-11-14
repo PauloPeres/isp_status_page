@@ -50,12 +50,25 @@ class StatusController extends AppController
      */
     public function index()
     {
+        // Check if status page is public
+        $isPublic = $this->settingService->get('status_page_public', true);
+
+        // If not public, require authentication
+        if (!$isPublic) {
+            $identity = $this->Authentication->getIdentity();
+            if (!$identity) {
+                $this->Flash->error(__d('status', 'A página de status não está disponível publicamente. Por favor, faça login.'));
+                return $this->redirect(['controller' => 'Users', 'action' => 'login']);
+            }
+        }
+
         $this->viewBuilder()->setLayout('public');
 
-        // Enable caching for 30 seconds
+        // Enable caching based on settings
+        $cacheSeconds = (int)$this->settingService->get('status_page_cache_seconds', 30);
         $this->response = $this->response
-            ->withCache('-30 seconds', '+30 seconds')
-            ->withHeader('Cache-Control', 'public, max-age=30');
+            ->withCache("-{$cacheSeconds} seconds", "+{$cacheSeconds} seconds")
+            ->withHeader('Cache-Control', $isPublic ? "public, max-age={$cacheSeconds}" : "private, max-age={$cacheSeconds}");
 
         // Get all active monitors
         $monitors = $this->fetchTable('Monitors')
@@ -114,6 +127,8 @@ class StatusController extends AppController
         // Load settings
         $siteName = $this->settingService->get('site_name', 'ISP Status');
         $statusPageTitle = $this->settingService->get('status_page_title', 'Status dos Serviços');
+        $logoUrl = $this->settingService->get('site_logo_url', null);
+        $supportEmail = $this->settingService->get('support_email', 'support@example.com');
 
         // Set HTTP status code based on system status
         if ($systemStatus === 'major-outage') {
@@ -133,7 +148,9 @@ class StatusController extends AppController
             'degradedMonitors',
             'recentIncidents',
             'siteName',
-            'statusPageTitle'
+            'statusPageTitle',
+            'logoUrl',
+            'supportEmail'
         ));
     }
 
@@ -144,6 +161,18 @@ class StatusController extends AppController
      */
     public function history()
     {
+        // Check if status page is public
+        $isPublic = $this->settingService->get('status_page_public', true);
+
+        // If not public, require authentication
+        if (!$isPublic) {
+            $identity = $this->Authentication->getIdentity();
+            if (!$identity) {
+                $this->Flash->error(__d('status', 'A página de status não está disponível publicamente. Por favor, faça login.'));
+                return $this->redirect(['controller' => 'Users', 'action' => 'login']);
+            }
+        }
+
         $this->viewBuilder()->setLayout('public');
 
         // Get incidents from last 30 days
@@ -165,6 +194,10 @@ class StatusController extends AppController
             $groupedIncidents[$date][] = $incident;
         }
 
-        $this->set(compact('groupedIncidents'));
+        // Load settings for footer
+        $siteName = $this->settingService->get('site_name', 'ISP Status');
+        $supportEmail = $this->settingService->get('support_email', 'support@example.com');
+
+        $this->set(compact('groupedIncidents', 'siteName', 'supportEmail'));
     }
 }

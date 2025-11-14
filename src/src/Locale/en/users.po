@@ -1,0 +1,226 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ISP Status Page - Users\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: Users - Títulos
+msgid "Users"
+msgstr "Users"
+
+msgid "User List"
+msgstr "User List"
+
+msgid "Add User"
+msgstr "Add User"
+
+msgid "Edit User"
+msgstr "Edit User"
+
+msgid "User Details"
+msgstr "User Details"
+
+msgid "New User"
+msgstr "New User"
+
+msgid "My Profile"
+msgstr "My Profile"
+
+msgid "Edit Profile"
+msgstr "Edit Profile"
+
+#: Users - Campos
+msgid "Username"
+msgstr "Username"
+
+msgid "User Email"
+msgstr "User Email"
+
+msgid "User Password"
+msgstr "User Password"
+
+msgid "New Password"
+msgstr "New Password"
+
+msgid "Confirm New Password"
+msgstr "Confirm New Password"
+
+msgid "Role"
+msgstr "Role"
+
+msgid "Last Login"
+msgstr "Last Login"
+
+msgid "Account Created"
+msgstr "Account Created"
+
+#: Users - Funções
+msgid "Administrator"
+msgstr "Administrator"
+
+msgid "User"
+msgstr "User"
+
+msgid "Viewer"
+msgstr "Viewer"
+
+msgid "Admin"
+msgstr "Admin"
+
+#: Users - Login
+msgid "Login"
+msgstr "Login"
+
+msgid "Sign In"
+msgstr "Sign In"
+
+msgid "Sign Out"
+msgstr "Sign Out"
+
+msgid "Remember Me"
+msgstr "Remember Me"
+
+msgid "Forgot Password?"
+msgstr "Forgot Password?"
+
+msgid "Invalid username or password"
+msgstr "Invalid username or password"
+
+msgid "You have been logged out successfully."
+msgstr "You have been logged out successfully."
+
+#: Users - Mensagens
+msgid "User created successfully."
+msgstr "User created successfully."
+
+msgid "User updated successfully."
+msgstr "User updated successfully."
+
+msgid "Profile updated successfully."
+msgstr "Profile updated successfully."
+
+msgid "User deleted successfully."
+msgstr "User deleted successfully."
+
+msgid "Error creating user."
+msgstr "Error creating user."
+
+msgid "Error updating user."
+msgstr "Error updating user."
+
+msgid "Error deleting user."
+msgstr "Error deleting user."
+
+msgid "You do not have permission to edit this user."
+msgstr "You do not have permission to edit this user."
+
+msgid "Password must be at least 8 characters."
+msgstr "Password must be at least 8 characters."
+
+#: Users - Estatísticas
+msgid "Total Users"
+msgstr "Total Users"
+
+msgid "Active Users"
+msgstr "Active Users"
+
+msgid "Administrators"
+msgstr "Administrators"
+
+msgid "Never"
+msgstr "Never"
+
+msgid "No users found"
+msgstr "No users found"
+
+#: Users - Templates
+msgid "Sign in to your account"
+msgstr "Sign in to your account"
+
+msgid "Invalid username or password. Please try again."
+msgstr "Invalid username or password. Please try again."
+
+msgid "Enter your username"
+msgstr "Enter your username"
+
+msgid "Enter your password"
+msgstr "Enter your password"
+
+msgid "Username or email..."
+msgstr "Username or email..."
+
+msgid "User Information"
+msgstr "User Information"
+
+msgid "Update Information"
+msgstr "Update Information"
+
+msgid "Basic Information"
+msgstr "Basic Information"
+
+msgid "Enter your email"
+msgstr "Enter your email"
+
+msgid "Change Password"
+msgstr "Change Password"
+
+msgid "Leave blank if you do not want to change the password"
+msgstr "Leave blank if you do not want to change the password"
+
+msgid "Minimum 8 characters"
+msgstr "Minimum 8 characters"
+
+msgid "Re-enter password"
+msgstr "Re-enter password"
+
+msgid "Access Data"
+msgstr "Access Data"
+
+msgid "Enter username"
+msgstr "Enter username"
+
+msgid "Enter email"
+msgstr "Enter email"
+
+msgid "Permissions"
+msgstr "Permissions"
+
+msgid "Select a role"
+msgstr "Select a role"
+
+msgid "Active user"
+msgstr "Active user"
+
+msgid "Create User"
+msgstr "Create User"
+
+#: Users - Mensagens Flash do Controller
+msgid "Você saiu com sucesso."
+msgstr "You have been logged out successfully."
+
+msgid "As senhas não coincidem."
+msgstr "Passwords do not match."
+
+msgid "Usuário criado com sucesso."
+msgstr "User created successfully."
+
+msgid "Não foi possível criar o usuário. Verifique os erros abaixo."
+msgstr "Could not create user. Please check the errors below."
+
+msgid "Você não tem permissão para editar este usuário."
+msgstr "You do not have permission to edit this user."
+
+msgid "Perfil atualizado com sucesso."
+msgstr "Profile updated successfully."
+
+msgid "Não foi possível atualizar o perfil. Tente novamente."
+msgstr "Could not update profile. Please try again."
+
+msgid "Usuário excluído com sucesso."
+msgstr "User deleted successfully."
+
+msgid "Não foi possível excluir o usuário. Tente novamente."
+msgstr "Could not delete user. Please try again."

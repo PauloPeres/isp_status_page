@@ -1446,23 +1446,146 @@ bin/cake bake model Monitors --no-test --no-fixture
 
 ---
 
+### TASK-260: Incident Acknowledgement System
+**Status**: 🔴 | **Prioridade**: ⭐ | **Dependências**: TASK-220, TASK-251
+**Estimativa**: 6h
+
+**Descrição**: Sistema de reconhecimento (acknowledge) de incidentes por múltiplos usuários.
+
+**Funcionalidades**:
+1. Quando um incidente é disparado:
+   - Sistema envia notificações para lista de usuários (email, Telegram, SMS)
+   - Notificações incluem link/botão para "Acknowledge"
+
+2. Primeiro usuário que der acknowledge:
+   - Sistema para envio de notificações para demais usuários
+   - Sistema notifica os outros usuários: "Usuário X reconheceu o incidente às HH:MM"
+   - Informação é salva no incidente (quem, quando)
+
+3. Visualização administrativa:
+   - Painel admin mostra quem deu acknowledge e quando
+   - Timeline do incidente inclui evento de acknowledgement
+   - Badge visual indicando incidente reconhecido
+
+**Implementar**:
+- Migration para adicionar campos em `incidents`:
+  - `acknowledged_by_user_id` (FK para users, nullable)
+  - `acknowledged_at` (datetime, nullable)
+  - `acknowledged_via` (string: 'email', 'telegram', 'sms', 'web')
+
+- Modificar Entity Incident:
+  - Métodos: `isAcknowledged()`, `acknowledgeBy(User $user, string $via)`
+  - Virtual field: `acknowledged_by_name`
+
+- Controller action:
+  - `IncidentsController::acknowledge($id, $token)` - público (link no email)
+  - `IncidentsController::acknowledgeAdmin($id)` - admin (botão no painel)
+  - Validação de token de segurança
+  - Validação: não pode acknowledge incidente já reconhecido
+
+- AlertService modificações:
+  - Verificar se incidente já foi acknowledged antes de enviar notificações
+  - Parar fila de envio após acknowledgement
+  - Enviar notificação de acknowledgement para demais usuários
+
+- Templates de notificação:
+  - Email com botão "Reconhecer Incidente" (link com token)
+  - Email de confirmação: "Usuário X reconheceu o incidente"
+  - Badge no painel admin
+
+- Views admin:
+  - Badge "Reconhecido por X" no index de incidentes
+  - Timeline no view mostrando evento de acknowledgement
+  - Botão "Reconhecer" no view (se não reconhecido)
+  - Informações: usuário, data/hora, canal usado
+
+**Arquivos a criar**:
+- `config/Migrations/YYYYMMDDHHMMSS_AddAcknowledgementToIncidents.php`
+- `templates/email/html/incident_acknowledged.php`
+- `templates/element/incidents/acknowledge_badge.php`
+
+**Arquivos a modificar**:
+- `src/Model/Entity/Incident.php` - Adicionar métodos e campos
+- `src/Model/Table/IncidentsTable.php` - Associação com Users
+- `src/Controller/IncidentsController.php` - Actions de acknowledge
+- `src/Service/AlertService.php` - Lógica de parada de envio
+- `templates/Incidents/index.php` - Badge de acknowledged
+- `templates/Incidents/view.php` - Timeline e botão de acknowledge
+- `templates/email/html/incident_down.php` - Adicionar botão acknowledge
+
+**Fluxo de Funcionamento**:
+1. Incidente criado → AlertService envia para lista de usuários
+2. Usuário A recebe email com link: `/incidents/acknowledge/{incident_id}/{token}`
+3. Usuário A clica no link → Sistema valida token
+4. Sistema marca incidente como acknowledged (user_id, timestamp, via='email')
+5. AlertService cancela envios pendentes para outros usuários
+6. Sistema envia notificação: "Usuário A reconheceu incidente às 14:30"
+7. Timeline do incidente mostra: "🔔 Reconhecido por Usuário A via email"
+
+**Critérios de Aceite**:
+- [ ] Migration adiciona campos acknowledged_by_user_id, acknowledged_at, acknowledged_via
+- [ ] Usuário pode dar acknowledge via link no email (com token seguro)
+- [ ] Admin pode dar acknowledge via painel web
+- [ ] Envio de notificações para após acknowledgement
+- [ ] Demais usuários são notificados sobre o acknowledgement
+- [ ] Timeline mostra quem reconheceu e quando
+- [ ] Badge visual no index de incidentes
+- [ ] Apenas primeiro acknowledge é aceito (não permite múltiplos)
+- [ ] Testes unitários para lógica de acknowledgement
+- [ ] Logs de quem reconheceu cada incidente
+
+**Segurança**:
+- Token único por incidente para acknowledgement público
+- Expiração de token (24h após criação do incidente)
+- Validação de permissões no painel admin
+- Log de todas as ações de acknowledgement
+
+---
+
 ## Fase 3: Integrações
 
 ### TASK-300: Integration Interface
-**Status**: 🔴 | **Prioridade**: ⭐ | **Dependências**: TASK-160
-**Estimativa**: 2h
+**Status**: 🟢 **COMPLETO** | **Prioridade**: ⭐ | **Dependências**: TASK-160
+**Estimativa**: 2h | **Tempo Real**: 1.5h
 
 **Descrição**: Criar interface e estrutura base para integrações.
 
 **Ver**: docs/API_INTEGRATIONS.md
 
-**Arquivos a criar**:
-- `src/Integration/IntegrationInterface.php`
-- `src/Integration/AbstractIntegration.php`
+**Arquivos criados**:
+- `src/Integration/IntegrationInterface.php` - Interface completa com todos os métodos
+- `src/Integration/AbstractIntegration.php` - Classe abstrata com funcionalidades comuns
+- `src/Integration/README.md` - Documentação completa e exemplos de uso
+
+**Funcionalidades Implementadas**:
+
+**IntegrationInterface**:
+- `connect()` - Estabelecer conexão com serviço externo
+- `testConnection()` - Testar conectividade
+- `getStatus(resourceId)` - Obter status de recurso
+- `getMetrics(resourceId, params)` - Obter métricas de recurso
+- `disconnect()` - Desconectar e limpar recursos
+- `getName()` - Nome legível da integração
+- `getType()` - Tipo/identificador da integração
+- `isConnected()` - Verificar status de conexão
+- PHPDoc com array shapes detalhados para retornos
+
+**AbstractIntegration**:
+- Gerenciamento de configuração (`getConfig()`, `setConfig()`)
+- Controle de estado de conexão (`$connected`, `isConnected()`)
+- Sistema de logging integrado (debug, info, warning, error)
+- Tratamento de erros (`setLastError()`, `getLastError()`)
+- Validação de configuração (`validateConfig()`)
+- Helpers para respostas (`buildErrorResponse()`, `buildSuccessResponse()`)
+- Métodos abstratos para implementação em classes concretas
 
 **Critérios de Aceite**:
-- [ ] Interface bem definida
-- [ ] Abstract com métodos comuns
+- [x] Interface bem definida com todos os métodos necessários
+- [x] Abstract com métodos comuns (config, logging, errors, validation)
+- [x] Documentação completa com exemplos de uso
+- [x] Sistema de logging integrado
+- [x] Validação de sintaxe PHP (sem erros)
+- [x] Preparado para TASK-301 (IXC Adapter)
 
 ---
 
@@ -1678,7 +1801,7 @@ bin/cake bake model Monitors --no-test --no-fixture
 - TASK-220, 221 (Incidents)
 - TASK-230, 231 (Status Page)
 - TASK-240, 241 (Subscribers)
-- TASK-250, 251 (Alerts)
+- TASK-250, 251, 260 (Alerts + Acknowledgement)
 
 **Sprint 4** (Semana 7-8):
 - TASK-300, 301, 302, 303 (Integrações)
@@ -1692,8 +1815,8 @@ bin/cake bake model Monitors --no-test --no-fixture
 
 - Fase 0: ~5h
 - Fase 1: ~40h
-- Fase 2: ~60h
+- Fase 2: ~66h (adicionado TASK-260: Acknowledgement System)
 - Fase 3: ~25h
 - Fase 4: ~10h
 
-**Total: ~140 horas** (~4-5 semanas com 1 dev, ~2-3 semanas com 2-3 devs)
+**Total: ~146 horas** (~4-5 semanas com 1 dev, ~2-3 semanas com 2-3 devs)

@@ -1,0 +1,62 @@
+# Validation Messages
+msgid ""
+msgstr ""
+"Project-Id-Version: ISP Status Page\n"
+"POT-Creation-Date: 2025-11-14 15:00:00\n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+# Users validation messages
+msgid "Password must be at least 8 characters long"
+msgstr "Senha deve ter no mínimo 8 caracteres"
+
+msgid "Invalid role. Must be admin, user, or viewer"
+msgstr "Função inválida. Deve ser admin, user ou viewer"
+
+# Monitors validation messages
+msgid "Invalid monitor type"
+msgstr "Tipo de monitor inválido"
+
+msgid "Configuration must be valid JSON"
+msgstr "Configuração deve ser um JSON válido"
+
+msgid "Check interval must be greater than 0"
+msgstr "Intervalo de verificação deve ser maior que 0"
+
+msgid "Timeout must be greater than 0"
+msgstr "Timeout deve ser maior que 0"
+
+msgid "Retry count cannot be negative"
+msgstr "Número de tentativas não pode ser negativo"
+
+msgid "Invalid status"
+msgstr "Status inválido"
+
+msgid "Uptime percentage must be between 0 and 100"
+msgstr "Porcentagem de uptime deve estar entre 0 e 100"
+
+msgid "Display order cannot be negative"
+msgstr "Ordem de exibição não pode ser negativa"
+
+# Settings validation messages
+msgid "Invalid type. Must be string, integer, boolean, or json"
+msgstr "Tipo inválido. Deve ser string, integer, boolean ou json"
+
+# Alert Rules validation messages
+msgid "Invalid alert channel"
+msgstr "Canal de alerta inválido"
+
+msgid "Invalid trigger type"
+msgstr "Tipo de gatilho inválido"
+
+msgid "Throttle minutes cannot be negative"
+msgstr "Minutos de throttle não podem ser negativos"
+
+msgid "Recipients must be a valid non-empty JSON array"
+msgstr "Destinatários devem ser um array JSON válido e não vazio"
+
+# Alert Logs validation messages
+msgid "Invalid alert log status"
+msgstr "Status de log de alerta inválido"

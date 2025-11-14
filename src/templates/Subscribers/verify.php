@@ -3,7 +3,7 @@
  * @var \App\View\AppView $this
  * @var \App\Model\Entity\Subscriber $subscriber
  */
-$this->assign('title', 'Email Verificado');
+$this->assign('title', __d('subscribers', 'Email Verificado'));
 ?>
 
 <div class="verify-page">
@@ -12,24 +12,24 @@ $this->assign('title', 'Email Verificado');
             ✅
         </div>
 
-        <h1 class="verify-title">Email Verificado com Sucesso!</h1>
+        <h1 class="verify-title"><?= __d('subscribers', 'Email Verificado com Sucesso!') ?></h1>
 
         <p class="verify-message">
-            Obrigado por verificar seu email <strong><?= h($subscriber->email) ?></strong>
+            <?= __d('subscribers', 'Obrigado por verificar seu email') ?> <strong><?= h($subscriber->email) ?></strong>
         </p>
 
         <div class="verify-info">
-            <h3>O que acontece agora?</h3>
+            <h3><?= __d('subscribers', 'O que acontece agora?') ?></h3>
             <ul>
-                <li>✓ Você começará a receber notificações sobre incidentes</li>
-                <li>✓ Alertas serão enviados quando serviços ficarem offline</li>
-                <li>✓ Você será informado quando os problemas forem resolvidos</li>
+                <li>✓ <?= __d('subscribers', 'Você começará a receber notificações sobre incidentes') ?></li>
+                <li>✓ <?= __d('subscribers', 'Alertas serão enviados quando serviços ficarem offline') ?></li>
+                <li>✓ <?= __d('subscribers', 'Você será informado quando os problemas forem resolvidos') ?></li>
             </ul>
         </div>
 
         <div class="verify-actions">
             <?= $this->Html->link(
-                '← Voltar para Status',
+                '← ' . __d('subscribers', 'Voltar para Status'),
                 ['controller' => 'Status', 'action' => 'index'],
                 ['class' => 'btn btn-primary']
             ) ?>
@@ -37,9 +37,9 @@ $this->assign('title', 'Email Verificado');
 
         <div class="verify-footer">
             <p>
-                Não quer mais receber notificações?
+                <?= __d('subscribers', 'Não quer mais receber notificações?') ?>
                 <?= $this->Html->link(
-                    'Cancelar inscrição',
+                    __d('subscribers', 'Cancelar inscrição'),
                     ['action' => 'unsubscribe', $subscriber->unsubscribe_token],
                     ['class' => 'unsubscribe-link']
                 ) ?>

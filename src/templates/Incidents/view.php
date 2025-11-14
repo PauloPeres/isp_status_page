@@ -5,7 +5,7 @@
  * @var array $timeline
  * @var \Cake\Collection\CollectionInterface $recentChecks
  */
-$this->assign('title', 'Detalhes do Incidente');
+$this->assign('title', __d('incidents', 'Detalhes do Incidente'));
 ?>
 
 <style>
@@ -400,17 +400,17 @@ $this->assign('title', 'Detalhes do Incidente');
 <div class="incident-header">
     <div>
         <h2>🚨 <?= h($incident->title) ?></h2>
-        <?= $this->Html->link('← Voltar para Incidentes', ['action' => 'index'], ['class' => 'back-link']) ?>
+        <?= $this->Html->link(__d('incidents', '← Voltar para Incidentes'), ['action' => 'index'], ['class' => 'back-link']) ?>
     </div>
     <div class="header-actions">
         <?php if (!$incident->isResolved()): ?>
-            <?= $this->Html->link('Editar', ['action' => 'edit', $incident->id], ['class' => 'btn btn-primary']) ?>
+            <?= $this->Html->link(__d('incidents', 'Editar'), ['action' => 'edit', $incident->id], ['class' => 'btn btn-primary']) ?>
             <?= $this->Form->postLink(
-                'Resolver',
+                __d('incidents', 'Resolver'),
                 ['action' => 'resolve', $incident->id],
                 [
                     'class' => 'btn btn-success',
-                    'confirm' => 'Tem certeza que deseja resolver este incidente?'
+                    'confirm' => __d('incidents', 'Tem certeza que deseja resolver este incidente?')
                 ]
             ) ?>
         <?php endif; ?>
@@ -421,18 +421,18 @@ $this->assign('title', 'Detalhes do Incidente');
 <div class="status-banner <?= $incident->isResolved() ? 'success' : 'danger' ?>">
     <span style="font-size: 24px;"><?= $incident->isResolved() ? '✅' : '⚠️' ?></span>
     <span>
-        <?= $incident->isResolved() ? 'Incidente resolvido' : 'Incidente ativo' ?>
+        <?= $incident->isResolved() ? __d('incidents', 'Incidente resolvido') : __d('incidents', 'Incidente ativo') ?>
         - <?= h($incident->getStatusName()) ?>
     </span>
 </div>
 
 <!-- Main Information -->
 <div class="incident-details">
-    <h3>📋 Informações Principais</h3>
+    <h3>📋 <?= __d('incidents', 'Informações Principais') ?></h3>
 
     <div class="details-grid">
         <div class="detail-item">
-            <span class="detail-label">Status</span>
+            <span class="detail-label"><?= __d('incidents', 'Status') ?></span>
             <span class="detail-value">
                 <span class="badge badge-<?= $incident->isResolved() ? 'success' : 'danger' ?> badge-lg">
                     <?= $incident->isResolved() ? '✅' : '⚠️' ?>
@@ -442,7 +442,7 @@ $this->assign('title', 'Detalhes do Incidente');
         </div>
 
         <div class="detail-item">
-            <span class="detail-label">Severidade</span>
+            <span class="detail-label"><?= __d('incidents', 'Severidade') ?></span>
             <span class="detail-value">
                 <span class="badge badge-<?= $incident->getSeverityBadgeClass() ?> badge-lg">
                     <?= h(ucfirst($incident->severity)) ?>
@@ -451,7 +451,7 @@ $this->assign('title', 'Detalhes do Incidente');
         </div>
 
         <div class="detail-item">
-            <span class="detail-label">Monitor Afetado</span>
+            <span class="detail-label"><?= __d('incidents', 'Monitor Afetado') ?></span>
             <span class="detail-value">
                 <?= $this->Html->link(
                     h($incident->monitor->name),
@@ -462,14 +462,14 @@ $this->assign('title', 'Detalhes do Incidente');
         </div>
 
         <div class="detail-item">
-            <span class="detail-label">Criação</span>
+            <span class="detail-label"><?= __d('incidents', 'Criação') ?></span>
             <span class="detail-value">
-                <?= $incident->auto_created ? '🤖 Auto-criado' : '👤 Manual' ?>
+                <?= $incident->auto_created ? __d('incidents', '🤖 Auto-criado') : __d('incidents', '👤 Manual') ?>
             </span>
         </div>
 
         <div class="detail-item">
-            <span class="detail-label">Iniciado em</span>
+            <span class="detail-label"><?= __d('incidents', 'Iniciado em') ?></span>
             <span class="detail-value">
                 <?= h($incident->started_at->i18nFormat('dd/MM/yyyy HH:mm:ss')) ?>
                 <div class="time-ago">(<?= h($incident->started_at->timeAgoInWords()) ?>)</div>
@@ -478,7 +478,7 @@ $this->assign('title', 'Detalhes do Incidente');
 
         <?php if ($incident->identified_at): ?>
             <div class="detail-item">
-                <span class="detail-label">Identificado em</span>
+                <span class="detail-label"><?= __d('incidents', 'Identificado em') ?></span>
                 <span class="detail-value">
                     <?= h($incident->identified_at->i18nFormat('dd/MM/yyyy HH:mm:ss')) ?>
                     <div class="time-ago">(<?= h($incident->identified_at->timeAgoInWords()) ?>)</div>
@@ -488,7 +488,7 @@ $this->assign('title', 'Detalhes do Incidente');
 
         <?php if ($incident->resolved_at): ?>
             <div class="detail-item">
-                <span class="detail-label">Resolvido em</span>
+                <span class="detail-label"><?= __d('incidents', 'Resolvido em') ?></span>
                 <span class="detail-value">
                     <?= h($incident->resolved_at->i18nFormat('dd/MM/yyyy HH:mm:ss')) ?>
                     <div class="time-ago">(<?= h($incident->resolved_at->timeAgoInWords()) ?>)</div>
@@ -497,34 +497,34 @@ $this->assign('title', 'Detalhes do Incidente');
         <?php endif; ?>
 
         <div class="detail-item">
-            <span class="detail-label">Duração</span>
+            <span class="detail-label"><?= __d('incidents', 'Duração') ?></span>
             <span class="detail-value">
                 <?php if ($incident->duration !== null): ?>
                     <strong style="font-family: 'Courier New', monospace; color: #333;">
                         <?php
                         $duration = $incident->duration;
                         if ($duration < 60) {
-                            echo "{$duration} segundos";
+                            echo "{$duration} " . __d('incidents', 'segundos');
                         } elseif ($duration < 3600) {
                             $minutes = floor($duration / 60);
                             $seconds = $duration % 60;
-                            echo $seconds > 0 ? "{$minutes}m {$seconds}s" : "{$minutes} minutos";
+                            echo $seconds > 0 ? "{$minutes}m {$seconds}s" : "{$minutes} " . __d('incidents', 'minutos');
                         } else {
                             $hours = floor($duration / 3600);
                             $minutes = floor(($duration % 3600) / 60);
                             if ($hours < 24) {
-                                echo $minutes > 0 ? "{$hours}h {$minutes}m" : "{$hours} horas";
+                                echo $minutes > 0 ? "{$hours}h {$minutes}m" : "{$hours} " . __d('incidents', 'horas');
                             } else {
                                 $days = floor($hours / 24);
                                 $remainingHours = $hours % 24;
-                                echo $remainingHours > 0 ? "{$days}d {$remainingHours}h" : "{$days} dias";
+                                echo $remainingHours > 0 ? "{$days}d {$remainingHours}h" : "{$days} " . __d('incidents', 'dias');
                             }
                         }
                         ?>
                     </strong>
                 <?php else: ?>
                     <span style="color: #999;">
-                        <?= $incident->isResolved() ? 'N/A' : '⏱️ Em andamento...' ?>
+                        <?= $incident->isResolved() ? __d('incidents', 'N/A') : __d('incidents', '⏱️ Em andamento...') ?>
                     </span>
                 <?php endif; ?>
             </span>
@@ -533,7 +533,7 @@ $this->assign('title', 'Detalhes do Incidente');
 
     <?php if ($incident->description): ?>
         <div class="description-section">
-            <div class="detail-label">Descrição</div>
+            <div class="detail-label"><?= __d('incidents', 'Descrição') ?></div>
             <div class="description-box">
                 <?= h($incident->description) ?>
             </div>
@@ -543,7 +543,7 @@ $this->assign('title', 'Detalhes do Incidente');
 
 <!-- Timeline -->
 <div class="timeline-section">
-    <h3>⏱️ Timeline de Eventos</h3>
+    <h3>⏱️ <?= __d('incidents', 'Timeline de Eventos') ?></h3>
     <div class="timeline">
         <?php foreach ($timeline as $event): ?>
             <div class="timeline-item timeline-<?= h($event['color']) ?>">
@@ -566,7 +566,7 @@ $this->assign('title', 'Detalhes do Incidente');
 <!-- Recent Monitor Checks -->
 <?php if ($recentChecks->count() > 0): ?>
     <div class="checks-section">
-        <h3>📊 Verificações Recentes do Monitor</h3>
+        <h3>📊 <?= __d('incidents', 'Verificações Recentes do Monitor') ?></h3>
         <div class="checks-grid">
             <?php foreach ($recentChecks as $check): ?>
                 <div class="check-item check-<?= h($check->status) ?>">
@@ -590,8 +590,8 @@ $this->assign('title', 'Detalhes do Incidente');
 <?php endif; ?>
 
 <div style="margin-top: 24px;">
-    <?= $this->Html->link('← Voltar para Incidentes', ['action' => 'index'], ['class' => 'btn btn-secondary']) ?>
-    <?= $this->Html->link('Ver Monitor', ['controller' => 'Monitors', 'action' => 'view', $incident->monitor->id], [
+    <?= $this->Html->link(__d('incidents', '← Voltar para Incidentes'), ['action' => 'index'], ['class' => 'btn btn-secondary']) ?>
+    <?= $this->Html->link(__d('incidents', 'Ver Monitor'), ['controller' => 'Monitors', 'action' => 'view', $incident->monitor->id], [
         'class' => 'btn',
         'style' => 'background: #3b82f6; color: white; margin-left: 8px;'
     ]) ?>

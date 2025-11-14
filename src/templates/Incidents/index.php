@@ -5,7 +5,7 @@
  * @var array $stats
  * @var array $monitors
  */
-$this->assign('title', 'Incidentes');
+$this->assign('title', __d('incidents', 'Incidentes'));
 ?>
 
 <style>
@@ -146,6 +146,36 @@ $this->assign('title', 'Incidentes');
         color: #666;
         text-transform: uppercase;
         border-bottom: 2px solid #e0e0e0;
+    }
+
+    .incidents-table th a {
+        color: #666;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .incidents-table th a:hover {
+        color: #3b82f6;
+    }
+
+    .incidents-table th a::after {
+        content: '⇅';
+        opacity: 0.3;
+        font-size: 12px;
+    }
+
+    .incidents-table th a.asc::after {
+        content: '↑';
+        opacity: 1;
+        color: #3b82f6;
+    }
+
+    .incidents-table th a.desc::after {
+        content: '↓';
+        opacity: 1;
+        color: #3b82f6;
     }
 
     .incidents-table td {
@@ -342,25 +372,25 @@ $this->assign('title', 'Incidentes');
 </style>
 
 <div class="incidents-header">
-    <h2>🚨 Incidentes</h2>
+    <h2>🚨 <?= __d('incidents', 'Incidentes') ?></h2>
 </div>
 
 <!-- Statistics Cards -->
 <div class="stats-grid">
     <div class="stat-card-mini">
-        <div class="stat-label">Total</div>
+        <div class="stat-label"><?= __d('incidents', 'Total') ?></div>
         <div class="stat-value info"><?= number_format($stats['total']) ?></div>
     </div>
     <div class="stat-card-mini">
-        <div class="stat-label">Ativos</div>
+        <div class="stat-label"><?= __d('incidents', 'Ativos') ?></div>
         <div class="stat-value error"><?= number_format($stats['active']) ?></div>
     </div>
     <div class="stat-card-mini">
-        <div class="stat-label">Resolvidos</div>
+        <div class="stat-label"><?= __d('incidents', 'Resolvidos') ?></div>
         <div class="stat-value success"><?= number_format($stats['resolved']) ?></div>
     </div>
     <div class="stat-card-mini">
-        <div class="stat-label">Críticos</div>
+        <div class="stat-label"><?= __d('incidents', 'Críticos') ?></div>
         <div class="stat-value warning"><?= number_format($stats['critical']) ?></div>
     </div>
 </div>
@@ -370,26 +400,26 @@ $this->assign('title', 'Incidentes');
     <?= $this->Form->create(null, ['type' => 'get', 'id' => 'filters-form']) ?>
     <div class="filters-row">
         <div class="filter-group">
-            <label>Buscar</label>
+            <label><?= __d('incidents', 'Buscar') ?></label>
             <?= $this->Form->control('search', [
                 'label' => false,
-                'placeholder' => 'Título ou descrição...',
+                'placeholder' => __d('incidents', 'Título ou descrição...'),
                 'value' => $this->request->getQuery('search'),
                 'class' => 'form-control',
             ]) ?>
         </div>
 
         <div class="filter-group">
-            <label>Status</label>
+            <label><?= __d('incidents', 'Status') ?></label>
             <?= $this->Form->control('status', [
                 'label' => false,
                 'options' => [
-                    '' => 'Todos',
-                    'active' => 'Ativos',
-                    'investigating' => 'Investigando',
-                    'identified' => 'Identificado',
-                    'monitoring' => 'Monitorando',
-                    'resolved' => 'Resolvido',
+                    '' => __d('incidents', 'Todos'),
+                    'active' => __d('incidents', 'Ativos'),
+                    'investigating' => __d('incidents', 'Investigando'),
+                    'identified' => __d('incidents', 'Identificado'),
+                    'monitoring' => __d('incidents', 'Monitorando'),
+                    'resolved' => __d('incidents', 'Resolvido'),
                 ],
                 'value' => $this->request->getQuery('status'),
                 'empty' => false,
@@ -398,15 +428,15 @@ $this->assign('title', 'Incidentes');
         </div>
 
         <div class="filter-group">
-            <label>Severidade</label>
+            <label><?= __d('incidents', 'Severidade') ?></label>
             <?= $this->Form->control('severity', [
                 'label' => false,
                 'options' => [
-                    '' => 'Todas',
-                    'critical' => 'Crítica',
-                    'major' => 'Major',
-                    'minor' => 'Minor',
-                    'maintenance' => 'Manutenção',
+                    '' => __d('incidents', 'Todas'),
+                    'critical' => __d('incidents', 'Crítica'),
+                    'major' => __d('incidents', 'Major'),
+                    'minor' => __d('incidents', 'Minor'),
+                    'maintenance' => __d('incidents', 'Manutenção'),
                 ],
                 'value' => $this->request->getQuery('severity'),
                 'empty' => false,
@@ -415,10 +445,10 @@ $this->assign('title', 'Incidentes');
         </div>
 
         <div class="filter-group">
-            <label>Monitor</label>
+            <label><?= __d('incidents', 'Monitor') ?></label>
             <?= $this->Form->control('monitor_id', [
                 'label' => false,
-                'options' => ['' => 'Todos os Monitores'] + $monitors,
+                'options' => ['' => __d('incidents', 'Todos os Monitores')] + $monitors,
                 'value' => $this->request->getQuery('monitor_id'),
                 'empty' => false,
                 'class' => 'form-control',
@@ -427,8 +457,8 @@ $this->assign('title', 'Incidentes');
     </div>
 
     <div class="filter-buttons">
-        <?= $this->Form->button('Filtrar', ['type' => 'submit', 'class' => 'btn-filter']) ?>
-        <?= $this->Html->link('Limpar', ['action' => 'index'], ['class' => 'btn-clear']) ?>
+        <?= $this->Form->button(__d('incidents', 'Filtrar'), ['type' => 'submit', 'class' => 'btn-filter']) ?>
+        <?= $this->Html->link(__d('incidents', 'Limpar'), ['action' => 'index'], ['class' => 'btn-clear']) ?>
     </div>
     <?= $this->Form->end() ?>
 </div>
@@ -439,13 +469,13 @@ $this->assign('title', 'Incidentes');
         <table>
             <thead>
                 <tr>
-                    <th>Status</th>
-                    <th>Incidente</th>
-                    <th>Monitor</th>
-                    <th>Severidade</th>
-                    <th>Iniciado</th>
-                    <th>Duração</th>
-                    <th style="text-align: right;">Ações</th>
+                    <th><?= $this->Paginator->sort('status', __d('incidents', 'Status')) ?></th>
+                    <th><?= $this->Paginator->sort('title', __d('incidents', 'Incidente')) ?></th>
+                    <th><?= $this->Paginator->sort('monitor_id', __d('incidents', 'Monitor')) ?></th>
+                    <th><?= $this->Paginator->sort('severity', __d('incidents', 'Severidade')) ?></th>
+                    <th><?= $this->Paginator->sort('started_at', __d('incidents', 'Iniciado')) ?></th>
+                    <th><?= $this->Paginator->sort('duration', __d('incidents', 'Duração')) ?></th>
+                    <th style="text-align: right;"><?= __d('incidents', 'Ações') ?></th>
                 </tr>
             </thead>
             <tbody>
@@ -508,30 +538,30 @@ $this->assign('title', 'Incidentes');
                                 </span>
                             <?php else: ?>
                                 <span style="color: #999; font-size: 13px;">
-                                    <?= $incident->isResolved() ? 'N/A' : 'Em andamento' ?>
+                                    <?= $incident->isResolved() ? __d('incidents', 'N/A') : __d('incidents', 'Em andamento') ?>
                                 </span>
                             <?php endif; ?>
                         </td>
                         <td style="text-align: right;">
                             <div class="action-buttons">
                                 <?= $this->Html->link(
-                                    'Ver',
+                                    __d('incidents', 'Ver'),
                                     ['action' => 'view', $incident->id],
-                                    ['class' => 'btn-action btn-action-view', 'title' => 'Ver detalhes']
+                                    ['class' => 'btn-action btn-action-view', 'title' => __d('incidents', 'Ver detalhes')]
                                 ) ?>
                                 <?php if (!$incident->isResolved()): ?>
                                     <?= $this->Html->link(
-                                        'Editar',
+                                        __d('incidents', 'Editar'),
                                         ['action' => 'edit', $incident->id],
-                                        ['class' => 'btn-action btn-action-edit', 'title' => 'Editar']
+                                        ['class' => 'btn-action btn-action-edit', 'title' => __d('incidents', 'Editar')]
                                     ) ?>
                                     <?= $this->Form->postLink(
-                                        'Resolver',
+                                        __d('incidents', 'Resolver'),
                                         ['action' => 'resolve', $incident->id],
                                         [
                                             'class' => 'btn-action btn-action-resolve',
-                                            'title' => 'Resolver',
-                                            'confirm' => 'Tem certeza que deseja resolver este incidente?'
+                                            'title' => __d('incidents', 'Resolver'),
+                                            'confirm' => __d('incidents', 'Tem certeza que deseja resolver este incidente?')
                                         ]
                                     ) ?>
                                 <?php endif; ?>
@@ -543,8 +573,8 @@ $this->assign('title', 'Incidentes');
         </table>
     <?php else: ?>
         <div class="no-incidents">
-            <p style="font-size: 18px; margin-bottom: 8px;">📭 Nenhum incidente encontrado</p>
-            <p>Tente ajustar os filtros ou aguarde novos incidentes.</p>
+            <p style="font-size: 18px; margin-bottom: 8px;">📭 <?= __d('incidents', 'Nenhum incidente encontrado') ?></p>
+            <p><?= __d('incidents', 'Tente ajustar os filtros ou aguarde novos incidentes.') ?></p>
         </div>
     <?php endif; ?>
 </div>
@@ -552,13 +582,13 @@ $this->assign('title', 'Incidentes');
 <!-- Pagination -->
 <?php if ($incidents->count() > 0): ?>
     <div class="pagination">
-        <?= $this->Paginator->first('« Primeira') ?>
-        <?= $this->Paginator->prev('‹ Anterior') ?>
+        <?= $this->Paginator->first(__d('incidents', '« Primeira')) ?>
+        <?= $this->Paginator->prev(__d('incidents', '‹ Anterior')) ?>
         <?= $this->Paginator->numbers() ?>
-        <?= $this->Paginator->next('Próxima ›') ?>
-        <?= $this->Paginator->last('Última »') ?>
+        <?= $this->Paginator->next(__d('incidents', 'Próxima ›')) ?>
+        <?= $this->Paginator->last(__d('incidents', 'Última »')) ?>
     </div>
     <div class="pagination-info">
-        <?= $this->Paginator->counter('Página {{page}} de {{pages}}, mostrando {{current}} registro(s) de {{count}} no total') ?>
+        <?= $this->Paginator->counter(__d('incidents', 'Página {{page}} de {{pages}}, mostrando {{current}} registro(s) de {{count}} no total')) ?>
     </div>
 <?php endif; ?>

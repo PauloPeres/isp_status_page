@@ -1,0 +1,134 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ISP Status Page - Monitors\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: Monitors - Títulos
+msgid "Monitors"
+msgstr "Monitores"
+
+msgid "Monitor List"
+msgstr "Lista de Monitores"
+
+msgid "Add Monitor"
+msgstr "Añadir Monitor"
+
+msgid "Edit Monitor"
+msgstr "Editar Monitor"
+
+msgid "Monitor Details"
+msgstr "Detalles del Monitor"
+
+msgid "New Monitor"
+msgstr "Nuevo Monitor"
+
+#: Monitors - Campos
+msgid "Monitor Name"
+msgstr "Nombre del Monitor"
+
+msgid "Monitor Type"
+msgstr "Tipo de Monitor"
+
+msgid "Target"
+msgstr "Objetivo"
+
+msgid "Check Interval"
+msgstr "Intervalo de Verificación"
+
+msgid "Timeout"
+msgstr "Tiempo de Espera"
+
+msgid "Response Time"
+msgstr "Tiempo de Respuesta"
+
+msgid "Last Check"
+msgstr "Última Verificación"
+
+msgid "Next Check"
+msgstr "Próxima Verificación"
+
+msgid "Uptime"
+msgstr "Tiempo de Actividad"
+
+msgid "Visible on Status Page"
+msgstr "Visible en la Página de Estado"
+
+#: Monitors - Tipos
+msgid "HTTP"
+msgstr "HTTP"
+
+msgid "PING"
+msgstr "PING"
+
+msgid "Port"
+msgstr "Puerto"
+
+msgid "API"
+msgstr "API"
+
+#: Monitors - Status
+msgid "Monitor is online"
+msgstr "Monitor está en línea"
+
+msgid "Monitor is offline"
+msgstr "Monitor está fuera de línea"
+
+msgid "Monitor status is unknown"
+msgstr "El estado del monitor es desconocido"
+
+#: Monitors - Mensagens
+msgid "Monitor created successfully."
+msgstr "Monitor creado exitosamente."
+
+msgid "Monitor updated successfully."
+msgstr "Monitor actualizado exitosamente."
+
+msgid "Monitor deleted successfully."
+msgstr "Monitor eliminado exitosamente."
+
+msgid "Error creating monitor."
+msgstr "Error al crear el monitor."
+
+msgid "Error updating monitor."
+msgstr "Error al actualizar el monitor."
+
+msgid "Error deleting monitor."
+msgstr "Error al eliminar el monitor."
+
+#: Monitors - Estatísticas
+msgid "Total Monitors"
+msgstr "Total de Monitores"
+
+msgid "Active Monitors"
+msgstr "Monitores Activos"
+
+msgid "Online Monitors"
+msgstr "Monitores En Línea"
+
+msgid "Offline Monitors"
+msgstr "Monitores Fuera de Línea"
+
+msgid "Checks (24h)"
+msgstr "Verificaciones (24h)"
+
+msgid "Average Response"
+msgstr "Respuesta Promedio"
+
+msgid "Não foi possível criar o monitor. Por favor, tente novamente."
+msgstr "No fue posible crear el monitor. Por favor, inténtelo de nuevo."
+
+msgid "Não foi possível atualizar o monitor. Por favor, tente novamente."
+msgstr "No fue posible actualizar el monitor. Por favor, inténtelo de nuevo."
+
+msgid "Não foi possível excluir o monitor. Por favor, tente novamente."
+msgstr "No fue posible eliminar el monitor. Por favor, inténtelo de nuevo."
+
+msgid "Monitor {$status} com sucesso."
+msgstr "Monitor {$status} exitosamente."
+
+msgid "Não foi possível alterar o status do monitor."
+msgstr "No fue posible cambiar el estado del monitor."

@@ -80,8 +80,32 @@ class UsersController extends AppController
      */
     public function index()
     {
-        $query = $this->Users->find()
-            ->orderBy(['Users.created' => 'DESC']);
+        $this->viewBuilder()->setLayout('admin');
+
+        $query = $this->Users->find();
+
+        // Filtro por função
+        if ($this->request->getQuery('role')) {
+            $query->where(['role' => $this->request->getQuery('role')]);
+        }
+
+        // Filtro por status ativo/inativo
+        if ($this->request->getQuery('active') !== null && $this->request->getQuery('active') !== '') {
+            $query->where(['active' => (bool)$this->request->getQuery('active')]);
+        }
+
+        // Busca por username ou email
+        if ($this->request->getQuery('search')) {
+            $search = $this->request->getQuery('search');
+            $query->where([
+                'OR' => [
+                    'username LIKE' => '%' . $search . '%',
+                    'email LIKE' => '%' . $search . '%',
+                ]
+            ]);
+        }
+
+        $query->orderBy(['Users.created' => 'DESC']);
 
         $users = $this->paginate($query);
 
@@ -97,6 +121,8 @@ class UsersController extends AppController
      */
     public function view($id = null)
     {
+        $this->viewBuilder()->setLayout('admin');
+
         $user = $this->Users->get($id);
 
         $this->set(compact('user'));
@@ -109,18 +135,34 @@ class UsersController extends AppController
      */
     public function add()
     {
+        $this->viewBuilder()->setLayout('admin');
+
         $user = $this->Users->newEmptyEntity();
 
         if ($this->request->is('post')) {
-            $user = $this->Users->patchEntity($user, $this->request->getData());
+            $data = $this->request->getData();
+
+            // Validar confirmação de senha
+            if (!empty($data['password']) && !empty($data['confirm_password'])) {
+                if ($data['password'] !== $data['confirm_password']) {
+                    $this->Flash->error(__('As senhas não coincidem.'));
+                    $this->set(compact('user'));
+                    return;
+                }
+            }
+
+            // Remover campo de confirmação antes de salvar
+            unset($data['confirm_password']);
+
+            $user = $this->Users->patchEntity($user, $data);
 
             if ($this->Users->save($user)) {
-                $this->Flash->success(__('Usuário salvo com sucesso.'));
+                $this->Flash->success(__('Usuário criado com sucesso.'));
 
                 return $this->redirect(['action' => 'index']);
             }
 
-            $this->Flash->error(__('Não foi possível salvar o usuário. Tente novamente.'));
+            $this->Flash->error(__('Não foi possível criar o usuário. Verifique os erros abaixo.'));
         }
 
         $this->set(compact('user'));
@@ -135,18 +177,47 @@ class UsersController extends AppController
      */
     public function edit($id = null)
     {
+        $this->viewBuilder()->setLayout('admin');
+
         $user = $this->Users->get($id);
 
+        // Only allow users to edit their own profile
+        $identity = $this->Authentication->getIdentity();
+        if (!$identity || $identity->id != $user->id) {
+            $this->Flash->error(__('Você não tem permissão para editar este usuário.'));
+
+            return $this->redirect(['action' => 'view', $identity->id]);
+        }
+
         if ($this->request->is(['patch', 'post', 'put'])) {
-            $user = $this->Users->patchEntity($user, $this->request->getData());
+            $data = $this->request->getData();
 
-            if ($this->Users->save($user)) {
-                $this->Flash->success(__('Usuário atualizado com sucesso.'));
-
-                return $this->redirect(['action' => 'index']);
+            // Handle password change
+            if (!empty($data['new_password'])) {
+                // Validate password confirmation
+                if ($data['new_password'] !== $data['confirm_password']) {
+                    $this->Flash->error(__('As senhas não coincidem.'));
+                } else {
+                    // Set the new password
+                    $data['password'] = $data['new_password'];
+                }
             }
 
-            $this->Flash->error(__('Não foi possível atualizar o usuário. Tente novamente.'));
+            // Remove temporary password fields
+            unset($data['new_password'], $data['confirm_password']);
+
+            // Don't allow changing role or active status through profile edit
+            unset($data['role'], $data['active']);
+
+            $user = $this->Users->patchEntity($user, $data);
+
+            if ($this->Users->save($user)) {
+                $this->Flash->success(__('Perfil atualizado com sucesso.'));
+
+                return $this->redirect(['action' => 'view', $user->id]);
+            }
+
+            $this->Flash->error(__('Não foi possível atualizar o perfil. Tente novamente.'));
         }
 
         $this->set(compact('user'));

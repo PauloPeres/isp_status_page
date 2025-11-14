@@ -1,8 +1,11 @@
 <?php
 use Cake\Core\Configure;
+use App\Service\SettingService;
 
-// Get site name from settings (with fallback)
-$siteName = Configure::read('Settings.site_name', 'ISP Status');
+// Get settings
+$settingService = new SettingService();
+$siteName = $settingService->get('site_name', 'ISP Status');
+
 ?>
 
 <header class="public-header">
@@ -10,31 +13,30 @@ $siteName = Configure::read('Settings.site_name', 'ISP Status');
         <div class="header-content">
             <div class="header-brand">
                 <?= $this->Html->image('icon_isp_status_page.png', [
-                    'alt' => $siteName,
+                    'alt' => 'ISP Status',
                     'class' => 'header-logo'
                 ]) ?>
                 <div class="header-title">
                     <h1><?= h($siteName) ?></h1>
-                    <p class="header-subtitle">Status dos Serviços</p>
+                    <p class="header-subtitle"><?= __('Status dos Serviços') ?></p>
+                    
                 </div>
             </div>
 
             <nav class="header-nav">
                 <?= $this->Html->link(
-                    '🏠 Início',
+                    '🏠 ' . __('Início'),
                     ['controller' => 'Status', 'action' => 'index'],
                     ['class' => 'nav-link']
                 ) ?>
                 <?= $this->Html->link(
-                    '📜 Histórico',
+                    '📜 ' . __('Histórico'),
                     ['controller' => 'Status', 'action' => 'history'],
                     ['class' => 'nav-link']
                 ) ?>
-                <?= $this->Html->link(
-                    '📧 Notificações',
-                    ['controller' => 'Subscribers', 'action' => 'subscribe'],
-                    ['class' => 'nav-link']
-                ) ?>
+                <a href="#subscribe-form" class="nav-link nav-link-subscribe">
+                    📧 <?= __('Notificações') ?>
+                </a>
             </nav>
         </div>
     </div>

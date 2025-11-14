@@ -3,23 +3,23 @@
  * @var \App\View\AppView $this
  * @var \App\Model\Entity\Monitor $monitor
  */
-$this->assign('title', 'Editar Monitor');
+$this->assign('title', __d('monitors', 'Edit Monitor'));
 ?>
 
 <div class="monitors-form">
     <div class="page-header">
         <div>
-            <h1>✏️ Editar Monitor</h1>
-            <p>Atualize as configurações do monitor: <strong><?= h($monitor->name) ?></strong></p>
+            <h1>✏️ <?= __d('monitors', 'Edit Monitor') ?></h1>
+            <p><?= __d('monitors', 'Update monitor settings: {0}', '<strong>' . h($monitor->name) . '</strong>') ?></p>
         </div>
         <div style="display: flex; gap: 8px;">
             <?= $this->Html->link(
-                '👁️ Ver Detalhes',
+                '👁️ ' . __('View Details'),
                 ['action' => 'view', $monitor->id],
                 ['class' => 'btn btn-secondary']
             ) ?>
             <?= $this->Html->link(
-                '← Voltar',
+                '← ' . __('Back'),
                 ['action' => 'index'],
                 ['class' => 'btn btn-secondary']
             ) ?>
@@ -30,16 +30,16 @@ $this->assign('title', 'Editar Monitor');
         <?= $this->Form->create($monitor) ?>
 
         <div class="form-section">
-            <h3 class="form-section-title">Informações Básicas</h3>
+            <h3 class="form-section-title"><?= __d('monitors', 'Basic Information') ?></h3>
 
             <?= $this->Form->control('name', [
-                'label' => 'Nome do Monitor *',
+                'label' => __d('monitors', 'Monitor Name') . ' *',
                 'required' => true,
                 'class' => 'form-control',
             ]) ?>
 
             <?= $this->Form->control('description', [
-                'label' => 'Descrição',
+                'label' => __('Description'),
                 'type' => 'textarea',
                 'rows' => 3,
                 'class' => 'form-control',
@@ -47,11 +47,11 @@ $this->assign('title', 'Editar Monitor');
 
             <div class="form-row">
                 <?= $this->Form->control('type', [
-                    'label' => 'Tipo de Monitor *',
+                    'label' => __d('monitors', 'Monitor Type') . ' *',
                     'options' => [
                         'http' => 'HTTP/HTTPS',
                         'ping' => 'Ping (ICMP)',
-                        'port' => 'Porta (TCP/UDP)',
+                        'port' => __d('monitors', 'Port (TCP/UDP)'),
                     ],
                     'required' => true,
                     'class' => 'form-control',
@@ -59,108 +59,108 @@ $this->assign('title', 'Editar Monitor');
                 ]) ?>
 
                 <?= $this->Form->control('active', [
-                    'label' => 'Ativo',
+                    'label' => __d('monitors', 'Active'),
                     'type' => 'checkbox',
                 ]) ?>
             </div>
         </div>
 
         <div class="form-section">
-            <h3 class="form-section-title">Configuração do Alvo</h3>
+            <h3 class="form-section-title"><?= __d('monitors', 'Target Configuration') ?></h3>
 
             <?= $this->Form->control('target', [
-                'label' => 'Alvo *',
+                'label' => __d('monitors', 'Target') . ' *',
                 'required' => true,
                 'class' => 'form-control',
-                'help' => 'URL completa para HTTP, hostname/IP para Ping e Port',
+                'help' => __d('monitors', 'Full URL for HTTP, hostname/IP for Ping and Port'),
             ]) ?>
 
             <!-- HTTP Specific Fields -->
             <div id="http-fields" class="monitor-type-fields">
                 <?= $this->Form->control('expected_status_code', [
-                    'label' => 'Código HTTP Esperado',
+                    'label' => __d('monitors', 'Expected HTTP Code'),
                     'type' => 'number',
                     'class' => 'form-control',
-                    'help' => 'Código de status HTTP esperado (ex: 200, 301)',
+                    'help' => __d('monitors', 'Expected HTTP status code (e.g. 200, 301)'),
                 ]) ?>
             </div>
 
             <!-- Port Specific Fields -->
             <div id="port-fields" class="monitor-type-fields" style="display:none;">
                 <?= $this->Form->control('port', [
-                    'label' => 'Porta',
+                    'label' => __d('monitors', 'Port'),
                     'type' => 'number',
                     'min' => 1,
                     'max' => 65535,
                     'class' => 'form-control',
-                    'help' => 'Número da porta TCP/UDP (1-65535)',
+                    'help' => __d('monitors', 'TCP/UDP port number (1-65535)'),
                 ]) ?>
             </div>
         </div>
 
         <div class="form-section">
-            <h3 class="form-section-title">Configurações de Verificação</h3>
+            <h3 class="form-section-title"><?= __d('monitors', 'Check Settings') ?></h3>
 
             <div class="form-row">
                 <?= $this->Form->control('interval', [
-                    'label' => 'Intervalo (segundos) *',
+                    'label' => __d('monitors', 'Interval (seconds)') . ' *',
                     'type' => 'number',
                     'min' => 10,
                     'max' => 3600,
                     'required' => true,
                     'class' => 'form-control',
-                    'help' => 'Frequência de verificação (mínimo 10s)',
+                    'help' => __d('monitors', 'Check frequency (minimum 10s)'),
                 ]) ?>
 
                 <?= $this->Form->control('timeout', [
-                    'label' => 'Timeout (segundos) *',
+                    'label' => __d('monitors', 'Timeout (seconds)') . ' *',
                     'type' => 'number',
                     'min' => 1,
                     'max' => 60,
                     'required' => true,
                     'class' => 'form-control',
-                    'help' => 'Tempo máximo de espera',
+                    'help' => __d('monitors', 'Maximum wait time'),
                 ]) ?>
             </div>
         </div>
 
         <div class="form-section">
-            <h3 class="form-section-title">Informações do Sistema</h3>
+            <h3 class="form-section-title"><?= __d('monitors', 'System Information') ?></h3>
             <div class="info-grid">
                 <div class="info-item">
-                    <span class="info-label">Status Atual:</span>
+                    <span class="info-label"><?= __d('monitors', 'Current Status') ?>:</span>
                     <span class="badge badge-<?= $monitor->status === 'up' ? 'success' : ($monitor->status === 'down' ? 'error' : 'info') ?>">
                         <?= h(ucfirst($monitor->status)) ?>
                     </span>
                 </div>
                 <div class="info-item">
-                    <span class="info-label">Última Verificação:</span>
-                    <span><?= $monitor->last_check ? $monitor->last_check->format('d/m/Y H:i:s') : 'Nunca' ?></span>
+                    <span class="info-label"><?= __d('monitors', 'Last Check') ?>:</span>
+                    <span><?= $monitor->last_check ? $monitor->last_check->format('d/m/Y H:i:s') : __d('monitors', 'Never') ?></span>
                 </div>
                 <div class="info-item">
-                    <span class="info-label">Criado em:</span>
+                    <span class="info-label"><?= __('Created') ?>:</span>
                     <span><?= $monitor->created->format('d/m/Y H:i:s') ?></span>
                 </div>
                 <div class="info-item">
-                    <span class="info-label">Última Atualização:</span>
+                    <span class="info-label"><?= __('Last Updated') ?>:</span>
                     <span><?= $monitor->modified->format('d/m/Y H:i:s') ?></span>
                 </div>
             </div>
         </div>
 
         <div class="form-actions">
-            <?= $this->Form->button('💾 Salvar Alterações', ['class' => 'btn btn-primary']) ?>
+            <?= $this->Form->button('💾 ' . __d('monitors', 'Save Changes'), ['class' => 'btn btn-primary']) ?>
             <?= $this->Html->link(
-                'Cancelar',
+                __('Cancel'),
                 ['action' => 'index'],
                 ['class' => 'btn btn-secondary']
             ) ?>
             <?= $this->Form->postLink(
-                '🗑️ Excluir',
+                '🗑️ ' . __('Delete'),
                 ['action' => 'delete', $monitor->id],
                 [
                     'class' => 'btn btn-error',
-                    'confirm' => 'Tem certeza que deseja excluir este monitor? Esta ação não pode ser desfeita.'
+                    'confirm' => __d('monitors', 'Are you sure you want to delete this monitor? This action cannot be undone.')
                 ]
             ) ?>
         </div>

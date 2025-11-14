@@ -4,18 +4,18 @@
  * @var \App\Model\Entity\Subscriber $subscriber
  * @var int $emailLogsCount
  */
-$this->assign('title', 'Detalhes do Inscrito');
+$this->assign('title', __d('subscribers', 'Detalhes do Inscrito'));
 ?>
 
 <div class="subscriber-view">
     <div class="page-header">
         <div>
             <h1><?= h($subscriber->email) ?></h1>
-            <p><?= h($subscriber->name) ?: 'Inscrito de notificações' ?></p>
+            <p><?= h($subscriber->name) ?: __d('subscribers', 'Inscrito de notificações') ?></p>
         </div>
         <div style="display: flex; gap: 8px;">
             <?= $this->Html->link(
-                'Voltar',
+                __d('subscribers', 'Voltar'),
                 ['action' => 'index'],
                 ['class' => 'btn btn-secondary']
             ) ?>
@@ -29,14 +29,14 @@ $this->assign('title', 'Detalhes do Inscrito');
                 <?= $subscriber->canReceiveNotifications() ? '🟢' : '🔴' ?>
             </div>
             <div class="status-content">
-                <h2><?= $subscriber->canReceiveNotifications() ? 'Ativo e Verificado' : 'Inativo ou Não Verificado' ?></h2>
+                <h2><?= $subscriber->canReceiveNotifications() ? __d('subscribers', 'Ativo e Verificado') : __d('subscribers', 'Inativo ou Não Verificado') ?></h2>
                 <p>
                     <?php if ($subscriber->verified && $subscriber->active): ?>
-                        Pode receber notificações
+                        <?= __d('subscribers', 'Pode receber notificações') ?>
                     <?php elseif (!$subscriber->verified): ?>
-                        Aguardando verificação de email
+                        <?= __d('subscribers', 'Aguardando verificação de email') ?>
                     <?php else: ?>
-                        Inscrito desativado
+                        <?= __d('subscribers', 'Inscrito desativado') ?>
                     <?php endif; ?>
                 </p>
             </div>
@@ -49,7 +49,7 @@ $this->assign('title', 'Detalhes do Inscrito');
             <div class="stat-icon">📧</div>
             <div class="stat-content">
                 <div class="stat-value"><?= number_format($emailLogsCount) ?></div>
-                <div class="stat-label">Emails Recebidos</div>
+                <div class="stat-label"><?= __d('subscribers', 'Emails Recebidos') ?></div>
             </div>
         </div>
 
@@ -57,82 +57,82 @@ $this->assign('title', 'Detalhes do Inscrito');
             <div class="stat-icon">📬</div>
             <div class="stat-content">
                 <div class="stat-value"><?= isset($subscriber->subscriptions) ? count($subscriber->subscriptions) : 0 ?></div>
-                <div class="stat-label">Monitores Inscritos</div>
+                <div class="stat-label"><?= __d('subscribers', 'Monitores Inscritos') ?></div>
             </div>
         </div>
 
         <div class="stat-card">
             <div class="stat-icon">✅</div>
             <div class="stat-content">
-                <div class="stat-value"><?= $subscriber->verified ? 'Sim' : 'Não' ?></div>
-                <div class="stat-label">Verificado</div>
+                <div class="stat-value"><?= $subscriber->verified ? __d('subscribers', 'Sim') : __d('subscribers', 'Não') ?></div>
+                <div class="stat-label"><?= __d('subscribers', 'Verificado') ?></div>
             </div>
         </div>
 
         <div class="stat-card">
             <div class="stat-icon">⚡</div>
             <div class="stat-content">
-                <div class="stat-value"><?= $subscriber->active ? 'Ativo' : 'Inativo' ?></div>
-                <div class="stat-label">Status</div>
+                <div class="stat-value"><?= $subscriber->active ? __d('subscribers', 'Ativo') : __d('subscribers', 'Inativo') ?></div>
+                <div class="stat-label"><?= __d('subscribers', 'Status') ?></div>
             </div>
         </div>
     </div>
 
     <!-- Subscriber Details -->
     <div class="card">
-        <div class="card-header">Detalhes do Inscrito</div>
+        <div class="card-header"><?= __d('subscribers', 'Detalhes do Inscrito') ?></div>
         <div class="details-grid">
             <div class="detail-item">
-                <span class="detail-label">Email:</span>
+                <span class="detail-label"><?= __d('subscribers', 'Email:') ?></span>
                 <code><?= h($subscriber->email) ?></code>
             </div>
 
             <div class="detail-item">
-                <span class="detail-label">Nome:</span>
+                <span class="detail-label"><?= __d('subscribers', 'Nome:') ?></span>
                 <span><?= h($subscriber->name) ?: '-' ?></span>
             </div>
 
             <div class="detail-item">
-                <span class="detail-label">Status de Verificação:</span>
+                <span class="detail-label"><?= __d('subscribers', 'Status de Verificação:') ?></span>
                 <span class="badge badge-<?= $subscriber->verified ? 'success' : 'warning' ?>">
-                    <?= $subscriber->verified ? 'Verificado' : 'Pendente' ?>
+                    <?= $subscriber->verified ? __d('subscribers', 'Verificado') : __d('subscribers', 'Pendente') ?>
                 </span>
             </div>
 
             <div class="detail-item">
-                <span class="detail-label">Status Ativo:</span>
+                <span class="detail-label"><?= __d('subscribers', 'Status Ativo:') ?></span>
                 <span class="badge badge-<?= $subscriber->active ? 'success' : 'error' ?>">
-                    <?= $subscriber->active ? 'Ativo' : 'Inativo' ?>
+                    <?= $subscriber->active ? __d('subscribers', 'Ativo') : __d('subscribers', 'Inativo') ?>
                 </span>
             </div>
 
             <?php if ($subscriber->verified_at): ?>
                 <div class="detail-item">
-                    <span class="detail-label">Verificado em:</span>
+                    <span class="detail-label"><?= __d('subscribers', 'Verificado em:') ?></span>
                     <span><?= $subscriber->verified_at->format('d/m/Y H:i:s') ?></span>
                 </div>
             <?php endif; ?>
 
             <div class="detail-item">
-                <span class="detail-label">Data de Inscrição:</span>
+                <span class="detail-label"><?= __d('subscribers', 'Data de Inscrição:') ?></span>
                 <span><?= $subscriber->created->format('d/m/Y H:i:s') ?></span>
             </div>
 
             <div class="detail-item">
-                <span class="detail-label">Última Atualização:</span>
+                <span class="detail-label"><?= __d('subscribers', 'Última Atualização:') ?></span>
                 <span><?= $subscriber->modified->format('d/m/Y H:i:s') ?></span>
             </div>
 
             <?php if (!empty($subscriber->verification_token)): ?>
                 <div class="detail-item" style="grid-column: 1 / -1;">
-                    <span class="detail-label">Token de Verificação:</span>
+                    <span class="detail-label"><?= __d('subscribers', 'Token de Verificação:') ?></span>
                     <code style="word-break: break-all; font-size: 12px;"><?= h($subscriber->verification_token) ?></code>
                 </div>
             <?php endif; ?>
 
             <?php if (!empty($subscriber->unsubscribe_token)): ?>
                 <div class="detail-item" style="grid-column: 1 / -1;">
-                    <span class="detail-label">Token de Cancelamento:</span>
+                    <span class="detail-label"><?= __d('subscribers', 'Token de Cancelamento:') ?></span>
                     <code style="word-break: break-all; font-size: 12px;"><?= h($subscriber->unsubscribe_token) ?></code>
                 </div>
             <?php endif; ?>
@@ -143,8 +143,8 @@ $this->assign('title', 'Detalhes do Inscrito');
     <?php if (isset($subscriber->subscriptions) && count($subscriber->subscriptions) > 0): ?>
         <div class="card">
             <div class="card-header">
-                <span>Monitores Inscritos</span>
-                <span class="badge badge-info"><?= count($subscriber->subscriptions) ?> monitor<?= count($subscriber->subscriptions) > 1 ? 'es' : '' ?></span>
+                <span><?= __d('subscribers', 'Monitores Inscritos') ?></span>
+                <span class="badge badge-info"><?= count($subscriber->subscriptions) ?> <?= count($subscriber->subscriptions) > 1 ? __d('subscribers', 'monitores') : __d('subscribers', 'monitor') ?></span>
             </div>
             <div class="monitors-list">
                 <?php foreach ($subscriber->subscriptions as $subscription): ?>
@@ -156,11 +156,11 @@ $this->assign('title', 'Detalhes do Inscrito');
                                     <?= h(strtoupper($subscription->monitor->type)) ?>
                                 </span>
                             </div>
-                            <p><?= h($subscription->monitor->description) ?: 'Monitor de serviço' ?></p>
+                            <p><?= h($subscription->monitor->description) ?: __d('subscribers', 'Monitor de serviço') ?></p>
                             <div class="monitor-meta">
-                                <span>Inscrito em: <?= $subscription->created->format('d/m/Y H:i') ?></span>
+                                <span><?= __d('subscribers', 'Inscrito em: {0}', $subscription->created->format('d/m/Y H:i')) ?></span>
                                 <?= $this->Html->link(
-                                    'Ver Monitor',
+                                    __d('subscribers', 'Ver Monitor'),
                                     ['controller' => 'Monitors', 'action' => 'view', $subscription->monitor->id],
                                     ['class' => 'btn-link']
                                 ) ?>
@@ -174,42 +174,42 @@ $this->assign('title', 'Detalhes do Inscrito');
         <div class="card">
             <div class="empty-state">
                 <div class="empty-state-icon">📬</div>
-                <p>Nenhum monitor inscrito ainda.</p>
-                <small class="text-muted">O inscrito não se inscreveu em nenhum monitor específico.</small>
+                <p><?= __d('subscribers', 'Nenhum monitor inscrito ainda.') ?></p>
+                <small class="text-muted"><?= __d('subscribers', 'O inscrito não se inscreveu em nenhum monitor específico.') ?></small>
             </div>
         </div>
     <?php endif; ?>
 
     <!-- Actions -->
     <div class="card">
-        <div class="card-header">Ações</div>
+        <div class="card-header"><?= __d('subscribers', 'Ações') ?></div>
         <div class="actions-grid">
             <?php if (!$subscriber->verified): ?>
                 <?= $this->Form->postLink(
-                    'Reenviar Verificação',
+                    __d('subscribers', 'Reenviar Verificação'),
                     ['action' => 'resendVerification', $subscriber->id],
                     [
                         'class' => 'btn btn-primary',
-                        'confirm' => 'Tem certeza que deseja reenviar o email de verificação?'
+                        'confirm' => __d('subscribers', 'Tem certeza que deseja reenviar o email de verificação?')
                     ]
                 ) ?>
             <?php endif; ?>
 
             <?= $this->Form->postLink(
-                $subscriber->active ? 'Desativar Inscrito' : 'Ativar Inscrito',
+                $subscriber->active ? __d('subscribers', 'Desativar Inscrito') : __d('subscribers', 'Ativar Inscrito'),
                 ['action' => 'toggle', $subscriber->id],
                 [
                     'class' => 'btn ' . ($subscriber->active ? 'btn-secondary' : 'btn-success'),
-                    'confirm' => 'Tem certeza que deseja ' . ($subscriber->active ? 'desativar' : 'ativar') . ' este inscrito?'
+                    'confirm' => __d('subscribers', 'Tem certeza que deseja {0} este inscrito?', $subscriber->active ? __d('subscribers', 'desativar') : __d('subscribers', 'ativar'))
                 ]
             ) ?>
 
             <?= $this->Form->postLink(
-                'Excluir Inscrito',
+                __d('subscribers', 'Excluir Inscrito'),
                 ['action' => 'delete', $subscriber->id],
                 [
                     'class' => 'btn btn-error',
-                    'confirm' => 'Tem certeza que deseja excluir este inscrito? Esta ação não pode ser desfeita e todas as assinaturas serão removidas.'
+                    'confirm' => __d('subscribers', 'Tem certeza que deseja excluir este inscrito? Esta ação não pode ser desfeita e todas as assinaturas serão removidas.')
                 ]
             ) ?>
         </div>

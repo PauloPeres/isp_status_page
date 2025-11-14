@@ -6,7 +6,7 @@
  * @var array $monitors
  * @var string $period
  */
-$this->assign('title', 'Verificações de Monitores');
+$this->assign('title', __d('checks', 'Verificações de Monitores'));
 ?>
 
 <style>
@@ -137,6 +137,36 @@ $this->assign('title', 'Verificações de Monitores');
         color: #666;
         text-transform: uppercase;
         border-bottom: 2px solid #e0e0e0;
+    }
+
+    .checks-table th a {
+        color: #666;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .checks-table th a:hover {
+        color: #3b82f6;
+    }
+
+    .checks-table th a::after {
+        content: '⇅';
+        opacity: 0.3;
+        font-size: 12px;
+    }
+
+    .checks-table th a.asc::after {
+        content: '↑';
+        opacity: 1;
+        color: #3b82f6;
+    }
+
+    .checks-table th a.desc::after {
+        content: '↓';
+        opacity: 1;
+        color: #3b82f6;
     }
 
     .checks-table td {
@@ -287,36 +317,36 @@ $this->assign('title', 'Verificações de Monitores');
 </style>
 
 <div class="checks-header">
-    <h2>📈 Verificações de Monitores</h2>
+    <h2>📈 <?= __d('checks', 'Verificações de Monitores') ?></h2>
 </div>
 
 <!-- Statistics Cards -->
 <div class="stats-grid">
     <div class="stat-card-mini">
-        <div class="stat-label">Total Checks</div>
+        <div class="stat-label"><?= __d('checks', 'Total Checks') ?></div>
         <div class="stat-value info"><?= number_format($stats['total']) ?></div>
     </div>
     <div class="stat-card-mini">
-        <div class="stat-label">Sucesso</div>
+        <div class="stat-label"><?= __d('checks', 'Sucesso') ?></div>
         <div class="stat-value success"><?= number_format($stats['success']) ?></div>
     </div>
     <div class="stat-card-mini">
-        <div class="stat-label">Falhas</div>
+        <div class="stat-label"><?= __d('checks', 'Falhas') ?></div>
         <div class="stat-value error"><?= number_format($stats['failed']) ?></div>
     </div>
     <div class="stat-card-mini">
-        <div class="stat-label">Taxa de Sucesso</div>
+        <div class="stat-label"><?= __d('checks', 'Taxa de Sucesso') ?></div>
         <div class="stat-value <?= $stats['successRate'] >= 95 ? 'success' : ($stats['successRate'] >= 80 ? 'info' : 'error') ?>">
             <?= number_format($stats['successRate'], 1) ?>%
         </div>
     </div>
     <div class="stat-card-mini">
-        <div class="stat-label">Tempo Médio</div>
+        <div class="stat-label"><?= __d('checks', 'Tempo Médio') ?></div>
         <div class="stat-value">
             <?php if ($stats['avgResponseTime']): ?>
                 <?= number_format($stats['avgResponseTime'], 0) ?>ms
             <?php else: ?>
-                <span style="font-size: 18px; color: #999;">N/A</span>
+                <span style="font-size: 18px; color: #999;"><?= __d('checks', 'N/A') ?></span>
             <?php endif; ?>
         </div>
     </div>
@@ -327,9 +357,9 @@ $this->assign('title', 'Verificações de Monitores');
     <?= $this->Form->create(null, ['type' => 'get', 'id' => 'filters-form']) ?>
     <div class="filters-row">
         <div class="filter-group">
-            <label>Monitor</label>
+            <label><?= __d('checks', 'Monitor') ?></label>
             <?= $this->Form->control('monitor_id', [
-                'options' => ['' => 'Todos os Monitores'] + $monitors,
+                'options' => ['' => __d('checks', 'Todos os Monitores')] + $monitors,
                 'default' => $this->request->getQuery('monitor_id'),
                 'label' => false,
                 'class' => 'form-control',
@@ -337,12 +367,12 @@ $this->assign('title', 'Verificações de Monitores');
         </div>
 
         <div class="filter-group">
-            <label>Status</label>
+            <label><?= __d('checks', 'Status') ?></label>
             <?= $this->Form->control('status', [
                 'options' => [
-                    '' => 'Todos',
-                    'success' => 'Sucesso',
-                    'failed' => 'Falha',
+                    '' => __d('checks', 'Todos'),
+                    'success' => __d('checks', 'Sucesso'),
+                    'failed' => __d('checks', 'Falha'),
                 ],
                 'default' => $this->request->getQuery('status'),
                 'label' => false,
@@ -351,13 +381,13 @@ $this->assign('title', 'Verificações de Monitores');
         </div>
 
         <div class="filter-group">
-            <label>Período</label>
+            <label><?= __d('checks', 'Período') ?></label>
             <?= $this->Form->control('period', [
                 'options' => [
-                    '24h' => 'Últimas 24 horas',
-                    '7d' => 'Últimos 7 dias',
-                    '30d' => 'Últimos 30 dias',
-                    'all' => 'Todos',
+                    '24h' => __d('checks', 'Últimas 24 horas'),
+                    '7d' => __d('checks', 'Últimos 7 dias'),
+                    '30d' => __d('checks', 'Últimos 30 dias'),
+                    'all' => __d('checks', 'Todos'),
                 ],
                 'default' => $period,
                 'label' => false,
@@ -366,8 +396,8 @@ $this->assign('title', 'Verificações de Monitores');
         </div>
 
         <div class="filter-buttons">
-            <?= $this->Form->button('Filtrar', ['type' => 'submit', 'class' => 'btn-filter']) ?>
-            <?= $this->Html->link('Limpar', ['action' => 'index'], ['class' => 'btn-clear']) ?>
+            <?= $this->Form->button(__d('checks', 'Filtrar'), ['type' => 'submit', 'class' => 'btn-filter']) ?>
+            <?= $this->Html->link(__d('checks', 'Limpar'), ['action' => 'index'], ['class' => 'btn-clear']) ?>
         </div>
     </div>
     <?= $this->Form->end() ?>
@@ -379,12 +409,12 @@ $this->assign('title', 'Verificações de Monitores');
         <table>
             <thead>
                 <tr>
-                    <th>Data/Hora</th>
-                    <th>Monitor</th>
-                    <th>Status</th>
-                    <th>Tempo Resposta</th>
-                    <th>Mensagem</th>
-                    <th style="text-align: right;">Ações</th>
+                    <th><?= $this->Paginator->sort('checked_at', __d('checks', 'Data/Hora')) ?></th>
+                    <th><?= $this->Paginator->sort('monitor_id', __d('checks', 'Monitor')) ?></th>
+                    <th><?= $this->Paginator->sort('status', __d('checks', 'Status')) ?></th>
+                    <th><?= $this->Paginator->sort('response_time', __d('checks', 'Tempo Resposta')) ?></th>
+                    <th><?= __d('checks', 'Mensagem') ?></th>
+                    <th style="text-align: right;"><?= __d('checks', 'Ações') ?></th>
                 </tr>
             </thead>
             <tbody>
@@ -406,7 +436,7 @@ $this->assign('title', 'Verificações de Monitores');
                         </td>
                         <td>
                             <span class="badge badge-<?= $check->status === 'success' ? 'success' : 'danger' ?>">
-                                <?= $check->status === 'success' ? '✅ Sucesso' : '❌ Falha' ?>
+                                <?= $check->status === 'success' ? '✅ ' . __d('checks', 'Sucesso') : '❌ ' . __d('checks', 'Falha') ?>
                             </span>
                         </td>
                         <td>
@@ -428,9 +458,9 @@ $this->assign('title', 'Verificações de Monitores');
                         <td style="text-align: right;">
                             <div class="action-buttons">
                                 <?= $this->Html->link(
-                                    'Ver',
+                                    __d('checks', 'Ver'),
                                     ['action' => 'view', $check->id],
-                                    ['class' => 'btn-action btn-action-view', 'title' => 'Ver detalhes']
+                                    ['class' => 'btn-action btn-action-view', 'title' => __d('checks', 'Ver detalhes')]
                                 ) ?>
                             </div>
                         </td>
@@ -440,8 +470,8 @@ $this->assign('title', 'Verificações de Monitores');
         </table>
     <?php else: ?>
         <div class="no-checks">
-            <p style="font-size: 18px; margin-bottom: 8px;">📭 Nenhuma verificação encontrada</p>
-            <p>Tente ajustar os filtros ou aguarde as próximas verificações.</p>
+            <p style="font-size: 18px; margin-bottom: 8px;">📭 <?= __d('checks', 'Nenhuma verificação encontrada') ?></p>
+            <p><?= __d('checks', 'Tente ajustar os filtros ou aguarde as próximas verificações.') ?></p>
         </div>
     <?php endif; ?>
 </div>
@@ -449,13 +479,13 @@ $this->assign('title', 'Verificações de Monitores');
 <!-- Pagination -->
 <?php if ($checks->count() > 0): ?>
     <div class="pagination">
-        <?= $this->Paginator->first('« Primeira') ?>
-        <?= $this->Paginator->prev('‹ Anterior') ?>
+        <?= $this->Paginator->first(__d('checks', '« Primeira')) ?>
+        <?= $this->Paginator->prev(__d('checks', '‹ Anterior')) ?>
         <?= $this->Paginator->numbers() ?>
-        <?= $this->Paginator->next('Próxima ›') ?>
-        <?= $this->Paginator->last('Última »') ?>
+        <?= $this->Paginator->next(__d('checks', 'Próxima ›')) ?>
+        <?= $this->Paginator->last(__d('checks', 'Última »')) ?>
     </div>
     <div class="pagination-info">
-        <?= $this->Paginator->counter('Página {{page}} de {{pages}}, mostrando {{current}} registro(s) de {{count}} no total') ?>
+        <?= $this->Paginator->counter(__d('checks', 'Página {{page}} de {{pages}}, mostrando {{current}} registro(s) de {{count}} no total')) ?>
     </div>
 <?php endif; ?>

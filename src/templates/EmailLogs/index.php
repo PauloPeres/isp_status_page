@@ -5,7 +5,7 @@
  * @var array $stats
  * @var string $period
  */
-$this->assign('title', 'Logs de Emails');
+$this->assign('title', __('Logs de Emails'));
 ?>
 
 <style>
@@ -274,31 +274,31 @@ $this->assign('title', 'Logs de Emails');
 </style>
 
 <div class="email-logs-header">
-    <h2>Logs de Emails</h2>
+    <h2><?= __('Logs de Emails') ?></h2>
 </div>
 
 <!-- Statistics Cards -->
 <div class="stats-grid">
     <div class="stat-card-mini">
-        <div class="stat-label">Total Enviados</div>
+        <div class="stat-label"><?= __('Total Enviados') ?></div>
         <div class="stat-value info"><?= number_format($stats['total']) ?></div>
     </div>
     <div class="stat-card-mini">
-        <div class="stat-label">Sucesso</div>
+        <div class="stat-label"><?= __('Sucesso') ?></div>
         <div class="stat-value success"><?= number_format($stats['sent']) ?></div>
     </div>
     <div class="stat-card-mini">
-        <div class="stat-label">Falhas</div>
+        <div class="stat-label"><?= __('Falhas') ?></div>
         <div class="stat-value error"><?= number_format($stats['failed']) ?></div>
     </div>
     <div class="stat-card-mini">
-        <div class="stat-label">Taxa de Sucesso</div>
+        <div class="stat-label"><?= __('Taxa de Sucesso') ?></div>
         <div class="stat-value <?= $stats['successRate'] >= 95 ? 'success' : ($stats['successRate'] >= 80 ? 'info' : 'error') ?>">
             <?= number_format($stats['successRate'], 1) ?>%
         </div>
     </div>
     <div class="stat-card-mini">
-        <div class="stat-label">Hoje</div>
+        <div class="stat-label"><?= __('Hoje') ?></div>
         <div class="stat-value info"><?= number_format($stats['today']) ?></div>
     </div>
 </div>
@@ -308,23 +308,23 @@ $this->assign('title', 'Logs de Emails');
     <?= $this->Form->create(null, ['type' => 'get', 'id' => 'filters-form']) ?>
     <div class="filters-row">
         <div class="filter-group">
-            <label>Buscar</label>
+            <label><?= __('Buscar') ?></label>
             <?= $this->Form->control('search', [
                 'label' => false,
-                'placeholder' => 'Email ou assunto...',
+                'placeholder' => __('Email ou assunto...'),
                 'value' => $this->request->getQuery('search'),
                 'class' => 'form-control',
             ]) ?>
         </div>
 
         <div class="filter-group">
-            <label>Status</label>
+            <label><?= __('Status') ?></label>
             <?= $this->Form->control('status', [
                 'options' => [
-                    '' => 'Todos',
-                    'sent' => 'Enviados',
-                    'failed' => 'Falhas',
-                    'queued' => 'Na Fila',
+                    '' => __('Todos'),
+                    'sent' => __('Enviados'),
+                    'failed' => __('Falhas'),
+                    'queued' => __('Na Fila'),
                 ],
                 'default' => $this->request->getQuery('status'),
                 'label' => false,
@@ -333,13 +333,13 @@ $this->assign('title', 'Logs de Emails');
         </div>
 
         <div class="filter-group">
-            <label>Período</label>
+            <label><?= __('Período') ?></label>
             <?= $this->Form->control('period', [
                 'options' => [
-                    '24h' => 'Últimas 24 horas',
-                    '7d' => 'Últimos 7 dias',
-                    '30d' => 'Últimos 30 dias',
-                    'all' => 'Todos',
+                    '24h' => __('Últimas 24 horas'),
+                    '7d' => __('Últimos 7 dias'),
+                    '30d' => __('Últimos 30 dias'),
+                    'all' => __('Todos'),
                 ],
                 'default' => $period,
                 'label' => false,
@@ -348,8 +348,8 @@ $this->assign('title', 'Logs de Emails');
         </div>
 
         <div class="filter-buttons">
-            <?= $this->Form->button('Filtrar', ['type' => 'submit', 'class' => 'btn-filter']) ?>
-            <?= $this->Html->link('Limpar', ['action' => 'index'], ['class' => 'btn-clear']) ?>
+            <?= $this->Form->button(__('Filtrar'), ['type' => 'submit', 'class' => 'btn-filter']) ?>
+            <?= $this->Html->link(__('Limpar'), ['action' => 'index'], ['class' => 'btn-clear']) ?>
         </div>
     </div>
     <?= $this->Form->end() ?>
@@ -361,12 +361,12 @@ $this->assign('title', 'Logs de Emails');
         <table>
             <thead>
                 <tr>
-                    <th>Data/Hora</th>
-                    <th>Destinatário</th>
-                    <th>Assunto</th>
-                    <th>Status</th>
-                    <th>Monitor</th>
-                    <th style="text-align: right;">Ações</th>
+                    <th><?= __('Data/Hora') ?></th>
+                    <th><?= __('Destinatário') ?></th>
+                    <th><?= __('Assunto') ?></th>
+                    <th><?= __('Status') ?></th>
+                    <th><?= __('Monitor') ?></th>
+                    <th style="text-align: right;"><?= __('Ações') ?></th>
                 </tr>
             </thead>
             <tbody>
@@ -382,7 +382,7 @@ $this->assign('title', 'Logs de Emails');
                             <?php if (isset($log->monitor)): ?>
                                 <span><?= h($log->monitor->name) ?></span>
                                 <?php if (isset($log->incident)): ?>
-                                    <br><span style="color: #999; font-size: 12px;">Incidente #<?= h($log->incident->id) ?></span>
+                                    <br><span style="color: #999; font-size: 12px;"><?= __('Incidente') ?> #<?= h($log->incident->id) ?></span>
                                 <?php endif; ?>
                             <?php else: ?>
                                 <span style="color: #999;">-</span>
@@ -390,16 +390,16 @@ $this->assign('title', 'Logs de Emails');
                         </td>
                         <td>
                             <?php if ($log->status === 'sent'): ?>
-                                <span class="badge badge-success">Enviado</span>
+                                <span class="badge badge-success"><?= __('Enviado') ?></span>
                                 <?php if ($log->sent_at): ?>
                                     <br><span style="color: #999; font-size: 12px;">
                                         <span class="local-datetime" data-utc="<?= $log->sent_at->format('c') ?>"></span>
                                     </span>
                                 <?php endif; ?>
                             <?php elseif ($log->status === 'failed'): ?>
-                                <span class="badge badge-danger">Falha</span>
+                                <span class="badge badge-danger"><?= __('Falha') ?></span>
                             <?php elseif ($log->status === 'queued'): ?>
-                                <span class="badge badge-warning">Na Fila</span>
+                                <span class="badge badge-warning"><?= __('Na Fila') ?></span>
                             <?php else: ?>
                                 <span class="badge badge-info"><?= h(ucfirst($log->status)) ?></span>
                             <?php endif; ?>
@@ -422,9 +422,9 @@ $this->assign('title', 'Logs de Emails');
                         <td style="text-align: right;">
                             <div class="action-buttons">
                                 <?= $this->Html->link(
-                                    'Ver',
+                                    __('Ver'),
                                     ['action' => 'view', $log->id],
-                                    ['class' => 'btn-action btn-action-view', 'title' => 'Ver detalhes']
+                                    ['class' => 'btn-action btn-action-view', 'title' => __('Ver detalhes')]
                                 ) ?>
                             </div>
                         </td>
@@ -434,8 +434,8 @@ $this->assign('title', 'Logs de Emails');
         </table>
     <?php else: ?>
         <div class="no-emails">
-            <p style="font-size: 18px; margin-bottom: 8px;">📭 Nenhum email encontrado</p>
-            <p>Tente ajustar os filtros ou aguarde o envio de novos emails.</p>
+            <p style="font-size: 18px; margin-bottom: 8px;">📭 <?= __('Nenhum email encontrado') ?></p>
+            <p><?= __('Tente ajustar os filtros ou aguarde o envio de novos emails.') ?></p>
         </div>
     <?php endif; ?>
 </div>
@@ -443,13 +443,13 @@ $this->assign('title', 'Logs de Emails');
 <!-- Pagination -->
 <?php if ($emailLogs->count() > 0): ?>
     <div class="pagination">
-        <?= $this->Paginator->first('« Primeira') ?>
-        <?= $this->Paginator->prev('‹ Anterior') ?>
+        <?= $this->Paginator->first(__('« Primeira')) ?>
+        <?= $this->Paginator->prev(__('‹ Anterior')) ?>
         <?= $this->Paginator->numbers() ?>
-        <?= $this->Paginator->next('Próxima ›') ?>
-        <?= $this->Paginator->last('Última »') ?>
+        <?= $this->Paginator->next(__('Próxima ›')) ?>
+        <?= $this->Paginator->last(__('Última »')) ?>
     </div>
     <div class="pagination-info">
-        <?= $this->Paginator->counter('Página {{page}} de {{pages}}, mostrando {{current}} registro(s) de {{count}} no total') ?>
+        <?= $this->Paginator->counter(__('Página {{page}} de {{pages}}, mostrando {{current}} registro(s) de {{count}} no total')) ?>
     </div>
 <?php endif; ?>

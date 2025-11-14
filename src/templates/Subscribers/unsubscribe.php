@@ -4,7 +4,7 @@
  * @var \App\Model\Entity\Subscriber $subscriber
  * @var bool $success
  */
-$this->assign('title', 'Cancelar Inscrição');
+$this->assign('title', __d('subscribers', 'Cancelar Inscrição'));
 ?>
 
 <div class="unsubscribe-page">
@@ -15,20 +15,20 @@ $this->assign('title', 'Cancelar Inscrição');
                 ✅
             </div>
 
-            <h1 class="unsubscribe-title">Inscrição Cancelada</h1>
+            <h1 class="unsubscribe-title"><?= __d('subscribers', 'Inscrição Cancelada') ?></h1>
 
             <p class="unsubscribe-message">
-                Você foi desinscrito com sucesso. Não receberá mais notificações no email <strong><?= h($subscriber->email) ?></strong>
+                <?= __d('subscribers', 'Você foi desinscrito com sucesso. Não receberá mais notificações no email') ?> <strong><?= h($subscriber->email) ?></strong>
             </p>
 
             <div class="unsubscribe-info">
-                <p>Sentiremos sua falta! 😢</p>
-                <p>Se você mudar de ideia, pode se inscrever novamente a qualquer momento na página de status.</p>
+                <p><?= __d('subscribers', 'Sentiremos sua falta! 😢') ?></p>
+                <p><?= __d('subscribers', 'Se você mudar de ideia, pode se inscrever novamente a qualquer momento na página de status.') ?></p>
             </div>
 
             <div class="unsubscribe-actions">
                 <?= $this->Html->link(
-                    '← Voltar para Status',
+                    '← ' . __d('subscribers', 'Voltar para Status'),
                     ['controller' => 'Status', 'action' => 'index'],
                     ['class' => 'btn btn-primary']
                 ) ?>
@@ -40,28 +40,28 @@ $this->assign('title', 'Cancelar Inscrição');
                 ⚠️
             </div>
 
-            <h1 class="unsubscribe-title">Cancelar Inscrição?</h1>
+            <h1 class="unsubscribe-title"><?= __d('subscribers', 'Cancelar Inscrição?') ?></h1>
 
             <p class="unsubscribe-message">
-                Tem certeza que deseja cancelar as notificações para <strong><?= h($subscriber->email) ?></strong>?
+                <?= __d('subscribers', 'Tem certeza que deseja cancelar as notificações para') ?> <strong><?= h($subscriber->email) ?></strong>?
             </p>
 
             <div class="unsubscribe-info">
-                <h3>Você deixará de receber:</h3>
+                <h3><?= __d('subscribers', 'Você deixará de receber:') ?></h3>
                 <ul>
-                    <li>✗ Notificações sobre incidentes</li>
-                    <li>✗ Alertas de serviços offline</li>
-                    <li>✗ Informações sobre resoluções de problemas</li>
+                    <li>✗ <?= __d('subscribers', 'Notificações sobre incidentes') ?></li>
+                    <li>✗ <?= __d('subscribers', 'Alertas de serviços offline') ?></li>
+                    <li>✗ <?= __d('subscribers', 'Informações sobre resoluções de problemas') ?></li>
                 </ul>
             </div>
 
             <div class="unsubscribe-actions">
                 <?= $this->Form->create(null, ['class' => 'unsubscribe-form']) ?>
                     <button type="submit" class="btn btn-danger">
-                        Sim, cancelar inscrição
+                        <?= __d('subscribers', 'Sim, cancelar inscrição') ?>
                     </button>
                     <?= $this->Html->link(
-                        'Não, manter inscrição',
+                        __d('subscribers', 'Não, manter inscrição'),
                         ['controller' => 'Status', 'action' => 'index'],
                         ['class' => 'btn btn-secondary']
                     ) ?>
@@ -71,7 +71,7 @@ $this->assign('title', 'Cancelar Inscrição');
             <div class="unsubscribe-footer">
                 <p>
                     <small>
-                        Você pode se reinscrever a qualquer momento pela página de status.
+                        <?= __d('subscribers', 'Você pode se reinscrever a qualquer momento pela página de status.') ?>
                     </small>
                 </p>
             </div>

@@ -1,39 +1,43 @@
 <?php
-use Cake\Core\Configure;
+/**
+ * @var \App\View\AppView $this
+ * @var string $siteName Site name from controller
+ * @var string $supportEmail Support email from controller
+ */
 
-$siteName = Configure::read('Settings.site_name', 'ISP Status');
-$supportEmail = Configure::read('Settings.support_email', 'support@example.com');
+// Fallback values if variables are not set
+$siteName = $siteName ?? 'ISP Status';
+$supportEmail = $supportEmail ?? 'support@example.com';
 ?>
 
 <footer class="public-footer">
     <div class="container">
         <div class="footer-grid">
             <div class="footer-section">
-                <h4>Sobre</h4>
+                <h4><?= __('Sobre') ?></h4>
                 <p>
-                    Esta página mostra o status em tempo real de todos os nossos serviços.
-                    Monitoramos continuamente para garantir a melhor experiência.
+                    <?= __('Esta página mostra o status em tempo real de todos os nossos serviços. Monitoramos continuamente para garantir a melhor experiência.') ?>
                 </p>
             </div>
 
             <div class="footer-section">
-                <h4>Links Úteis</h4>
+                <h4><?= __('Links Úteis') ?></h4>
                 <ul class="footer-links">
                     <li>
                         <?= $this->Html->link(
-                            'Página Inicial',
+                            __('Página Inicial'),
                             ['controller' => 'Status', 'action' => 'index']
                         ) ?>
                     </li>
                     <li>
                         <?= $this->Html->link(
-                            'Histórico de Incidentes',
+                            __('Histórico de Incidentes'),
                             ['controller' => 'Status', 'action' => 'history']
                         ) ?>
                     </li>
                     <li>
                         <?= $this->Html->link(
-                            'Assinar Notificações',
+                            __('Assinar Notificações'),
                             ['controller' => 'Subscribers', 'action' => 'subscribe']
                         ) ?>
                     </li>
@@ -41,21 +45,21 @@ $supportEmail = Configure::read('Settings.support_email', 'support@example.com')
             </div>
 
             <div class="footer-section">
-                <h4>Suporte</h4>
+                <h4><?= __('Suporte') ?></h4>
                 <p>
-                    <strong>Email:</strong><br>
+                    <strong><?= __('Email:') ?></strong><br>
                     <a href="mailto:<?= h($supportEmail) ?>"><?= h($supportEmail) ?></a>
                 </p>
                 <p class="footer-note">
-                    Atualizações automáticas a cada 30 segundos
+                    <?= __('Atualizações automáticas a cada 30 segundos') ?>
                 </p>
             </div>
         </div>
 
         <div class="footer-bottom">
-            <p>&copy; <?= date('Y') ?> <?= h($siteName) ?>. Todos os direitos reservados.</p>
+            <p>&copy; <?= date('Y') ?> <?= h($siteName) ?>. <?= __('Todos os direitos reservados.') ?></p>
             <p class="footer-powered">
-                Powered by <a href="https://github.com/PauloPeres/isp_status_page" target="_blank">ISP Status Page</a>
+                <?= __('Powered by') ?> <a href="https://github.com/PauloPeres/isp_status_page" target="_blank">ISP Status Page</a>
             </p>
         </div>
     </div>

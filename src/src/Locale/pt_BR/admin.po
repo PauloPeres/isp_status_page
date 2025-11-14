@@ -1,0 +1,91 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ISP Status Page - Admin\n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: Admin - Menu e Navegação
+msgid "Dashboard"
+msgstr "Painel"
+
+msgid "Monitors"
+msgstr "Monitores"
+
+msgid "Incidents"
+msgstr "Incidentes"
+
+msgid "Checks"
+msgstr "Verificações"
+
+msgid "Subscribers"
+msgstr "Assinantes"
+
+msgid "Users"
+msgstr "Usuários"
+
+msgid "Settings"
+msgstr "Configurações"
+
+msgid "Logout"
+msgstr "Sair"
+
+msgid "Profile"
+msgstr "Perfil"
+
+#: Admin - Breadcrumbs
+msgid "Home"
+msgstr "Início"
+
+msgid "Admin"
+msgstr "Administração"
+
+msgid "Administration"
+msgstr "Administração"
+
+msgid "Admin Panel"
+msgstr "Painel Administrativo"
+
+#: Admin - Actions
+msgid "Add New"
+msgstr "Adicionar Novo"
+
+msgid "View All"
+msgstr "Ver Todos"
+
+msgid "Export"
+msgstr "Exportar"
+
+msgid "Import"
+msgstr "Importar"
+
+msgid "Refresh"
+msgstr "Atualizar"
+
+#: Admin - Status Messages
+msgid "Welcome to the admin panel"
+msgstr "Bem-vindo ao painel administrativo"
+
+msgid "You are logged in as {0}"
+msgstr "Você está conectado como {0}"
+
+msgid "Last login: {0}"
+msgstr "Último acesso: {0}"
+
+msgid "System is running normally"
+msgstr "Sistema funcionando normalmente"
+
+msgid "There are pending notifications"
+msgstr "Há notificações pendentes"
+
+#: Admin - Footer
+msgid "Powered by ISP Status Page"
+msgstr "Powered by ISP Status Page"
+
+msgid "Version {0}"
+msgstr "Versão {0}"
+
+msgid "All rights reserved"
+msgstr "Todos os direitos reservados"

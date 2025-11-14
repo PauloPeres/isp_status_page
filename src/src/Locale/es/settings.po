@@ -1,0 +1,451 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ISP Status Page - Settings\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: Settings - Títulos
+msgid "Settings"
+msgstr "Configuración"
+
+msgid "General Settings"
+msgstr "Configuración General"
+
+msgid "Email Settings"
+msgstr "Configuración de Email"
+
+msgid "System Settings"
+msgstr "Configuración del Sistema"
+
+msgid "Status Page Settings"
+msgstr "Configuración de la Página de Estado"
+
+#: Settings - Geral
+msgid "Site Name"
+msgstr "Nombre del Sitio"
+
+msgid "Site URL"
+msgstr "URL del Sitio"
+
+msgid "Site Logo"
+msgstr "Logo del Sitio"
+
+msgid "Contact Email"
+msgstr "Email de Contacto"
+
+msgid "Time Zone"
+msgstr "Zona Horaria"
+
+msgid "Date Format"
+msgstr "Formato de Fecha"
+
+msgid "Language"
+msgstr "Idioma"
+
+#: Settings - Email
+msgid "Email From"
+msgstr "Email de Envío"
+
+msgid "Email From Name"
+msgstr "Nombre del Remitente"
+
+msgid "SMTP Host"
+msgstr "Servidor SMTP"
+
+msgid "SMTP Port"
+msgstr "Puerto SMTP"
+
+msgid "SMTP Username"
+msgstr "Usuario SMTP"
+
+msgid "SMTP Password"
+msgstr "Contraseña SMTP"
+
+msgid "SMTP Encryption"
+msgstr "Cifrado SMTP"
+
+msgid "Test Email Configuration"
+msgstr "Probar Configuración de Email"
+
+#: Settings - Status Page
+msgid "Public Access"
+msgstr "Acceso Público"
+
+msgid "Is status page publicly accessible"
+msgstr "La página de estado es accesible públicamente"
+
+msgid "Show Uptime"
+msgstr "Mostrar Tiempo de Actividad"
+
+msgid "Show Response Time"
+msgstr "Mostrar Tiempo de Respuesta"
+
+msgid "Show Incident History"
+msgstr "Mostrar Historial de Incidentes"
+
+msgid "Custom CSS"
+msgstr "CSS Personalizado"
+
+msgid "Custom JavaScript"
+msgstr "JavaScript Personalizado"
+
+msgid "Header Text"
+msgstr "Texto del Encabezado"
+
+msgid "Footer Text"
+msgstr "Texto del Pie de Página"
+
+#: Settings - Sistema
+msgid "Default Check Interval"
+msgstr "Intervalo Predeterminado de Verificación"
+
+msgid "Check Retention Days"
+msgstr "Días de Retención de Verificaciones"
+
+msgid "Log Retention Days"
+msgstr "Días de Retención de Logs"
+
+msgid "Enable Notifications"
+msgstr "Habilitar Notificaciones"
+
+msgid "Enable Maintenance Mode"
+msgstr "Habilitar Modo de Mantenimiento"
+
+msgid "Maintenance Message"
+msgstr "Mensaje de Mantenimiento"
+
+#: Settings - Mensagens
+msgid "Settings saved successfully."
+msgstr "Configuración guardada exitosamente."
+
+msgid "Error saving settings."
+msgstr "Error al guardar configuración."
+
+msgid "Test email sent successfully."
+msgstr "Email de prueba enviado exitosamente."
+
+msgid "Error sending test email."
+msgstr "Error al enviar email de prueba."
+
+#: Settings - Template index.php
+msgid "Configurações do Sistema"
+msgstr "Configuración del Sistema"
+
+msgid "Geral"
+msgstr "General"
+
+msgid "Email"
+msgstr "Email"
+
+msgid "Monitoramento"
+msgstr "Monitoreo"
+
+msgid "Notificações"
+msgstr "Notificaciones"
+
+msgid "Nome do Site"
+msgstr "Nombre del Sitio"
+
+msgid "URL do Site"
+msgstr "URL del Sitio"
+
+msgid "Título da Página de Status"
+msgstr "Título de la Página de Estado"
+
+msgid "Página de Status Pública"
+msgstr "Página de Estado Pública"
+
+msgid "Cache da Página (segundos)"
+msgstr "Caché de la Página (segundos)"
+
+msgid "Servidor SMTP"
+msgstr "Servidor SMTP"
+
+msgid "Porta SMTP"
+msgstr "Puerto SMTP"
+
+msgid "Usuário SMTP"
+msgstr "Usuario SMTP"
+
+msgid "Senha SMTP"
+msgstr "Contraseña SMTP"
+
+msgid "Email Remetente"
+msgstr "Email Remitente"
+
+msgid "Nome do Remetente"
+msgstr "Nombre del Remitente"
+
+msgid "Criptografia SMTP"
+msgstr "Cifrado SMTP"
+
+msgid "Timeout SMTP (segundos)"
+msgstr "Tiempo de espera SMTP (segundos)"
+
+msgid "Intervalo Padrão (segundos)"
+msgstr "Intervalo Predeterminado (segundos)"
+
+msgid "Timeout Padrão (segundos)"
+msgstr "Tiempo de espera Predeterminado (segundos)"
+
+msgid "Máximo de Tentativas"
+msgstr "Máximo de Reintentos"
+
+msgid "Auto-resolver Incidentes"
+msgstr "Resolver Incidentes Automáticamente"
+
+msgid "Intervalo de Verificação (minutos)"
+msgstr "Intervalo de Verificación (minutos)"
+
+msgid "Timeout de Verificação (segundos)"
+msgstr "Tiempo de espera de Verificación (segundos)"
+
+msgid "Email ao Criar Incidente"
+msgstr "Email al Crear Incidente"
+
+msgid "Email ao Resolver Incidente"
+msgstr "Email al Resolver Incidente"
+
+msgid "Email ao Ficar Offline"
+msgstr "Email al Quedar Fuera de Línea"
+
+msgid "Email ao Voltar Online"
+msgstr "Email al Volver en Línea"
+
+msgid "Intervalo Entre Alertas (minutos)"
+msgstr "Intervalo Entre Alertas (minutos)"
+
+msgid "Ativar esta opção"
+msgstr "Activar esta opción"
+
+msgid "Salvar Configurações"
+msgstr "Guardar Configuración"
+
+msgid "Restaurar Padrões"
+msgstr "Restaurar Valores Predeterminados"
+
+msgid "Tem certeza que deseja restaurar as configurações para os valores padrão?"
+msgstr "¿Está seguro de que desea restaurar la configuración a los valores predeterminados?"
+
+msgid "Nenhuma configuração geral disponível."
+msgstr "No hay configuración general disponible."
+
+msgid "Testar Email"
+msgstr "Probar Email"
+
+msgid "Enviar email de teste para verificar as configurações?"
+msgstr "¿Enviar email de prueba para verificar la configuración?"
+
+msgid "Nenhuma configuração de email disponível."
+msgstr "No hay configuración de email disponible."
+
+msgid "Configure as configurações de email para enviar notificações."
+msgstr "Configure los ajustes de email para enviar notificaciones."
+
+msgid "Nenhuma configuração de monitoramento disponível."
+msgstr "No hay configuración de monitoreo disponible."
+
+msgid "Nenhuma configuração de notificações disponível."
+msgstr "No hay configuración de notificaciones disponible."
+
+#: Settings - Mensagens Flash do Controller
+msgid "Nenhuma configuração foi enviada."
+msgstr "No se envió ninguna configuración."
+
+msgid "{$successCount} configuração(ões) salva(s) com sucesso."
+msgstr "{$successCount} configuración(es) guardada(s) exitosamente."
+
+msgid "{$errorCount} configuração(ões) falharam ao salvar."
+msgstr "{$errorCount} configuración(es) fallaron al guardar."
+
+msgid "Por favor, informe um endereço de email para o teste."
+msgstr "Por favor, indique una dirección de email para la prueba."
+
+msgid "Endereço de email inválido."
+msgstr "Dirección de email inválida."
+
+msgid "Email de teste enviado para {0}. Verifique sua caixa de entrada."
+msgstr "Email de prueba enviado a {0}. Verifique su bandeja de entrada."
+
+msgid "Não foi possível enviar o email de teste. Verifique as configurações de email e os logs de erro."
+msgstr "No se pudo enviar el email de prueba. Verifique la configuración de email y los logs de error."
+
+msgid "Erro ao enviar email de teste: {0}"
+msgstr "Error al enviar email de prueba: {0}"
+
+msgid "Categoria não especificada."
+msgstr "Categoría no especificada."
+
+msgid "{$resetCount} configuração(ões) restaurada(s) para o padrão."
+msgstr "{$resetCount} configuración(es) restaurada(s) a los valores predeterminados."
+
+msgid "Nenhuma configuração foi restaurada."
+msgstr "No se restauró ninguna configuración."
+
+#: Settings - Idiomas
+msgid "Idioma do Sistema"
+msgstr "Idioma del Sistema"
+
+msgid "Português (Brasil)"
+msgstr "Portugués (Brasil)"
+
+msgid "English"
+msgstr "English"
+
+msgid "Español"
+msgstr "Español"
+
+#: Settings - Help texts / Descriptions
+msgid "Nome do site exibido na página de status"
+msgstr "Nombre del sitio mostrado en la página de estado"
+
+msgid "URL completa onde o sistema está hospedado"
+msgstr "URL completa donde el sistema está alojado"
+
+msgid "Idioma da interface do sistema"
+msgstr "Idioma de la interfaz del sistema"
+
+msgid "Título exibido na página de status"
+msgstr "Título mostrado en la página de estado"
+
+msgid "A página de status é acessível publicamente"
+msgstr "La página de estado es accesible públicamente"
+
+msgid "Tempo de cache da página de status em segundos"
+msgstr "Tiempo de caché de la página de estado en segundos"
+
+msgid "Endereço do servidor SMTP"
+msgstr "Dirección del servidor SMTP"
+
+msgid "Porta do servidor SMTP (geralmente 587 ou 465)"
+msgstr "Puerto del servidor SMTP (generalmente 587 o 465)"
+
+msgid "Nome de usuário para autenticação SMTP"
+msgstr "Nombre de usuario para autenticación SMTP"
+
+msgid "Senha para autenticação SMTP"
+msgstr "Contraseña para autenticación SMTP"
+
+msgid "Endereço de email do remetente"
+msgstr "Dirección de email del remitente"
+
+msgid "Nome exibido como remetente dos emails"
+msgstr "Nombre mostrado como remitente de los emails"
+
+msgid "Tipo de criptografia (TLS, SSL ou nenhuma)"
+msgstr "Tipo de cifrado (TLS, SSL o ninguno)"
+
+msgid "Tempo limite para conexão SMTP em segundos"
+msgstr "Tiempo límite para conexión SMTP en segundos"
+
+msgid "Intervalo padrão entre verificações em segundos"
+msgstr "Intervalo predeterminado entre verificaciones en segundos"
+
+msgid "Tempo limite padrão para verificações em segundos"
+msgstr "Tiempo límite predeterminado para verificaciones en segundos"
+
+msgid "Número máximo de tentativas antes de marcar como falha"
+msgstr "Número máximo de reintentos antes de marcar como fallo"
+
+msgid "Resolver automaticamente incidentes quando monitor volta online"
+msgstr "Resolver automáticamente incidentes cuando el monitor vuelve a estar en línea"
+
+msgid "Intervalo entre execuções do comando de verificação em minutos"
+msgstr "Intervalo entre ejecuciones del comando de verificación en minutos"
+
+msgid "Tempo máximo de execução de uma verificação em segundos"
+msgstr "Tiempo máximo de ejecución de una verificación en segundos"
+
+msgid "Enviar email quando um novo incidente é criado"
+msgstr "Enviar email cuando se crea un nuevo incidente"
+
+msgid "Enviar email quando um incidente é resolvido"
+msgstr "Enviar email cuando un incidente es resuelto"
+
+msgid "Enviar email quando um monitor fica offline"
+msgstr "Enviar email cuando un monitor queda fuera de línea"
+
+msgid "Enviar email quando um monitor volta online"
+msgstr "Enviar email cuando un monitor vuelve en línea"
+
+msgid "Intervalo mínimo em minutos entre alertas do mesmo monitor"
+msgstr "Intervalo mínimo en minutos entre alertas del mismo monitor"
+
+# Términos SMTP (etiquetas)
+msgid "Host"
+msgstr "Host"
+
+msgid "Port"
+msgstr "Puerto"
+
+msgid "Username"
+msgstr "Usuario"
+
+msgid "Password"
+msgstr "Contraseña"
+
+msgid "Encryption"
+msgstr "Cifrado"
+
+msgid "Timeout"
+msgstr "Tiempo de espera"
+
+msgid "segundos"
+msgstr "segundos"
+
+msgid "Nenhuma"
+msgstr "Ninguna"
+
+msgid "Tipo de criptografia SMTP (TLS, SSL ou nenhuma)"
+msgstr "Tipo de cifrado SMTP (TLS, SSL o ninguno)"
+
+# Test Email Section
+msgid "Testar Configurações de Email"
+msgstr "Probar Configuraciones de Correo"
+
+msgid "Email de Destino"
+msgstr "Correo de Destino"
+
+msgid "Digite o email para receber o teste"
+msgstr "Ingrese correo para recibir la prueba"
+
+msgid "Digite o endereço de email onde deseja receber o email de teste."
+msgstr "Ingrese la dirección de correo donde desea recibir el correo de prueba."
+
+msgid "Enviar Email de Teste"
+msgstr "Enviar Correo de Prueba"
+
+# Alert Settings
+msgid "Habilitar Alertas por Email"
+msgstr "Habilitar Alertas por Correo"
+
+msgid "Habilitar Alertas por WhatsApp"
+msgstr "Habilitar Alertas por WhatsApp"
+
+msgid "Habilitar Alertas por Telegram"
+msgstr "Habilitar Alertas por Telegram"
+
+msgid "Habilitar Alertas por SMS"
+msgstr "Habilitar Alertas por SMS"
+
+msgid "Ativar envio de alertas por email para assinantes"
+msgstr "Activar envío de alertas por correo a suscriptores"
+
+msgid "Ativar envio de alertas via WhatsApp (funcionalidade futura)"
+msgstr "Activar envío de alertas vía WhatsApp (funcionalidad futura)"
+
+msgid "Ativar envio de alertas via Telegram (funcionalidade futura)"
+msgstr "Activar envío de alertas vía Telegram (funcionalidad futura)"
+
+msgid "Ativar envio de alertas via SMS (funcionalidade futura)"
+msgstr "Activar envío de alertas vía SMS (funcionalidad futura)"
+
+# Logo Settings
+msgid "URL da Logo Personalizada"
+msgstr "URL del Logo Personalizado"
+
+msgid "URL completa da imagem da logo (PNG, JPG, SVG). Deixe vazio para usar o logo padrão."
+msgstr "URL completa de la imagen del logo (PNG, JPG, SVG). Dejar vacío para usar el logo predeterminado."

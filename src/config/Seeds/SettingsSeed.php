@@ -37,6 +37,13 @@ class SettingsSeed extends AbstractSeed
                 'modified' => $now,
             ],
             [
+                'key' => 'site_logo_url',
+                'value' => '',
+                'type' => 'string',
+                'description' => 'URL of custom logo displayed on status page',
+                'modified' => $now,
+            ],
+            [
                 'key' => 'status_page_title',
                 'value' => 'System Status',
                 'type' => 'string',
@@ -55,6 +62,13 @@ class SettingsSeed extends AbstractSeed
                 'value' => '30',
                 'type' => 'integer',
                 'description' => 'Cache duration for status page in seconds',
+                'modified' => $now,
+            ],
+            [
+                'key' => 'support_email',
+                'value' => 'support@example.com',
+                'type' => 'string',
+                'description' => 'Support email displayed on public status page',
                 'modified' => $now,
             ],
 
@@ -102,10 +116,10 @@ class SettingsSeed extends AbstractSeed
                 'modified' => $now,
             ],
             [
-                'key' => 'smtp_tls',
-                'value' => 'true',
-                'type' => 'boolean',
-                'description' => 'Use TLS for SMTP',
+                'key' => 'smtp_encryption',
+                'value' => 'tls',
+                'type' => 'string',
+                'description' => 'SMTP encryption type (TLS, SSL or none)',
                 'modified' => $now,
             ],
 

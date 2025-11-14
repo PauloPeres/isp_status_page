@@ -96,7 +96,7 @@ class AlertLogsTable extends Table
                 AlertRule::CHANNEL_TELEGRAM,
                 AlertRule::CHANNEL_SMS,
                 AlertRule::CHANNEL_PHONE,
-            ], 'Invalid alert channel');
+            ], __('Invalid alert channel'));
 
         $validator
             ->scalar('recipient')
@@ -113,7 +113,7 @@ class AlertLogsTable extends Table
                 AlertLog::STATUS_SENT,
                 AlertLog::STATUS_FAILED,
                 AlertLog::STATUS_QUEUED,
-            ], 'Invalid alert log status');
+            ], __('Invalid alert log status'));
 
         $validator
             ->dateTime('sent_at')
