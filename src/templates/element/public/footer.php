@@ -35,12 +35,6 @@ $supportEmail = $supportEmail ?? 'support@example.com';
                             ['controller' => 'Status', 'action' => 'history']
                         ) ?>
                     </li>
-                    <li>
-                        <?= $this->Html->link(
-                            __('Assinar Notificações'),
-                            ['controller' => 'Subscribers', 'action' => 'subscribe']
-                        ) ?>
-                    </li>
                 </ul>
             </div>
 
