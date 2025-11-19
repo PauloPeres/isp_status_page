@@ -224,3 +224,38 @@ msgstr "Usuário excluído com sucesso."
 
 msgid "Não foi possível excluir o usuário. Tente novamente."
 msgstr "Não foi possível excluir o usuário. Tente novamente."
+
+#: Users - Login com Email ou Username
+msgid "Username or Email"
+msgstr "Usuário ou Email"
+
+msgid "Enter your username or email"
+msgstr "Digite seu usuário ou email"
+
+#: Users - Invite Options
+msgid "Invite Options"
+msgstr "Opções de Convite"
+
+msgid "Configure automatic password generation and email invitation"
+msgstr "Configure geração automática de senha e envio de convite por email"
+
+msgid "Generate password automatically"
+msgstr "Gerar senha automaticamente"
+
+msgid "A secure random password will be generated for this user"
+msgstr "Uma senha aleatória segura será gerada para este usuário"
+
+msgid "Send invitation email"
+msgstr "Enviar email de convite"
+
+msgid "User will receive credentials and login instructions by email"
+msgstr "Usuário receberá credenciais e instruções de login por email"
+
+msgid "Email de convite enviado com sucesso."
+msgstr "Email de convite enviado com sucesso."
+
+msgid "Usuário criado, mas houve erro ao enviar o email de convite: "
+msgstr "Usuário criado, mas houve erro ao enviar o email de convite: "
+
+msgid "A senha é obrigatória."
+msgstr "A senha é obrigatória."

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><?= __d('users', 'Login') ?> - ISP Status</title>
+    <title><?= __('Alterar Senha') ?> - ISP Status</title>
     <style>
         :root {
             /* Cores Primárias */
@@ -48,7 +48,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+            background: linear-gradient(135deg, var(--color-warning) 0%, #F9A825 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -61,7 +61,7 @@
             border-radius: var(--radius-xl);
             box-shadow: var(--shadow-lg);
             width: 100%;
-            max-width: 420px;
+            max-width: 480px;
             padding: 50px 40px;
         }
 
@@ -91,6 +91,22 @@
             font-size: 15px;
             text-align: center;
             margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .warning-banner {
+            background: #FFF3CD;
+            border-left: 4px solid var(--color-warning);
+            padding: 16px;
+            border-radius: var(--radius-md);
+            margin-bottom: 30px;
+        }
+
+        .warning-banner p {
+            margin: 0;
+            color: #856404;
+            font-size: 14px;
+            line-height: 1.5;
         }
 
         .input-group {
@@ -118,8 +134,8 @@
 
         input:focus {
             outline: none;
-            border-color: var(--color-primary);
-            box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.1);
+            border-color: var(--color-warning);
+            box-shadow: 0 0 0 3px rgba(253, 216, 53, 0.1);
         }
 
         input::placeholder {
@@ -129,8 +145,8 @@
         .btn {
             width: 100%;
             padding: 16px;
-            background: var(--color-primary);
-            color: var(--color-white);
+            background: var(--color-warning);
+            color: var(--color-dark);
             border: none;
             border-radius: var(--radius-lg);
             font-size: 16px;
@@ -138,37 +154,17 @@
             cursor: pointer;
             transition: all 0.3s ease;
             margin-top: 8px;
-            box-shadow: 0 4px 12px rgba(30, 136, 229, 0.3);
+            box-shadow: 0 4px 12px rgba(253, 216, 53, 0.3);
         }
 
         .btn:hover {
-            background: var(--color-primary-hover);
+            background: #F9A825;
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(30, 136, 229, 0.4);
+            box-shadow: 0 6px 16px rgba(253, 216, 53, 0.4);
         }
 
         .btn:active {
             transform: translateY(0);
-        }
-
-        .alert {
-            padding: 14px 18px;
-            border-radius: var(--radius-md);
-            margin-bottom: 20px;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        .alert-error {
-            background: #FFEBEE;
-            color: #C62828;
-            border-left: 4px solid var(--color-error);
-        }
-
-        .alert-success {
-            background: #E8F5E9;
-            color: #2E7D32;
-            border-left: 4px solid var(--color-success);
         }
 
         /* CakePHP Flash Messages */
@@ -198,43 +194,22 @@
             border-left: 4px solid var(--color-warning);
         }
 
-        .message.info {
-            background: #E3F2FD;
-            color: #1565C0;
-            border-left: 4px solid var(--color-primary);
-        }
-
-        .footer {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid var(--color-gray-light);
-            text-align: center;
-        }
-
-        .credentials {
-            display: inline-block;
+        .password-requirements {
+            margin-top: 12px;
+            padding: 12px;
             background: var(--color-gray-light);
-            padding: 10px 16px;
             border-radius: var(--radius-md);
             font-size: 13px;
             color: var(--color-gray-medium);
-            font-family: 'Courier New', monospace;
         }
 
-        .forgot-password {
-            display: block;
-            text-align: center;
-            margin-top: 16px;
-            color: var(--color-primary);
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            transition: color 0.3s ease;
+        .password-requirements ul {
+            margin: 8px 0 0 0;
+            padding-left: 20px;
         }
 
-        .forgot-password:hover {
-            color: var(--color-primary-hover);
-            text-decoration: underline;
+        .password-requirements li {
+            margin: 4px 0;
         }
 
         @media (max-width: 480px) {
@@ -252,66 +227,77 @@
     <div class="login-box">
         <div class="logo-container">
             <img src="/img/icon_isp_status_page.png" alt="ISP Status" class="logo">
-            <h1>ISP Status</h1>
-            <p class="subtitle"><?= __d('users', 'Sign in to your account') ?></p>
+            <h1>⚠️ Alterar Senha</h1>
+            <p class="subtitle">
+                <?= __('Por segurança, você deve alterar sua senha antes de continuar.') ?>
+            </p>
         </div>
 
-        <?php
-        // Show flash messages
-        echo $this->Flash->render();
+        <div class="warning-banner">
+            <p>
+                <strong>🔒 Troca Obrigatória:</strong>
+                Esta é sua primeira vez acessando o sistema ou você está usando uma senha temporária.
+                Por favor, defina uma nova senha segura.
+            </p>
+        </div>
 
-        // Show login error if authentication failed
-        if (isset($result) && $result !== null && $this->request->is('post') && !$result->isValid()):
-        ?>
-            <div class="alert alert-error">
-                ⚠️ <?= __d('users', 'Invalid username or password. Please try again.') ?>
-            </div>
-        <?php endif; ?>
+        <?= $this->Flash->render() ?>
 
-        <form method="post" action="/users/login">
+        <form method="post" action="<?= $this->Url->build(['controller' => 'Users', 'action' => 'changePassword']) ?>">
             <?php if (isset($this->request)): ?>
                 <input type="hidden" name="_csrfToken" value="<?= $this->request->getAttribute('csrfToken') ?>">
             <?php endif; ?>
 
             <div class="input-group">
-                <label for="username"><?= __d('users', 'Username or Email') ?></label>
-                <input
-                    type="text"
-                    id="username"
-                    name="username"
-                    placeholder="<?= __d('users', 'Enter your username or email') ?>"
-                    required
-                    autofocus
-                    autocomplete="username"
-                >
-            </div>
-
-            <div class="input-group">
-                <label for="password"><?= __('Password') ?></label>
+                <label for="current_password"><?= __('Senha Atual') ?></label>
                 <input
                     type="password"
-                    id="password"
-                    name="password"
-                    placeholder="<?= __d('users', 'Enter your password') ?>"
+                    id="current_password"
+                    name="current_password"
+                    placeholder="<?= __('Digite sua senha atual') ?>"
                     required
+                    autofocus
                     autocomplete="current-password"
                 >
             </div>
 
-            <button type="submit" class="btn"><?= __d('users', 'Sign In') ?></button>
-        </form>
-
-        <a href="<?= $this->Url->build(['controller' => 'Users', 'action' => 'forgotPassword']) ?>" class="forgot-password">
-            <?= __('Esqueci minha senha') ?>
-        </a>
-
-        <?php if (!isset($hasUserWithChangedPassword) || !$hasUserWithChangedPassword): ?>
-        <div class="footer">
-            <div class="credentials">
-                admin / admin123
+            <div class="input-group">
+                <label for="new_password"><?= __('Nova Senha') ?></label>
+                <input
+                    type="password"
+                    id="new_password"
+                    name="new_password"
+                    placeholder="<?= __('Digite sua nova senha') ?>"
+                    required
+                    autocomplete="new-password"
+                    minlength="8"
+                >
             </div>
-        </div>
-        <?php endif; ?>
+
+            <div class="input-group">
+                <label for="confirm_password"><?= __('Confirmar Nova Senha') ?></label>
+                <input
+                    type="password"
+                    id="confirm_password"
+                    name="confirm_password"
+                    placeholder="<?= __('Digite novamente sua nova senha') ?>"
+                    required
+                    autocomplete="new-password"
+                    minlength="8"
+                >
+            </div>
+
+            <div class="password-requirements">
+                <strong><?= __('Requisitos da senha:') ?></strong>
+                <ul>
+                    <li><?= __('Mínimo de 8 caracteres') ?></li>
+                    <li><?= __('Deve ser diferente da senha atual') ?></li>
+                    <li><?= __('As senhas devem ser idênticas') ?></li>
+                </ul>
+            </div>
+
+            <button type="submit" class="btn"><?= __('Alterar Senha') ?></button>
+        </form>
     </div>
 </body>
 </html>

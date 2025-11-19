@@ -224,3 +224,38 @@ msgstr "Usuario eliminado exitosamente."
 
 msgid "Não foi possível excluir o usuário. Tente novamente."
 msgstr "No se pudo eliminar el usuario. Intente nuevamente."
+
+#: Users - Login com Email ou Username
+msgid "Username or Email"
+msgstr "Usuario o Email"
+
+msgid "Enter your username or email"
+msgstr "Ingrese su usuario o email"
+
+#: Users - Invite Options
+msgid "Invite Options"
+msgstr "Opciones de Invitación"
+
+msgid "Configure automatic password generation and email invitation"
+msgstr "Configure la generación automática de contraseña y envío de invitación por email"
+
+msgid "Generate password automatically"
+msgstr "Generar contraseña automáticamente"
+
+msgid "A secure random password will be generated for this user"
+msgstr "Se generará una contraseña aleatoria segura para este usuario"
+
+msgid "Send invitation email"
+msgstr "Enviar email de invitación"
+
+msgid "User will receive credentials and login instructions by email"
+msgstr "El usuario recibirá credenciales e instrucciones de inicio de sesión por email"
+
+msgid "Email de convite enviado com sucesso."
+msgstr "Email de invitación enviado exitosamente."
+
+msgid "Usuário criado, mas houve erro ao enviar o email de convite: "
+msgstr "Usuario creado, pero hubo un error al enviar el email de invitación: "
+
+msgid "A senha é obrigatória."
+msgstr "La contraseña es obligatoria."

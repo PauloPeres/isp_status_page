@@ -209,23 +209,58 @@ $this->assign('title', __d('users', 'New User'));
                 </div>
             </div>
 
-            <div class="form-row">
+            <div class="form-section">
+                <div class="form-section-title"><?= __d('users', 'Invite Options') ?></div>
+                <div class="form-help"><?= __d('users', 'Configure automatic password generation and email invitation') ?></div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <div class="checkbox-group">
+                            <?= $this->Form->checkbox('generate_password', [
+                                'id' => 'generate-password',
+                                'checked' => false
+                            ]) ?>
+                            <span><?= __d('users', 'Generate password automatically') ?></span>
+                        </div>
+                        <div class="form-help" style="margin-left: 26px;">
+                            <?= __d('users', 'A secure random password will be generated for this user') ?>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="checkbox-group">
+                            <?= $this->Form->checkbox('send_invite', [
+                                'id' => 'send-invite',
+                                'checked' => false
+                            ]) ?>
+                            <span><?= __d('users', 'Send invitation email') ?></span>
+                        </div>
+                        <div class="form-help" style="margin-left: 26px;">
+                            <?= __d('users', 'User will receive credentials and login instructions by email') ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row" id="password-fields">
                 <div class="form-group">
-                    <label><?= __('Password') ?> *</label>
+                    <label><?= __('Password') ?> <span id="password-required">*</span></label>
                     <?= $this->Form->control('password', [
                         'label' => false,
                         'type' => 'password',
-                        'required' => true,
+                        'id' => 'password-input',
+                        'required' => false,
                         'placeholder' => __d('users', 'Minimum 8 characters')
                     ]) ?>
                 </div>
 
                 <div class="form-group">
-                    <label><?= __('Confirm Password') ?> *</label>
+                    <label><?= __('Confirm Password') ?> <span id="confirm-required">*</span></label>
                     <?= $this->Form->control('confirm_password', [
                         'label' => false,
                         'type' => 'password',
-                        'required' => true,
+                        'id' => 'confirm-password-input',
+                        'required' => false,
                         'placeholder' => __d('users', 'Re-enter password')
                     ]) ?>
                 </div>
@@ -269,3 +304,43 @@ $this->assign('title', __d('users', 'New User'));
         <?= $this->Form->end() ?>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const generatePasswordCheckbox = document.getElementById('generate-password');
+    const passwordFields = document.getElementById('password-fields');
+    const passwordInput = document.getElementById('password-input');
+    const confirmPasswordInput = document.getElementById('confirm-password-input');
+    const passwordRequired = document.getElementById('password-required');
+    const confirmRequired = document.getElementById('confirm-required');
+
+    function togglePasswordFields() {
+        if (generatePasswordCheckbox.checked) {
+            // Disable and hide password fields
+            passwordFields.style.opacity = '0.5';
+            passwordInput.disabled = true;
+            passwordInput.required = false;
+            confirmPasswordInput.disabled = true;
+            confirmPasswordInput.required = false;
+            passwordInput.value = '';
+            confirmPasswordInput.value = '';
+            passwordRequired.style.display = 'none';
+            confirmRequired.style.display = 'none';
+        } else {
+            // Enable and show password fields
+            passwordFields.style.opacity = '1';
+            passwordInput.disabled = false;
+            passwordInput.required = true;
+            confirmPasswordInput.disabled = false;
+            confirmPasswordInput.required = true;
+            passwordRequired.style.display = 'inline';
+            confirmRequired.style.display = 'inline';
+        }
+    }
+
+    generatePasswordCheckbox.addEventListener('change', togglePasswordFields);
+
+    // Initialize on page load
+    togglePasswordFields();
+});
+</script>

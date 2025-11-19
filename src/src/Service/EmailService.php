@@ -217,6 +217,144 @@ class EmailService
     }
 
     /**
+     * Send password reset email
+     *
+     * @param object $user User entity with email property
+     * @param string $resetLink Full URL to reset password page
+     * @return array Result with 'success' (bool), 'message' (string), and optional 'technical_error'
+     */
+    public function sendPasswordReset($user, string $resetLink): array
+    {
+        try {
+            $mailer = new Mailer();
+            $this->configureSMTP($mailer);
+
+            // Get site settings
+            $siteName = $this->settingService->get('site_name', 'ISP Status');
+            $fromEmail = $this->settingService->get('email_from', 'noreply@localhost');
+            $fromName = $this->settingService->get('email_from_name', $siteName);
+
+            $mailer
+                ->setEmailFormat('html')
+                ->setFrom([$fromEmail => $fromName])
+                ->setTo($user->email)
+                ->setSubject("Recuperação de Senha - {$siteName}")
+                ->setViewVars([
+                    'user' => $user,
+                    'resetLink' => $resetLink,
+                    'siteName' => $siteName,
+                ])
+                ->viewBuilder()
+                    ->setTemplate('password_reset')
+                    ->setLayout('default'); // Use default email layout
+
+            $mailer->deliver();
+
+            // Log success
+            error_log("Password reset email sent successfully to {$user->email}");
+
+            return [
+                'success' => true,
+                'message' => 'Email de recuperação enviado com sucesso.',
+            ];
+        } catch (\Exception $e) {
+            $errorMessage = $e->getMessage();
+
+            // Log detailed error
+            error_log("Failed to send password reset email to {$user->email}: {$errorMessage}");
+
+            // Determine user-friendly error message based on exception
+            if (stripos($errorMessage, 'connection') !== false || stripos($errorMessage, 'could not connect') !== false) {
+                $userMessage = '❌ Não foi possível conectar ao servidor de email. Verifique as configurações SMTP.';
+            } elseif (stripos($errorMessage, 'authentication') !== false || stripos($errorMessage, 'auth') !== false) {
+                $userMessage = '❌ Falha na autenticação SMTP. Verifique usuário e senha nas configurações.';
+            } elseif (stripos($errorMessage, 'timeout') !== false) {
+                $userMessage = '❌ Timeout ao conectar ao servidor de email. Verifique host e porta nas configurações.';
+            } elseif (stripos($errorMessage, 'tls') !== false || stripos($errorMessage, 'ssl') !== false) {
+                $userMessage = '❌ Erro na criptografia TLS/SSL. Verifique as configurações de segurança.';
+            } else {
+                $userMessage = '❌ Erro ao enviar email. Verifique as configurações ou tente novamente mais tarde.';
+            }
+
+            return [
+                'success' => false,
+                'message' => $userMessage,
+                'technical_error' => $errorMessage,
+            ];
+        }
+    }
+
+    /**
+     * Send user invitation email with credentials
+     *
+     * @param object $user User entity with email, username, and role properties
+     * @param string $password Generated password for the user
+     * @param string $loginUrl Full URL to login page
+     * @return array Result with 'success' (bool), 'message' (string), and optional 'technical_error'
+     */
+    public function sendUserInvite($user, string $password, string $loginUrl): array
+    {
+        try {
+            $mailer = new Mailer();
+            $this->configureSMTP($mailer);
+
+            // Get site settings
+            $siteName = $this->settingService->get('site_name', 'ISP Status');
+            $fromEmail = $this->settingService->get('email_from', 'noreply@localhost');
+            $fromName = $this->settingService->get('email_from_name', $siteName);
+
+            $mailer
+                ->setEmailFormat('html')
+                ->setFrom([$fromEmail => $fromName])
+                ->setTo($user->email)
+                ->setSubject("🎉 Convite de Acesso - {$siteName}")
+                ->setViewVars([
+                    'user' => $user,
+                    'password' => $password,
+                    'loginUrl' => $loginUrl,
+                    'siteName' => $siteName,
+                ])
+                ->viewBuilder()
+                    ->setTemplate('user_invite')
+                    ->setLayout('default'); // Use default email layout
+
+            $mailer->deliver();
+
+            // Log success
+            error_log("User invitation email sent successfully to {$user->email}");
+
+            return [
+                'success' => true,
+                'message' => 'Email de convite enviado com sucesso.',
+            ];
+        } catch (\Exception $e) {
+            $errorMessage = $e->getMessage();
+
+            // Log detailed error
+            error_log("Failed to send user invitation email to {$user->email}: {$errorMessage}");
+
+            // Determine user-friendly error message based on exception
+            if (stripos($errorMessage, 'connection') !== false || stripos($errorMessage, 'could not connect') !== false) {
+                $userMessage = '❌ Não foi possível conectar ao servidor de email. Verifique as configurações SMTP.';
+            } elseif (stripos($errorMessage, 'authentication') !== false || stripos($errorMessage, 'auth') !== false) {
+                $userMessage = '❌ Falha na autenticação SMTP. Verifique usuário e senha nas configurações.';
+            } elseif (stripos($errorMessage, 'timeout') !== false) {
+                $userMessage = '❌ Timeout ao conectar ao servidor de email. Verifique host e porta nas configurações.';
+            } elseif (stripos($errorMessage, 'tls') !== false || stripos($errorMessage, 'ssl') !== false) {
+                $userMessage = '❌ Erro na criptografia TLS/SSL. Verifique as configurações de segurança.';
+            } else {
+                $userMessage = '❌ Erro ao enviar email. Verifique as configurações ou tente novamente mais tarde.';
+            }
+
+            return [
+                'success' => false,
+                'message' => $userMessage,
+                'technical_error' => $errorMessage,
+            ];
+        }
+    }
+
+    /**
      * Test email configuration by sending a test email
      *
      * @param string $toEmail Email address to send test to

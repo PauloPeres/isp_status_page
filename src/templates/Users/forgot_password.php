@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><?= __d('users', 'Login') ?> - ISP Status</title>
+    <title><?= __('Recuperar Senha') ?> - ISP Status</title>
     <style>
         :root {
             /* Cores Primárias */
@@ -91,6 +91,7 @@
             font-size: 15px;
             text-align: center;
             margin-bottom: 40px;
+            line-height: 1.6;
         }
 
         .input-group {
@@ -204,27 +205,10 @@
             border-left: 4px solid var(--color-primary);
         }
 
-        .footer {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid var(--color-gray-light);
-            text-align: center;
-        }
-
-        .credentials {
-            display: inline-block;
-            background: var(--color-gray-light);
-            padding: 10px 16px;
-            border-radius: var(--radius-md);
-            font-size: 13px;
-            color: var(--color-gray-medium);
-            font-family: 'Courier New', monospace;
-        }
-
-        .forgot-password {
+        .back-link {
             display: block;
             text-align: center;
-            margin-top: 16px;
+            margin-top: 20px;
             color: var(--color-primary);
             text-decoration: none;
             font-size: 14px;
@@ -232,7 +216,7 @@
             transition: color 0.3s ease;
         }
 
-        .forgot-password:hover {
+        .back-link:hover {
             color: var(--color-primary-hover);
             text-decoration: underline;
         }
@@ -252,66 +236,38 @@
     <div class="login-box">
         <div class="logo-container">
             <img src="/img/icon_isp_status_page.png" alt="ISP Status" class="logo">
-            <h1>ISP Status</h1>
-            <p class="subtitle"><?= __d('users', 'Sign in to your account') ?></p>
+            <h1><?= __('Recuperar Senha') ?></h1>
+            <p class="subtitle">
+                <?= __('Informe seu email e enviaremos um link para redefinir sua senha.') ?>
+            </p>
         </div>
 
-        <?php
-        // Show flash messages
-        echo $this->Flash->render();
+        <?= $this->Flash->render() ?>
 
-        // Show login error if authentication failed
-        if (isset($result) && $result !== null && $this->request->is('post') && !$result->isValid()):
-        ?>
-            <div class="alert alert-error">
-                ⚠️ <?= __d('users', 'Invalid username or password. Please try again.') ?>
-            </div>
-        <?php endif; ?>
-
-        <form method="post" action="/users/login">
+        <form method="post" action="<?= $this->Url->build(['controller' => 'Users', 'action' => 'forgotPassword']) ?>">
             <?php if (isset($this->request)): ?>
                 <input type="hidden" name="_csrfToken" value="<?= $this->request->getAttribute('csrfToken') ?>">
             <?php endif; ?>
 
             <div class="input-group">
-                <label for="username"><?= __d('users', 'Username or Email') ?></label>
+                <label for="email"><?= __('Email') ?></label>
                 <input
-                    type="text"
-                    id="username"
-                    name="username"
-                    placeholder="<?= __d('users', 'Enter your username or email') ?>"
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="<?= __('Digite seu email cadastrado') ?>"
                     required
                     autofocus
-                    autocomplete="username"
+                    autocomplete="email"
                 >
             </div>
 
-            <div class="input-group">
-                <label for="password"><?= __('Password') ?></label>
-                <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    placeholder="<?= __d('users', 'Enter your password') ?>"
-                    required
-                    autocomplete="current-password"
-                >
-            </div>
-
-            <button type="submit" class="btn"><?= __d('users', 'Sign In') ?></button>
+            <button type="submit" class="btn"><?= __('Enviar Link de Recuperação') ?></button>
         </form>
 
-        <a href="<?= $this->Url->build(['controller' => 'Users', 'action' => 'forgotPassword']) ?>" class="forgot-password">
-            <?= __('Esqueci minha senha') ?>
+        <a href="<?= $this->Url->build(['controller' => 'Users', 'action' => 'login']) ?>" class="back-link">
+            ← <?= __('Voltar para o login') ?>
         </a>
-
-        <?php if (!isset($hasUserWithChangedPassword) || !$hasUserWithChangedPassword): ?>
-        <div class="footer">
-            <div class="credentials">
-                admin / admin123
-            </div>
-        </div>
-        <?php endif; ?>
     </div>
 </body>
 </html>

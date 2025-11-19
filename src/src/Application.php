@@ -127,17 +127,33 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
             'queryParam' => 'redirect',
         ]);
 
-        // Load identifiers
-        $service->loadIdentifier('Authentication.Password', [
-            'fields' => [
-                'username' => 'username',
-                'password' => 'password',
-            ],
-            'resolver' => [
-                'className' => 'Authentication.Orm',
-                'userModel' => 'Users',
-                'finder' => 'auth',
-            ],
+        // Load identifiers - Accept username OR email for login
+        $service->loadIdentifier('Authentication.Callback', [
+            'callback' => function ($data) {
+                $usersTable = FactoryLocator::get('Table')->get('Users');
+
+                // Try to find user by username or email
+                $user = $usersTable->find('auth')
+                    ->where([
+                        'OR' => [
+                            'username' => $data['username'],
+                            'email' => $data['username'],
+                        ]
+                    ])
+                    ->first();
+
+                if (!$user) {
+                    return null;
+                }
+
+                // Verify password
+                $hasher = new \Authentication\PasswordHasher\DefaultPasswordHasher();
+                if ($hasher->check($data['password'], $user->password)) {
+                    return $user;
+                }
+
+                return null;
+            }
         ]);
 
         // Load authenticators

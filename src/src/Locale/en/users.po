@@ -224,3 +224,38 @@ msgstr "User deleted successfully."
 
 msgid "Não foi possível excluir o usuário. Tente novamente."
 msgstr "Could not delete user. Please try again."
+
+#: Users - Login com Email ou Username
+msgid "Username or Email"
+msgstr "Username or Email"
+
+msgid "Enter your username or email"
+msgstr "Enter your username or email"
+
+#: Users - Invite Options
+msgid "Invite Options"
+msgstr "Invite Options"
+
+msgid "Configure automatic password generation and email invitation"
+msgstr "Configure automatic password generation and email invitation"
+
+msgid "Generate password automatically"
+msgstr "Generate password automatically"
+
+msgid "A secure random password will be generated for this user"
+msgstr "A secure random password will be generated for this user"
+
+msgid "Send invitation email"
+msgstr "Send invitation email"
+
+msgid "User will receive credentials and login instructions by email"
+msgstr "User will receive credentials and login instructions by email"
+
+msgid "Email de convite enviado com sucesso."
+msgstr "Invitation email sent successfully."
+
+msgid "Usuário criado, mas houve erro ao enviar o email de convite: "
+msgstr "User created, but there was an error sending the invitation email: "
+
+msgid "A senha é obrigatória."
+msgstr "Password is required."
