@@ -132,3 +132,404 @@ msgstr "Monitor {$status} exitosamente."
 
 msgid "Não foi possível alterar o status do monitor."
 msgstr "No fue posible cambiar el estado del monitor."
+
+#: Monitors - Form Common
+msgid "Basic Information"
+msgstr "Información Básica"
+
+msgid "e.g. Main Website"
+msgstr "ej. Sitio Web Principal"
+
+msgid "Brief description of what is being monitored"
+msgstr "Breve descripción de lo que se está monitoreando"
+
+msgid "Port (TCP/UDP)"
+msgstr "Puerto (TCP/UDP)"
+
+msgid "Active"
+msgstr "Activo"
+
+msgid "Configure a new service for monitoring"
+msgstr "Configure un nuevo servicio para monitoreo"
+
+msgid "Target Configuration"
+msgstr "Configuración del Objetivo"
+
+msgid "Configuration depends on selected monitor type"
+msgstr "La configuración depende del tipo de monitor seleccionado"
+
+msgid "Check Settings"
+msgstr "Configuración de Verificación"
+
+msgid "Interval (seconds)"
+msgstr "Intervalo (segundos)"
+
+msgid "Check frequency (minimum 10s)"
+msgstr "Frecuencia de verificación (mínimo 10s)"
+
+msgid "Timeout (seconds)"
+msgstr "Tiempo de espera (segundos)"
+
+msgid "Maximum wait time"
+msgstr "Tiempo máximo de espera"
+
+msgid "Save Monitor"
+msgstr "Guardar Monitor"
+
+msgid "Save Changes"
+msgstr "Guardar Cambios"
+
+#: Monitors - HTTP Configuration
+msgid "HTTP/HTTPS Configuration"
+msgstr "Configuración HTTP/HTTPS"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Full URL including protocol (http:// or https://)"
+msgstr "URL completa incluyendo protocolo (http:// o https://)"
+
+msgid "HTTP Method"
+msgstr "Método HTTP"
+
+msgid "Expected HTTP Code"
+msgstr "Código HTTP Esperado"
+
+msgid "200 = OK, 301 = Redirect, etc"
+msgstr "200 = OK, 301 = Redirección, etc"
+
+msgid "Expected HTTP Status Code"
+msgstr "Código de Estado HTTP Esperado"
+
+msgid "Expected HTTP status code (e.g. 200=OK, 301=Redirect, 404=Not Found)"
+msgstr "Código de estado HTTP esperado (ej. 200=OK, 301=Redirección, 404=No Encontrado)"
+
+msgid "Custom Headers"
+msgstr "Encabezados Personalizados"
+
+msgid "Custom HTTP headers in JSON format (optional)"
+msgstr "Encabezados HTTP personalizados en formato JSON (opcional)"
+
+msgid "Leave empty for no custom headers"
+msgstr "Dejar vacío para no usar encabezados personalizados"
+
+msgid "Request Body"
+msgstr "Cuerpo de la Solicitud"
+
+msgid "Request body for POST/PUT/PATCH (optional)"
+msgstr "Cuerpo de la solicitud para POST/PUT/PATCH (opcional)"
+
+msgid "Only used for POST, PUT, PATCH methods"
+msgstr "Solo se usa para métodos POST, PUT, PATCH"
+
+msgid "Verify SSL Certificate"
+msgstr "Verificar Certificado SSL"
+
+msgid "Disable for self-signed certificates"
+msgstr "Desactive para certificados autofirmados"
+
+msgid "Follow Redirects"
+msgstr "Seguir Redirecciones"
+
+msgid "Follow HTTP 3xx redirects automatically"
+msgstr "Seguir redirecciones HTTP 3xx automáticamente"
+
+msgid "Expected Content"
+msgstr "Contenido Esperado"
+
+msgid "Text to search in response (optional)"
+msgstr "Texto para buscar en la respuesta (opcional)"
+
+msgid "Check will fail if this text is not found in response body"
+msgstr "La verificación fallará si este texto no se encuentra en el cuerpo de la respuesta"
+
+#: Monitors - Ping Configuration
+msgid "Ping (ICMP) Configuration"
+msgstr "Configuración Ping (ICMP)"
+
+msgid "Host or IP Address"
+msgstr "Host o Dirección IP"
+
+msgid "Hostname or IP address to ping"
+msgstr "Nombre de host o dirección IP para hacer ping"
+
+msgid "Packet Count"
+msgstr "Cantidad de Paquetes"
+
+msgid "Number of ping packets to send (1-10)"
+msgstr "Número de paquetes ping a enviar (1-10)"
+
+msgid "Max Packet Loss (%)"
+msgstr "Pérdida Máxima de Paquetes (%)"
+
+msgid "Alert if packet loss exceeds this percentage"
+msgstr "Alertar si la pérdida de paquetes excede este porcentaje"
+
+msgid "Max Latency (ms)"
+msgstr "Latencia Máxima (ms)"
+
+msgid "Alert if average latency exceeds this value (in milliseconds)"
+msgstr "Alertar si la latencia promedio excede este valor (en milisegundos)"
+
+msgid "Note"
+msgstr "Nota"
+
+msgid "ICMP ping requires appropriate system permissions"
+msgstr "Ping ICMP requiere permisos apropiados del sistema"
+
+msgid "Some firewalls may block ICMP packets"
+msgstr "Algunos firewalls pueden bloquear paquetes ICMP"
+
+msgid "Average latency is calculated from all packets"
+msgstr "La latencia promedio se calcula de todos los paquetes"
+
+#: Monitors - Port Configuration
+msgid "Port (TCP/UDP) Configuration"
+msgstr "Configuración de Puerto (TCP/UDP)"
+
+msgid "Hostname or IP address to connect"
+msgstr "Nombre de host o dirección IP para conectar"
+
+msgid "Port Number"
+msgstr "Número de Puerto"
+
+msgid "TCP/UDP port (1-65535)"
+msgstr "Puerto TCP/UDP (1-65535)"
+
+msgid "Protocol"
+msgstr "Protocolo"
+
+msgid "Connection protocol"
+msgstr "Protocolo de conexión"
+
+msgid "Send Data (optional)"
+msgstr "Enviar Datos (opcional)"
+
+msgid "Data to send after connection (optional)"
+msgstr "Datos a enviar después de la conexión (opcional)"
+
+msgid "Useful for testing application protocols"
+msgstr "Útil para probar protocolos de aplicación"
+
+msgid "Expected Response (optional)"
+msgstr "Respuesta Esperada (opcional)"
+
+msgid "Text to search in response"
+msgstr "Texto para buscar en la respuesta"
+
+msgid "Check will fail if this text is not found in server response"
+msgstr "La verificación fallará si este texto no se encuentra en la respuesta del servidor"
+
+msgid "Common Ports"
+msgstr "Puertos Comunes"
+
+#: Monitors - System Info
+msgid "System Information"
+msgstr "Información del Sistema"
+
+msgid "Current Status"
+msgstr "Estado Actual"
+
+msgid "Never"
+msgstr "Nunca"
+
+msgid "Update monitor settings: {0}"
+msgstr "Actualizar configuración del monitor: {0}"
+
+msgid "Are you sure you want to delete this monitor? This action cannot be undone."
+msgstr "¿Está seguro de que desea eliminar este monitor? Esta acción no se puede deshacer."
+
+#: Monitors - Tooltips
+msgid "tooltip.monitor_name"
+msgstr "Nombre único para identificar este monitor en el sistema. Use un nombre descriptivo que facilite la identificación."
+
+msgid "tooltip.monitor_type"
+msgstr "Tipo de verificación a realizar: HTTP/HTTPS para sitios web, Ping para conectividad, o Port para puertos TCP/UDP específicos."
+
+msgid "tooltip.check_interval"
+msgstr "Intervalo en segundos entre cada verificación. Valores menores significan verificaciones más frecuentes pero mayor uso de recursos. Mínimo: 10 segundos."
+
+msgid "tooltip.timeout"
+msgstr "Tiempo máximo en segundos para esperar respuesta antes de considerar la verificación fallida. Debe ser menor que el intervalo de verificación."
+
+msgid "tooltip.retry_count"
+msgstr "Número de reintentos antes de marcar el monitor como fuera de línea. Evita alertas falsas por problemas momentáneos."
+
+msgid "tooltip.active"
+msgstr "Los monitores activos se verifican automáticamente. Desactive para pausar temporalmente sin eliminar."
+
+msgid "tooltip.visible_on_status_page"
+msgstr "Si está activo, este monitor se mostrará en la página pública de estado para sus clientes."
+
+msgid "tooltip.http_url"
+msgstr "URL completa a monitorear, incluyendo protocolo (http:// o https://). Ejemplo: https://ejemplo.com/api/health"
+
+msgid "tooltip.http_method"
+msgstr "Método HTTP para la solicitud. GET es el más común para verificaciones de estado."
+
+msgid "tooltip.http_status_code"
+msgstr "Código HTTP esperado en la respuesta. 200 indica éxito, 301/302 son redirecciones. La verificación falla si el código devuelto difiere."
+
+msgid "tooltip.http_headers"
+msgstr "Encabezados HTTP personalizados en formato JSON. Útil para autenticación o requisitos específicos de API."
+
+msgid "tooltip.http_body"
+msgstr "Datos a enviar en el cuerpo de la solicitud. Solo se usa para métodos POST, PUT y PATCH."
+
+msgid "tooltip.http_verify_ssl"
+msgstr "Verifica la validez del certificado SSL/TLS. Desactive solo para certificados autofirmados en desarrollo."
+
+msgid "tooltip.http_follow_redirects"
+msgstr "Sigue automáticamente redirecciones HTTP (301, 302, etc). Desactive si desea probar la redirección en sí."
+
+msgid "tooltip.http_expected_content"
+msgstr "Texto que debe estar presente en el cuerpo de la respuesta. La verificación falla si no se encuentra este texto, incluso con código HTTP correcto."
+
+msgid "tooltip.ping_host"
+msgstr "Nombre de host o dirección IP para enviar paquetes ICMP. Ejemplo: ejemplo.com o 192.168.1.1"
+
+msgid "tooltip.ping_packet_count"
+msgstr "Número de paquetes ICMP a enviar por verificación. Más paquetes = resultado más preciso, pero verificación más lenta."
+
+msgid "tooltip.ping_packet_loss"
+msgstr "Porcentaje máximo de pérdida de paquetes tolerado. Si la pérdida excede este valor, el monitor se marca como degradado."
+
+msgid "tooltip.ping_latency"
+msgstr "Latencia promedio máxima tolerada en milisegundos. Útil para detectar degradación de rendimiento incluso cuando el host responde."
+
+msgid "tooltip.port_host"
+msgstr "Nombre de host o dirección IP donde se probará el puerto. Ejemplo: ejemplo.com o 192.168.1.1"
+
+msgid "tooltip.port_number"
+msgstr "Número de puerto TCP o UDP a monitorear (1-65535). Ejemplos: 80 (HTTP), 443 (HTTPS), 3306 (MySQL), 5432 (PostgreSQL)."
+
+msgid "tooltip.port_protocol"
+msgstr "Protocolo de transporte: TCP (más común, confiable) o UDP (usado en DNS, streaming, etc)."
+
+msgid "tooltip.port_send_data"
+msgstr "Datos opcionales a enviar después de establecer la conexión. Útil para probar protocolos de aplicación específicos."
+
+msgid "tooltip.port_expected_response"
+msgstr "Texto esperado en la respuesta del servidor. Si se especifica, la verificación solo tiene éxito si se recibe este texto."
+
+#: Settings - Tooltips
+msgid "tooltip.setting_site_name"
+msgstr "Nombre del sitio mostrado en el encabezado y títulos de página. Use el nombre de su empresa o proveedor."
+
+msgid "tooltip.setting_site_url"
+msgstr "URL completa donde está alojado el sistema. Usada para generar enlaces en emails y notificaciones. Ejemplo: https://status.suempresa.com"
+
+msgid "tooltip.setting_status_page_public"
+msgstr "Si está activo, la página de estado será accesible públicamente. Desactive para restringir acceso solo a usuarios autenticados."
+
+msgid "tooltip.setting_status_cache"
+msgstr "Tiempo de caché en segundos para la página pública de estado. Valores mayores reducen carga del servidor pero actualizan información menos frecuentemente."
+
+msgid "tooltip.setting_smtp_host"
+msgstr "Dirección del servidor SMTP para envío de emails. Ejemplo: smtp.gmail.com, smtp.office365.com, o SMTP de su proveedor."
+
+msgid "tooltip.setting_smtp_port"
+msgstr "Puerto del servidor SMTP. Valores comunes: 587 (TLS/STARTTLS), 465 (SSL), 25 (sin cifrado - no recomendado)."
+
+msgid "tooltip.setting_smtp_username"
+msgstr "Nombre de usuario o dirección de email para autenticación en servidor SMTP."
+
+msgid "tooltip.setting_smtp_password"
+msgstr "Contraseña de cuenta de email. Almacenada cifrada en base de datos. Algunos proveedores requieren contraseña de aplicación."
+
+msgid "tooltip.setting_email_from"
+msgstr "Dirección de email que aparecerá como remitente de todas las notificaciones enviadas por el sistema."
+
+msgid "tooltip.setting_email_from_name"
+msgstr "Nombre que aparecerá como remitente de emails. Ejemplo: 'Equipo de Monitoreo', 'Status Page', etc."
+
+msgid "tooltip.setting_default_interval"
+msgstr "Intervalo predeterminado en segundos para nuevos monitores. Puede cambiarse individualmente por monitor. Recomendado: 30-60 segundos."
+
+msgid "tooltip.setting_default_timeout"
+msgstr "Timeout predeterminado en segundos para nuevos monitores. Debe ser menor que el intervalo de verificación. Recomendado: 10-15 segundos."
+
+msgid "tooltip.setting_max_retries"
+msgstr "Número de reintentos antes de considerar un monitor fuera de línea. Previene falsas alarmas. Recomendado: 2-3 reintentos."
+
+msgid "tooltip.setting_auto_resolve"
+msgstr "Si está activo, incidentes se resolverán automáticamente cuando el monitor vuelva a la normalidad. Desactive para requerir resolución manual."
+
+#: Alert Rules - Tooltips
+msgid "tooltip.alert_rule_name"
+msgstr "Nombre descriptivo para esta regla de alerta. Ayuda a identificar rápidamente cuando una alerta se activa."
+
+msgid "tooltip.alert_rule_description"
+msgstr "Descripción detallada de condiciones y propósito de esta regla. Útil para documentación y referencia futura."
+
+msgid "tooltip.alert_rule_trigger"
+msgstr "Cuándo debe dispararse la alerta: cuando monitor queda fuera de línea (down), vuelve en línea (up), se degrada o en cualquier cambio de estado."
+
+msgid "tooltip.alert_rule_channels"
+msgstr "Canales de notificación: Email (siempre disponible), WhatsApp, Telegram o SMS (requieren configuración adicional). Se pueden seleccionar múltiples canales."
+
+msgid "tooltip.alert_rule_recipients"
+msgstr "Lista de destinatarios en formato JSON. Para email: direcciones. Para WhatsApp/Telegram: números/IDs. Ejemplo: ['admin@empresa.com', 'soporte@empresa.com']"
+
+msgid "tooltip.alert_rule_cooldown"
+msgstr "Tiempo mínimo en minutos entre alertas consecutivas de la misma regla. Previene spam de notificaciones. Recomendado: 5-15 minutos."
+
+msgid "tooltip.alert_rule_active"
+msgstr "Reglas activas disparan alertas automáticamente. Desactive temporalmente para mantenimiento sin eliminar la regla."
+
+#: Incidents - Tooltips
+msgid "tooltip.incident_title"
+msgstr "Título descriptivo del incidente. Se mostrará en la página pública de estado y en notificaciones a suscriptores."
+
+msgid "tooltip.incident_message"
+msgstr "Descripción detallada del incidente, incluyendo causa, impacto y acciones tomadas. Soporta formato markdown."
+
+msgid "tooltip.incident_status"
+msgstr "Estado actual: Investigando (inicial), Identificado (causa conocida), Monitoreando (siendo seguido), Resuelto (normalizado)."
+
+msgid "tooltip.incident_severity"
+msgstr "Gravedad: Crítico (servicio completamente indisponible), Alto (funcionalidades importantes afectadas), Medio (degradación), Bajo (impacto mínimo)."
+
+msgid "tooltip.incident_visible_status_page"
+msgstr "Si está activo, este incidente se mostrará públicamente en la página de estado. Desactive para incidentes internos o mantenimiento."
+
+msgid "tooltip.incident_notify_subscribers"
+msgstr "Si está activo, todos los suscriptores de la página de estado recibirán notificación por email sobre este incidente y sus actualizaciones."
+
+#: Integrations - Tooltips
+msgid "tooltip.integration_name"
+msgstr "Nombre identificador de la integración. Use un nombre descriptivo como 'IXC Producción', 'Servidor Principal Zabbix', etc."
+
+msgid "tooltip.integration_type"
+msgstr "Tipo de integración: IXC Soft (proveedor), Zabbix (monitoreo), o REST API (genérico para otras plataformas)."
+
+msgid "tooltip.integration_url"
+msgstr "URL completa de API del sistema externo. Para IXC: URL de su instalación. Para Zabbix: URL del servidor. Ejemplo: https://api.sistema.com"
+
+msgid "tooltip.integration_api_key"
+msgstr "Clave de API o token de autenticación. Almacenado cifrado. Obtenido de configuraciones del sistema externo."
+
+msgid "tooltip.integration_username"
+msgstr "Nombre de usuario para autenticación si API no usa clave API. Usado principalmente en autenticación básica HTTP."
+
+msgid "tooltip.integration_password"
+msgstr "Contraseña para autenticación si es necesario. Almacenada cifrada en base de datos."
+
+msgid "tooltip.integration_sync_interval"
+msgstr "Intervalo en minutos para sincronización automática de datos. Valores menores mantienen datos más actuales pero aumentan carga. Recomendado: 5-15 minutos."
+
+msgid "tooltip.integration_active"
+msgstr "Integraciones activas sincronizan datos automáticamente en el intervalo configurado. Desactive para pausar temporalmente."
+
+#: Subscribers - Tooltips
+msgid "tooltip.subscriber_email"
+msgstr "Dirección de email que recibirá notificaciones sobre incidentes y mantenimiento programado."
+
+msgid "tooltip.subscriber_monitors"
+msgstr "Seleccione monitores específicos o deje vacío para recibir notificaciones de todos los monitores."
+
+msgid "tooltip.subscriber_verified"
+msgstr "Estado de verificación del email. Suscriptores no verificados no reciben notificaciones hasta confirmar el email."
+
+msgid "tooltip.subscriber_subscribed"
+msgstr "Si está activo, el suscriptor recibirá notificaciones. Desactive para pausar temporalmente sin eliminar."

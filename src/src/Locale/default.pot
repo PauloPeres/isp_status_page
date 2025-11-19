@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2025-11-14 16:04-0300\n"
+"POT-Creation-Date: 2025-11-19 16:52-0300\n"
 "PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
@@ -23,40 +23,122 @@ msgstr ""
 msgid "Funcionalidade de reenvio será implementada quando o serviço de email estiver configurado."
 msgstr ""
 
-#: ./src/Controller/UsersController.php:70
+#: ./src/Controller/UsersController.php:46
+#: ./templates/Users/change_password.php:232
+msgid "Por segurança, você deve alterar sua senha antes de continuar."
+msgstr ""
+
+#: ./src/Controller/UsersController.php:84
 msgid "Você saiu com sucesso."
 msgstr ""
 
-#: ./src/Controller/UsersController.php:148
-#: ./src/Controller/UsersController.php:199
+#: ./src/Controller/UsersController.php:106
+msgid "Por favor, informe seu email."
+msgstr ""
+
+#: ./src/Controller/UsersController.php:146
+#: ./src/Controller/UsersController.php:163
+msgid "Se o email informado estiver cadastrado, você receberá as instruções para redefinir sua senha."
+msgstr ""
+
+#: ./src/Controller/UsersController.php:159
+msgid "Erro ao processar solicitação. Tente novamente."
+msgstr ""
+
+#: ./src/Controller/UsersController.php:186
+msgid "Token de redefinição inválido."
+msgstr ""
+
+#: ./src/Controller/UsersController.php:196
+msgid "Token de redefinição inválido ou expirado."
+msgstr ""
+
+#: ./src/Controller/UsersController.php:202
+msgid "Token de redefinição expirado. Solicite um novo link."
+msgstr ""
+
+#: ./src/Controller/UsersController.php:212
+#: ./src/Controller/UsersController.php:281
+msgid "Por favor, preencha todos os campos."
+msgstr ""
+
+#: ./src/Controller/UsersController.php:218
+#: ./src/Controller/UsersController.php:286
+#: ./src/Controller/UsersController.php:401
+#: ./src/Controller/UsersController.php:482
 msgid "As senhas não coincidem."
 msgstr ""
 
-#: ./src/Controller/UsersController.php:160
+#: ./src/Controller/UsersController.php:224
+#: ./src/Controller/UsersController.php:291
+msgid "A senha deve ter no mínimo 8 caracteres."
+msgstr ""
+
+#: ./src/Controller/UsersController.php:234
+msgid "Senha redefinida com sucesso! Você já pode fazer login."
+msgstr ""
+
+#: ./src/Controller/UsersController.php:237
+msgid "Erro ao redefinir senha. Tente novamente."
+msgstr ""
+
+#: ./src/Controller/UsersController.php:260
+msgid "Você precisa estar logado para trocar a senha."
+msgstr ""
+
+#: ./src/Controller/UsersController.php:275
+msgid "Senha atual incorreta."
+msgstr ""
+
+#: ./src/Controller/UsersController.php:297
+msgid "A nova senha deve ser diferente da senha atual."
+msgstr ""
+
+#: ./src/Controller/UsersController.php:306
+msgid "Senha alterada com sucesso! Você já pode acessar o sistema."
+msgstr ""
+
+#: ./src/Controller/UsersController.php:309
+msgid "Erro ao alterar senha. Tente novamente."
+msgstr ""
+
+#: ./src/Controller/UsersController.php:406
+msgid "A senha é obrigatória."
+msgstr ""
+
+#: ./src/Controller/UsersController.php:418
 msgid "Usuário criado com sucesso."
 msgstr ""
 
-#: ./src/Controller/UsersController.php:165
+#: ./src/Controller/UsersController.php:431
+msgid "Email de convite enviado com sucesso."
+msgstr ""
+
+#: ./src/Controller/UsersController.php:435
+msgid "Usuário criado, mas houve erro ao enviar o email de convite: "
+msgstr ""
+
+#: ./src/Controller/UsersController.php:448
 msgid "Não foi possível criar o usuário. Verifique os erros abaixo."
 msgstr ""
 
-#: ./src/Controller/UsersController.php:187
+#: ./src/Controller/UsersController.php:470
 msgid "Você não tem permissão para editar este usuário."
 msgstr ""
 
-#: ./src/Controller/UsersController.php:215
+#: ./src/Controller/UsersController.php:498
 msgid "Perfil atualizado com sucesso."
 msgstr ""
 
-#: ./src/Controller/UsersController.php:220
+#: ./src/Controller/UsersController.php:503
 msgid "Não foi possível atualizar o perfil. Tente novamente."
 msgstr ""
 
-#: ./src/Controller/UsersController.php:239
+#: ./src/Controller/UsersController.php:522
 msgid "Usuário excluído com sucesso."
 msgstr ""
 
-#: ./src/Controller/UsersController.php:241
+#: ./src/Controller/UsersController.php:524
 msgid "Não foi possível excluir o usuário. Tente novamente."
 msgstr ""
 
@@ -85,31 +167,31 @@ msgstr ""
 msgid "Invalid monitor type"
 msgstr ""
 
-#: ./src/Model/Table/MonitorsTable.php:108
+#: ./src/Model/Table/MonitorsTable.php:117
 msgid "Configuration must be valid JSON"
 msgstr ""
 
-#: ./src/Model/Table/MonitorsTable.php:114
+#: ./src/Model/Table/MonitorsTable.php:123
 msgid "Check interval must be greater than 0"
 msgstr ""
 
-#: ./src/Model/Table/MonitorsTable.php:119
+#: ./src/Model/Table/MonitorsTable.php:128
 msgid "Timeout must be greater than 0"
 msgstr ""
 
-#: ./src/Model/Table/MonitorsTable.php:124
+#: ./src/Model/Table/MonitorsTable.php:133
 msgid "Retry count cannot be negative"
 msgstr ""
 
-#: ./src/Model/Table/MonitorsTable.php:130
+#: ./src/Model/Table/MonitorsTable.php:139
 msgid "Invalid status"
 msgstr ""
 
-#: ./src/Model/Table/MonitorsTable.php:143
+#: ./src/Model/Table/MonitorsTable.php:152
 msgid "Uptime percentage must be between 0 and 100"
 msgstr ""
 
-#: ./src/Model/Table/MonitorsTable.php:156
+#: ./src/Model/Table/MonitorsTable.php:165
 msgid "Display order cannot be negative"
 msgstr ""
 
@@ -173,7 +255,7 @@ msgstr ""
 #: ./templates/Monitors/index.php:471
 #: ./templates/Monitors/index.php:515
 #: ./templates/Monitors/view.php:157
-#: ./templates/Users/add.php:255
+#: ./templates/Users/add.php:290
 #: ./templates/Users/index.php:415
 #: ./templates/Users/index.php:453
 #: ./templates/Users/view.php:179
@@ -358,9 +440,10 @@ msgstr ""
 #: ./templates/EmailLogs/view.php:13
 #: ./templates/Users/add.php:202
 #: ./templates/Users/edit.php:187
+#: ./templates/Users/forgot_password.php:253
 #: ./templates/Users/index.php:451
 #: ./templates/Users/view.php:165
-#: ./templates/Settings/index.php:233
+#: ./templates/Settings/index.php:293
 msgid "Email"
 msgstr ""
 
@@ -475,9 +558,9 @@ msgstr ""
 msgid "Description"
 msgstr ""
 
-#: ./templates/Monitors/add.php:130
-#: ./templates/Monitors/edit.php:154
-#: ./templates/Users/add.php:266
+#: ./templates/Monitors/add.php:109
+#: ./templates/Monitors/edit.php:135
+#: ./templates/Users/add.php:301
 #: ./templates/Users/edit.php:229
 msgid "Cancel"
 msgstr ""
@@ -486,18 +569,18 @@ msgstr ""
 msgid "View Details"
 msgstr ""
 
-#: ./templates/Monitors/edit.php:141
+#: ./templates/Monitors/edit.php:122
 #: ./templates/Monitors/view.php:135
 #: ./templates/Users/index.php:455
 msgid "Created"
 msgstr ""
 
-#: ./templates/Monitors/edit.php:145
+#: ./templates/Monitors/edit.php:126
 #: ./templates/Monitors/view.php:140
 msgid "Last Updated"
 msgstr ""
 
-#: ./templates/Monitors/edit.php:159
+#: ./templates/Monitors/edit.php:140
 #: ./templates/Monitors/index.php:589
 #: ./templates/Users/index.php:488
 msgid "Delete"
@@ -569,60 +652,178 @@ msgstr ""
 msgid "Date/Time"
 msgstr ""
 
-#: ./templates/Status/index.php:31
+#: ./templates/Status/history.php:9
+#: ./templates/Status/history.php:294
+#: ./templates/element/public/footer.php:34
+msgid "Histórico de Incidentes"
+msgstr ""
+
+#: ./templates/Status/history.php:288
+#: ./templates/Subscribers/unsubscribe.php:31
+#: ./templates/Subscribers/verify.php:32
+msgid "Voltar para Status"
+msgstr ""
+
+#: ./templates/Status/history.php:295
+msgid "Últimos 30 dias de incidentes reportados"
+msgstr ""
+
+#: ./templates/Status/history.php:302
+msgid "Nenhum incidente registrado"
+msgstr ""
+
+#: ./templates/Status/history.php:303
+msgid "Não houve incidentes nos últimos 30 dias. Todos os sistemas estão operando normalmente!"
+msgstr ""
+
+#: ./templates/Status/history.php:374
+msgid "Início:"
+msgstr ""
+
+#: ./templates/Status/history.php:380
+#: ./templates/element/status/incident_timeline.php:59
+msgid "Resolvido:"
+msgstr ""
+
+#: ./templates/Status/history.php:385
+#: ./templates/element/status/incident_timeline.php:67
+msgid "Duração:"
+msgstr ""
+
+#: ./templates/Status/history.php:393
+msgid "Auto-criado"
+msgstr ""
+
+#: ./templates/Status/index.php:37
 msgid "de"
 msgstr ""
 
-#: ./templates/Status/index.php:31
+#: ./templates/Status/index.php:37
 msgid "serviços operacionais"
 msgstr ""
 
-#: ./templates/Status/index.php:33
+#: ./templates/Status/index.php:39
 msgid "offline"
 msgstr ""
 
-#: ./templates/Status/index.php:36
+#: ./templates/Status/index.php:42
 msgid "degradados"
 msgstr ""
 
-#: ./templates/Status/index.php:43
-#: ./templates/element/public/header.php:18
+#: ./templates/Status/index.php:49
+#: ./templates/element/public/header.php:21
 msgid "Status dos Serviços"
 msgstr ""
 
-#: ./templates/Status/index.php:52
+#: ./templates/Status/index.php:58
 msgid "Nenhum serviço sendo monitorado no momento."
 msgstr ""
 
-#: ./templates/Status/index.php:67
+#: ./templates/Status/index.php:73
 msgid "Próxima atualização em:"
 msgstr ""
 
-#: ./templates/Status/index.php:67
+#: ./templates/Status/index.php:73
 #: ./templates/Incidents/view.php:507
+#: ./templates/Settings/index.php:28
 msgid "segundos"
 msgstr ""
 
-#: ./templates/Status/index.php:120
+#: ./templates/Status/index.php:126
 msgid "Última atualização:"
 msgstr ""
 
-#: ./templates/Status/index.php:121
+#: ./templates/Status/index.php:127
 msgid "Próxima atualização em 5 minutos"
 msgstr ""
 
-#: ./templates/Users/add.php:214
-#: ./templates/Users/login.php:235
+#: ./templates/Users/add.php:247
+#: ./templates/Users/login.php:290
+#: ./templates/Settings/index.php:24
 msgid "Password"
 msgstr ""
 
-#: ./templates/Users/add.php:224
+#: ./templates/Users/add.php:258
 msgid "Confirm Password"
 msgstr ""
 
+#: ./templates/Users/change_password.php:6
+#: ./templates/Users/change_password.php:299
+msgid "Alterar Senha"
+msgstr ""
+
+#: ./templates/Users/change_password.php:252
+msgid "Senha Atual"
+msgstr ""
+
+#: ./templates/Users/change_password.php:257
+msgid "Digite sua senha atual"
+msgstr ""
+
+#: ./templates/Users/change_password.php:265
+#: ./templates/Users/reset_password.php:271
+msgid "Nova Senha"
+msgstr ""
+
+#: ./templates/Users/change_password.php:270
+#: ./templates/Users/reset_password.php:276
+msgid "Digite sua nova senha"
+msgstr ""
+
+#: ./templates/Users/change_password.php:278
+#: ./templates/Users/reset_password.php:285
+msgid "Confirmar Nova Senha"
+msgstr ""
+
+#: ./templates/Users/change_password.php:283
+#: ./templates/Users/reset_password.php:290
+msgid "Digite novamente sua nova senha"
+msgstr ""
+
+#: ./templates/Users/change_password.php:291
+#: ./templates/Users/reset_password.php:298
+msgid "Requisitos da senha:"
+msgstr ""
+
+#: ./templates/Users/change_password.php:293
+#: ./templates/Users/reset_password.php:300
+msgid "Mínimo de 8 caracteres"
+msgstr ""
+
+#: ./templates/Users/change_password.php:294
+msgid "Deve ser diferente da senha atual"
+msgstr ""
+
+#: ./templates/Users/change_password.php:295
+#: ./templates/Users/reset_password.php:301
+msgid "As senhas devem ser idênticas"
+msgstr ""
+
 #: ./templates/Users/edit.php:228
-#: ./templates/Monitors/edit.php:152
+#: ./templates/Monitors/edit.php:133
 msgid "Save Changes"
+msgstr ""
+
+#: ./templates/Users/forgot_password.php:6
+#: ./templates/Users/forgot_password.php:239
+msgid "Recuperar Senha"
+msgstr ""
+
+#: ./templates/Users/forgot_password.php:241
+msgid "Informe seu email e enviaremos um link para redefinir sua senha."
+msgstr ""
+
+#: ./templates/Users/forgot_password.php:258
+msgid "Digite seu email cadastrado"
+msgstr ""
+
+#: ./templates/Users/forgot_password.php:265
+msgid "Enviar Link de Recuperação"
+msgstr ""
+
+#: ./templates/Users/forgot_password.php:269
+#: ./templates/Users/reset_password.php:309
+msgid "Voltar para o login"
 msgstr ""
 
 #: ./templates/Users/index.php:381
@@ -659,6 +860,20 @@ msgstr ""
 msgid "Showing {{start}} to {{end}} of {{count}} entries"
 msgstr ""
 
+#: ./templates/Users/login.php:305
+msgid "Esqueci minha senha"
+msgstr ""
+
+#: ./templates/Users/reset_password.php:6
+#: ./templates/Users/reset_password.php:257
+#: ./templates/Users/reset_password.php:305
+msgid "Redefinir Senha"
+msgstr ""
+
+#: ./templates/Users/reset_password.php:259
+msgid "Digite sua nova senha abaixo."
+msgstr ""
+
 #: ./templates/Users/view.php:206
 msgid "Last Modified"
 msgstr ""
@@ -680,7 +895,7 @@ msgid "ISP Status"
 msgstr ""
 
 #: ./templates/element/admin/navbar.php:22
-#: ./templates/Users/add.php:245
+#: ./templates/Users/add.php:280
 #: ./templates/Users/index.php:404
 msgid "Administrator"
 msgstr ""
@@ -760,61 +975,53 @@ msgstr ""
 msgid "System Online"
 msgstr ""
 
-#: ./templates/element/public/footer.php:12
+#: ./templates/element/public/footer.php:17
 msgid "Sobre"
 msgstr ""
 
-#: ./templates/element/public/footer.php:14
+#: ./templates/element/public/footer.php:19
 msgid "Esta página mostra o status em tempo real de todos os nossos serviços. Monitoramos continuamente para garantir a melhor experiência."
 msgstr ""
 
-#: ./templates/element/public/footer.php:19
+#: ./templates/element/public/footer.php:24
 msgid "Links Úteis"
 msgstr ""
 
-#: ./templates/element/public/footer.php:23
+#: ./templates/element/public/footer.php:28
 msgid "Página Inicial"
 msgstr ""
 
-#: ./templates/element/public/footer.php:29
-msgid "Histórico de Incidentes"
-msgstr ""
-
-#: ./templates/element/public/footer.php:35
-msgid "Assinar Notificações"
-msgstr ""
-
-#: ./templates/element/public/footer.php:43
+#: ./templates/element/public/footer.php:42
 msgid "Suporte"
 msgstr ""
 
-#: ./templates/element/public/footer.php:45
+#: ./templates/element/public/footer.php:44
 #: ./templates/Subscribers/view.php:86
 msgid "Email:"
 msgstr ""
 
-#: ./templates/element/public/footer.php:49
+#: ./templates/element/public/footer.php:48
 msgid "Atualizações automáticas a cada 30 segundos"
 msgstr ""
 
-#: ./templates/element/public/footer.php:55
+#: ./templates/element/public/footer.php:54
 msgid "Todos os direitos reservados."
 msgstr ""
 
-#: ./templates/element/public/footer.php:57
+#: ./templates/element/public/footer.php:56
 msgid "Powered by"
 msgstr ""
 
-#: ./templates/element/public/header.php:24
+#: ./templates/element/public/header.php:28
 msgid "Início"
 msgstr ""
 
-#: ./templates/element/public/header.php:29
+#: ./templates/element/public/header.php:33
 msgid "Histórico"
 msgstr ""
 
-#: ./templates/element/public/header.php:34
-#: ./templates/Settings/index.php:235
+#: ./templates/element/public/header.php:38
+#: ./templates/Settings/index.php:295
 msgid "Notificações"
 msgstr ""
 
@@ -834,14 +1041,6 @@ msgstr ""
 
 #: ./templates/element/status/incident_timeline.php:51
 msgid "Iniciado:"
-msgstr ""
-
-#: ./templates/element/status/incident_timeline.php:59
-msgid "Resolvido:"
-msgstr ""
-
-#: ./templates/element/status/incident_timeline.php:67
-msgid "Duração:"
 msgstr ""
 
 #: ./templates/element/status/incident_timeline.php:74
@@ -899,7 +1098,7 @@ msgstr ""
 msgid "ISP Status Admin"
 msgstr ""
 
-#: ./templates/layout/public.php:17
+#: ./templates/layout/public.php:15
 msgid "Página de status em tempo real dos serviços de internet"
 msgstr ""
 
@@ -1096,31 +1295,31 @@ msgstr ""
 msgid "Verificações Recentes do Monitor"
 msgstr ""
 
-#: ./src/Controller/MonitorsController.php:121
+#: ./src/Controller/MonitorsController.php:123
 msgid "Monitor criado com sucesso."
 msgstr ""
 
-#: ./src/Controller/MonitorsController.php:126
+#: ./src/Controller/MonitorsController.php:128
 msgid "Não foi possível criar o monitor. Por favor, tente novamente."
 msgstr ""
 
-#: ./src/Controller/MonitorsController.php:149
+#: ./src/Controller/MonitorsController.php:151
 msgid "Monitor atualizado com sucesso."
 msgstr ""
 
-#: ./src/Controller/MonitorsController.php:154
+#: ./src/Controller/MonitorsController.php:156
 msgid "Não foi possível atualizar o monitor. Por favor, tente novamente."
 msgstr ""
 
-#: ./src/Controller/MonitorsController.php:174
+#: ./src/Controller/MonitorsController.php:176
 msgid "Monitor excluído com sucesso."
 msgstr ""
 
-#: ./src/Controller/MonitorsController.php:176
+#: ./src/Controller/MonitorsController.php:178
 msgid "Não foi possível excluir o monitor. Por favor, tente novamente."
 msgstr ""
 
-#: ./src/Controller/MonitorsController.php:200
+#: ./src/Controller/MonitorsController.php:202
 msgid "Não foi possível alterar o status do monitor."
 msgstr ""
 
@@ -1168,69 +1367,37 @@ msgstr ""
 msgid "Target Configuration"
 msgstr ""
 
-#: ./templates/Monitors/add.php:68
-#: ./templates/Monitors/edit.php:72
-#: ./templates/Monitors/index.php:518
-#: ./templates/Monitors/view.php:90
-msgid "Target"
+#: ./templates/Monitors/add.php:66
+#: ./templates/Monitors/edit.php:70
+msgid "Configuration depends on selected monitor type"
 msgstr ""
 
-#: ./templates/Monitors/add.php:69
-msgid "https://example.com or 192.168.1.1"
-msgstr ""
-
-#: ./templates/Monitors/add.php:72
-#: ./templates/Monitors/edit.php:75
-msgid "Full URL for HTTP, hostname/IP for Ping and Port"
-msgstr ""
-
-#: ./templates/Monitors/add.php:78
-#: ./templates/Monitors/edit.php:81
-msgid "Expected HTTP Code"
-msgstr ""
-
-#: ./templates/Monitors/add.php:82
-#: ./templates/Monitors/edit.php:84
-msgid "Expected HTTP status code (e.g. 200, 301)"
-msgstr ""
-
-#: ./templates/Monitors/add.php:89
-#: ./templates/Monitors/edit.php:91
-#: ./templates/Monitors/view.php:103
-msgid "Port"
-msgstr ""
-
-#: ./templates/Monitors/add.php:94
-#: ./templates/Monitors/edit.php:96
-msgid "TCP/UDP port number (1-65535)"
-msgstr ""
-
-#: ./templates/Monitors/add.php:100
-#: ./templates/Monitors/edit.php:102
+#: ./templates/Monitors/add.php:79
+#: ./templates/Monitors/edit.php:83
 msgid "Check Settings"
 msgstr ""
 
-#: ./templates/Monitors/add.php:104
-#: ./templates/Monitors/edit.php:106
+#: ./templates/Monitors/add.php:83
+#: ./templates/Monitors/edit.php:87
 msgid "Interval (seconds)"
 msgstr ""
 
-#: ./templates/Monitors/add.php:111
-#: ./templates/Monitors/edit.php:112
+#: ./templates/Monitors/add.php:90
+#: ./templates/Monitors/edit.php:93
 msgid "Check frequency (minimum 10s)"
 msgstr ""
 
-#: ./templates/Monitors/add.php:115
-#: ./templates/Monitors/edit.php:116
+#: ./templates/Monitors/add.php:94
+#: ./templates/Monitors/edit.php:97
 msgid "Timeout (seconds)"
 msgstr ""
 
-#: ./templates/Monitors/add.php:122
-#: ./templates/Monitors/edit.php:122
+#: ./templates/Monitors/add.php:101
+#: ./templates/Monitors/edit.php:103
 msgid "Maximum wait time"
 msgstr ""
 
-#: ./templates/Monitors/add.php:128
+#: ./templates/Monitors/add.php:107
 msgid "Save Monitor"
 msgstr ""
 
@@ -1243,21 +1410,21 @@ msgstr ""
 msgid "Update monitor settings: {0}"
 msgstr ""
 
-#: ./templates/Monitors/edit.php:128
+#: ./templates/Monitors/edit.php:109
 msgid "System Information"
 msgstr ""
 
-#: ./templates/Monitors/edit.php:131
+#: ./templates/Monitors/edit.php:112
 msgid "Current Status"
 msgstr ""
 
-#: ./templates/Monitors/edit.php:137
+#: ./templates/Monitors/edit.php:118
 #: ./templates/Monitors/index.php:519
 #: ./templates/Monitors/view.php:119
 msgid "Last Check"
 msgstr ""
 
-#: ./templates/Monitors/edit.php:138
+#: ./templates/Monitors/edit.php:119
 #: ./templates/Monitors/index.php:549
 #: ./templates/Monitors/view.php:124
 #: ./templates/Users/index.php:480
@@ -1265,7 +1432,7 @@ msgstr ""
 msgid "Never"
 msgstr ""
 
-#: ./templates/Monitors/edit.php:163
+#: ./templates/Monitors/edit.php:144
 #: ./templates/Monitors/index.php:593
 msgid "Are you sure you want to delete this monitor? This action cannot be undone."
 msgstr ""
@@ -1296,6 +1463,11 @@ msgstr ""
 
 #: ./templates/Monitors/index.php:516
 msgid "Name"
+msgstr ""
+
+#: ./templates/Monitors/index.php:518
+#: ./templates/Monitors/view.php:90
+msgid "Target"
 msgstr ""
 
 #: ./templates/Monitors/index.php:520
@@ -1380,12 +1552,18 @@ msgstr ""
 msgid "Expected HTTP Status"
 msgstr ""
 
+#: ./templates/Monitors/view.php:103
+#: ./templates/Settings/index.php:22
+msgid "Port"
+msgstr ""
+
 #: ./templates/Monitors/view.php:110
 #: ./templates/Monitors/view.php:115
 msgid "{0} seconds"
 msgstr ""
 
 #: ./templates/Monitors/view.php:114
+#: ./templates/Settings/index.php:28
 msgid "Timeout"
 msgstr ""
 
@@ -1455,55 +1633,228 @@ msgstr ""
 msgid "Are you sure you want to delete this monitor? This action cannot be undone and all historical data will be lost."
 msgstr ""
 
-#: ./src/Controller/SettingsController.php:88
+#: ./templates/element/monitor/form_http.php:15
+msgid "HTTP/HTTPS Configuration"
+msgstr ""
+
+#: ./templates/element/monitor/form_http.php:20
+msgid "HTTP Method"
+msgstr ""
+
+#: ./templates/element/monitor/form_http.php:39
+msgid "Expected HTTP Status Code"
+msgstr ""
+
+#: ./templates/element/monitor/form_http.php:46
+msgid "Expected HTTP status code (e.g. 200=OK, 301=Redirect, 404=Not Found)"
+msgstr ""
+
+#: ./templates/element/monitor/form_http.php:52
+msgid "Custom Headers"
+msgstr ""
+
+#: ./templates/element/monitor/form_http.php:61
+msgid "Custom HTTP headers in JSON format (optional)"
+msgstr ""
+
+#: ./templates/element/monitor/form_http.php:64
+msgid "Leave empty for no custom headers"
+msgstr ""
+
+#: ./templates/element/monitor/form_http.php:70
+msgid "Request Body"
+msgstr ""
+
+#: ./templates/element/monitor/form_http.php:75
+msgid "Request body for POST/PUT/PATCH (optional)"
+msgstr ""
+
+#: ./templates/element/monitor/form_http.php:76
+msgid "Only used for POST, PUT, PATCH methods"
+msgstr ""
+
+#: ./templates/element/monitor/form_http.php:83
+msgid "Verify SSL Certificate"
+msgstr ""
+
+#: ./templates/element/monitor/form_http.php:86
+msgid "Disable for self-signed certificates"
+msgstr ""
+
+#: ./templates/element/monitor/form_http.php:92
+msgid "Follow Redirects"
+msgstr ""
+
+#: ./templates/element/monitor/form_http.php:95
+msgid "Follow HTTP 3xx redirects automatically"
+msgstr ""
+
+#: ./templates/element/monitor/form_http.php:102
+msgid "Expected Content"
+msgstr ""
+
+#: ./templates/element/monitor/form_http.php:106
+msgid "Text to search in response (optional)"
+msgstr ""
+
+#: ./templates/element/monitor/form_http.php:107
+msgid "Check will fail if this text is not found in response body"
+msgstr ""
+
+#: ./templates/element/monitor/form_ping.php:15
+msgid "Ping (ICMP) Configuration"
+msgstr ""
+
+#: ./templates/element/monitor/form_ping.php:20
+#: ./templates/element/monitor/form_port.php:20
+msgid "Host or IP Address"
+msgstr ""
+
+#: ./templates/element/monitor/form_ping.php:25
+msgid "Hostname or IP address to ping"
+msgstr ""
+
+#: ./templates/element/monitor/form_ping.php:32
+msgid "Packet Count"
+msgstr ""
+
+#: ./templates/element/monitor/form_ping.php:38
+msgid "Number of ping packets to send (1-10)"
+msgstr ""
+
+#: ./templates/element/monitor/form_ping.php:44
+msgid "Max Packet Loss (%)"
+msgstr ""
+
+#: ./templates/element/monitor/form_ping.php:50
+msgid "Alert if packet loss exceeds this percentage"
+msgstr ""
+
+#: ./templates/element/monitor/form_ping.php:57
+msgid "Max Latency (ms)"
+msgstr ""
+
+#: ./templates/element/monitor/form_ping.php:62
+msgid "Alert if average latency exceeds this value (in milliseconds)"
+msgstr ""
+
+#: ./templates/element/monitor/form_ping.php:67
+msgid "Note"
+msgstr ""
+
+#: ./templates/element/monitor/form_ping.php:69
+msgid "ICMP ping requires appropriate system permissions"
+msgstr ""
+
+#: ./templates/element/monitor/form_ping.php:70
+msgid "Some firewalls may block ICMP packets"
+msgstr ""
+
+#: ./templates/element/monitor/form_ping.php:71
+msgid "Average latency is calculated from all packets"
+msgstr ""
+
+#: ./templates/element/monitor/form_port.php:15
+msgid "Port (TCP/UDP) Configuration"
+msgstr ""
+
+#: ./templates/element/monitor/form_port.php:25
+msgid "Hostname or IP address to connect"
+msgstr ""
+
+#: ./templates/element/monitor/form_port.php:32
+msgid "Port Number"
+msgstr ""
+
+#: ./templates/element/monitor/form_port.php:39
+msgid "TCP/UDP port (1-65535)"
+msgstr ""
+
+#: ./templates/element/monitor/form_port.php:45
+msgid "Protocol"
+msgstr ""
+
+#: ./templates/element/monitor/form_port.php:54
+msgid "Connection protocol"
+msgstr ""
+
+#: ./templates/element/monitor/form_port.php:61
+msgid "Send Data (optional)"
+msgstr ""
+
+#: ./templates/element/monitor/form_port.php:66
+msgid "Data to send after connection (optional)"
+msgstr ""
+
+#: ./templates/element/monitor/form_port.php:67
+msgid "Useful for testing application protocols"
+msgstr ""
+
+#: ./templates/element/monitor/form_port.php:73
+msgid "Expected Response (optional)"
+msgstr ""
+
+#: ./templates/element/monitor/form_port.php:77
+msgid "Text to search in response"
+msgstr ""
+
+#: ./templates/element/monitor/form_port.php:78
+msgid "Check will fail if this text is not found in server response"
+msgstr ""
+
+#: ./templates/element/monitor/form_port.php:83
+msgid "Common Ports"
+msgstr ""
+
+#: ./src/Controller/SettingsController.php:94
 msgid "Nenhuma configuração foi enviada."
 msgstr ""
 
-#: ./src/Controller/SettingsController.php:147
+#: ./src/Controller/SettingsController.php:172
 msgid "Por favor, informe um endereço de email para o teste."
 msgstr ""
 
-#: ./src/Controller/SettingsController.php:153
+#: ./src/Controller/SettingsController.php:178
 msgid "Endereço de email inválido."
 msgstr ""
 
-#: ./src/Controller/SettingsController.php:161
+#: ./src/Controller/SettingsController.php:186
 msgid "Email de teste enviado para {0}. Verifique sua caixa de entrada."
 msgstr ""
 
-#: ./src/Controller/SettingsController.php:163
+#: ./src/Controller/SettingsController.php:188
 msgid "Não foi possível enviar o email de teste. Verifique as configurações de email e os logs de erro."
 msgstr ""
 
-#: ./src/Controller/SettingsController.php:166
+#: ./src/Controller/SettingsController.php:191
 msgid "Erro ao enviar email de teste: {0}"
 msgstr ""
 
-#: ./src/Controller/SettingsController.php:184
+#: ./src/Controller/SettingsController.php:209
 msgid "Categoria não especificada."
 msgstr ""
 
-#: ./src/Controller/SettingsController.php:201
+#: ./src/Controller/SettingsController.php:226
 msgid "Nenhuma configuração foi restaurada."
 msgstr ""
 
 #: ./src/View/Helper/LanguageHelper.php:46
-#: ./templates/Settings/index.php:252
+#: ./templates/Settings/index.php:312
 msgid "Português (Brasil)"
 msgstr ""
 
 #: ./src/View/Helper/LanguageHelper.php:47
-#: ./templates/Settings/index.php:253
+#: ./templates/Settings/index.php:313
 msgid "English"
 msgstr ""
 
 #: ./src/View/Helper/LanguageHelper.php:48
-#: ./templates/Settings/index.php:254
+#: ./templates/Settings/index.php:314
 msgid "Español"
 msgstr ""
 
 #: ./templates/Settings/index.php:6
-#: ./templates/Settings/index.php:227
+#: ./templates/Settings/index.php:287
 msgid "Configurações do Sistema"
 msgstr ""
 
@@ -1516,158 +1867,321 @@ msgid "URL do Site"
 msgstr ""
 
 #: ./templates/Settings/index.php:13
-msgid "Idioma do Sistema"
+msgid "URL da Logo Personalizada"
 msgstr ""
 
 #: ./templates/Settings/index.php:14
-msgid "Título da Página de Status"
+msgid "Idioma do Sistema"
 msgstr ""
 
 #: ./templates/Settings/index.php:15
-msgid "Página de Status Pública"
+msgid "Título da Página de Status"
 msgstr ""
 
 #: ./templates/Settings/index.php:16
+msgid "Página de Status Pública"
+msgstr ""
+
+#: ./templates/Settings/index.php:17
 msgid "Cache da Página (segundos)"
 msgstr ""
 
-#: ./templates/Settings/index.php:19
-msgid "Servidor SMTP"
-msgstr ""
-
-#: ./templates/Settings/index.php:20
-msgid "Porta SMTP"
+#: ./templates/Settings/index.php:18
+msgid "Email de Suporte"
 msgstr ""
 
 #: ./templates/Settings/index.php:21
-msgid "Usuário SMTP"
-msgstr ""
-
-#: ./templates/Settings/index.php:22
-msgid "Senha SMTP"
+msgid "Host"
 msgstr ""
 
 #: ./templates/Settings/index.php:23
-msgid "Email Remetente"
-msgstr ""
-
-#: ./templates/Settings/index.php:24
-msgid "Nome do Remetente"
+#: ./templates/Users/add.php:193
+#: ./templates/Users/edit.php:178
+#: ./templates/Users/index.php:450
+#: ./templates/Users/view.php:160
+msgid "Username"
 msgstr ""
 
 #: ./templates/Settings/index.php:25
-msgid "Criptografia SMTP"
+msgid "Email Remetente"
 msgstr ""
 
 #: ./templates/Settings/index.php:26
-msgid "Timeout SMTP (segundos)"
+msgid "Nome do Remetente"
 msgstr ""
 
-#: ./templates/Settings/index.php:29
-msgid "Intervalo Padrão (segundos)"
-msgstr ""
-
-#: ./templates/Settings/index.php:30
-msgid "Timeout Padrão (segundos)"
+#: ./templates/Settings/index.php:27
+msgid "Encryption"
 msgstr ""
 
 #: ./templates/Settings/index.php:31
-msgid "Máximo de Tentativas"
+msgid "Intervalo Padrão (segundos)"
 msgstr ""
 
 #: ./templates/Settings/index.php:32
-msgid "Auto-resolver Incidentes"
+msgid "Timeout Padrão (segundos)"
 msgstr ""
 
 #: ./templates/Settings/index.php:33
-msgid "Intervalo de Verificação (minutos)"
+msgid "Máximo de Tentativas"
 msgstr ""
 
 #: ./templates/Settings/index.php:34
+msgid "Auto-resolver Incidentes"
+msgstr ""
+
+#: ./templates/Settings/index.php:35
+msgid "Intervalo de Verificação (minutos)"
+msgstr ""
+
+#: ./templates/Settings/index.php:36
 msgid "Timeout de Verificação (segundos)"
 msgstr ""
 
-#: ./templates/Settings/index.php:37
+#: ./templates/Settings/index.php:39
 msgid "Email ao Criar Incidente"
 msgstr ""
 
-#: ./templates/Settings/index.php:38
+#: ./templates/Settings/index.php:40
 msgid "Email ao Resolver Incidente"
 msgstr ""
 
-#: ./templates/Settings/index.php:39
+#: ./templates/Settings/index.php:41
 msgid "Email ao Ficar Offline"
 msgstr ""
 
-#: ./templates/Settings/index.php:40
+#: ./templates/Settings/index.php:42
 msgid "Email ao Voltar Online"
 msgstr ""
 
-#: ./templates/Settings/index.php:41
+#: ./templates/Settings/index.php:43
 msgid "Intervalo Entre Alertas (minutos)"
 msgstr ""
 
-#: ./templates/Settings/index.php:232
+#: ./templates/Settings/index.php:44
+msgid "Habilitar Alertas por Email"
+msgstr ""
+
+#: ./templates/Settings/index.php:45
+msgid "Habilitar Alertas por WhatsApp"
+msgstr ""
+
+#: ./templates/Settings/index.php:46
+msgid "Habilitar Alertas por Telegram"
+msgstr ""
+
+#: ./templates/Settings/index.php:47
+msgid "Habilitar Alertas por SMS"
+msgstr ""
+
+#: ./templates/Settings/index.php:53
+msgid "Nome do site exibido na página de status"
+msgstr ""
+
+#: ./templates/Settings/index.php:54
+msgid "URL completa onde o sistema está hospedado"
+msgstr ""
+
+#: ./templates/Settings/index.php:55
+msgid "URL completa da imagem da logo (PNG, JPG, SVG). Deixe vazio para usar o logo padrão."
+msgstr ""
+
+#: ./templates/Settings/index.php:56
+msgid "Idioma da interface do sistema"
+msgstr ""
+
+#: ./templates/Settings/index.php:57
+msgid "Título exibido na página de status"
+msgstr ""
+
+#: ./templates/Settings/index.php:58
+msgid "A página de status é acessível publicamente"
+msgstr ""
+
+#: ./templates/Settings/index.php:59
+msgid "Tempo de cache da página de status em segundos"
+msgstr ""
+
+#: ./templates/Settings/index.php:60
+msgid "Email de suporte exibido no rodapé da página pública"
+msgstr ""
+
+#: ./templates/Settings/index.php:63
+msgid "Endereço do servidor SMTP"
+msgstr ""
+
+#: ./templates/Settings/index.php:64
+msgid "Porta do servidor SMTP (geralmente 587 ou 465)"
+msgstr ""
+
+#: ./templates/Settings/index.php:65
+msgid "Nome de usuário para autenticação SMTP"
+msgstr ""
+
+#: ./templates/Settings/index.php:66
+msgid "Senha para autenticação SMTP"
+msgstr ""
+
+#: ./templates/Settings/index.php:67
+msgid "Tipo de criptografia SMTP (TLS, SSL ou nenhuma)"
+msgstr ""
+
+#: ./templates/Settings/index.php:68
+msgid "Endereço de email do remetente"
+msgstr ""
+
+#: ./templates/Settings/index.php:69
+msgid "Nome exibido como remetente dos emails"
+msgstr ""
+
+#: ./templates/Settings/index.php:70
+msgid "Tempo limite para conexão SMTP em segundos"
+msgstr ""
+
+#: ./templates/Settings/index.php:73
+msgid "Intervalo padrão entre verificações em segundos"
+msgstr ""
+
+#: ./templates/Settings/index.php:74
+msgid "Tempo limite padrão para verificações em segundos"
+msgstr ""
+
+#: ./templates/Settings/index.php:75
+msgid "Número máximo de tentativas antes de marcar como falha"
+msgstr ""
+
+#: ./templates/Settings/index.php:76
+msgid "Resolver automaticamente incidentes quando monitor volta online"
+msgstr ""
+
+#: ./templates/Settings/index.php:77
+msgid "Intervalo entre execuções do comando de verificação em minutos"
+msgstr ""
+
+#: ./templates/Settings/index.php:78
+msgid "Tempo máximo de execução de uma verificação em segundos"
+msgstr ""
+
+#: ./templates/Settings/index.php:81
+msgid "Enviar email quando um novo incidente é criado"
+msgstr ""
+
+#: ./templates/Settings/index.php:82
+msgid "Enviar email quando um incidente é resolvido"
+msgstr ""
+
+#: ./templates/Settings/index.php:83
+msgid "Enviar email quando um monitor fica offline"
+msgstr ""
+
+#: ./templates/Settings/index.php:84
+msgid "Enviar email quando um monitor volta online"
+msgstr ""
+
+#: ./templates/Settings/index.php:85
+msgid "Intervalo mínimo em minutos entre alertas do mesmo monitor"
+msgstr ""
+
+#: ./templates/Settings/index.php:86
+msgid "Ativar envio de alertas por email para assinantes"
+msgstr ""
+
+#: ./templates/Settings/index.php:87
+msgid "Ativar envio de alertas via WhatsApp (funcionalidade futura)"
+msgstr ""
+
+#: ./templates/Settings/index.php:88
+msgid "Ativar envio de alertas via Telegram (funcionalidade futura)"
+msgstr ""
+
+#: ./templates/Settings/index.php:89
+msgid "Ativar envio de alertas via SMS (funcionalidade futura)"
+msgstr ""
+
+#: ./templates/Settings/index.php:292
 msgid "Geral"
 msgstr ""
 
-#: ./templates/Settings/index.php:234
+#: ./templates/Settings/index.php:294
 msgid "Monitoramento"
 msgstr ""
 
-#: ./templates/Settings/index.php:268
-#: ./templates/Settings/index.php:401
-#: ./templates/Settings/index.php:465
+#: ./templates/Settings/index.php:327
+#: ./templates/Settings/index.php:416
+#: ./templates/Subscribers/index.php:477
+msgid "Nenhuma"
+msgstr ""
+
+#: ./templates/Settings/index.php:349
+#: ./templates/Settings/index.php:519
+#: ./templates/Settings/index.php:592
 msgid "Ativar esta opção"
 msgstr ""
 
-#: ./templates/Settings/index.php:291
-#: ./templates/Settings/index.php:351
-#: ./templates/Settings/index.php:424
-#: ./templates/Settings/index.php:481
+#: ./templates/Settings/index.php:379
+#: ./templates/Settings/index.php:452
+#: ./templates/Settings/index.php:549
+#: ./templates/Settings/index.php:637
 msgid "Salvar Configurações"
 msgstr ""
 
-#: ./templates/Settings/index.php:296
-#: ./templates/Settings/index.php:364
-#: ./templates/Settings/index.php:429
-#: ./templates/Settings/index.php:486
+#: ./templates/Settings/index.php:384
+#: ./templates/Settings/index.php:457
+#: ./templates/Settings/index.php:554
+#: ./templates/Settings/index.php:642
 msgid "Restaurar Padrões"
 msgstr ""
 
-#: ./templates/Settings/index.php:301
-#: ./templates/Settings/index.php:369
-#: ./templates/Settings/index.php:434
-#: ./templates/Settings/index.php:491
+#: ./templates/Settings/index.php:389
+#: ./templates/Settings/index.php:462
+#: ./templates/Settings/index.php:559
+#: ./templates/Settings/index.php:647
 msgid "Tem certeza que deseja restaurar as configurações para os valores padrão?"
 msgstr ""
 
-#: ./templates/Settings/index.php:309
+#: ./templates/Settings/index.php:397
 msgid "Nenhuma configuração geral disponível."
 msgstr ""
 
-#: ./templates/Settings/index.php:356
-msgid "Testar Email"
+#: ./templates/Settings/index.php:471
+msgid "Testar Configurações de Email"
 msgstr ""
 
-#: ./templates/Settings/index.php:360
-msgid "Enviar email de teste para verificar as configurações?"
+#: ./templates/Settings/index.php:474
+msgid "Email de Destino"
 msgstr ""
 
-#: ./templates/Settings/index.php:377
+#: ./templates/Settings/index.php:477
+msgid "Digite o email para receber o teste"
+msgstr ""
+
+#: ./templates/Settings/index.php:481
+msgid "Digite o endereço de email onde deseja receber o email de teste."
+msgstr ""
+
+#: ./templates/Settings/index.php:484
+msgid "Enviar Email de Teste"
+msgstr ""
+
+#: ./templates/Settings/index.php:493
 msgid "Nenhuma configuração de email disponível."
 msgstr ""
 
-#: ./templates/Settings/index.php:378
+#: ./templates/Settings/index.php:494
 msgid "Configure as configurações de email para enviar notificações."
 msgstr ""
 
-#: ./templates/Settings/index.php:442
+#: ./templates/Settings/index.php:567
 msgid "Nenhuma configuração de monitoramento disponível."
 msgstr ""
 
-#: ./templates/Settings/index.php:499
+#: ./templates/Settings/index.php:655
 msgid "Nenhuma configuração de notificações disponível."
+msgstr ""
+
+#: ./src/Controller/StatusController.php:60
+#: ./src/Controller/StatusController.php:171
+msgid "A página de status não está disponível publicamente. Por favor, faça login."
 msgstr ""
 
 #: ./src/Controller/SubscribersController.php:57
@@ -1855,10 +2369,6 @@ msgstr ""
 msgid "monitor"
 msgstr ""
 
-#: ./templates/Subscribers/index.php:477
-msgid "Nenhuma"
-msgstr ""
-
 #: ./templates/Subscribers/index.php:488
 msgid "Desativar"
 msgstr ""
@@ -1928,11 +2438,6 @@ msgstr ""
 
 #: ./templates/Subscribers/unsubscribe.php:26
 msgid "Se você mudar de ideia, pode se inscrever novamente a qualquer momento na página de status."
-msgstr ""
-
-#: ./templates/Subscribers/unsubscribe.php:31
-#: ./templates/Subscribers/verify.php:32
-msgid "Voltar para Status"
 msgstr ""
 
 #: ./templates/Subscribers/unsubscribe.php:43
@@ -2125,6 +2630,69 @@ msgstr ""
 msgid "Tem certeza que deseja excluir este inscrito? Esta ação não pode ser desfeita e todas as assinaturas serão removidas."
 msgstr ""
 
+#: ./src/templates/email/text/test.php:9
+msgid "EMAIL DE TESTE"
+msgstr ""
+
+#: ./src/templates/email/text/test.php:14
+#: ./templates/email/html/test.php:12
+msgid "Olá!"
+msgstr ""
+
+#: ./src/templates/email/text/test.php:16
+#: ./templates/email/html/test.php:15
+msgid "Este é um email de teste do sistema {0}."
+msgstr ""
+
+#: ./src/templates/email/text/test.php:18
+#: ./templates/email/html/test.php:20
+msgid "Sucesso!"
+msgstr ""
+
+#: ./src/templates/email/text/test.php:20
+#: ./templates/email/html/test.php:21
+msgid "Se você está recebendo este email, significa que o sistema de envio de emails está configurado corretamente."
+msgstr ""
+
+#: ./src/templates/email/text/test.php:23
+#: ./templates/email/html/test.php:26
+msgid "Informações do Email:"
+msgstr ""
+
+#: ./src/templates/email/text/test.php:25
+#: ./templates/email/html/test.php:28
+msgid "Data/Hora:"
+msgstr ""
+
+#: ./src/templates/email/text/test.php:27
+#: ./templates/email/html/test.php:29
+msgid "Fuso horário:"
+msgstr ""
+
+#: ./src/templates/email/text/test.php:29
+#: ./templates/email/html/test.php:30
+msgid "Sistema:"
+msgstr ""
+
+#: ./src/templates/email/text/test.php:32
+#: ./templates/email/html/test.php:35
+msgid "Agora você pode começar a enviar notificações aos seus usuários!"
+msgstr ""
+
+#: ./src/templates/email/text/test.php:37
+#: ./templates/email/html/test.php:39
+msgid "Este é um email automático de teste. Não é necessário responder."
+msgstr ""
+
+#: ./src/templates/layout/email/html/default.php:129
+#: ./src/templates/layout/email/text/default.php:20
+msgid "Este é um email automático. Por favor, não responda."
+msgstr ""
+
+#: ./templates/email/html/test.php:10
+msgid "Email de Teste"
+msgstr ""
+
 #: ./templates/Checks/index.php:9
 #: ./templates/Checks/index.php:320
 msgid "Verificações de Monitores"
@@ -2245,14 +2813,6 @@ msgstr ""
 msgid "Access Data"
 msgstr ""
 
-#: ./templates/Users/add.php:193
-#: ./templates/Users/edit.php:178
-#: ./templates/Users/index.php:450
-#: ./templates/Users/login.php:222
-#: ./templates/Users/view.php:160
-msgid "Username"
-msgstr ""
-
 #: ./templates/Users/add.php:197
 msgid "Enter username"
 msgstr ""
@@ -2261,46 +2821,70 @@ msgstr ""
 msgid "Enter email"
 msgstr ""
 
-#: ./templates/Users/add.php:219
+#: ./templates/Users/add.php:213
+msgid "Invite Options"
+msgstr ""
+
+#: ./templates/Users/add.php:214
+msgid "Configure automatic password generation and email invitation"
+msgstr ""
+
+#: ./templates/Users/add.php:223
+msgid "Generate password automatically"
+msgstr ""
+
+#: ./templates/Users/add.php:226
+msgid "A secure random password will be generated for this user"
+msgstr ""
+
+#: ./templates/Users/add.php:236
+msgid "Send invitation email"
+msgstr ""
+
+#: ./templates/Users/add.php:239
+msgid "User will receive credentials and login instructions by email"
+msgstr ""
+
+#: ./templates/Users/add.php:253
 #: ./templates/Users/edit.php:210
 msgid "Minimum 8 characters"
 msgstr ""
 
-#: ./templates/Users/add.php:229
+#: ./templates/Users/add.php:264
 #: ./templates/Users/edit.php:221
 msgid "Re-enter password"
 msgstr ""
 
-#: ./templates/Users/add.php:236
+#: ./templates/Users/add.php:271
 msgid "Permissions"
 msgstr ""
 
-#: ./templates/Users/add.php:240
+#: ./templates/Users/add.php:275
 #: ./templates/Users/index.php:401
 #: ./templates/Users/index.php:452
 #: ./templates/Users/view.php:170
 msgid "Role"
 msgstr ""
 
-#: ./templates/Users/add.php:246
+#: ./templates/Users/add.php:281
 #: ./templates/Users/index.php:405
 msgid "User"
 msgstr ""
 
-#: ./templates/Users/add.php:247
+#: ./templates/Users/add.php:282
 #: ./templates/Users/index.php:406
 msgid "Viewer"
 msgstr ""
 
-#: ./templates/Users/add.php:249
+#: ./templates/Users/add.php:284
 msgid "Select a role"
 msgstr ""
 
-#: ./templates/Users/add.php:258
+#: ./templates/Users/add.php:293
 msgid "Active user"
 msgstr ""
 
-#: ./templates/Users/add.php:265
+#: ./templates/Users/add.php:300
 msgid "Create User"
 msgstr ""
 
@@ -2315,7 +2899,6 @@ msgid "Update Information"
 msgstr ""
 
 #: ./templates/Users/edit.php:182
-#: ./templates/Users/login.php:227
 msgid "Enter your username"
 msgstr ""
 
@@ -2360,19 +2943,27 @@ msgstr ""
 msgid "Login"
 msgstr ""
 
-#: ./templates/Users/login.php:207
+#: ./templates/Users/login.php:256
 msgid "Sign in to your account"
 msgstr ""
 
-#: ./templates/Users/login.php:212
+#: ./templates/Users/login.php:267
 msgid "Invalid username or password. Please try again."
 msgstr ""
 
-#: ./templates/Users/login.php:240
+#: ./templates/Users/login.php:277
+msgid "Username or Email"
+msgstr ""
+
+#: ./templates/Users/login.php:282
+msgid "Enter your username or email"
+msgstr ""
+
+#: ./templates/Users/login.php:295
 msgid "Enter your password"
 msgstr ""
 
-#: ./templates/Users/login.php:246
+#: ./templates/Users/login.php:301
 msgid "Sign In"
 msgstr ""
 

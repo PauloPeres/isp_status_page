@@ -6,7 +6,9 @@
  * @var \App\Model\Entity\Monitor $monitor
  */
 
-$configuration = $monitor->configuration ?? [];
+$configuration = is_object($monitor) && method_exists($monitor, 'getConfiguration')
+    ? $monitor->getConfiguration()
+    : [];
 ?>
 
 <div id="http-fields" class="monitor-type-fields">
@@ -16,41 +18,60 @@ $configuration = $monitor->configuration ?? [];
     </h4>
 
     <div class="form-group">
-        <?= $this->Form->control('configuration.method', [
-            'label' => __d('monitors', 'HTTP Method') . ' *',
-            'type' => 'select',
-            'options' => [
-                'GET' => 'GET',
-                'POST' => 'POST',
-                'PUT' => 'PUT',
-                'DELETE' => 'DELETE',
-                'HEAD' => 'HEAD',
-                'OPTIONS' => 'OPTIONS',
-                'PATCH' => 'PATCH',
-            ],
-            'default' => $configuration['method'] ?? 'GET',
+        <label>
+            <?= __d('monitors', 'URL') ?> *
+            <?= $this->element('tooltip', ['text' => __d('monitors', 'tooltip.http_url')]) ?>
+        </label>
+        <?= $this->Form->url('configuration.url', [
+            'placeholder' => 'https://example.com',
+            'value' => $configuration['url'] ?? '',
+            'required' => false,
+            'class' => 'form-control http-required',
+        ]) ?>
+        <small class="form-help"><?= __d('monitors', 'Full URL including protocol (http:// or https://)') ?></small>
+    </div>
+
+    <div class="form-group">
+        <label>
+            <?= __d('monitors', 'HTTP Method') ?> *
+            <?= $this->element('tooltip', ['text' => __d('monitors', 'tooltip.http_method')]) ?>
+        </label>
+        <?= $this->Form->select('configuration.method', [
+            'GET' => 'GET',
+            'POST' => 'POST',
+            'PUT' => 'PUT',
+            'DELETE' => 'DELETE',
+            'HEAD' => 'HEAD',
+            'OPTIONS' => 'OPTIONS',
+            'PATCH' => 'PATCH',
+        ], [
+            'value' => $configuration['method'] ?? 'GET',
             'required' => true,
             'class' => 'form-control',
         ]) ?>
     </div>
 
     <div class="form-group">
-        <?= $this->Form->control('expected_status_code', [
-            'label' => __d('monitors', 'Expected HTTP Status Code') . ' *',
-            'type' => 'number',
+        <label>
+            <?= __d('monitors', 'Expected HTTP Status Code') ?> *
+            <?= $this->element('tooltip', ['text' => __d('monitors', 'tooltip.http_status_code')]) ?>
+        </label>
+        <?= $this->Form->number('configuration.expected_status_code', [
             'min' => 100,
             'max' => 599,
-            'default' => 200,
+            'value' => $configuration['expected_status_code'] ?? 200,
             'required' => true,
             'class' => 'form-control',
-            'help' => __d('monitors', 'Expected HTTP status code (e.g. 200=OK, 301=Redirect, 404=Not Found)'),
         ]) ?>
+        <small class="form-help"><?= __d('monitors', 'Expected HTTP status code (e.g. 200=OK, 301=Redirect, 404=Not Found)') ?></small>
     </div>
 
     <div class="form-group">
-        <?= $this->Form->control('configuration.headers', [
-            'label' => __d('monitors', 'Custom Headers'),
-            'type' => 'textarea',
+        <label>
+            <?= __d('monitors', 'Custom Headers') ?>
+            <?= $this->element('tooltip', ['text' => __d('monitors', 'tooltip.http_headers')]) ?>
+        </label>
+        <?= $this->Form->textarea('configuration.headers', [
             'rows' => 4,
             'class' => 'form-control',
             'placeholder' => '{
@@ -58,54 +79,55 @@ $configuration = $monitor->configuration ?? [];
   "Authorization": "Bearer your-token-here"
 }',
             'value' => !empty($configuration['headers']) ? json_encode($configuration['headers'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) : '',
-            'help' => __d('monitors', 'Custom HTTP headers in JSON format (optional)'),
         ]) ?>
-        <small class="form-text text-muted">
-            <?= __d('monitors', 'Leave empty for no custom headers') ?>
-        </small>
+        <small class="form-help"><?= __d('monitors', 'Leave empty for no custom headers') ?></small>
     </div>
 
     <div class="form-group">
-        <?= $this->Form->control('configuration.body', [
-            'label' => __d('monitors', 'Request Body'),
-            'type' => 'textarea',
+        <label>
+            <?= __d('monitors', 'Request Body') ?>
+            <?= $this->element('tooltip', ['text' => __d('monitors', 'tooltip.http_body')]) ?>
+        </label>
+        <?= $this->Form->textarea('configuration.body', [
             'rows' => 3,
             'class' => 'form-control',
             'value' => $configuration['body'] ?? '',
             'placeholder' => __d('monitors', 'Request body for POST/PUT/PATCH (optional)'),
-            'help' => __d('monitors', 'Only used for POST, PUT, PATCH methods'),
         ]) ?>
+        <small class="form-help"><?= __d('monitors', 'Only used for POST, PUT, PATCH methods') ?></small>
     </div>
 
     <div class="form-row">
         <div class="form-group">
-            <?= $this->Form->control('configuration.verify_ssl', [
-                'label' => __d('monitors', 'Verify SSL Certificate'),
-                'type' => 'checkbox',
-                'checked' => $configuration['verify_ssl'] ?? true,
-                'help' => __d('monitors', 'Disable for self-signed certificates'),
-            ]) ?>
+            <label>
+                <?= $this->Form->checkbox('configuration.verify_ssl', ['checked' => $configuration['verify_ssl'] ?? true]) ?>
+                <?= __d('monitors', 'Verify SSL Certificate') ?>
+                <?= $this->element('tooltip', ['text' => __d('monitors', 'tooltip.http_verify_ssl')]) ?>
+            </label>
+            <small class="form-help"><?= __d('monitors', 'Disable for self-signed certificates') ?></small>
         </div>
 
         <div class="form-group">
-            <?= $this->Form->control('configuration.follow_redirects', [
-                'label' => __d('monitors', 'Follow Redirects'),
-                'type' => 'checkbox',
-                'checked' => $configuration['follow_redirects'] ?? true,
-                'help' => __d('monitors', 'Follow HTTP 3xx redirects automatically'),
-            ]) ?>
+            <label>
+                <?= $this->Form->checkbox('configuration.follow_redirects', ['checked' => $configuration['follow_redirects'] ?? true]) ?>
+                <?= __d('monitors', 'Follow Redirects') ?>
+                <?= $this->element('tooltip', ['text' => __d('monitors', 'tooltip.http_follow_redirects')]) ?>
+            </label>
+            <small class="form-help"><?= __d('monitors', 'Follow HTTP 3xx redirects automatically') ?></small>
         </div>
     </div>
 
     <div class="form-group">
-        <?= $this->Form->control('configuration.expected_content', [
-            'label' => __d('monitors', 'Expected Content'),
-            'type' => 'text',
+        <label>
+            <?= __d('monitors', 'Expected Content') ?>
+            <?= $this->element('tooltip', ['text' => __d('monitors', 'tooltip.http_expected_content')]) ?>
+        </label>
+        <?= $this->Form->text('configuration.expected_content', [
             'class' => 'form-control',
             'value' => $configuration['expected_content'] ?? '',
             'placeholder' => __d('monitors', 'Text to search in response (optional)'),
-            'help' => __d('monitors', 'Check will fail if this text is not found in response body'),
         ]) ?>
+        <small class="form-help"><?= __d('monitors', 'Check will fail if this text is not found in response body') ?></small>
     </div>
 </div>
 

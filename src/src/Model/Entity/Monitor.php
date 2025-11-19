@@ -136,11 +136,15 @@ class Monitor extends Entity
     /**
      * Set configuration from array
      *
-     * @param array|string $value Configuration array or JSON string
-     * @return string
+     * @param array|string|null $value Configuration array or JSON string
+     * @return string|null
      */
-    protected function _setConfiguration(array|string $value): string
+    protected function _setConfiguration(array|string|null $value): ?string
     {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
         if (is_array($value)) {
             return json_encode($value);
         }

@@ -94,16 +94,25 @@ class MonitorsTable extends Table
             ->inList('type', ['http', 'ping', 'port', 'api', 'ixc', 'zabbix'], __('Invalid monitor type'));
 
         $validator
-            ->scalar('configuration')
             ->allowEmptyString('configuration')
             ->add('configuration', 'validJson', [
                 'rule' => function ($value) {
                     if (empty($value)) {
                         return true;
                     }
-                    json_decode($value);
 
-                    return json_last_error() === JSON_ERROR_NONE;
+                    // If already an array (from database), it's valid
+                    if (is_array($value)) {
+                        return true;
+                    }
+
+                    // If string, validate JSON
+                    if (is_string($value)) {
+                        json_decode($value);
+                        return json_last_error() === JSON_ERROR_NONE;
+                    }
+
+                    return false;
                 },
                 'message' => __('Configuration must be valid JSON'),
             ]);

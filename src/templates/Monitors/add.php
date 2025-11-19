@@ -25,12 +25,17 @@ $this->assign('title', __d('monitors', 'New Monitor'));
         <div class="form-section">
             <h3 class="form-section-title"><?= __d('monitors', 'Basic Information') ?></h3>
 
-            <?= $this->Form->control('name', [
-                'label' => __d('monitors', 'Monitor Name') . ' *',
-                'placeholder' => __d('monitors', 'e.g. Main Website'),
-                'required' => true,
-                'class' => 'form-control',
-            ]) ?>
+            <div class="form-group">
+                <label>
+                    <?= __d('monitors', 'Monitor Name') ?> *
+                    <?= $this->element('tooltip', ['text' => __d('monitors', 'tooltip.monitor_name')]) ?>
+                </label>
+                <?= $this->Form->text('name', [
+                    'placeholder' => __d('monitors', 'e.g. Main Website'),
+                    'required' => true,
+                    'class' => 'form-control',
+                ]) ?>
+            </div>
 
             <?= $this->Form->control('description', [
                 'label' => __('Description'),
@@ -41,86 +46,79 @@ $this->assign('title', __d('monitors', 'New Monitor'));
             ]) ?>
 
             <div class="form-row">
-                <?= $this->Form->control('type', [
-                    'label' => __d('monitors', 'Monitor Type') . ' *',
-                    'options' => [
+                <div class="form-group">
+                    <label>
+                        <?= __d('monitors', 'Monitor Type') ?> *
+                        <?= $this->element('tooltip', ['text' => __d('monitors', 'tooltip.monitor_type')]) ?>
+                    </label>
+                    <?= $this->Form->select('type', [
                         'http' => 'HTTP/HTTPS',
                         'ping' => 'Ping (ICMP)',
                         'port' => __d('monitors', 'Port (TCP/UDP)'),
-                    ],
-                    'required' => true,
-                    'class' => 'form-control',
-                    'id' => 'monitor-type',
-                ]) ?>
+                    ], [
+                        'required' => true,
+                        'class' => 'form-control',
+                        'id' => 'monitor-type',
+                    ]) ?>
+                </div>
 
-                <?= $this->Form->control('active', [
-                    'label' => __d('monitors', 'Active'),
-                    'type' => 'checkbox',
-                    'checked' => true,
-                ]) ?>
+                <div class="form-group">
+                    <label>
+                        <?= $this->Form->checkbox('active', ['checked' => true]) ?>
+                        <?= __d('monitors', 'Active') ?>
+                        <?= $this->element('tooltip', ['text' => __d('monitors', 'tooltip.active')]) ?>
+                    </label>
+                </div>
             </div>
         </div>
 
         <div class="form-section">
             <h3 class="form-section-title"><?= __d('monitors', 'Target Configuration') ?></h3>
+            <p class="form-help"><?= __d('monitors', 'Configuration depends on selected monitor type') ?></p>
 
-            <?= $this->Form->control('target', [
-                'label' => __d('monitors', 'Target') . ' *',
-                'placeholder' => __d('monitors', 'https://example.com or 192.168.1.1'),
-                'required' => true,
-                'class' => 'form-control',
-                'help' => __d('monitors', 'Full URL for HTTP, hostname/IP for Ping and Port'),
-            ]) ?>
+            <!-- HTTP/HTTPS Fields -->
+            <?= $this->element('monitor/form_http') ?>
 
-            <!-- HTTP Specific Fields -->
-            <div id="http-fields" class="monitor-type-fields">
-                <?= $this->Form->control('expected_status_code', [
-                    'label' => __d('monitors', 'Expected HTTP Code'),
-                    'type' => 'number',
-                    'default' => 200,
-                    'class' => 'form-control',
-                    'help' => __d('monitors', 'Expected HTTP status code (e.g. 200, 301)'),
-                ]) ?>
-            </div>
+            <!-- Ping/ICMP Fields -->
+            <?= $this->element('monitor/form_ping') ?>
 
-            <!-- Port Specific Fields -->
-            <div id="port-fields" class="monitor-type-fields" style="display:none;">
-                <?= $this->Form->control('port', [
-                    'label' => __d('monitors', 'Port'),
-                    'type' => 'number',
-                    'min' => 1,
-                    'max' => 65535,
-                    'class' => 'form-control',
-                    'help' => __d('monitors', 'TCP/UDP port number (1-65535)'),
-                ]) ?>
-            </div>
+            <!-- Port/TCP/UDP Fields -->
+            <?= $this->element('monitor/form_port') ?>
         </div>
 
         <div class="form-section">
             <h3 class="form-section-title"><?= __d('monitors', 'Check Settings') ?></h3>
 
             <div class="form-row">
-                <?= $this->Form->control('interval', [
-                    'label' => __d('monitors', 'Interval (seconds)') . ' *',
-                    'type' => 'number',
-                    'default' => 30,
-                    'min' => 10,
-                    'max' => 3600,
-                    'required' => true,
-                    'class' => 'form-control',
-                    'help' => __d('monitors', 'Check frequency (minimum 10s)'),
-                ]) ?>
+                <div class="form-group">
+                    <label>
+                        <?= __d('monitors', 'Interval (seconds)') ?> *
+                        <?= $this->element('tooltip', ['text' => __d('monitors', 'tooltip.check_interval')]) ?>
+                    </label>
+                    <?= $this->Form->number('check_interval', [
+                        'value' => 30,
+                        'min' => 10,
+                        'max' => 3600,
+                        'required' => true,
+                        'class' => 'form-control',
+                    ]) ?>
+                    <small class="form-help"><?= __d('monitors', 'Check frequency (minimum 10s)') ?></small>
+                </div>
 
-                <?= $this->Form->control('timeout', [
-                    'label' => __d('monitors', 'Timeout (seconds)') . ' *',
-                    'type' => 'number',
-                    'default' => 10,
-                    'min' => 1,
-                    'max' => 60,
-                    'required' => true,
-                    'class' => 'form-control',
-                    'help' => __d('monitors', 'Maximum wait time'),
-                ]) ?>
+                <div class="form-group">
+                    <label>
+                        <?= __d('monitors', 'Timeout (seconds)') ?> *
+                        <?= $this->element('tooltip', ['text' => __d('monitors', 'tooltip.timeout')]) ?>
+                    </label>
+                    <?= $this->Form->number('timeout', [
+                        'value' => 10,
+                        'min' => 1,
+                        'max' => 60,
+                        'required' => true,
+                        'class' => 'form-control',
+                    ]) ?>
+                    <small class="form-help"><?= __d('monitors', 'Maximum wait time') ?></small>
+                </div>
             </div>
         </div>
 
@@ -137,35 +135,30 @@ $this->assign('title', __d('monitors', 'New Monitor'));
     </div>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const typeSelect = document.getElementById('monitor-type');
-    const httpFields = document.getElementById('http-fields');
-    const portFields = document.getElementById('port-fields');
-
-    function updateFields() {
-        const type = typeSelect.value;
-
-        // Hide all type-specific fields
-        httpFields.style.display = 'none';
-        portFields.style.display = 'none';
-
-        // Show relevant fields
-        if (type === 'http') {
-            httpFields.style.display = 'block';
-        } else if (type === 'port') {
-            portFields.style.display = 'block';
-        }
-    }
-
-    typeSelect.addEventListener('change', updateFields);
-    updateFields(); // Initial call
-});
-</script>
+<?= $this->Html->script('monitor-form', ['block' => true]) ?>
 
 <style>
 .monitors-form {
     max-width: 800px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: var(--color-dark);
+}
+
+.form-help {
+    display: block;
+    margin-top: 6px;
+    font-size: 13px;
+    color: var(--color-gray-medium);
+    line-height: 1.4;
 }
 
 .form-section {

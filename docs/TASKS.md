@@ -29,6 +29,35 @@ isp_status_page/
 3. Status: 🔴 Não iniciado | 🟡 Em progresso | 🟢 Completo
 4. Prioridade: 🔥 Crítica | ⭐ Alta | 💡 Média | 📌 Baixa
 
+## 💡 Sistema de Tooltips (Importante!)
+
+**TODOS OS FORMULÁRIOS devem usar tooltips informativos!**
+
+Sistema completo implementado em `templates/element/tooltip.php` com 68+ tooltips traduzidos em pt_BR, en, es.
+
+**Como usar:**
+```php
+<label>
+    <?= __d('domain', 'Label do Campo') ?> *
+    <?= $this->element('tooltip', ['text' => __d('domain', 'tooltip.campo_nome')]) ?>
+</label>
+```
+
+**Tooltips disponíveis por categoria:**
+- ✅ **Monitors** (28): Todos os campos de HTTP, Ping, Port + campos gerais
+- ✅ **Settings** (11): Site, Email SMTP, Monitoring defaults
+- ✅ **Alert Rules** (7): Name, Trigger, Channels, Recipients, Cooldown, etc
+- ✅ **Incidents** (6): Title, Message, Status, Severity, Visibility
+- ✅ **Integrations** (8): IXC, Zabbix, REST API configs
+- ✅ **Subscribers** (4): Email, Monitors, Verification, Status
+
+**Arquivos de tradução:**
+- `src/Locale/pt_BR/monitors.po`
+- `src/Locale/en/monitors.po`
+- `src/Locale/es/monitors.po`
+
+**⚠️ IMPORTANTE**: Ao implementar formulários, sempre adicione tooltips nos campos que precisam de explicação!
+
 ## ✅ Tarefas Completas
 
 **Fase 0**: TASK-000 ✅, TASK-001 ✅ (2/2 completas)
@@ -573,33 +602,41 @@ bin/cake bake model Monitors --no-test --no-fixture
 ---
 
 ### TASK-202: Forms Dinâmicos por Tipo de Monitor
-**Status**: 🔴 | **Prioridade**: ⭐ | **Dependências**: TASK-201
-**Estimativa**: 4h
+**Status**: 🟢 **COMPLETO** | **Prioridade**: ⭐ | **Dependências**: TASK-201
+**Estimativa**: 4h | **Tempo Real**: 3h
 
 **Descrição**: Criar forms que mudam baseado no tipo de monitor selecionado.
 
-**Tipos**:
-- HTTP: URL, method, headers, expected_status
-- Ping: Host, packet_count, max_latency
-- Port: Host, port, protocol
+**Tipos implementados**:
+- ✅ HTTP: URL, method, headers, expected_status, body, verify_ssl, follow_redirects, expected_content
+- ✅ Ping: Host, packet_count, max_latency, max_packet_loss
+- ✅ Port: Host, port, protocol, send_data, expected_response
 
-**Implementar**:
-- JavaScript para mostrar/ocultar campos
-- Validação frontend
-- Componentes reutilizáveis
+**Arquivos criados/modificados**:
+- ✅ `templates/Monitors/add.php` - Atualizado para usar elementos dinâmicos
+- ✅ `templates/Monitors/edit.php` - Atualizado para usar elementos dinâmicos
+- ✅ `webroot/js/monitor-form.js` - JavaScript com validações e controle de visibilidade
+- ✅ `templates/element/monitor/form_http.php` - Formulário HTTP completo
+- ✅ `templates/element/monitor/form_ping.php` - Formulário Ping completo
+- ✅ `templates/element/monitor/form_port.php` - Formulário Port completo
 
-**Arquivos a criar/modificar**:
-- `templates/Admin/Monitors/add.php`
-- `templates/Admin/Monitors/edit.php`
-- `webroot/js/monitor-form.js`
-- `templates/element/monitor/form_http.php`
-- `templates/element/monitor/form_ping.php`
-- `templates/element/monitor/form_port.php`
+**Funcionalidades implementadas**:
+- ✅ Forms mudam dinamicamente baseado no tipo selecionado
+- ✅ Campos específicos aparecem/desaparecem com transições suaves
+- ✅ Validação frontend com mensagens de erro claras
+- ✅ Validação de JSON para HTTP headers
+- ✅ Validação de URL, porta, hosts
+- ✅ Required fields dinâmicos por tipo
+- ✅ Helper boxes com informações úteis (common ports, notes)
+- ✅ UX intuitiva com ícones e cores por tipo
 
 **Critérios de Aceite**:
-- [ ] Form muda dinamicamente
-- [ ] Validações adequadas por tipo
-- [ ] UX intuitiva
+- [x] Form muda dinamicamente
+- [x] Validações adequadas por tipo
+- [x] UX intuitiva
+- [x] Componentes reutilizáveis
+- [x] JavaScript modular e separado
+- [x] Suporte completo a configurações avançadas por tipo
 
 ---
 
@@ -810,6 +847,15 @@ bin/cake bake model Monitors --no-test --no-fixture
 - Timestamps: started_at, identified_at, resolved_at
 - Severidade atual: todos como "major" (pronto para expansão futura)
 
+**🔔 Tooltips Disponíveis** (6 tooltips já traduzidos em pt_BR, en, es):
+- `tooltip.incident_title` - Título do incidente para status page
+- `tooltip.incident_message` - Descrição detalhada (suporta markdown)
+- `tooltip.incident_status` - Investigando/Identificado/Monitorando/Resolvido
+- `tooltip.incident_severity` - Crítico/Alto/Médio/Baixo
+- `tooltip.incident_visible_status_page` - Exibir publicamente
+- `tooltip.incident_notify_subscribers` - Notificar assinantes por email
+**Uso**: `<?= $this->element('tooltip', ['text' => __d('monitors', 'tooltip.incident_title')]) ?>`
+
 ---
 
 ### TASK-221: Incidents Controller
@@ -880,6 +926,10 @@ bin/cake bake model Monitors --no-test --no-fixture
 - 3 incidentes de teste criados para validação da interface
 - Método `buildTimeline()` gera eventos cronológicos automaticamente
 - Método `formatDuration()` formata duração em formato legível
+
+**🔔 Tooltips Disponíveis** (6 tooltips já traduzidos - mesmos da TASK-220):
+- Usar os tooltips de incidents ao criar formulários de edição
+- Ver lista completa em TASK-220 acima
 
 ---
 
@@ -1012,6 +1062,13 @@ bin/cake bake model Monitors --no-test --no-fixture
 - Método `resendVerification()` preparado para integração futura com EmailService
 - EmailLogs count incluído no view (preparado para TASK-224)
 - Subscriptions relationship carregada com eager loading (contain)
+
+**🔔 Tooltips Disponíveis** (4 tooltips já traduzidos em pt_BR, en, es):
+- `tooltip.subscriber_email` - Email que receberá notificações
+- `tooltip.subscriber_monitors` - Monitores específicos ou todos
+- `tooltip.subscriber_verified` - Status de verificação do email
+- `tooltip.subscriber_subscribed` - Status de assinatura ativo/inativo
+**Uso**: `<?= $this->element('tooltip', ['text' => __d('monitors', 'tooltip.subscriber_email')]) ?>`
 
 ---
 
@@ -1159,6 +1216,24 @@ bin/cake bake model Monitors --no-test --no-fixture
 
 **Notas de Implementação**:
 - Usa SettingService existente com cache de 1 hora
+
+**🔔 Tooltips Disponíveis** (11 tooltips já traduzidos em pt_BR, en, es):
+- `tooltip.setting_site_name` - Nome do site
+- `tooltip.setting_site_url` - URL completa do sistema
+- `tooltip.setting_status_page_public` - Página pública ou restrita
+- `tooltip.setting_status_cache` - Tempo de cache
+- `tooltip.setting_smtp_host` - Servidor SMTP
+- `tooltip.setting_smtp_port` - Porta SMTP (587/465/25)
+- `tooltip.setting_smtp_username` - Usuário SMTP
+- `tooltip.setting_smtp_password` - Senha SMTP (app password)
+- `tooltip.setting_email_from` - Email remetente
+- `tooltip.setting_email_from_name` - Nome remetente
+- `tooltip.setting_default_interval` - Intervalo padrão monitores
+- `tooltip.setting_default_timeout` - Timeout padrão monitores
+- `tooltip.setting_max_retries` - Tentativas antes offline
+- `tooltip.setting_auto_resolve` - Resolver incidentes automaticamente
+
+**Uso**: `<?= $this->element('tooltip', ['text' => __d('monitors', 'tooltip.setting_site_name')]) ?>`
 - Categorização automática baseada em prefixo da key (site_, email_, monitor_, notification_)
 - Settings existentes no banco: 5 configurações gerais já populadas
 - Método getDefaultSettings() define valores padrão para reset
@@ -1444,6 +1519,16 @@ bin/cake bake model Monitors --no-test --no-fixture
 - [ ] Throttling funciona
 - [ ] Registra em alert_logs
 
+**🔔 Tooltips Disponíveis** (7 tooltips já traduzidos em pt_BR, en, es):
+- `tooltip.alert_rule_name` - Nome descritivo da regra
+- `tooltip.alert_rule_description` - Descrição detalhada e propósito
+- `tooltip.alert_rule_trigger` - Quando disparar (down/up/degraded/any)
+- `tooltip.alert_rule_channels` - Email/WhatsApp/Telegram/SMS
+- `tooltip.alert_rule_recipients` - Lista JSON de destinatários
+- `tooltip.alert_rule_cooldown` - Tempo mínimo entre alertas (minutos)
+- `tooltip.alert_rule_active` - Ativo/Inativo
+**Uso**: `<?= $this->element('tooltip', ['text' => __d('monitors', 'tooltip.alert_rule_name')]) ?>`
+
 ---
 
 ### TASK-260: Incident Acknowledgement System
@@ -1698,6 +1783,17 @@ bin/cake bake model Monitors --no-test --no-fixture
 - [ ] CRUD completo
 - [ ] Teste de conexão funciona
 - [ ] Credenciais seguras
+
+**🔔 Tooltips Disponíveis** (8 tooltips já traduzidos em pt_BR, en, es):
+- `tooltip.integration_name` - Nome identificador da integração
+- `tooltip.integration_type` - IXC Soft/Zabbix/REST API
+- `tooltip.integration_url` - URL completa da API externa
+- `tooltip.integration_api_key` - Chave API/token (criptografado)
+- `tooltip.integration_username` - Usuário para auth básica
+- `tooltip.integration_password` - Senha (criptografada)
+- `tooltip.integration_sync_interval` - Intervalo de sincronização (minutos)
+- `tooltip.integration_active` - Status ativo/inativo
+**Uso**: `<?= $this->element('tooltip', ['text' => __d('monitors', 'tooltip.integration_name')]) ?>`
 
 ---
 
