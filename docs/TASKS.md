@@ -1729,30 +1729,32 @@ bin/cake bake model Monitors --no-test --no-fixture
 ---
 
 ### TASK-410: Cleanup Command
-**Status**: 🔴 | **Prioridade**: 📌 | **Dependências**: TASK-000
-**Estimativa**: 2h
+**Status**: 🟢 **COMPLETO** | **Prioridade**: 📌 | **Dependências**: TASK-000
+**Estimativa**: 2h | **Tempo Real**: 2h
 
 **Descrição**: Command para limpeza de dados antigos.
 
-**Implementar**:
-- Deletar monitor_checks > 30 dias
-- Deletar integration_logs > 7 dias
-- Deletar alert_logs > 30 dias
-- VACUUM SQLite
+**Implementado**:
+- ✅ Deletar monitor_checks > 30 dias (configurável)
+- ✅ Deletar integration_logs > 7 dias (configurável)
+- ✅ Deletar alert_logs > 30 dias (configurável)
+- ✅ VACUUM SQLite
+- ✅ Modo dry-run para testes
+- ✅ Opções configuráveis via CLI
 
-**Arquivos a criar**:
-- `src/Command/CleanupCommand.php`
+**Arquivos criados**:
+- `src/Command/CleanupCommand.php` - ✅ 280 linhas
 
 **Critérios de Aceite**:
-- [ ] Limpeza funcional
-- [ ] Logs informativos
-- [ ] Configurável
+- [x] Limpeza funcional com rotação configurável
+- [x] Logs informativos com contadores
+- [x] Configurável via opções de linha de comando
 
 ---
 
 ### TASK-420: Backup Command
-**Status**: 🔴 | **Prioridade**: 📌 | **Dependências**: TASK-000
-**Estimativa**: 2h
+**Status**: 🟢 **COMPLETO** | **Prioridade**: 📌 | **Dependências**: TASK-000
+**Estimativa**: 2h | **Tempo Real**: 2h
 
 **Descrição**: Command para backup automático.
 
@@ -1762,14 +1764,114 @@ bin/cake bake model Monitors --no-test --no-fixture
 - Rotação (manter últimos 30)
 - Compressão opcional
 
-**Arquivos a criar**:
-- `src/Command/BackupCommand.php`
-- `bin/backup.sh`
+**Arquivos criados**:
+- `src/Command/BackupCommand.php` ✅
+- `bin/backup.sh` ✅
 
 **Critérios de Aceite**:
-- [ ] Backup funciona
-- [ ] Rotação automática
-- [ ] Restore documentado
+- [x] Backup funciona
+- [x] Rotação automática
+- [x] Restore documentado
+
+---
+
+### TASK-421: Backup FTP/SFTP Upload
+**Status**: 🔴 | **Prioridade**: 💡 | **Dependências**: TASK-420
+**Estimativa**: 4h
+
+**Descrição**: Adicionar upload automático de backups para servidor FTP/SFTP remoto.
+
+**Implementar**:
+- Migration para settings de FTP/SFTP
+- Interface de configuração no Settings (nova aba "Backup")
+- Service para upload FTP/SFTP
+- Botão "Testar Conexão FTP/SFTP"
+- Integração no BackupCommand (upload após criar backup)
+- Suporte para FTP (porta 21) e SFTP (porta 22)
+- Modo passivo para FTP
+- Logs de upload
+
+**Settings a adicionar**:
+- `backup_ftp_enabled` (boolean) - Habilitar upload automático
+- `backup_ftp_type` (string) - Tipo: 'ftp' ou 'sftp'
+- `backup_ftp_host` (string) - Hostname do servidor
+- `backup_ftp_port` (integer) - Porta (21 para FTP, 22 para SFTP)
+- `backup_ftp_username` (string) - Usuário FTP/SFTP
+- `backup_ftp_password` (string) - Senha FTP/SFTP
+- `backup_ftp_path` (string) - Diretório remoto (ex: /backups)
+- `backup_ftp_passive` (boolean) - Modo passivo (apenas FTP)
+
+**Arquivos a criar**:
+- `config/Migrations/YYYYMMDDHHMMSS_AddBackupFtpSettings.php`
+- `src/Service/BackupUploaderService.php`
+- `src/Controller/SettingsController::testFtpConnection()`
+
+**Arquivos a modificar**:
+- `src/Command/BackupCommand.php` - Adicionar upload após backup
+- `templates/Settings/index.php` - Adicionar aba "Backup"
+- `src/Locale/*/settings.po` - Traduções (pt_BR, en, es)
+
+**Interface na aba Settings → Backup**:
+```
+[ ] Habilitar Upload Automático para FTP/SFTP
+
+Tipo de Conexão: [Dropdown: FTP | SFTP]
+Servidor: [input text]
+Porta: [input number] (21 para FTP, 22 para SFTP)
+Usuário: [input text]
+Senha: [input password]
+Diretório Remoto: [input text] (/backups)
+[ ] Modo Passivo (apenas FTP)
+
+[Botão: Testar Conexão] [Botão: Salvar]
+```
+
+**Fluxo do Backup com Upload**:
+1. BackupCommand cria backup local
+2. Se `backup_ftp_enabled` = true:
+   - Instancia BackupUploaderService
+   - Conecta ao servidor FTP/SFTP
+   - Faz upload do arquivo de backup
+   - Loga resultado (sucesso/erro)
+3. Continua rotação local normalmente
+
+**Bibliotecas**:
+- FTP: Usar funções nativas PHP (`ftp_connect`, `ftp_login`, `ftp_put`)
+- SFTP: Usar `phpseclib/phpseclib` (adicionar ao composer.json)
+
+**Tratamento de Erros**:
+- Timeout de conexão (30s)
+- Credenciais inválidas
+- Diretório remoto não existe
+- Sem espaço no servidor remoto
+- Logs detalhados em `logs/backup.log`
+
+**Critérios de Aceite**:
+- [ ] Migration de settings executada
+- [ ] Interface de configuração funcional
+- [ ] Botão "Testar Conexão" valida credenciais
+- [ ] Upload FTP funciona (testado)
+- [ ] Upload SFTP funciona (testado)
+- [ ] Modo passivo FTP funciona
+- [ ] Erros são logados adequadamente
+- [ ] BackupCommand faz upload automático se habilitado
+- [ ] Traduções em 3 idiomas (pt_BR, en, es)
+- [ ] Documentação de uso no README ou docs/
+
+**Exemplo de uso**:
+```bash
+# Configurar via Settings web interface
+# Depois executar backup normalmente
+bin/cake backup --compress
+
+# Log de saída:
+# Creating backup: backup_2025-11-14_18-00-00.db.gz
+# ✓ Backup created successfully
+# Uploading to FTP server (ftp.example.com)...
+# ✓ Uploaded successfully to /backups/backup_2025-11-14_18-00-00.db.gz
+# Rotating backups (keeping last 30)...
+# ✓ Backup completed successfully!
+```
 
 ---
 

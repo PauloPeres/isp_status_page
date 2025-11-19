@@ -141,11 +141,6 @@ $this->assign('title', 'Dashboard');
                     ['class' => 'btn btn-primary']
                 ) ?>
                 <?= $this->Html->link(
-                    '🚨 Novo Incidente',
-                    ['controller' => 'Incidents', 'action' => 'add'],
-                    ['class' => 'btn btn-error']
-                ) ?>
-                <?= $this->Html->link(
                     '⚙️ Configurações',
                     ['controller' => 'Settings', 'action' => 'index'],
                     ['class' => 'btn btn-secondary']

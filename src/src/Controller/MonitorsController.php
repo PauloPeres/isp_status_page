@@ -94,7 +94,9 @@ class MonitorsController extends AppController
             ->all();
 
         $totalChecks = $checksLast24h->count();
-        $successfulChecks = $checksLast24h->where(['status' => 'up'])->count();
+        $successfulChecks = $checksLast24h->filter(function ($check) {
+            return $check->status === 'success';
+        })->count();
         $uptime = $totalChecks > 0 ? ($successfulChecks / $totalChecks) * 100 : 0;
 
         // Calcular tempo médio de resposta
