@@ -32,6 +32,9 @@ class AlertRule extends Entity
     public const CHANNEL_TELEGRAM = 'telegram';
     public const CHANNEL_SMS = 'sms';
     public const CHANNEL_PHONE = 'phone';
+    public const CHANNEL_SLACK = 'slack';
+    public const CHANNEL_DISCORD = 'discord';
+    public const CHANNEL_WEBHOOK = 'webhook';
 
     /**
      * Trigger types (matching DATABASE.md)
@@ -161,6 +164,36 @@ class AlertRule extends Entity
     }
 
     /**
+     * Check if channel is Slack
+     *
+     * @return bool
+     */
+    public function isSlackChannel(): bool
+    {
+        return $this->channel === self::CHANNEL_SLACK;
+    }
+
+    /**
+     * Check if channel is Discord
+     *
+     * @return bool
+     */
+    public function isDiscordChannel(): bool
+    {
+        return $this->channel === self::CHANNEL_DISCORD;
+    }
+
+    /**
+     * Check if channel is Webhook
+     *
+     * @return bool
+     */
+    public function isWebhookChannel(): bool
+    {
+        return $this->channel === self::CHANNEL_WEBHOOK;
+    }
+
+    /**
      * Get human-readable channel name
      *
      * @return string
@@ -173,6 +206,9 @@ class AlertRule extends Entity
             self::CHANNEL_TELEGRAM => 'Telegram',
             self::CHANNEL_SMS => 'SMS',
             self::CHANNEL_PHONE => 'Phone',
+            self::CHANNEL_SLACK => 'Slack',
+            self::CHANNEL_DISCORD => 'Discord',
+            self::CHANNEL_WEBHOOK => 'Webhook',
             default => 'Unknown',
         };
     }

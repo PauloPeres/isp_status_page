@@ -207,30 +207,30 @@ Transforming the existing ISP Status Page (CakePHP 5.x) into a full SaaS UptimeR
 ## Phase 5: Feature Parity with UptimeRobot
 
 ### TASK-1000: Heartbeat/Cron Monitoring (Push-Based)
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Description:** Heartbeats table with token and expected_interval. Public ping endpoint GET /heartbeat/{token}. HeartbeatChecker detects stale pings. HeartbeatCheckCommand.
 - **Files to create:** Migration, HeartbeatsTable, HeartbeatController, HeartbeatChecker, HeartbeatCheckCommand, form element
-- **Result:** _pending_
+- **Result:** Created migration `20260328000040_CreateHeartbeats.php` with heartbeats table (id, monitor_id, organization_id, token UNIQUE, last_ping_at, expected_interval default 300, grace_period default 60, created) with foreign keys to monitors (CASCADE) and organizations, unique index on token. Created `Heartbeat.php` entity with `isOverdue()` helper. Created `HeartbeatsTable.php` with belongsTo Monitors and Organizations, validation rules, and build rules (existsIn, isUnique token). Created `HeartbeatController.php` with public `ping($token)` endpoint (no auth required via `addUnauthenticatedActions`), finds heartbeat by token, updates `last_ping_at`, returns JSON `{"ok": true}`. Created `HeartbeatChecker.php` extending AbstractChecker -- checks if `last_ping_at + expected_interval + grace_period > now`, returns success if on time, down if overdue or never pinged. Added route `GET /heartbeat/{token}` in routes.php. Added `heartbeat` to MonitorsTable type validation and `TYPE_HEARTBEAT` constant to Monitor entity. Created HeartbeatCheckerTest with 6 tests covering: within interval (success), overdue (down), grace period boundary (success), never pinged (down), no heartbeat record (down), and configuration validation.
 
 ### TASK-1001: Keyword Monitoring
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Description:** KeywordChecker extends HttpChecker with content matching (contains/not-contains text). New monitor type 'keyword'.
 - **Files to create:** KeywordChecker
 - **Files to modify:** MonitorsTable (add type), HttpChecker (refactor for extension)
-- **Result:** _pending_
+- **Result:** Created `KeywordChecker.php` extending AbstractChecker with injected Cake HTTP Client (for testing). Configuration: url, keyword, keyword_type (contains/not_contains). Makes HTTP request to URL, checks if response body contains (or doesn't contain) the keyword using case-insensitive matching. Returns success if keyword check passes, down if it fails. `validateConfiguration()` requires url, keyword, valid keyword_type, and timeout. Added `keyword` to MonitorsTable type validation and `TYPE_KEYWORD` constant to Monitor entity. Created KeywordCheckerTest with 8 tests covering: keyword found (success), keyword not found (down), not_contains mode absent (success), not_contains mode present (down), missing keyword validation, valid config validation, connection error (down), and type/name getters.
 
 ### TASK-1002: SSL Certificate Monitoring
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Description:** SslCertChecker checks certificate expiry and chain validity. Alerts at configurable thresholds (30/14/7/1 days).
 - **Files to create:** SslCertChecker, SslCertCheckJob, ssl_form element
-- **Result:** _pending_
+- **Result:** Created `SslCertChecker.php` extending AbstractChecker with injectable socket factory (for testing). Configuration: host, port (default 443), warning_days (default 30). Uses PHP `stream_socket_client` with SSL context to retrieve certificate info via `openssl_x509_parse`. Returns: success (cert OK, expiry > warning_days), degraded (expiring soon within warning_days), down (expired or invalid/unreachable). Response metadata includes: issuer, subject, valid_from, valid_to, days_remaining. `validateConfiguration()` requires host and valid port (1-65535). Added `ssl` to MonitorsTable type validation and `TYPE_SSL` constant to Monitor entity. Created SslCertCheckerTest with 9 tests covering: valid cert (success), expiring cert (degraded), expired cert (down), null cert info (down), connection exception (down), missing host validation, valid config validation, invalid port validation, and type/name getters.
 
 ### TASK-1003: Alert Channels — Slack, Discord, Telegram, Webhook
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Description:** Four new alert channel implementations. Register in AlertService.
 - **Files to create:** SlackAlertChannel, DiscordAlertChannel, TelegramAlertChannel, WebhookAlertChannel, tests
 - **Files to modify:** AlertService, AlertRulesTable
-- **Result:** _pending_
+- **Result:** Created four new alert channel implementations, all implementing ChannelInterface and using CakePHP's Http\Client for HTTP requests. **SlackAlertChannel** sends alerts via Slack incoming webhook URLs with Block Kit formatting (color-coded attachments: red #E53935 for down, green #43A047 for up, with monitor name, status, type, timestamp, and incident fields). **DiscordAlertChannel** sends alerts via Discord webhook URLs using embed format with color-coded sidebar (decimal color integers), timestamp, and footer. **TelegramAlertChannel** sends alerts via Telegram Bot API (`/bot{token}/sendMessage`) with HTML formatting; recipients are JSON objects containing `bot_token` and `chat_id`; includes HTML escaping for security. **WebhookAlertChannel** POSTs structured JSON payloads (event_type, monitor, incident, timestamp) to custom URLs with HMAC-SHA256 signing via `X-Signature-256` header; the signing secret is read from the alert rule's template field as `{"webhook_secret": "..."}`. Added `CHANNEL_SLACK`, `CHANNEL_DISCORD`, and `CHANNEL_WEBHOOK` constants to AlertRule entity with corresponding helper methods and channel name mapping. Updated AlertRulesTable validation inList to accept all 8 channel types. Registered all four new channels in MonitorCheckCommand alongside the existing EmailAlertChannel. Created comprehensive test suites: SlackAlertChannelTest (8 tests), DiscordAlertChannelTest (8 tests), TelegramAlertChannelTest (13 tests), WebhookAlertChannelTest (13 tests) -- total 42 new tests passing with 88 assertions, using mocked Http\Client to avoid actual API calls.
 
 ### TASK-1004: Custom Status Pages (Per-Org)
 - **Status:** PENDING

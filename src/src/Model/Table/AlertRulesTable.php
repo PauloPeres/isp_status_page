@@ -86,6 +86,9 @@ class AlertRulesTable extends Table
                 AlertRule::CHANNEL_TELEGRAM,
                 AlertRule::CHANNEL_SMS,
                 AlertRule::CHANNEL_PHONE,
+                AlertRule::CHANNEL_SLACK,
+                AlertRule::CHANNEL_DISCORD,
+                AlertRule::CHANNEL_WEBHOOK,
             ], __('Invalid alert channel'));
 
         $validator

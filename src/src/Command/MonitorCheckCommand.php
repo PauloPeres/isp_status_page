@@ -4,7 +4,11 @@ declare(strict_types=1);
 namespace App\Command;
 
 use App\Service\Alert\AlertService;
+use App\Service\Alert\DiscordAlertChannel;
 use App\Service\Alert\EmailAlertChannel;
+use App\Service\Alert\SlackAlertChannel;
+use App\Service\Alert\TelegramAlertChannel;
+use App\Service\Alert\WebhookAlertChannel;
 use App\Service\Check\CheckService;
 use App\Service\Check\HttpChecker;
 use App\Service\Check\PingChecker;
@@ -67,6 +71,10 @@ class MonitorCheckCommand extends Command
         // Initialize alert service and register channels
         $this->alertService = new AlertService();
         $this->alertService->registerChannel(new EmailAlertChannel());
+        $this->alertService->registerChannel(new SlackAlertChannel());
+        $this->alertService->registerChannel(new DiscordAlertChannel());
+        $this->alertService->registerChannel(new TelegramAlertChannel());
+        $this->alertService->registerChannel(new WebhookAlertChannel());
 
         // Initialize incident service
         $this->incidentService = new IncidentService();
