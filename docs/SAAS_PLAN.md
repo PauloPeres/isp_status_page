@@ -102,11 +102,11 @@ Transforming the existing ISP Status Page (CakePHP 5.x) into a full SaaS UptimeR
 - **Result:** _pending_
 
 ### TASK-703: RBAC (Role-Based Access Control)
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Description:** Permission policies for org, monitors, invitations. Roles: owner (full), admin (team+resources), member (resources), viewer (read-only). Uses cakephp/authorization.
 - **Files to create:** Policy classes, AuthorizationService, middleware, tests
 - **Depends on:** Phase 1
-- **Result:** _pending_
+- **Result:** Implemented lightweight RBAC using a PermissionService approach (simpler than full cakephp/authorization plugin). Added `cakephp/authorization: ^3.0` to composer.json for future use. Created four policy classes (OrganizationPolicy, MonitorPolicy, IntegrationPolicy, AlertRulePolicy) enforcing the permission matrix: owner (full access), admin (team+settings+resources), member (resources only), viewer (read-only). Created `PermissionService` with a declarative permission matrix, role lookup via OrganizationUsers table, and convenience methods (canManageBilling, canManageTeam, canManageSettings, canManageResources, canView). Updated `AppController` with `$currentUserRole` property loaded from OrganizationUsers on each request, `checkPermission()` helper that throws ForbiddenException, and role passed to all views. Updated admin sidebar to conditionally show/hide Users and Settings menu items for owner/admin only. Added viewer fixture record to OrganizationUsersFixture. Created 23 tests (93 assertions) covering all role-permission combinations, non-member rejection, TenantContext integration, and policy classes.
 
 ### TASK-704: OAuth/Social Login (Google, GitHub)
 - **Status:** PENDING
@@ -128,10 +128,10 @@ Transforming the existing ISP Status Page (CakePHP 5.x) into a full SaaS UptimeR
 ## Phase 3: Stripe Billing
 
 ### TASK-800: Plans & Pricing Configuration
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Description:** Plans table: Free (1 monitor, 5min, email only), Pro $15/mo (50 monitors, 1min, Slack+webhook, API), Business $45/mo (unlimited, 30s, all channels, multi-region). PlanService for limit enforcement.
 - **Files to create:** Migration, PlansTable, Plan entity, PlansSeed, PlanService, fixture
-- **Result:** _pending_
+- **Result:** Created migration `20260328000020_CreatePlans.php` with all columns (name, slug, stripe_price_id_monthly/yearly, price_monthly/yearly in cents, monitor_limit, check_interval_min, team_member_limit, status_page_limit, api_rate_limit, data_retention_days, features JSON, display_order, active, timestamps) and indexes (unique slug, active, display_order). Created `PlansSeed.php` with Free/Pro/Business plan data. Created `Plan.php` entity with slug constants (FREE, PRO, BUSINESS), UNLIMITED constant (-1), helper methods (isUnlimited, getMonthlyPriceFormatted, getYearlyPriceFormatted, getFeatures, hasFeature), virtual property is_free, and JSON features mutator. Created `PlansTable.php` with validation rules, unique slug build rule, hasMany Organizations association, and custom finders (findBySlug, findActive). Created `PlanService.php` with getPlanForOrganization, canAddMonitor, canAddTeamMember, canUseFeature, getMinCheckInterval, enforceLimit (throws RuntimeException on exceeded limits), and in-memory plan cache. Created `PlansFixture.php` with all 3 plans. Created `PlanServiceTest.php` with 27 tests covering monitor limit enforcement, team member limits, feature access checks, unlimited plan handling, free plan restrictions, plan entity helpers (formatting, virtual fields), finders, cache clearing, and error cases.
 
 ### TASK-801: Stripe Integration Service
 - **Status:** PENDING

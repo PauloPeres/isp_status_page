@@ -17,7 +17,9 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use Cake\Controller\Controller;
+use Cake\Http\Exception\ForbiddenException;
 use Cake\I18n\I18n;
+use App\Service\PermissionService;
 use App\Service\SettingService;
 use App\Tenant\TenantContext;
 
@@ -37,6 +39,20 @@ class AppController extends Controller
      * @var array|null
      */
     protected ?array $currentOrganization = null;
+
+    /**
+     * The current user's role in the current organization.
+     *
+     * @var string|null
+     */
+    protected ?string $currentUserRole = null;
+
+    /**
+     * Permission service instance.
+     *
+     * @var \App\Service\PermissionService|null
+     */
+    protected ?PermissionService $permissionService = null;
 
     /**
      * Initialization hook method.
@@ -68,6 +84,16 @@ class AppController extends Controller
         if (TenantContext::isSet()) {
             $this->currentOrganization = TenantContext::getCurrentOrganization();
             $this->set('currentOrganization', $this->currentOrganization);
+
+            // Load the current user's role in this organization
+            $this->permissionService = new PermissionService();
+            $identity = $this->request->getAttribute('identity');
+            if ($identity && $this->currentOrganization) {
+                $userId = (int)$identity->getIdentifier();
+                $orgId = (int)$this->currentOrganization['id'];
+                $this->currentUserRole = $this->permissionService->getUserRole($userId, $orgId);
+                $this->set('currentUserRole', $this->currentUserRole);
+            }
         }
 
         /*
@@ -90,5 +116,28 @@ class AppController extends Controller
         // Allow public access to the display action (status page) and home (root redirect)
         // Login and logout will be configured in UsersController
         $this->Authentication->addUnauthenticatedActions(['display', 'home']);
+    }
+
+    /**
+     * Check if the current user has permission to perform an action.
+     * Throws ForbiddenException if not authorized.
+     *
+     * @param string $action The action to check (use PermissionService::ACTION_* constants).
+     * @return void
+     * @throws \Cake\Http\Exception\ForbiddenException If user is not authorized.
+     */
+    protected function checkPermission(string $action): void
+    {
+        if ($this->currentUserRole === null) {
+            throw new ForbiddenException(__('You do not have access to this organization.'));
+        }
+
+        if ($this->permissionService === null) {
+            $this->permissionService = new PermissionService();
+        }
+
+        if (!$this->permissionService->canWithRole($this->currentUserRole, $action)) {
+            throw new ForbiddenException(__('You do not have permission to perform this action.'));
+        }
     }
 }

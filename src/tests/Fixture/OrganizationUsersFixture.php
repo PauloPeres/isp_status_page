@@ -49,5 +49,16 @@ class OrganizationUsersFixture extends TestFixture
             'created' => '2024-02-01 09:00:00',
             'modified' => '2024-02-01 11:00:00',
         ],
+        [
+            'id' => 4,
+            'organization_id' => 1,
+            'user_id' => 3,
+            'role' => 'viewer',
+            'invited_by' => 1,
+            'invited_at' => '2024-03-01 09:00:00',
+            'accepted_at' => '2024-03-01 11:00:00',
+            'created' => '2024-03-01 09:00:00',
+            'modified' => '2024-03-01 11:00:00',
+        ],
     ];
 }

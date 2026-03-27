@@ -100,6 +100,14 @@ function isActive($currentController, $targetController, $currentAction = null, 
         <div class="nav-section">
             <span class="nav-section-title"><?= __('System') ?></span>
 
+            <?php
+            // Users (team management): only show for owner and admin
+            $role = $currentUserRole ?? null;
+            $canManageTeam = $role === null || in_array($role, ['owner', 'admin'], true);
+            $canManageSettings = $role === null || in_array($role, ['owner', 'admin'], true);
+            ?>
+
+            <?php if ($canManageTeam): ?>
             <?= $this->Html->link(
                 '<span class="nav-icon">👥</span> ' . __('Users'),
                 ['controller' => 'Users', 'action' => 'index'],
@@ -108,7 +116,9 @@ function isActive($currentController, $targetController, $currentAction = null, 
                     'class' => 'nav-item' . (isActive($controller, 'Users') ? ' active' : '')
                 ]
             ) ?>
+            <?php endif; ?>
 
+            <?php if ($canManageSettings): ?>
             <?= $this->Html->link(
                 '<span class="nav-icon">⚙️</span> ' . __('Settings'),
                 ['controller' => 'Settings', 'action' => 'index'],
@@ -117,6 +127,7 @@ function isActive($currentController, $targetController, $currentAction = null, 
                     'class' => 'nav-item' . (isActive($controller, 'Settings') ? ' active' : '')
                 ]
             ) ?>
+            <?php endif; ?>
         </div>
 
         <div class="nav-section">
