@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Model\Entity;
 
+use Cake\I18n\DateTime;
 use Cake\ORM\Entity;
 
 /**
@@ -19,10 +20,15 @@ use Cake\ORM\Entity;
  * @property \Cake\I18n\DateTime|null $resolved_at
  * @property int|null $duration
  * @property bool $auto_created
+ * @property int|null $acknowledged_by_user_id
+ * @property \Cake\I18n\DateTime|null $acknowledged_at
+ * @property string|null $acknowledged_via
+ * @property string|null $acknowledgement_token
  * @property \Cake\I18n\DateTime $created
  * @property \Cake\I18n\DateTime $modified
  *
  * @property \App\Model\Entity\Monitor $monitor
+ * @property \App\Model\Entity\User|null $acknowledged_by_user
  * @property \App\Model\Entity\AlertLog[] $alert_logs
  */
 class Incident extends Entity
@@ -34,6 +40,19 @@ class Incident extends Entity
     public const STATUS_IDENTIFIED = 'identified';
     public const STATUS_MONITORING = 'monitoring';
     public const STATUS_RESOLVED = 'resolved';
+
+    /**
+     * Acknowledgement channels
+     */
+    public const ACK_VIA_EMAIL = 'email';
+    public const ACK_VIA_WEB = 'web';
+    public const ACK_VIA_TELEGRAM = 'telegram';
+    public const ACK_VIA_SMS = 'sms';
+
+    /**
+     * Token expiry in hours
+     */
+    public const TOKEN_EXPIRY_HOURS = 24;
 
     /**
      * Incident severities
@@ -63,9 +82,14 @@ class Incident extends Entity
         'resolved_at' => true,
         'duration' => true,
         'auto_created' => true,
+        'acknowledged_by_user_id' => true,
+        'acknowledged_at' => true,
+        'acknowledged_via' => true,
+        'acknowledgement_token' => true,
         'created' => true,
         'modified' => true,
         'monitor' => true,
+        'acknowledged_by_user' => true,
         'alert_logs' => true,
     ];
 
@@ -119,5 +143,69 @@ class Incident extends Entity
             self::STATUS_RESOLVED => 'Resolved',
             default => 'Unknown',
         };
+    }
+
+    /**
+     * Check if incident has been acknowledged
+     *
+     * @return bool
+     */
+    public function isAcknowledged(): bool
+    {
+        return $this->acknowledged_at !== null;
+    }
+
+    /**
+     * Acknowledge this incident by a user
+     *
+     * Only the first acknowledgement is accepted. Subsequent calls return false.
+     *
+     * @param int|null $userId The user ID who acknowledged (null for token-based)
+     * @param string $via The channel used to acknowledge ('email', 'web', 'telegram', 'sms')
+     * @return bool True if acknowledged, false if already acknowledged
+     */
+    public function acknowledgeBy(?int $userId, string $via): bool
+    {
+        // Only first acknowledgement is accepted
+        if ($this->isAcknowledged()) {
+            return false;
+        }
+
+        $this->acknowledged_by_user_id = $userId;
+        $this->acknowledged_at = DateTime::now();
+        $this->acknowledged_via = $via;
+
+        return true;
+    }
+
+    /**
+     * Generate a secure acknowledgement token
+     *
+     * @return string The generated token
+     */
+    public function generateAcknowledgementToken(): string
+    {
+        $token = bin2hex(random_bytes(32));
+        $this->acknowledgement_token = $token;
+
+        return $token;
+    }
+
+    /**
+     * Check if the acknowledgement token is still valid (not expired)
+     *
+     * Token expires 24h after incident creation.
+     *
+     * @return bool
+     */
+    public function isTokenValid(): bool
+    {
+        if (empty($this->acknowledgement_token)) {
+            return false;
+        }
+
+        $expiresAt = $this->created->modify('+' . self::TOKEN_EXPIRY_HOURS . ' hours');
+
+        return DateTime::now()->lessThan($expiresAt);
     }
 }

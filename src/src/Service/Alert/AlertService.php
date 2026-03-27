@@ -101,6 +101,13 @@ class AlertService
     public function dispatch(Monitor $monitor, Incident $incident): int
     {
         try {
+            // Stop sending alerts if incident is already acknowledged
+            if ($incident->isAcknowledged()) {
+                Log::debug("Incident {$incident->id} already acknowledged, skipping alert dispatch");
+
+                return 0;
+            }
+
             $rules = $this->AlertRules->getActiveRulesForMonitor($monitor->id);
 
             if (empty($rules)) {

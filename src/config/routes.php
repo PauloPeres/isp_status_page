@@ -57,6 +57,22 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/', ['controller' => 'Pages', 'action' => 'home']);
 
         /*
+         * Incident acknowledgement routes (TASK-260)
+         */
+        // Public: token-based acknowledge (no auth)
+        $builder->connect(
+            '/incidents/acknowledge/{id}/{token}',
+            ['controller' => 'Incidents', 'action' => 'acknowledge'],
+            ['pass' => ['id', 'token'], 'id' => '\d+', 'token' => '[a-f0-9]{64}']
+        );
+        // Admin: authenticated acknowledge
+        $builder->connect(
+            '/incidents/{id}/acknowledge-admin',
+            ['controller' => 'Incidents', 'action' => 'acknowledgeAdmin'],
+            ['pass' => ['id'], 'id' => '\d+']
+        );
+
+        /*
          * ...and connect the rest of 'Pages' controller's URLs.
          */
         $builder->connect('/pages/*', 'Pages::display');

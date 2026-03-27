@@ -56,6 +56,18 @@
             Voce recebera uma notificacao quando o servico for restabelecido.
         </p>
 
+        <?php if (!empty($acknowledgeUrl)): ?>
+        <div style="text-align: center; margin: 24px 0;">
+            <a href="<?= h($acknowledgeUrl) ?>"
+               style="display: inline-block; padding: 12px 32px; background-color: #1E88E5; color: #ffffff; text-decoration: none; border-radius: 6px; font-size: 16px; font-weight: bold;">
+                Reconhecer Incidente
+            </a>
+            <p style="font-size: 12px; color: #999; margin-top: 8px;">
+                Clique para confirmar que voce esta ciente deste incidente. O link expira em 24 horas.
+            </p>
+        </div>
+        <?php endif; ?>
+
         <p style="font-size: 12px; color: #999; margin-top: 24px; border-top: 1px solid #eee; padding-top: 12px;">
             Este alerta foi enviado automaticamente por <?= h($siteName) ?>.
         </p>

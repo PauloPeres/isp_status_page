@@ -285,6 +285,11 @@ $this->assign('title', __d('incidents', 'Detalhes do Incidente'));
         background: #dcfce7;
     }
 
+    .timeline-info .timeline-marker {
+        border-color: #1E88E5;
+        background: #dbeafe;
+    }
+
     .timeline-icon {
         font-size: 16px;
     }
@@ -404,6 +409,17 @@ $this->assign('title', __d('incidents', 'Detalhes do Incidente'));
     </div>
     <div class="header-actions">
         <?php if (!$incident->isResolved()): ?>
+            <?php if (!$incident->isAcknowledged()): ?>
+                <?= $this->Form->postLink(
+                    __d('incidents', 'Reconhecer'),
+                    ['action' => 'acknowledgeAdmin', $incident->id],
+                    [
+                        'class' => 'btn',
+                        'style' => 'background: #1E88E5; color: white;',
+                        'confirm' => __d('incidents', 'Reconhecer este incidente?')
+                    ]
+                ) ?>
+            <?php endif; ?>
             <?= $this->Html->link(__d('incidents', 'Editar'), ['action' => 'edit', $incident->id], ['class' => 'btn btn-primary']) ?>
             <?= $this->Form->postLink(
                 __d('incidents', 'Resolver'),
@@ -526,6 +542,31 @@ $this->assign('title', __d('incidents', 'Detalhes do Incidente'));
                     <span style="color: #999;">
                         <?= $incident->isResolved() ? __d('incidents', 'N/A') : __d('incidents', '⏱️ Em andamento...') ?>
                     </span>
+                <?php endif; ?>
+            </span>
+        </div>
+        <div class="detail-item">
+            <span class="detail-label"><?= __d('incidents', 'Reconhecimento') ?></span>
+            <span class="detail-value">
+                <?php if ($incident->isAcknowledged()): ?>
+                    <?= $this->element('incidents/acknowledge_badge', ['incident' => $incident]) ?>
+                    <?php if ($incident->acknowledged_by_user): ?>
+                        <div style="font-size: 13px; color: #666; margin-top: 4px;">
+                            <?= __d('incidents', 'Por: {0}', h($incident->acknowledged_by_user->username)) ?>
+                        </div>
+                    <?php endif; ?>
+                    <?php if ($incident->acknowledged_at): ?>
+                        <div class="time-ago">
+                            <?= h($incident->acknowledged_at->i18nFormat('dd/MM/yyyy HH:mm:ss')) ?>
+                            (<?= h($incident->acknowledged_at->timeAgoInWords()) ?>)
+                        </div>
+                    <?php endif; ?>
+                <?php else: ?>
+                    <?php if ($incident->isOngoing()): ?>
+                        <span class="badge badge-warning">&#x23F3; <?= __d('incidents', 'Aguardando reconhecimento') ?></span>
+                    <?php else: ?>
+                        <span style="color: #999;"><?= __d('incidents', 'N/A') ?></span>
+                    <?php endif; ?>
                 <?php endif; ?>
             </span>
         </div>

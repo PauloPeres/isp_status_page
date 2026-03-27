@@ -3,7 +3,11 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Service\Alert\AlertService;
 use App\Service\IncidentService;
+use App\Service\SettingService;
+use Cake\I18n\DateTime;
+use Cake\Log\Log;
 
 /**
  * Incidents Controller
@@ -31,6 +35,18 @@ class IncidentsController extends AppController
     {
         parent::initialize();
         $this->incidentService = new IncidentService();
+    }
+
+    /**
+     * Before filter — allow public acknowledge action (token-based auth)
+     *
+     * @param \Cake\Event\EventInterface $event The event
+     * @return \Cake\Http\Response|null|void
+     */
+    public function beforeFilter(\Cake\Event\EventInterface $event)
+    {
+        parent::beforeFilter($event);
+        $this->Authentication->addUnauthenticatedActions(['acknowledge']);
     }
 
     /**
@@ -128,6 +144,7 @@ class IncidentsController extends AppController
         $incident = $this->Incidents->get($id, [
             'contain' => [
                 'Monitors',
+                'AcknowledgedByUsers',
                 'AlertLogs' => function ($q) {
                     return $q->orderBy(['created' => 'DESC']);
                 },
@@ -219,6 +236,192 @@ class IncidentsController extends AppController
     }
 
     /**
+     * Acknowledge an incident via public token link (no auth required)
+     *
+     * GET /incidents/acknowledge/{id}/{token}
+     *
+     * @param string|null $id Incident id
+     * @param string|null $token Acknowledgement token
+     * @return \Cake\Http\Response|null|void Renders view or redirects
+     */
+    public function acknowledge($id = null, $token = null)
+    {
+        $this->viewBuilder()->setLayout('public');
+
+        try {
+            $incident = $this->Incidents->get($id, [
+                'contain' => ['Monitors', 'AcknowledgedByUsers'],
+            ]);
+        } catch (\Cake\Datasource\Exception\RecordNotFoundException $e) {
+            $this->Flash->error(__d('incidents', 'Incidente nao encontrado.'));
+            $this->set('error', __d('incidents', 'Incidente nao encontrado.'));
+            $this->set('incident', null);
+
+            return;
+        }
+
+        // Validate token
+        if (empty($token) || $token !== $incident->acknowledgement_token) {
+            $this->Flash->error(__d('incidents', 'Token de reconhecimento invalido.'));
+            $this->set('error', __d('incidents', 'Token de reconhecimento invalido.'));
+            $this->set('incident', $incident);
+
+            return;
+        }
+
+        // Check if already acknowledged
+        if ($incident->isAcknowledged()) {
+            $this->Flash->warning(__d('incidents', 'Este incidente ja foi reconhecido.'));
+            $this->set('error', null);
+            $this->set('incident', $incident);
+            $this->set('alreadyAcknowledged', true);
+
+            return;
+        }
+
+        // Check token expiry (24h after incident creation)
+        if (!$incident->isTokenValid()) {
+            $this->Flash->error(__d('incidents', 'O token de reconhecimento expirou (valido por 24h).'));
+            $this->set('error', __d('incidents', 'O token de reconhecimento expirou.'));
+            $this->set('incident', $incident);
+
+            return;
+        }
+
+        // Perform acknowledgement
+        $incident->acknowledgeBy(null, \App\Model\Entity\Incident::ACK_VIA_EMAIL);
+
+        if ($this->Incidents->save($incident)) {
+            $this->Flash->success(__d('incidents', 'Incidente reconhecido com sucesso.'));
+
+            // Notify other recipients
+            $this->notifyAcknowledgement($incident, 'Email link');
+
+            $this->set('error', null);
+            $this->set('incident', $incident);
+            $this->set('success', true);
+
+            return;
+        }
+
+        $this->Flash->error(__d('incidents', 'Erro ao reconhecer o incidente.'));
+        $this->set('error', __d('incidents', 'Erro ao reconhecer o incidente.'));
+        $this->set('incident', $incident);
+    }
+
+    /**
+     * Acknowledge an incident from the admin panel (requires authentication)
+     *
+     * POST /incidents/{id}/acknowledge-admin
+     *
+     * @param string|null $id Incident id
+     * @return \Cake\Http\Response|null Redirects to view
+     */
+    public function acknowledgeAdmin($id = null)
+    {
+        $this->request->allowMethod(['post']);
+
+        $incident = $this->Incidents->get($id, [
+            'contain' => ['Monitors'],
+        ]);
+
+        if ($incident->isAcknowledged()) {
+            $this->Flash->warning(__d('incidents', 'Este incidente ja foi reconhecido.'));
+
+            return $this->redirect(['action' => 'view', $id]);
+        }
+
+        // Get the authenticated user
+        $user = $this->Authentication->getIdentity();
+        $userId = $user ? (int)$user->getIdentifier() : null;
+
+        $incident->acknowledgeBy($userId, \App\Model\Entity\Incident::ACK_VIA_WEB);
+
+        if ($this->Incidents->save($incident)) {
+            $this->Flash->success(__d('incidents', 'Incidente reconhecido com sucesso.'));
+
+            // Notify other recipients
+            $userName = $user ? ($user->get('username') ?? 'Admin') : 'Admin';
+            $this->notifyAcknowledgement($incident, $userName);
+        } else {
+            $this->Flash->error(__d('incidents', 'Erro ao reconhecer o incidente.'));
+        }
+
+        return $this->redirect(['action' => 'view', $id]);
+    }
+
+    /**
+     * Notify other alert recipients that an incident was acknowledged
+     *
+     * @param \App\Model\Entity\Incident $incident The acknowledged incident
+     * @param string $acknowledgedBy Who acknowledged it
+     * @return void
+     */
+    protected function notifyAcknowledgement(\App\Model\Entity\Incident $incident, string $acknowledgedBy): void
+    {
+        try {
+            $settingService = new SettingService();
+            $siteName = $settingService->get('site_name', 'ISP Status');
+            $siteUrl = $settingService->get('site_url', '');
+
+            // Load monitor if not already loaded
+            if (!$incident->monitor) {
+                $incident = $this->Incidents->get($incident->id, [
+                    'contain' => ['Monitors'],
+                ]);
+            }
+
+            // Find alert rules for this monitor to get recipient list
+            $alertRules = $this->Incidents->Monitors->AlertRules->find()
+                ->where([
+                    'monitor_id' => $incident->monitor_id,
+                    'active' => true,
+                    'channel' => 'email',
+                ])
+                ->all();
+
+            foreach ($alertRules as $rule) {
+                $recipients = json_decode($rule->recipients, true);
+                if (!is_array($recipients)) {
+                    continue;
+                }
+
+                foreach ($recipients as $email) {
+                    try {
+                        $mailer = new \Cake\Mailer\Mailer('default');
+                        $mailer
+                            ->setFrom(
+                                $settingService->get('email_from', 'noreply@example.com'),
+                                $settingService->get('email_from_name', $siteName)
+                            )
+                            ->setTo($email)
+                            ->setSubject("[{$siteName}] Incidente Reconhecido - {$incident->monitor->name}")
+                            ->setViewVars([
+                                'monitor' => $incident->monitor,
+                                'incident' => $incident,
+                                'acknowledgedBy' => $acknowledgedBy,
+                                'acknowledgedAt' => $incident->acknowledged_at
+                                    ? $incident->acknowledged_at->format('d/m/Y H:i:s')
+                                    : DateTime::now()->format('d/m/Y H:i:s'),
+                                'acknowledgedVia' => $incident->acknowledged_via ?? 'web',
+                                'siteName' => $siteName,
+                            ])
+                            ->viewBuilder()
+                            ->setTemplate('incident_acknowledged')
+                            ->setLayout('default');
+
+                        $mailer->deliver();
+                    } catch (\Exception $e) {
+                        Log::error("Failed to send acknowledgement notification to {$email}: {$e->getMessage()}");
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error("Failed to notify acknowledgement: {$e->getMessage()}");
+        }
+    }
+
+    /**
      * Build timeline of incident events
      *
      * Creates a chronological timeline of all events related to the incident
@@ -252,6 +455,22 @@ class IncidentsController extends AppController
                 'description' => 'Status changed to identified',
                 'icon' => '🔍',
                 'color' => 'warning',
+            ];
+        }
+
+        // Incident acknowledged
+        if ($incident->acknowledged_at) {
+            $ackDescription = 'Acknowledged via ' . ($incident->acknowledged_via ?? 'unknown');
+            if ($incident->acknowledged_by_user) {
+                $ackDescription .= ' by ' . $incident->acknowledged_by_user->username;
+            }
+            $timeline[] = [
+                'timestamp' => $incident->acknowledged_at,
+                'type' => 'acknowledged',
+                'title' => 'Incident Acknowledged',
+                'description' => $ackDescription,
+                'icon' => '&#x2714;',
+                'color' => 'info',
             ];
         }
 

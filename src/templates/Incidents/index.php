@@ -491,8 +491,9 @@ $this->assign('title', __d('incidents', 'Incidentes'));
                             <div class="incident-title">
                                 <?= h($incident->title) ?>
                                 <?php if ($incident->auto_created): ?>
-                                    <span class="badge badge-secondary" title="Auto-criado">🤖</span>
+                                    <span class="badge badge-secondary" title="Auto-criado">&#x1F916;</span>
                                 <?php endif; ?>
+                                <?= $this->element('incidents/acknowledge_badge', ['incident' => $incident]) ?>
                             </div>
                             <?php if ($incident->description): ?>
                                 <div class="incident-description" title="<?= h($incident->description) ?>">

@@ -10,6 +10,7 @@ use App\Service\SettingService;
 use Cake\Log\Log;
 use Cake\Mailer\Mailer;
 use Cake\Mailer\TransportFactory;
+use Cake\ORM\Locator\LocatorAwareTrait;
 
 /**
  * Email Alert Channel
@@ -19,6 +20,8 @@ use Cake\Mailer\TransportFactory;
  */
 class EmailAlertChannel implements ChannelInterface
 {
+    use LocatorAwareTrait;
+
     /**
      * Setting service instance
      *
@@ -150,13 +153,51 @@ class EmailAlertChannel implements ChannelInterface
                 ->setLayout('default');
         }
 
+        // Build acknowledge URL for down alerts
+        $acknowledgeUrl = '';
+        if ($isDown) {
+            $acknowledgeUrl = $this->buildAcknowledgeUrl($incident, $siteName);
+        }
+
         $mailer->setViewVars([
             'monitor' => $monitor,
             'incident' => $incident,
             'siteName' => $siteName,
+            'acknowledgeUrl' => $acknowledgeUrl,
         ]);
 
         $mailer->deliver();
+    }
+
+    /**
+     * Build the acknowledge URL for an incident
+     *
+     * Generates a token if the incident doesn't have one yet, saves it,
+     * and returns the full public URL.
+     *
+     * @param \App\Model\Entity\Incident $incident The incident
+     * @param string $siteName Site name for logging
+     * @return string The acknowledge URL
+     */
+    protected function buildAcknowledgeUrl(Incident $incident, string $siteName): string
+    {
+        try {
+            // Generate token if not already set
+            if (empty($incident->acknowledgement_token)) {
+                $incident->generateAcknowledgementToken();
+
+                $incidentsTable = $this->fetchTable('Incidents');
+                $incidentsTable->save($incident);
+            }
+
+            $siteUrl = rtrim($this->settingService->getString('site_url', ''), '/');
+
+            return "{$siteUrl}/incidents/acknowledge/{$incident->id}/{$incident->acknowledgement_token}";
+        } catch (\Exception $e) {
+            Log::error("Failed to build acknowledge URL: {$e->getMessage()}");
+
+            return '';
+        }
     }
 
     /**

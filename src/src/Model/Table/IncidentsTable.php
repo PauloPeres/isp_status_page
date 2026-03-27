@@ -12,6 +12,7 @@ use Cake\Validation\Validator;
  * Incidents Model
  *
  * @property \App\Model\Table\MonitorsTable&\Cake\ORM\Association\BelongsTo $Monitors
+ * @property \App\Model\Table\UsersTable&\Cake\ORM\Association\BelongsTo $AcknowledgedByUsers
  * @property \App\Model\Table\AlertLogsTable&\Cake\ORM\Association\HasMany $AlertLogs
  *
  * @method \App\Model\Entity\Incident newEmptyEntity()
@@ -51,6 +52,12 @@ class IncidentsTable extends Table
         $this->belongsTo('Monitors', [
             'foreignKey' => 'monitor_id',
             'joinType' => 'INNER',
+        ]);
+        $this->belongsTo('AcknowledgedByUsers', [
+            'className' => 'Users',
+            'foreignKey' => 'acknowledged_by_user_id',
+            'joinType' => 'LEFT',
+            'propertyName' => 'acknowledged_by_user',
         ]);
         $this->hasMany('AlertLogs', [
             'foreignKey' => 'incident_id',
@@ -125,6 +132,10 @@ class IncidentsTable extends Table
     public function buildRules(RulesChecker $rules): RulesChecker
     {
         $rules->add($rules->existsIn(['monitor_id'], 'Monitors'), ['errorField' => 'monitor_id']);
+        $rules->add($rules->existsIn(['acknowledged_by_user_id'], 'AcknowledgedByUsers'), [
+            'errorField' => 'acknowledged_by_user_id',
+            'allowNullableNulls' => true,
+        ]);
 
         return $rules;
     }
