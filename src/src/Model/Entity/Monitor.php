@@ -43,6 +43,9 @@ class Monitor extends Entity
     public const TYPE_API = 'api';
     public const TYPE_IXC = 'ixc';
     public const TYPE_ZABBIX = 'zabbix';
+    public const TYPE_HEARTBEAT = 'heartbeat';
+    public const TYPE_KEYWORD = 'keyword';
+    public const TYPE_SSL = 'ssl';
 
     /**
      * Monitor statuses

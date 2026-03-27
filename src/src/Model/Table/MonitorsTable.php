@@ -96,7 +96,7 @@ class MonitorsTable extends Table
             ->maxLength('type', 50)
             ->requirePresence('type', 'create')
             ->notEmptyString('type')
-            ->inList('type', ['http', 'ping', 'port', 'api', 'ixc', 'zabbix'], __('Invalid monitor type'));
+            ->inList('type', ['http', 'ping', 'port', 'api', 'ixc', 'zabbix', 'heartbeat', 'keyword', 'ssl'], __('Invalid monitor type'));
 
         $validator
             ->allowEmptyString('configuration')

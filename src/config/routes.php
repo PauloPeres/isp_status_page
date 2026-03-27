@@ -131,6 +131,41 @@ return function (RouteBuilder $routes): void {
         );
 
         /*
+         * Invitation routes (TASK-702)
+         */
+        $builder->connect(
+            '/invite/{token}',
+            ['controller' => 'Invitations', 'action' => 'accept'],
+            ['pass' => ['token'], 'token' => '[a-f0-9]{64}']
+        );
+        $builder->connect(
+            '/invitations',
+            ['controller' => 'Invitations', 'action' => 'index']
+        );
+        $builder->connect(
+            '/invitations/send',
+            ['controller' => 'Invitations', 'action' => 'send']
+        );
+        $builder->connect(
+            '/invitations/revoke/{id}',
+            ['controller' => 'Invitations', 'action' => 'revoke'],
+            ['pass' => ['id'], 'id' => '\d+']
+        );
+
+        /*
+         * Organization switcher routes (TASK-705)
+         */
+        $builder->connect(
+            '/organizations/select',
+            ['controller' => 'OrganizationSwitcher', 'action' => 'select']
+        );
+        $builder->connect(
+            '/organizations/switch/{orgId}',
+            ['controller' => 'OrganizationSwitcher', 'action' => 'switch'],
+            ['pass' => ['orgId'], 'orgId' => '\d+']
+        );
+
+        /*
          * ...and connect the rest of 'Pages' controller's URLs.
          */
         $builder->connect('/pages/*', 'Pages::display');
