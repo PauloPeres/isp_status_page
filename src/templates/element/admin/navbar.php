@@ -15,6 +15,8 @@
         </button>
 
         <div class="navbar-user">
+            <?= $this->element('admin/org_switcher') ?>
+
             <div class="user-info">
                 <span class="user-name">
                     <?= h($this->Identity->get('username')) ?>

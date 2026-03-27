@@ -116,6 +116,15 @@ function isActive($currentController, $targetController, $currentAction = null, 
                     'class' => 'nav-item' . (isActive($controller, 'Users') ? ' active' : '')
                 ]
             ) ?>
+
+            <?= $this->Html->link(
+                '<span class="nav-icon">📨</span> ' . __('Invitations'),
+                ['controller' => 'Invitations', 'action' => 'index'],
+                [
+                    'escape' => false,
+                    'class' => 'nav-item' . (isActive($controller, 'Invitations') ? ' active' : '')
+                ]
+            ) ?>
             <?php endif; ?>
 
             <?php if ($canManageSettings): ?>

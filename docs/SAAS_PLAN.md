@@ -95,11 +95,11 @@ Transforming the existing ISP Status Page (CakePHP 5.x) into a full SaaS UptimeR
 - **Result:** _pending_
 
 ### TASK-702: Team Invitation System
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Description:** Invitations table (org_id, email, role, token, expires_at). Send invite emails, accept/revoke invitations. Creates OrganizationUser on acceptance.
 - **Files to create:** Migration, InvitationsTable, InvitationsController, InvitationService, email template, tests
 - **Depends on:** TASK-700
-- **Result:** _pending_
+- **Result:** Created migration `20260328000011_CreateInvitations.php` with all columns (organization_id, email, role, token unique, invited_by, accepted_at, expires_at, timestamps), foreign keys to organizations (CASCADE) and users, and indexes on token (unique), organization_id, email, expires_at. Created `InvitationsTable.php` with belongsTo Organizations and Inviter (Users) associations, validation rules, unique token build rule, and custom finders (findPending, findByToken). Created `Invitation.php` entity with helper methods (isAccepted, isExpired, isPending). Created `InvitationService.php` with send() (creates token, checks duplicates, checks existing membership, sends email), accept() (finds/creates user, creates OrganizationUser, marks accepted), revoke() (deletes pending invitation), and isExpired(). Created `InvitationsController.php` with index (list all invitations, admin layout, manage_team permission), send (POST, creates invitation via service), accept (public, token-based, shows acceptance page), revoke (POST, cancels pending). Created templates: index.php (send form + invitation list with status badges), accept.php (standalone public page), team_invite.php (HTML email template). Added routes for /invite/{token} (public), /invitations, /invitations/send, /invitations/revoke/{id}. Added Invitations link to admin sidebar under System section (visible to owner/admin). Created InvitationsFixture with 4 records (pending, accepted, expired, other-org). Created InvitationServiceTest with 11 tests covering send, duplicate prevention, existing member rejection, accept valid/accepted/expired/non-existent, revoke pending/accepted/non-existent, and isExpired.
 
 ### TASK-703: RBAC (Role-Based Access Control)
 - **Status:** COMPLETED
@@ -116,12 +116,12 @@ Transforming the existing ISP Status Page (CakePHP 5.x) into a full SaaS UptimeR
 - **Result:** _pending_
 
 ### TASK-705: Organization Switcher
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Description:** UI dropdown in admin header for switching between orgs. Session management for current org.
 - **Files to create:** OrganizationSwitcherController, org_switcher element
 - **Files to modify:** admin layout, AppController
 - **Depends on:** TASK-700
-- **Result:** _pending_
+- **Result:** Created `OrganizationSwitcherController.php` with select() (lists user's organizations with current org highlighted, admin layout) and switch() (POST, verifies membership, checks org active status, updates session current_organization_id, logs switch, redirects to dashboard). Created `org_switcher.php` element that displays a dropdown in the admin navbar showing current org name, lists all user organizations with switch links (POST forms), highlights current org, and includes "View all organizations" link. Only shows the dropdown arrow/menu when user belongs to multiple organizations. Created `OrganizationSwitcher/select.php` template with a grid of organization cards showing name, role, plan, and switch/current buttons. Modified `navbar.php` to include the org_switcher element next to the user menu. Added routes for /organizations/select and /organizations/switch/{orgId}.
 
 ---
 
@@ -156,12 +156,12 @@ Transforming the existing ISP Status Page (CakePHP 5.x) into a full SaaS UptimeR
 - **Result:** Created `WebhooksController.php` with stripe() action handling POST /webhooks/stripe. The controller exempts the endpoint from authentication via `addUnauthenticatedActions(['stripe'])` and disables auto-rendering. It reads the raw request body and Stripe-Signature header, verifies the webhook signature via `StripeService::constructWebhookEvent()`, and dispatches to `SubscriptionService` handlers based on event type: checkout.session.completed (plan activation), customer.subscription.updated (plan changes), customer.subscription.deleted (downgrade to free), and invoice.payment_failed (grace period). Returns 400 for invalid signatures, 200 for successful processing. Added webhook route `/webhooks/stripe` to routes.php. CSRF exemption for `/webhooks/` path was already configured in Application.php's CsrfProtectionMiddleware skipCheckCallback. Created `WebhooksControllerTest.php` with 4 tests covering POST acceptance, GET rejection (405), invalid signature (400), and unauthenticated access verification.
 
 ### TASK-804: Usage Metering & Limit Enforcement
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Description:** PlanLimitMiddleware checks monitor count before create. LimitEnforcer service.
 - **Files to create:** PlanLimitMiddleware, LimitEnforcer
 - **Files to modify:** MonitorsController, Application.php
 - **Depends on:** TASK-801
-- **Result:** _pending_
+- **Result:** Created `PlanLimitMiddleware.php` that intercepts POST requests to /monitors/add, checks TenantContext for current org, calls PlanService::canAddMonitor(), and redirects to /billing/plans with a flash error message when the limit is reached. Only checks create actions (POST), not reads. Modified `MonitorsController::add()` to also check PlanService::canAddMonitor() before saving -- if the org has reached its monitor limit, sets flash error "You've reached the monitor limit for your plan. Upgrade to add more monitors." and redirects to the billing plans page. Registered PlanLimitMiddleware in Application.php middleware queue after ApiRateLimitMiddleware, providing defense-in-depth (both middleware and controller check).
 
 ---
 
@@ -181,12 +181,12 @@ Transforming the existing ISP Status Page (CakePHP 5.x) into a full SaaS UptimeR
 - **Result:** Created `ApiAuthMiddleware.php` that authenticates `/api/v1/*` requests via Bearer token -- extracts the token from the Authorization header, validates it through ApiKeyService, sets TenantContext from the API key's organization_id, and attaches the API key entity and permissions array to the request attributes for downstream controllers. Returns 401 JSON for missing/invalid/expired keys. Created `ApiRateLimitMiddleware.php` that enforces per-API-key rate limiting using CakePHP Cache -- reads the key's `rate_limit` field (default 1000/hour), tracks request counts by key_prefix in cache, returns 429 JSON when exceeded, and adds `X-RateLimit-Limit` and `X-RateLimit-Remaining` headers to all API responses. Registered both middlewares in `Application.php` after TenantMiddleware. Added CSRF skip for `/api/` and `/webhooks/` routes via CsrfProtectionMiddleware's `skipCheckCallback`. Fixed pre-existing bug in ApiKeysTable validation where `key_prefix` maxLength was 10 but the generated prefix is 12 characters. Created `ApiAuthMiddlewareTest.php` with 7 tests (32 assertions) covering: non-API route passthrough, missing auth header 401, non-Bearer auth 401, invalid token 401, valid token sets tenant context and request attributes, JSON content type on errors, and empty Bearer token 401.
 
 ### TASK-902: REST API Controllers
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Description:** JSON API controllers for /api/v1/: monitors (CRUD + pause/resume), incidents (CRUD), checks (read), status-pages (CRUD), alert-rules (CRUD), webhooks (CRUD). Base Api/V1/AppController.
 - **Files to create:** 7 API controllers, tests
 - **Files to modify:** routes.php
 - **Depends on:** TASK-901
-- **Result:** _pending_
+- **Result:** Created base `Api/V1/AppController` extending `Cake\Controller\Controller` (NOT the main AppController) with JSON view, permission checking via `requirePermission()`, and helper methods `success()`/`error()` for consistent response format `{"success":true,"data":{...}}` / `{"error":true,"message":"..."}`. Created 4 API controllers: `MonitorsController` (CRUD + pause/resume/checks — 8 endpoints), `IncidentsController` (index/view/add/edit — 4 endpoints), `ChecksController` (index/view read-only — 2 endpoints), `AlertRulesController` (full CRUD — 5 endpoints). All controllers check API key permissions (read for GET, write for POST/PUT/DELETE) and rely on TenantScopeBehavior for automatic tenant isolation. Added 19 explicit route definitions in `routes.php` under `/api/v1` scope with proper HTTP method constraints and `{id}` parameters. Fixed pre-existing bug in `Application.php` where `CsrfProtectionMiddleware`'s `skipCheckCallback` was passed via constructor config array (which only sets `$_config`) instead of using the fluent `->skipCheckCallback()` method — CSRF was never actually being skipped for `/api/` and `/webhooks/` routes. Added `/api/v1/` to TenantMiddleware's public paths since API tenant resolution is handled by ApiAuthMiddleware which runs after TenantMiddleware. Updated 3 TenantMiddleware tests to reflect this change. Created `MonitorsControllerTest` with 10 tests (32 assertions) covering: index returns JSON, create with write permission, create rejected with read-only, view single monitor, view nonexistent returns 404, delete, checks endpoint, pause, resume, unauthenticated returns 401. Tests use real API key generation via ApiKeyService for authentic Bearer token validation through the full middleware stack.
 
 ### TASK-903: OpenAPI/Swagger Documentation
 - **Status:** PENDING

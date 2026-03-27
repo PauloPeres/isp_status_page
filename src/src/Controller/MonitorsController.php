@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Service\PlanService;
+
 /**
  * Monitors Controller
  *
@@ -116,6 +118,18 @@ class MonitorsController extends AppController
         $monitor = $this->Monitors->newEmptyEntity();
 
         if ($this->request->is('post')) {
+            // Check plan limit before saving
+            if ($this->currentOrganization) {
+                $planService = new PlanService();
+                $orgId = (int)$this->currentOrganization['id'];
+
+                if (!$planService->canAddMonitor($orgId)) {
+                    $this->Flash->error(__("You've reached the monitor limit for your plan. Upgrade to add more monitors."));
+
+                    return $this->redirect(['controller' => 'Billing', 'action' => 'plans']);
+                }
+            }
+
             $data = $this->request->getData();
 
             // Filter configuration fields based on monitor type
