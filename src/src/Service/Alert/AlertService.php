@@ -79,6 +79,16 @@ class AlertService
     }
 
     /**
+     * Get all registered channels
+     *
+     * @return array<string, \App\Service\Alert\ChannelInterface>
+     */
+    public function getChannels(): array
+    {
+        return $this->channels;
+    }
+
+    /**
      * Dispatch alerts for a monitor/incident
      *
      * Finds applicable alert rules, checks throttling, triggers
