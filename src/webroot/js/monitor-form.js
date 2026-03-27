@@ -21,27 +21,45 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateFields() {
         const type = typeSelect.value;
 
-        // Hide all type-specific fields
-        if (httpFields) httpFields.style.display = 'none';
-        if (pingFields) pingFields.style.display = 'none';
-        if (portFields) portFields.style.display = 'none';
+        // Hide all type-specific fields and disable their inputs
+        if (httpFields) {
+            httpFields.style.display = 'none';
+            disableFieldInputs(httpFields);
+        }
+        if (pingFields) {
+            pingFields.style.display = 'none';
+            disableFieldInputs(pingFields);
+        }
+        if (portFields) {
+            portFields.style.display = 'none';
+            disableFieldInputs(portFields);
+        }
 
-        // Show relevant fields based on type
+        // Show relevant fields based on type and enable their inputs
         switch (type) {
             case 'http':
-                if (httpFields) httpFields.style.display = 'block';
+                if (httpFields) {
+                    httpFields.style.display = 'block';
+                    enableFieldInputs(httpFields);
+                }
                 updateTargetPlaceholder('https://example.com or http://api.example.com/health');
                 updateTargetHelp('Full URL including protocol (http:// or https://)');
                 break;
 
             case 'ping':
-                if (pingFields) pingFields.style.display = 'block';
+                if (pingFields) {
+                    pingFields.style.display = 'block';
+                    enableFieldInputs(pingFields);
+                }
                 updateTargetPlaceholder('example.com or 192.168.1.1');
                 updateTargetHelp('Hostname or IP address for ICMP ping');
                 break;
 
             case 'port':
-                if (portFields) portFields.style.display = 'block';
+                if (portFields) {
+                    portFields.style.display = 'block';
+                    enableFieldInputs(portFields);
+                }
                 updateTargetPlaceholder('example.com or 192.168.1.1');
                 updateTargetHelp('Hostname or IP address for TCP/UDP port check');
                 break;
@@ -53,6 +71,26 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Enable/disable required fields based on type
         updateRequiredFields(type);
+    }
+
+    /**
+     * Disable all inputs within a container
+     */
+    function disableFieldInputs(container) {
+        const inputs = container.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => {
+            input.disabled = true;
+        });
+    }
+
+    /**
+     * Enable all inputs within a container
+     */
+    function enableFieldInputs(container) {
+        const inputs = container.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => {
+            input.disabled = false;
+        });
     }
 
     /**

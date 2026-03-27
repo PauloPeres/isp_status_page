@@ -117,7 +117,14 @@ class MonitorsController extends AppController
         $monitor = $this->Monitors->newEmptyEntity();
 
         if ($this->request->is('post')) {
-            $monitor = $this->Monitors->patchEntity($monitor, $this->request->getData());
+            $data = $this->request->getData();
+
+            // Filter configuration fields based on monitor type
+            if (isset($data['type']) && isset($data['configuration'])) {
+                $data['configuration'] = $this->filterConfigurationByType($data['type'], $data['configuration']);
+            }
+
+            $monitor = $this->Monitors->patchEntity($monitor, $data);
 
             if ($this->Monitors->save($monitor)) {
                 $this->Flash->success(__d('monitors', 'Monitor criado com sucesso.'));
@@ -145,9 +152,25 @@ class MonitorsController extends AppController
         $monitor = $this->Monitors->get($id);
 
         if ($this->request->is(['patch', 'post', 'put'])) {
-            $monitor = $this->Monitors->patchEntity($monitor, $this->request->getData());
+            $data = $this->request->getData();
+
+            \Cake\Log\Log::debug('=== EDIT DEBUG ===');
+            \Cake\Log\Log::debug('Original config from DB:', ['config' => $monitor->configuration]);
+            \Cake\Log\Log::debug('POST configuration:', ['config' => $data['configuration'] ?? 'NONE']);
+
+            // Filter configuration fields based on monitor type
+            if (isset($data['type']) && isset($data['configuration'])) {
+                $filtered = $this->filterConfigurationByType($data['type'], $data['configuration']);
+                \Cake\Log\Log::debug('Filtered configuration:', ['config' => $filtered]);
+                $data['configuration'] = $filtered;
+            }
+
+            $monitor = $this->Monitors->patchEntity($monitor, $data);
+
+            \Cake\Log\Log::debug('After patchEntity:', ['config' => $monitor->configuration]);
 
             if ($this->Monitors->save($monitor)) {
+                \Cake\Log\Log::debug('After save:', ['config' => $monitor->configuration]);
                 $this->Flash->success(__d('monitors', 'Monitor atualizado com sucesso.'));
 
                 return $this->redirect(['action' => 'index']);
@@ -157,6 +180,45 @@ class MonitorsController extends AppController
         }
 
         $this->set(compact('monitor'));
+    }
+
+    /**
+     * Filter configuration array to only include fields relevant to the monitor type
+     *
+     * @param string $type Monitor type (http, ping, port)
+     * @param array $configuration Full configuration array
+     * @return array Filtered configuration
+     */
+    private function filterConfigurationByType(string $type, array $configuration): array
+    {
+        $filtered = [];
+
+        switch ($type) {
+            case 'http':
+                $allowedKeys = ['url', 'method', 'expected_status_code', 'headers', 'body',
+                               'verify_ssl', 'follow_redirects', 'expected_content'];
+                break;
+
+            case 'ping':
+                $allowedKeys = ['host', 'packet_count', 'max_packet_loss', 'max_latency'];
+                break;
+
+            case 'port':
+                $allowedKeys = ['host', 'port', 'protocol', 'send_data', 'expected_response'];
+                break;
+
+            default:
+                return $configuration;
+        }
+
+        // Filter to only include allowed keys
+        foreach ($allowedKeys as $key) {
+            if (isset($configuration[$key]) && $configuration[$key] !== '') {
+                $filtered[$key] = $configuration[$key];
+            }
+        }
+
+        return $filtered;
     }
 
     /**

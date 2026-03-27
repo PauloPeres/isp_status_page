@@ -19,6 +19,8 @@ services:
       - SECURITY_SALT=18454403c4173e367f60744ce2db198e5a721ebbc89f4eb3122d5b5b30adafeb
       - DATABASE_URL=sqlite:///var/www/html/database.db
       - ENABLE_CRON=true
+    cap_add:
+      - NET_RAW
     networks:
       - isp-status-network
     restart: unless-stopped

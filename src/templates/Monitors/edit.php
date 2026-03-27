@@ -84,13 +84,13 @@ $this->assign('title', __d('monitors', 'Edit Monitor'));
             <p class="form-help"><?= __d('monitors', 'Configuration depends on selected monitor type') ?></p>
 
             <!-- HTTP/HTTPS Fields -->
-            <?= $this->element('monitor/form_http') ?>
+            <?= $this->element('monitor/form_http', ['monitor' => $monitor]) ?>
 
             <!-- Ping/ICMP Fields -->
-            <?= $this->element('monitor/form_ping') ?>
+            <?= $this->element('monitor/form_ping', ['monitor' => $monitor]) ?>
 
             <!-- Port/TCP/UDP Fields -->
-            <?= $this->element('monitor/form_port') ?>
+            <?= $this->element('monitor/form_port', ['monitor' => $monitor]) ?>
         </div>
 
         <div class="form-section">

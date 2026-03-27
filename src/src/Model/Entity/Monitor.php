@@ -141,15 +141,36 @@ class Monitor extends Entity
      */
     protected function _setConfiguration(array|string|null $value): ?string
     {
+        // If null or empty string, return null
         if ($value === null || $value === '') {
             return null;
         }
 
-        if (is_array($value)) {
-            return json_encode($value);
+        // If already a string (JSON), validate and return
+        if (is_string($value)) {
+            return $value;
         }
 
-        return $value;
+        // If array, process it
+        if (is_array($value)) {
+            // Filter out empty string values to check meaningful data
+            $nonEmptyValues = array_filter($value, function($val) {
+                // Keep: non-empty strings, numbers, booleans, arrays
+                // Remove: empty strings only
+                return $val !== '';
+            });
+
+            // If array has NO meaningful values, keep existing configuration
+            if (empty($nonEmptyValues)) {
+                // Don't overwrite - return unchanged
+                return $this->getOriginal('configuration');
+            }
+
+            // Encode the filtered array
+            return json_encode($nonEmptyValues);
+        }
+
+        return null;
     }
 
     /**

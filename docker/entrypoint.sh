@@ -53,20 +53,27 @@ chmod -R 777 /var/www/html/logs
 if [ "${ENABLE_CRON:-false}" = "true" ]; then
     echo "Configuring cron for monitor checks..."
 
+    # Create wrapper script for monitor checks
+    cat > /usr/local/bin/monitor-check-cron.sh <<'EOF'
+#!/bin/bash
+export DATABASE_URL=sqlite:///var/www/html/database.db
+cd /var/www/html
+bin/cake monitor_check
+EOF
+
+    chmod +x /usr/local/bin/monitor-check-cron.sh
+
     # Create cron job file
     cat > /etc/cron.d/isp-status-cron <<EOF
 # ISP Status Page - Monitor Check Cron
 # Runs every minute to check all monitors
-* * * * * www-data cd /var/www/html && bin/cake monitor_check >> /var/www/html/logs/cron.log 2>&1
+* * * * * www-data /usr/local/bin/monitor-check-cron.sh >> /var/www/html/logs/cron.log 2>&1
 
-# Empty line required at end of cron file
 EOF
 
-    # Set correct permissions
+    # Set correct permissions and ownership
     chmod 0644 /etc/cron.d/isp-status-cron
-
-    # Register the cron job
-    crontab /etc/cron.d/isp-status-cron
+    chown root:root /etc/cron.d/isp-status-cron
 
     # Start cron daemon in background
     echo "Starting cron daemon..."
