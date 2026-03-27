@@ -27,6 +27,7 @@ class Integration extends Entity
      */
     public const TYPE_IXC = 'ixc';
     public const TYPE_ZABBIX = 'zabbix';
+    public const TYPE_REST_API = 'rest_api';
 
     /**
      * Sync statuses
@@ -121,6 +122,7 @@ class Integration extends Entity
         return match ($this->type) {
             self::TYPE_IXC => 'IXC Soft',
             self::TYPE_ZABBIX => 'Zabbix',
+            self::TYPE_REST_API => 'REST API',
             default => 'Unknown',
         };
     }

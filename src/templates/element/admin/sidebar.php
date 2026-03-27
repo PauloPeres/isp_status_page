@@ -62,6 +62,15 @@ function isActive($currentController, $targetController, $currentAction = null, 
                     'class' => 'nav-item' . (isActive($controller, 'Incidents') ? ' active' : '')
                 ]
             ) ?>
+
+            <?= $this->Html->link(
+                '<span class="nav-icon">🔗</span> ' . __('Integracoes'),
+                ['controller' => 'Integrations', 'action' => 'index'],
+                [
+                    'escape' => false,
+                    'class' => 'nav-item' . (isActive($controller, 'Integrations') ? ' active' : '')
+                ]
+            ) ?>
         </div>
 
         <div class="nav-section">
