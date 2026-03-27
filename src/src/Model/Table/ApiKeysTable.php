@@ -81,7 +81,7 @@ class ApiKeysTable extends Table
 
         $validator
             ->scalar('key_prefix')
-            ->maxLength('key_prefix', 10)
+            ->maxLength('key_prefix', 12)
             ->requirePresence('key_prefix', 'create')
             ->notEmptyString('key_prefix');
 

@@ -31,6 +31,8 @@ use Cake\Http\MiddlewareQueue;
 use Cake\ORM\Locator\TableLocator;
 use Cake\Routing\Middleware\AssetMiddleware;
 use Cake\Routing\Middleware\RoutingMiddleware;
+use App\Middleware\ApiAuthMiddleware;
+use App\Middleware\ApiRateLimitMiddleware;
 use App\Middleware\TenantMiddleware;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -104,6 +106,12 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
             // Resolve the current tenant (organization) from subdomain, session, header, etc.
             ->add(new TenantMiddleware())
 
+            // API authentication via Bearer token (API key) — only activates on /api/v1/* paths
+            ->add(new ApiAuthMiddleware())
+
+            // API rate limiting per API key — only activates on /api/v1/* paths
+            ->add(new ApiRateLimitMiddleware())
+
             // Parse various types of encoded request bodies so that they are
             // available as array through $request->getData()
             // https://book.cakephp.org/4/en/controllers/middleware.html#body-parser-middleware
@@ -113,6 +121,12 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
             // https://book.cakephp.org/4/en/security/csrf.html#cross-site-request-forgery-csrf-middleware
             ->add(new CsrfProtectionMiddleware([
                 'httponly' => true,
+                'skipCheckCallback' => function ($request) {
+                    // Skip CSRF for API and webhook routes
+                    $path = $request->getUri()->getPath();
+
+                    return str_starts_with($path, '/api/') || str_starts_with($path, '/webhooks/');
+                },
             ]));
 
         return $middlewareQueue;
