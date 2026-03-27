@@ -46,9 +46,14 @@ class IntegrationLogsTable extends Table
         $this->setPrimaryKey('id');
 
         $this->addBehavior('Timestamp');
+        $this->addBehavior('TenantScope');
 
         $this->belongsTo('Integrations', [
             'foreignKey' => 'integration_id',
+            'joinType' => 'INNER',
+        ]);
+        $this->belongsTo('Organizations', [
+            'foreignKey' => 'organization_id',
             'joinType' => 'INNER',
         ]);
     }
@@ -97,6 +102,7 @@ class IntegrationLogsTable extends Table
      */
     public function buildRules(RulesChecker $rules): RulesChecker
     {
+        $rules->add($rules->existsIn(['organization_id'], 'Organizations'), ['errorField' => 'organization_id']);
         $rules->add($rules->existsIn(['integration_id'], 'Integrations'), ['errorField' => 'integration_id']);
 
         return $rules;

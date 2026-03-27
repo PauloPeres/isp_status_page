@@ -32,6 +32,7 @@ class MonitorCheck extends Entity
      * @var array<string, bool>
      */
     protected array $_accessible = [
+        'organization_id' => true,
         'monitor_id' => true,
         'status' => true,
         'response_time' => true,

@@ -32,6 +32,7 @@ class Subscription extends Entity
      * @var array<string, bool>
      */
     protected array $_accessible = [
+        'organization_id' => true,
         'subscriber_id' => true,
         'monitor_id' => true,
         'notify_on_down' => true,

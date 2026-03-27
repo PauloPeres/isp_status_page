@@ -1,4 +1,6 @@
 <?php
+use Cake\Cache\Engine\FileEngine;
+use Cake\Cache\Engine\RedisEngine;
 use Cake\Database\Connection;
 use Cake\Database\Driver\Mysql;
 use Cake\Database\Driver\Postgres;
@@ -16,7 +18,7 @@ if (str_starts_with($databaseUrl, 'sqlite:///')) {
     $scheme = 'sqlite';
     $sqlitePath = substr($databaseUrl, 9); // Remove 'sqlite://'
 } else {
-    // Other database types (mysql, postgres)
+    // Other database types (mysql, postgres, postgresql)
     $parsedUrl = parse_url($databaseUrl);
     $scheme = $parsedUrl['scheme'] ?? 'sqlite';
 }
@@ -47,14 +49,93 @@ switch ($scheme) {
         $config['encoding'] = 'utf8mb4';
         break;
     case 'postgres':
+    case 'postgresql':
         $config['driver'] = Postgres::class;
         $config['host'] = $parsedUrl['host'] ?? 'localhost';
         $config['port'] = $parsedUrl['port'] ?? 5432;
         $config['username'] = $parsedUrl['user'] ?? 'postgres';
         $config['password'] = $parsedUrl['pass'] ?? '';
         $config['database'] = ltrim($parsedUrl['path'] ?? '/app', '/');
+        $config['encoding'] = 'utf8';
         $config['schema'] = 'public';
         break;
+}
+
+// Redis configuration
+$redisUrl = getenv('REDIS_URL') ?: '';
+$cacheDriver = getenv('CACHE_DRIVER') ?: 'file';
+$sessionDriver = getenv('SESSION_DRIVER') ?: 'php';
+
+$redisHost = '127.0.0.1';
+$redisPort = 6379;
+if ($redisUrl) {
+    $parsedRedis = parse_url($redisUrl);
+    $redisHost = $parsedRedis['host'] ?? '127.0.0.1';
+    $redisPort = $parsedRedis['port'] ?? 6379;
+}
+
+// Build cache configuration
+$cacheConfig = [];
+
+if ($cacheDriver === 'redis' && $redisUrl) {
+    $cacheConfig['default'] = [
+        'className' => RedisEngine::class,
+        'host' => $redisHost,
+        'port' => $redisPort,
+        'database' => 0,
+        'prefix' => 'isp_status_',
+        'duration' => '+1 hours',
+    ];
+    $cacheConfig['_cake_core_'] = [
+        'className' => RedisEngine::class,
+        'host' => $redisHost,
+        'port' => $redisPort,
+        'database' => 1,
+        'prefix' => 'isp_cake_core_',
+        'duration' => '+1 years',
+    ];
+    $cacheConfig['_cake_model_'] = [
+        'className' => RedisEngine::class,
+        'host' => $redisHost,
+        'port' => $redisPort,
+        'database' => 2,
+        'prefix' => 'isp_cake_model_',
+        'duration' => '+1 years',
+    ];
+} else {
+    $cacheConfig['default'] = [
+        'className' => FileEngine::class,
+        'path' => CACHE,
+    ];
+    $cacheConfig['_cake_core_'] = [
+        'className' => FileEngine::class,
+        'prefix' => 'myapp_cake_core_',
+        'path' => CACHE . 'persistent' . DS,
+        'serialize' => true,
+        'duration' => '+1 years',
+    ];
+    $cacheConfig['_cake_model_'] = [
+        'className' => FileEngine::class,
+        'prefix' => 'myapp_cake_model_',
+        'path' => CACHE . 'models' . DS,
+        'serialize' => true,
+        'duration' => '+1 years',
+    ];
+}
+
+// Build session configuration
+$sessionConfig = [
+    'defaults' => 'php',
+];
+
+if ($sessionDriver === 'redis' && $redisUrl) {
+    $sessionConfig = [
+        'defaults' => 'php',
+        'ini' => [
+            'session.save_handler' => 'redis',
+            'session.save_path' => "tcp://{$redisHost}:{$redisPort}?database=3",
+        ],
+    ];
 }
 
 return [
@@ -68,4 +149,6 @@ return [
             'database' => ':memory:',
         ],
     ],
+    'Cache' => $cacheConfig,
+    'Session' => $sessionConfig,
 ];

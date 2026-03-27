@@ -46,9 +46,14 @@ class SubscribersTable extends Table
         $this->setPrimaryKey('id');
 
         $this->addBehavior('Timestamp');
+        $this->addBehavior('TenantScope');
 
         $this->hasMany('Subscriptions', [
             'foreignKey' => 'subscriber_id',
+        ]);
+        $this->belongsTo('Organizations', [
+            'foreignKey' => 'organization_id',
+            'joinType' => 'INNER',
         ]);
     }
 
@@ -105,6 +110,7 @@ class SubscribersTable extends Table
      */
     public function buildRules(RulesChecker $rules): RulesChecker
     {
+        $rules->add($rules->existsIn(['organization_id'], 'Organizations'), ['errorField' => 'organization_id']);
         $rules->add($rules->isUnique(['email']), ['errorField' => 'email']);
 
         return $rules;

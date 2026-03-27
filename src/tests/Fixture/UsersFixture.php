@@ -18,6 +18,7 @@ class UsersFixture extends TestFixture
     public array $records = [
         [
             'id' => 1,
+            'organization_id' => 1,
             'username' => 'admin',
             'password' => '$2y$10$oYBfA/7TTlJsi6aURb.UFuUJVBcM78buScLArOQNbI/dGjweiic6W', // admin123
             'email' => 'admin@example.com',
@@ -30,6 +31,7 @@ class UsersFixture extends TestFixture
         ],
         [
             'id' => 2,
+            'organization_id' => 1,
             'username' => 'user',
             'password' => '$2y$10$oYBfA/7TTlJsi6aURb.UFuUJVBcM78buScLArOQNbI/dGjweiic6W', // admin123
             'email' => 'user@example.com',
@@ -42,6 +44,7 @@ class UsersFixture extends TestFixture
         ],
         [
             'id' => 3,
+            'organization_id' => 1,
             'username' => 'inactive',
             'password' => '$2y$10$oYBfA/7TTlJsi6aURb.UFuUJVBcM78buScLArOQNbI/dGjweiic6W', // admin123
             'email' => 'inactive@example.com',

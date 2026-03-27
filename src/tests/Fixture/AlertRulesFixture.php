@@ -23,6 +23,7 @@ class AlertRulesFixture extends TestFixture
         $this->records = [
             [
                 'id' => 1,
+                'organization_id' => 1,
                 'monitor_id' => 1,
                 'channel' => 'email',
                 'trigger_on' => 'on_down',
@@ -35,6 +36,7 @@ class AlertRulesFixture extends TestFixture
             ],
             [
                 'id' => 2,
+                'organization_id' => 1,
                 'monitor_id' => 1,
                 'channel' => 'email',
                 'trigger_on' => 'on_up',
@@ -47,6 +49,7 @@ class AlertRulesFixture extends TestFixture
             ],
             [
                 'id' => 3,
+                'organization_id' => 1,
                 'monitor_id' => 2,
                 'channel' => 'email',
                 'trigger_on' => 'on_change',
@@ -59,6 +62,7 @@ class AlertRulesFixture extends TestFixture
             ],
             [
                 'id' => 4,
+                'organization_id' => 1,
                 'monitor_id' => 1,
                 'channel' => 'whatsapp',
                 'trigger_on' => 'on_down',

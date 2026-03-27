@@ -46,9 +46,14 @@ class IntegrationsTable extends Table
         $this->setPrimaryKey('id');
 
         $this->addBehavior('Timestamp');
+        $this->addBehavior('TenantScope');
 
         $this->hasMany('IntegrationLogs', [
             'foreignKey' => 'integration_id',
+        ]);
+        $this->belongsTo('Organizations', [
+            'foreignKey' => 'organization_id',
+            'joinType' => 'INNER',
         ]);
     }
 
@@ -90,5 +95,19 @@ class IntegrationsTable extends Table
             ->allowEmptyString('last_sync_status');
 
         return $validator;
+    }
+
+    /**
+     * Returns a rules checker object that will be used for validating
+     * application integrity.
+     *
+     * @param \Cake\ORM\RulesChecker $rules The rules object to be modified.
+     * @return \Cake\ORM\RulesChecker
+     */
+    public function buildRules(RulesChecker $rules): RulesChecker
+    {
+        $rules->add($rules->existsIn(['organization_id'], 'Organizations'), ['errorField' => 'organization_id']);
+
+        return $rules;
     }
 }

@@ -18,6 +18,7 @@ class IncidentsFixture extends TestFixture
     public array $records = [
         [
             'id' => 1,
+            'organization_id' => 1,
             'monitor_id' => 1,
             'title' => 'Website Downtime',
             'description' => 'Main website is not responding',
@@ -33,6 +34,7 @@ class IncidentsFixture extends TestFixture
         ],
         [
             'id' => 2,
+            'organization_id' => 1,
             'monitor_id' => 2,
             'title' => 'API Slow Response',
             'description' => 'API is responding slowly',

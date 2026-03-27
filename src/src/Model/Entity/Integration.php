@@ -46,6 +46,7 @@ class Integration extends Entity
      * @var array<string, bool>
      */
     protected array $_accessible = [
+        'organization_id' => true,
         'name' => true,
         'type' => true,
         'configuration' => true,

@@ -30,6 +30,7 @@ class IntegrationLog extends Entity
      * @var array<string, bool>
      */
     protected array $_accessible = [
+        'organization_id' => true,
         'integration_id' => true,
         'action' => true,
         'status' => true,

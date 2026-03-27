@@ -62,6 +62,7 @@ class Monitor extends Entity
      * @var array<string, bool>
      */
     protected array $_accessible = [
+        'organization_id' => true,
         'name' => true,
         'description' => true,
         'type' => true,

@@ -26,6 +26,7 @@ class AlertLogsFixture extends TestFixture
         $this->records = [
             [
                 'id' => 1,
+                'organization_id' => 1,
                 'alert_rule_id' => 1,
                 'incident_id' => 1,
                 'monitor_id' => 1,
@@ -38,6 +39,7 @@ class AlertLogsFixture extends TestFixture
             ],
             [
                 'id' => 2,
+                'organization_id' => 1,
                 'alert_rule_id' => 1,
                 'incident_id' => 1,
                 'monitor_id' => 1,
@@ -50,6 +52,7 @@ class AlertLogsFixture extends TestFixture
             ],
             [
                 'id' => 3,
+                'organization_id' => 1,
                 'alert_rule_id' => 2,
                 'incident_id' => 1,
                 'monitor_id' => 1,
@@ -62,6 +65,7 @@ class AlertLogsFixture extends TestFixture
             ],
             [
                 'id' => 4,
+                'organization_id' => 1,
                 'alert_rule_id' => 3,
                 'incident_id' => null,
                 'monitor_id' => 2,

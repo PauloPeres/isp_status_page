@@ -51,6 +51,7 @@ class AlertLogsTable extends Table
         $this->setPrimaryKey('id');
 
         $this->addBehavior('Timestamp');
+        $this->addBehavior('TenantScope');
 
         $this->belongsTo('AlertRules', [
             'foreignKey' => 'alert_rule_id',
@@ -61,6 +62,10 @@ class AlertLogsTable extends Table
         ]);
         $this->belongsTo('Monitors', [
             'foreignKey' => 'monitor_id',
+            'joinType' => 'INNER',
+        ]);
+        $this->belongsTo('Organizations', [
+            'foreignKey' => 'organization_id',
             'joinType' => 'INNER',
         ]);
     }
@@ -135,6 +140,7 @@ class AlertLogsTable extends Table
      */
     public function buildRules(RulesChecker $rules): RulesChecker
     {
+        $rules->add($rules->existsIn(['organization_id'], 'Organizations'), ['errorField' => 'organization_id']);
         $rules->add($rules->existsIn(['alert_rule_id'], 'AlertRules'), ['errorField' => 'alert_rule_id']);
         $rules->add($rules->existsIn(['incident_id'], 'Incidents'), ['errorField' => 'incident_id']);
         $rules->add($rules->existsIn(['monitor_id'], 'Monitors'), ['errorField' => 'monitor_id']);

@@ -17,13 +17,21 @@ services:
       - APP_NAME=ISP Status Page
       - APP_DEBUG=true
       - SECURITY_SALT=18454403c4173e367f60744ce2db198e5a721ebbc89f4eb3122d5b5b30adafeb
-      - DATABASE_URL=sqlite:///var/www/html/database.db
+      - DATABASE_URL=postgres://isp:isp_secret@postgres:5432/isp_status
+      - REDIS_URL=redis://redis:6379
+      - CACHE_DRIVER=redis
+      - SESSION_DRIVER=redis
       - ENABLE_CRON=true
     cap_add:
       - NET_RAW
     networks:
       - isp-status-network
     restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/"]
       interval: 30s
@@ -31,10 +39,52 @@ services:
       retries: 3
       start_period: 40s
 
+  # PostgreSQL 16 Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: isp-status-postgres
+    environment:
+      POSTGRES_DB: isp_status
+      POSTGRES_USER: isp
+      POSTGRES_PASSWORD: isp_secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - isp-status-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U isp -d isp_status"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+  # Redis 7 Cache / Session / Queue
+  redis:
+    image: redis:7-alpine
+    container_name: isp-status-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - isp-status-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+
 networks:
   isp-status-network:
     driver: bridge
 
 volumes:
-  database:
+  postgres_data:
+    driver: local
+  redis_data:
     driver: local

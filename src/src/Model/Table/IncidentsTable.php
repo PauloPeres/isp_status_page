@@ -48,6 +48,7 @@ class IncidentsTable extends Table
         $this->setPrimaryKey('id');
 
         $this->addBehavior('Timestamp');
+        $this->addBehavior('TenantScope');
 
         $this->belongsTo('Monitors', [
             'foreignKey' => 'monitor_id',
@@ -61,6 +62,10 @@ class IncidentsTable extends Table
         ]);
         $this->hasMany('AlertLogs', [
             'foreignKey' => 'incident_id',
+        ]);
+        $this->belongsTo('Organizations', [
+            'foreignKey' => 'organization_id',
+            'joinType' => 'INNER',
         ]);
     }
 
@@ -131,6 +136,7 @@ class IncidentsTable extends Table
      */
     public function buildRules(RulesChecker $rules): RulesChecker
     {
+        $rules->add($rules->existsIn(['organization_id'], 'Organizations'), ['errorField' => 'organization_id']);
         $rules->add($rules->existsIn(['monitor_id'], 'Monitors'), ['errorField' => 'monitor_id']);
         $rules->add($rules->existsIn(['acknowledged_by_user_id'], 'AcknowledgedByUsers'), [
             'errorField' => 'acknowledged_by_user_id',

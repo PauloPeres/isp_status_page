@@ -72,6 +72,7 @@ class Incident extends Entity
      * @var array<string, bool>
      */
     protected array $_accessible = [
+        'organization_id' => true,
         'monitor_id' => true,
         'title' => true,
         'description' => true,

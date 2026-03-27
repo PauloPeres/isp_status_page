@@ -12,24 +12,32 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     libzip-dev \
     libicu-dev \
+    libpq-dev \
     zip \
     unzip \
     sqlite3 \
     libsqlite3-dev \
     cron \
     iputils-ping \
+    postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
 RUN docker-php-ext-install \
     pdo \
     pdo_sqlite \
+    pdo_pgsql \
+    pgsql \
     mbstring \
     exif \
     pcntl \
     bcmath \
     intl \
     zip
+
+# Install phpredis extension
+RUN pecl install redis \
+    && docker-php-ext-enable redis
 
 # Enable Apache modules
 RUN a2enmod rewrite headers
@@ -43,15 +51,11 @@ WORKDIR /var/www/html
 # Copy application files
 COPY src/ /var/www/html/
 
-# Copy database file (will be created if doesn't exist)
-RUN touch /var/www/html/database.db
-
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html \
     && chmod -R 777 /var/www/html/tmp \
-    && chmod -R 777 /var/www/html/logs \
-    && chmod 666 /var/www/html/database.db
+    && chmod -R 777 /var/www/html/logs
 
 # Configure Apache
 RUN sed -i 's!/var/www/html!/var/www/html/webroot!g' /etc/apache2/sites-available/000-default.conf

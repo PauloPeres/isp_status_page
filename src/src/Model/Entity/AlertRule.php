@@ -51,6 +51,7 @@ class AlertRule extends Entity
      * @var array<string, bool>
      */
     protected array $_accessible = [
+        'organization_id' => true,
         'monitor_id' => true,
         'channel' => true,
         'trigger_on' => true,

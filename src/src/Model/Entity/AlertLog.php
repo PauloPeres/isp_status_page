@@ -42,6 +42,7 @@ class AlertLog extends Entity
      * @var array<string, bool>
      */
     protected array $_accessible = [
+        'organization_id' => true,
         'alert_rule_id' => true,
         'incident_id' => true,
         'monitor_id' => true,

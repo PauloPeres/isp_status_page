@@ -1,7 +1,7 @@
 # ISP Status Page - Makefile
 # Simplifica comandos Docker e desenvolvimento
 
-.PHONY: help dev prod build up down logs shell clean migrate seed test test-all test-unit test-coverage
+.PHONY: help dev prod build up down logs shell clean migrate seed test test-all test-unit test-coverage db-shell redis-cli redis-flush
 
 # Default target
 .DEFAULT_GOAL := help
@@ -114,13 +114,25 @@ seed: ## Executa seeds
 db-reset: ## Reset completo do banco (CUIDADO!)
 	@echo "$(RED)⚠ Isso vai apagar TODOS os dados!$(NC)"
 	@read -p "Tem certeza? [y/N]: " confirm && [ "$$confirm" = "y" ] || exit 1
-	docker-compose exec app rm -f database.db
-	docker-compose exec app touch database.db
-	docker-compose exec app chown www-data:www-data database.db
-	docker-compose exec app chmod 666 database.db
+	docker-compose exec postgres psql -U isp -d postgres -c "DROP DATABASE IF EXISTS isp_status;"
+	docker-compose exec postgres psql -U isp -d postgres -c "CREATE DATABASE isp_status;"
 	$(MAKE) migrate
 	$(MAKE) seed
 	@echo "$(GREEN)✓ Banco resetado!$(NC)"
+
+db-shell: ## Acessa shell do PostgreSQL
+	@echo "$(BLUE)Acessando PostgreSQL...$(NC)"
+	docker-compose exec postgres psql -U isp -d isp_status
+
+redis-cli: ## Acessa Redis CLI
+	@echo "$(BLUE)Acessando Redis...$(NC)"
+	docker-compose exec redis redis-cli
+
+redis-flush: ## Limpa todos os dados do Redis
+	@echo "$(RED)⚠ Isso vai apagar TODOS os dados do Redis!$(NC)"
+	@read -p "Tem certeza? [y/N]: " confirm && [ "$$confirm" = "y" ] || exit 1
+	docker-compose exec redis redis-cli FLUSHALL
+	@echo "$(GREEN)✓ Redis limpo!$(NC)"
 
 # Development tools
 test: ## Executa todos os testes
@@ -187,16 +199,15 @@ clean-all: ## Limpa tudo (containers, volumes, imagens)
 	docker rmi isp-status-page:latest || true
 	@echo "$(GREEN)✓ Tudo limpo!$(NC)"
 
-backup: ## Cria backup do banco de dados
+backup: ## Cria backup do banco de dados (PostgreSQL pg_dump)
 	@echo "$(BLUE)Criando backup...$(NC)"
 	mkdir -p backups
-	docker cp isp-status-app:/var/www/html/database.db backups/database-$$(date +%Y%m%d-%H%M%S).db
+	docker-compose exec postgres pg_dump -U isp -d isp_status > backups/isp_status-$$(date +%Y%m%d-%H%M%S).sql
 	@echo "$(GREEN)✓ Backup criado em backups/$(NC)"
 
-restore: ## Restaura backup - use: make restore FILE=backups/database-20241031.db
+restore: ## Restaura backup - use: make restore FILE=backups/isp_status-20241031.sql
 	@echo "$(BLUE)Restaurando backup $(FILE)...$(NC)"
-	docker cp $(FILE) isp-status-app:/var/www/html/database.db
-	docker-compose exec app chown www-data:www-data database.db
+	docker-compose exec -T postgres psql -U isp -d isp_status < $(FILE)
 	@echo "$(GREEN)✓ Backup restaurado!$(NC)"
 
 # Status and info

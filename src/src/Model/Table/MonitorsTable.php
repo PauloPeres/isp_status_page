@@ -50,6 +50,7 @@ class MonitorsTable extends Table
         $this->setPrimaryKey('id');
 
         $this->addBehavior('Timestamp');
+        $this->addBehavior('TenantScope');
 
         $this->hasMany('AlertLogs', [
             'foreignKey' => 'monitor_id',
@@ -65,6 +66,10 @@ class MonitorsTable extends Table
         ]);
         $this->hasMany('Subscriptions', [
             'foreignKey' => 'monitor_id',
+        ]);
+        $this->belongsTo('Organizations', [
+            'foreignKey' => 'organization_id',
+            'joinType' => 'INNER',
         ]);
     }
 
@@ -165,5 +170,19 @@ class MonitorsTable extends Table
             ->greaterThanOrEqual('display_order', 0, __('Display order cannot be negative'));
 
         return $validator;
+    }
+
+    /**
+     * Returns a rules checker object that will be used for validating
+     * application integrity.
+     *
+     * @param \Cake\ORM\RulesChecker $rules The rules object to be modified.
+     * @return \Cake\ORM\RulesChecker
+     */
+    public function buildRules(RulesChecker $rules): RulesChecker
+    {
+        $rules->add($rules->existsIn(['organization_id'], 'Organizations'), ['errorField' => 'organization_id']);
+
+        return $rules;
     }
 }

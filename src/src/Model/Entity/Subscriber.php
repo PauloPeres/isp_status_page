@@ -33,6 +33,7 @@ class Subscriber extends Entity
      * @var array<string, bool>
      */
     protected array $_accessible = [
+        'organization_id' => true,
         'email' => true,
         'name' => true,
         'verification_token' => true,

@@ -31,6 +31,7 @@ use Cake\Http\MiddlewareQueue;
 use Cake\ORM\Locator\TableLocator;
 use Cake\Routing\Middleware\AssetMiddleware;
 use Cake\Routing\Middleware\RoutingMiddleware;
+use App\Middleware\TenantMiddleware;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -99,6 +100,9 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
 
             // Add authentication middleware. It should be after routing.
             ->add(new AuthenticationMiddleware($this))
+
+            // Resolve the current tenant (organization) from subdomain, session, header, etc.
+            ->add(new TenantMiddleware())
 
             // Parse various types of encoded request bodies so that they are
             // available as array through $request->getData()

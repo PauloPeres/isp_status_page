@@ -18,6 +18,7 @@ class MonitorsFixture extends TestFixture
     public array $records = [
         [
             'id' => 1,
+            'organization_id' => 1,
             'name' => 'Website',
             'description' => 'Main website monitoring',
             'type' => 'http',
@@ -37,6 +38,7 @@ class MonitorsFixture extends TestFixture
         ],
         [
             'id' => 2,
+            'organization_id' => 1,
             'name' => 'API Server',
             'description' => 'API endpoint monitoring',
             'type' => 'http',
@@ -56,6 +58,7 @@ class MonitorsFixture extends TestFixture
         ],
         [
             'id' => 3,
+            'organization_id' => 1,
             'name' => 'Inactive Monitor',
             'description' => 'This monitor is inactive',
             'type' => 'http',

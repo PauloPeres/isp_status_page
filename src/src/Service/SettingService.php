@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Model\Table\SettingsTable;
+use App\Tenant\TenantContext;
 use Cake\Cache\Cache;
 use Cake\ORM\Locator\LocatorAwareTrait;
 
@@ -223,6 +224,31 @@ class SettingService
     public function clearCache(): bool
     {
         return Cache::delete(self::CACHE_KEY, self::CACHE_CONFIG);
+    }
+
+    /**
+     * Get an organization-level setting, falling back to global settings.
+     *
+     * Organization settings are stored in the `settings` JSON column of the
+     * organizations table. If TenantContext is set and the org has a value
+     * for the requested key, that value is returned. Otherwise the global
+     * system setting (from the settings table) is returned.
+     *
+     * @param string $key The setting key
+     * @param mixed $default Default value if neither org nor global setting exists
+     * @return mixed
+     */
+    public function getOrgSetting(string $key, mixed $default = null): mixed
+    {
+        if (TenantContext::isSet()) {
+            $org = TenantContext::getCurrentOrganization();
+            $orgSettings = json_decode($org['settings'] ?? '{}', true);
+            if (isset($orgSettings[$key])) {
+                return $orgSettings[$key];
+            }
+        }
+
+        return $this->get($key, $default);
     }
 
     /**

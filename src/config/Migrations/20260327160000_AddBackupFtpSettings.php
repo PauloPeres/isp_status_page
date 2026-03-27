@@ -82,7 +82,7 @@ class AddBackupFtpSettings extends AbstractMigration
         foreach ($settings as $setting) {
             // Only insert if key does not exist
             $exists = $this->fetchRow(
-                "SELECT id FROM settings WHERE `key` = '{$setting['key']}'"
+                "SELECT id FROM settings WHERE \"key\" = '{$setting['key']}'"
             );
             if (!$exists) {
                 $table->insert($setting);
@@ -110,7 +110,7 @@ class AddBackupFtpSettings extends AbstractMigration
         ];
 
         foreach ($keys as $key) {
-            $this->execute("DELETE FROM settings WHERE `key` = '{$key}'");
+            $this->execute("DELETE FROM settings WHERE \"key\" = '{$key}'");
         }
     }
 }

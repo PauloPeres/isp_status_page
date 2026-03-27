@@ -18,6 +18,7 @@ class MonitorChecksFixture extends TestFixture
     public array $records = [
         [
             'id' => 1,
+            'organization_id' => 1,
             'monitor_id' => 1,
             'status' => 'success',
             'response_time' => 150,
@@ -28,6 +29,7 @@ class MonitorChecksFixture extends TestFixture
         ],
         [
             'id' => 2,
+            'organization_id' => 1,
             'monitor_id' => 1,
             'status' => 'success',
             'response_time' => 145,
@@ -38,6 +40,7 @@ class MonitorChecksFixture extends TestFixture
         ],
         [
             'id' => 3,
+            'organization_id' => 1,
             'monitor_id' => 2,
             'status' => 'success',
             'response_time' => 200,

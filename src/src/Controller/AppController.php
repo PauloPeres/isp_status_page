@@ -19,6 +19,7 @@ namespace App\Controller;
 use Cake\Controller\Controller;
 use Cake\I18n\I18n;
 use App\Service\SettingService;
+use App\Tenant\TenantContext;
 
 /**
  * Application Controller
@@ -30,6 +31,13 @@ use App\Service\SettingService;
  */
 class AppController extends Controller
 {
+    /**
+     * The current organization (set from TenantContext).
+     *
+     * @var array|null
+     */
+    protected ?array $currentOrganization = null;
+
     /**
      * Initialization hook method.
      *
@@ -54,6 +62,12 @@ class AppController extends Controller
         } catch (\Exception $e) {
             // Fallback to default language if settings fail to load
             I18n::setLocale('pt_BR');
+        }
+
+        // Load current organization from TenantContext (set by TenantMiddleware)
+        if (TenantContext::isSet()) {
+            $this->currentOrganization = TenantContext::getCurrentOrganization();
+            $this->set('currentOrganization', $this->currentOrganization);
         }
 
         /*

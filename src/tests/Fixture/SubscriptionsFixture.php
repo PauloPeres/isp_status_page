@@ -18,6 +18,7 @@ class SubscriptionsFixture extends TestFixture
     public array $records = [
         [
             'id' => 1,
+            'organization_id' => 1,
             'subscriber_id' => 1,
             'monitor_id' => 1,
             'notify_on_down' => true,
@@ -28,6 +29,7 @@ class SubscriptionsFixture extends TestFixture
         ],
         [
             'id' => 2,
+            'organization_id' => 1,
             'subscriber_id' => 1,
             'monitor_id' => 2,
             'notify_on_down' => true,
@@ -38,6 +40,7 @@ class SubscriptionsFixture extends TestFixture
         ],
         [
             'id' => 3,
+            'organization_id' => 1,
             'subscriber_id' => 2,
             'monitor_id' => null, // Global subscription - all monitors
             'notify_on_down' => true,
@@ -48,6 +51,7 @@ class SubscriptionsFixture extends TestFixture
         ],
         [
             'id' => 4,
+            'organization_id' => 1,
             'subscriber_id' => 3,
             'monitor_id' => 1,
             'notify_on_down' => true,
