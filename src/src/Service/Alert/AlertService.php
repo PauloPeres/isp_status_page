@@ -9,6 +9,7 @@ use App\Model\Entity\Incident;
 use App\Model\Entity\Monitor;
 use App\Model\Table\AlertLogsTable;
 use App\Model\Table\AlertRulesTable;
+use App\Service\MaintenanceService;
 use Cake\I18n\DateTime;
 use Cake\Log\Log;
 use Cake\ORM\Locator\LocatorAwareTrait;
@@ -46,12 +47,20 @@ class AlertService
     protected AlertLogsTable $AlertLogs;
 
     /**
+     * Maintenance service for checking active maintenance windows
+     *
+     * @var \App\Service\MaintenanceService
+     */
+    protected MaintenanceService $maintenanceService;
+
+    /**
      * Constructor
      */
     public function __construct()
     {
         $this->AlertRules = $this->fetchTable('AlertRules');
         $this->AlertLogs = $this->fetchTable('AlertLogs');
+        $this->maintenanceService = new MaintenanceService();
     }
 
     /**
@@ -104,6 +113,13 @@ class AlertService
             // Stop sending alerts if incident is already acknowledged
             if ($incident->isAcknowledged()) {
                 Log::debug("Incident {$incident->id} already acknowledged, skipping alert dispatch");
+
+                return 0;
+            }
+
+            // Check if monitor is in a maintenance window with alert suppression
+            if ($this->maintenanceService->shouldSuppressAlert((int)$monitor->id)) {
+                Log::debug("Monitor {$monitor->id} is in maintenance window, suppressing alert dispatch");
 
                 return 0;
             }

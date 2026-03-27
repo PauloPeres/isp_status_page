@@ -73,6 +73,24 @@ function isActive($currentController, $targetController, $currentAction = null, 
                     'class' => 'nav-item' . (isActive($controller, 'Integrations') ? ' active' : '')
                 ]
             ) ?>
+
+            <?= $this->Html->link(
+                '<span class="nav-icon">📄</span> ' . __('Status Pages'),
+                ['controller' => 'StatusPages', 'action' => 'index'],
+                [
+                    'escape' => false,
+                    'class' => 'nav-item' . (isActive($controller, 'StatusPages') ? ' active' : '')
+                ]
+            ) ?>
+
+            <?= $this->Html->link(
+                '<span class="nav-icon">🔧</span> ' . __('Maintenance'),
+                ['controller' => 'MaintenanceWindows', 'action' => 'index'],
+                [
+                    'escape' => false,
+                    'class' => 'nav-item' . (isActive($controller, 'MaintenanceWindows') ? ' active' : '')
+                ]
+            ) ?>
         </div>
 
         <div class="nav-section">

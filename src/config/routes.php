@@ -73,6 +73,20 @@ return function (RouteBuilder $routes): void {
         );
 
         /*
+         * OAuth/Social login routes (TASK-704)
+         */
+        $builder->connect(
+            '/auth/{provider}/redirect',
+            ['controller' => 'OAuth', 'action' => 'redirect'],
+            ['pass' => ['provider'], 'provider' => '(google|github)']
+        );
+        $builder->connect(
+            '/auth/{provider}/callback',
+            ['controller' => 'OAuth', 'action' => 'callback'],
+            ['pass' => ['provider'], 'provider' => '(google|github)']
+        );
+
+        /*
          * Public registration routes (TASK-700)
          */
         $builder->connect(
