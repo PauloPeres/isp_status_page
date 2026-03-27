@@ -45,6 +45,16 @@ $labels = [
     'enable_whatsapp_alerts' => __d('settings', 'Habilitar Alertas por WhatsApp'),
     'enable_telegram_alerts' => __d('settings', 'Habilitar Alertas por Telegram'),
     'enable_sms_alerts' => __d('settings', 'Habilitar Alertas por SMS'),
+
+    // Backup
+    'backup_ftp_enabled' => __d('settings', 'Habilitar Upload FTP/SFTP'),
+    'backup_ftp_type' => __d('settings', 'Tipo de Protocolo'),
+    'backup_ftp_host' => __d('settings', 'Host do Servidor'),
+    'backup_ftp_port' => __d('settings', 'Porta'),
+    'backup_ftp_username' => __d('settings', 'Usuario'),
+    'backup_ftp_password' => __d('settings', 'Senha'),
+    'backup_ftp_path' => __d('settings', 'Caminho Remoto'),
+    'backup_ftp_passive' => __d('settings', 'Modo Passivo (FTP)'),
 ];
 
 // Traduções das descrições (help text)
@@ -87,6 +97,16 @@ $descriptions = [
     'enable_whatsapp_alerts' => __d('settings', 'Ativar envio de alertas via WhatsApp (funcionalidade futura)'),
     'enable_telegram_alerts' => __d('settings', 'Ativar envio de alertas via Telegram (funcionalidade futura)'),
     'enable_sms_alerts' => __d('settings', 'Ativar envio de alertas via SMS (funcionalidade futura)'),
+
+    // Backup
+    'backup_ftp_enabled' => __d('settings', 'Ativar upload automatico de backups via FTP ou SFTP'),
+    'backup_ftp_type' => __d('settings', 'Protocolo de transferencia: ftp ou sftp'),
+    'backup_ftp_host' => __d('settings', 'Endereco do servidor FTP/SFTP'),
+    'backup_ftp_port' => __d('settings', 'Porta do servidor (FTP: 21, SFTP: 22)'),
+    'backup_ftp_username' => __d('settings', 'Nome de usuario para autenticacao'),
+    'backup_ftp_password' => __d('settings', 'Senha para autenticacao'),
+    'backup_ftp_path' => __d('settings', 'Diretorio remoto para armazenar os backups'),
+    'backup_ftp_passive' => __d('settings', 'Usar modo passivo para conexoes FTP'),
 ];
 
 /**
@@ -293,6 +313,7 @@ function getDescription($key, $descriptions, $fallback = '') {
         <button class="tab-button" data-tab="email"><?= __d('settings', 'Email') ?></button>
         <button class="tab-button" data-tab="monitoring"><?= __d('settings', 'Monitoramento') ?></button>
         <button class="tab-button" data-tab="notifications"><?= __d('settings', 'Notificações') ?></button>
+        <button class="tab-button" data-tab="backup"><?= __d('settings', 'Backup') ?></button>
     </div>
 
     <!-- General Settings -->
@@ -653,6 +674,103 @@ function getDescription($key, $descriptions, $fallback = '') {
         <?php else: ?>
             <div class="empty-category">
                 <p><?= __d('settings', 'Nenhuma configuração de notificações disponível.') ?></p>
+            </div>
+        <?php endif; ?>
+    </div>
+
+    <!-- Backup Settings -->
+    <div class="tab-content" id="backup">
+        <?php if (isset($settings['backup']) && count($settings['backup']) > 0): ?>
+            <?= $this->Form->create(null, ['url' => ['action' => 'save'], 'class' => 'settings-form']) ?>
+            <?= $this->Form->hidden('category', ['value' => 'backup']) ?>
+
+            <?php foreach ($settings['backup'] as $setting): ?>
+                <div class="form-group">
+                    <label for="<?= h($setting->key) ?>">
+                        <?= h(getLabel($setting->key, $labels)) ?>
+                    </label>
+
+                    <?php if ($setting->key === 'backup_ftp_type'): ?>
+                        <?= $this->Form->select("settings.{$setting->key}", [
+                            'ftp' => 'FTP',
+                            'sftp' => 'SFTP',
+                        ], [
+                            'value' => $setting->getTypedValue(),
+                            'class' => 'form-control',
+                            'empty' => false,
+                        ]) ?>
+                    <?php elseif (str_contains($setting->key, 'password')): ?>
+                        <?= $this->Form->password("settings.{$setting->key}", [
+                            'value' => $setting->getTypedValue(),
+                            'class' => 'form-control',
+                            'autocomplete' => 'new-password',
+                        ]) ?>
+                    <?php elseif ($setting->type === 'boolean'): ?>
+                        <div class="checkbox-label">
+                            <?= $this->Form->checkbox("settings.{$setting->key}", [
+                                'checked' => $setting->getTypedValue(),
+                                'hiddenField' => true,
+                                'id' => 'setting-' . h($setting->key),
+                            ]) ?>
+                            <label for="setting-<?= h($setting->key) ?>">
+                                <?= h(getDescription($setting->key, $descriptions) ?: __d('settings', 'Ativar esta opção')) ?>
+                            </label>
+                        </div>
+                    <?php elseif ($setting->type === 'integer'): ?>
+                        <?= $this->Form->number("settings.{$setting->key}", [
+                            'value' => $setting->getTypedValue(),
+                            'class' => 'form-control',
+                        ]) ?>
+                    <?php else: ?>
+                        <?= $this->Form->text("settings.{$setting->key}", [
+                            'value' => $setting->getTypedValue(),
+                            'class' => 'form-control',
+                        ]) ?>
+                    <?php endif; ?>
+
+                    <?php
+                        $desc = getDescription($setting->key, $descriptions);
+                        if ($desc && $setting->type !== 'boolean'):
+                    ?>
+                        <span class="help-text"><?= h($desc) ?></span>
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
+
+            <div class="form-actions">
+                <?= $this->Form->button(__d('settings', 'Salvar Configurações'), [
+                    'type' => 'submit',
+                    'class' => 'btn btn-primary'
+                ]) ?>
+                <?= $this->Form->postLink(
+                    __d('settings', 'Restaurar Padrões'),
+                    ['action' => 'reset'],
+                    [
+                        'class' => 'btn btn-warning',
+                        'data' => ['category' => 'backup'],
+                        'confirm' => __d('settings', 'Tem certeza que deseja restaurar as configurações para os valores padrão?')
+                    ]
+                ) ?>
+            </div>
+
+            <?= $this->Form->end() ?>
+
+            <!-- Test FTP Connection -->
+            <div class="test-ftp-section" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+                <h4 style="margin-bottom: 15px;"><?= __d('settings', 'Testar Conexao FTP/SFTP') ?></h4>
+                <?= $this->Form->create(null, ['url' => ['action' => 'testFtpConnection']]) ?>
+                    <div class="form-actions">
+                        <?= $this->Form->button(__d('settings', 'Testar Conexao'), [
+                            'type' => 'submit',
+                            'class' => 'btn btn-secondary'
+                        ]) ?>
+                    </div>
+                <?= $this->Form->end() ?>
+            </div>
+        <?php else: ?>
+            <div class="empty-category">
+                <p><?= __d('settings', 'Nenhuma configuração de backup disponível.') ?></p>
+                <p style="font-size: 13px; margin-top: 8px;"><?= __d('settings', 'Execute as migrations para adicionar as configurações de backup FTP/SFTP.') ?></p>
             </div>
         <?php endif; ?>
     </div>

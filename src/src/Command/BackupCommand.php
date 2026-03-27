@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Command;
 
+use App\Service\BackupUploaderService;
+use App\Service\SettingService;
 use Cake\Command\Command;
 use Cake\Console\Arguments;
 use Cake\Console\ConsoleIo;
@@ -103,6 +105,9 @@ class BackupCommand extends Command
 
         // Rotate old backups
         $this->rotateBackups($backupDir, $prefix, $keepCount, $io);
+
+        // Upload to FTP/SFTP if enabled
+        $this->uploadBackup($backupFile, $io);
 
         $io->hr();
         $io->out('<success>Backup completed successfully!</success>');
@@ -275,6 +280,37 @@ class BackupCommand extends Command
 
         if ($deleted > 0) {
             $io->out("  <success>✓</success> Removed {$deleted} old backup(s)");
+        }
+    }
+
+    /**
+     * Upload backup file to remote FTP/SFTP if enabled
+     *
+     * @param string $backupFile Path to the backup file
+     * @param \Cake\Console\ConsoleIo $io Console IO
+     * @return void
+     */
+    private function uploadBackup(string $backupFile, ConsoleIo $io): void
+    {
+        try {
+            $settingService = new SettingService();
+            if (!$settingService->getBool('backup_ftp_enabled', false)) {
+                $io->verbose('FTP/SFTP upload is disabled, skipping remote upload.');
+                return;
+            }
+
+            $io->out('Uploading backup to remote server...');
+
+            $uploader = new BackupUploaderService($settingService);
+            $result = $uploader->upload($backupFile);
+
+            if ($result) {
+                $io->out('  <success>✓</success> Backup uploaded successfully');
+            } else {
+                $io->warning('  ✗ Backup upload failed. Check logs/backup.log for details.');
+            }
+        } catch (\Exception $e) {
+            $io->warning('  ✗ Backup upload error: ' . $e->getMessage());
         }
     }
 

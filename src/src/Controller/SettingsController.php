@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Service\BackupUploaderService;
 use App\Service\SettingService;
 use App\Service\EmailService;
 use Cake\Http\Exception\BadRequestException;
@@ -56,6 +57,7 @@ class SettingsController extends AppController
             'email' => [],
             'monitoring' => [],
             'notifications' => [],
+            'backup' => [],
         ];
 
         foreach ($allSettings as $setting) {
@@ -72,6 +74,8 @@ class SettingsController extends AppController
                 str_starts_with($setting->key, 'enable_') && str_contains($setting->key, '_alerts')
             ) {
                 $settings['notifications'][] = $setting;
+            } elseif (str_starts_with($setting->key, 'backup_ftp_')) {
+                $settings['backup'][] = $setting;
             }
         }
 
@@ -230,6 +234,31 @@ class SettingsController extends AppController
     }
 
     /**
+     * Test FTP/SFTP connection
+     *
+     * @return \Cake\Http\Response|null Redirects to index
+     */
+    public function testFtpConnection()
+    {
+        $this->request->allowMethod(['post']);
+
+        try {
+            $uploader = new BackupUploaderService($this->settingService);
+            $result = $uploader->testConnection();
+
+            if ($result['success']) {
+                $this->Flash->success(__d('settings', 'Conexao FTP/SFTP realizada com sucesso! {0}', $result['message']));
+            } else {
+                $this->Flash->error(__d('settings', 'Falha na conexao FTP/SFTP: {0}', $result['message']));
+            }
+        } catch (\Exception $e) {
+            $this->Flash->error(__d('settings', 'Erro ao testar conexao: {0}', $e->getMessage()));
+        }
+
+        return $this->redirect(['action' => 'index', '#' => 'backup']);
+    }
+
+    /**
      * Convert value based on type
      *
      * @param mixed $value The value to convert
@@ -285,6 +314,17 @@ class SettingsController extends AppController
                 'notification_email_on_up' => ['value' => false, 'type' => 'boolean'],
             ],
         ];
+
+        $defaults['backup'] = [
+                'backup_ftp_enabled' => ['value' => false, 'type' => 'boolean'],
+                'backup_ftp_type' => ['value' => 'ftp', 'type' => 'string'],
+                'backup_ftp_host' => ['value' => '', 'type' => 'string'],
+                'backup_ftp_port' => ['value' => 21, 'type' => 'integer'],
+                'backup_ftp_username' => ['value' => '', 'type' => 'string'],
+                'backup_ftp_password' => ['value' => '', 'type' => 'string'],
+                'backup_ftp_path' => ['value' => '/backups', 'type' => 'string'],
+                'backup_ftp_passive' => ['value' => true, 'type' => 'boolean'],
+            ];
 
         return $defaults[$category] ?? [];
     }

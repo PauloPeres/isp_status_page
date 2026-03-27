@@ -3,10 +3,13 @@ declare(strict_types=1);
 
 namespace App\Command;
 
+use App\Service\Alert\AlertService;
+use App\Service\Alert\EmailAlertChannel;
 use App\Service\Check\CheckService;
 use App\Service\Check\HttpChecker;
 use App\Service\Check\PingChecker;
 use App\Service\Check\PortChecker;
+use App\Service\IncidentService;
 use Cake\Command\Command;
 use Cake\Console\Arguments;
 use Cake\Console\ConsoleIo;
@@ -35,6 +38,20 @@ class MonitorCheckCommand extends Command
     protected CheckService $checkService;
 
     /**
+     * Alert service instance
+     *
+     * @var \App\Service\Alert\AlertService
+     */
+    protected AlertService $alertService;
+
+    /**
+     * Incident service instance
+     *
+     * @var \App\Service\IncidentService
+     */
+    protected IncidentService $incidentService;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -46,6 +63,13 @@ class MonitorCheckCommand extends Command
         $this->checkService->registerChecker(new HttpChecker());
         $this->checkService->registerChecker(new PingChecker());
         $this->checkService->registerChecker(new PortChecker());
+
+        // Initialize alert service and register channels
+        $this->alertService = new AlertService();
+        $this->alertService->registerChannel(new EmailAlertChannel());
+
+        // Initialize incident service
+        $this->incidentService = new IncidentService();
     }
 
     /**
@@ -186,8 +210,14 @@ class MonitorCheckCommand extends Command
                 // Save check result
                 $this->saveCheckResult($monitor, $checkResult);
 
+                // Track old status before updating
+                $oldStatus = $monitor->getOriginal('status') ?? $monitor->status;
+
                 // Update monitor status
                 $this->updateMonitorStatus($monitor, $checkResult);
+
+                // Handle incidents and alerts based on status
+                $this->handleIncidentsAndAlerts($monitor, $checkResult, $oldStatus);
 
                 // Count results
                 $status = $checkResult['status'];
@@ -216,6 +246,59 @@ class MonitorCheckCommand extends Command
         }
 
         return $results;
+    }
+
+    /**
+     * Handle incidents and alert dispatching based on monitor status
+     *
+     * Creates incidents when monitors go down, resolves them when
+     * monitors come back up, and dispatches alerts via AlertService.
+     *
+     * @param \App\Model\Entity\Monitor $monitor Monitor entity
+     * @param array $checkResult Check result
+     * @param string $oldStatus Previous monitor status
+     * @return void
+     */
+    protected function handleIncidentsAndAlerts($monitor, array $checkResult, string $oldStatus): void
+    {
+        try {
+            $newStatus = $checkResult['status'];
+
+            if ($newStatus === 'down' || $newStatus === 'degraded') {
+                // Monitor went down or degraded - create incident if needed
+                $incident = $this->incidentService->createIncident($monitor);
+
+                if ($incident !== null) {
+                    // New incident created - dispatch alerts
+                    $this->alertService->dispatch($monitor, $incident);
+                    Log::info("Incident created and alerts dispatched for monitor {$monitor->id}");
+                } else {
+                    // Incident already exists - check if we should still alert
+                    $existingIncident = $this->incidentService->getActiveIncidentForMonitor($monitor->id);
+                    if ($existingIncident !== null && $oldStatus !== $newStatus) {
+                        $this->alertService->dispatch($monitor, $existingIncident);
+                    }
+                }
+            } elseif ($newStatus === 'up' && ($oldStatus === 'down' || $oldStatus === 'degraded')) {
+                // Monitor recovered - get active incident before resolving
+                $activeIncident = $this->incidentService->getActiveIncidentForMonitor($monitor->id);
+
+                // Auto-resolve incidents
+                $this->incidentService->autoResolveIncidents($monitor);
+
+                // Dispatch recovery alerts
+                if ($activeIncident !== null) {
+                    // Reload the incident to get resolved_at timestamp
+                    $incidentsTable = $this->fetchTable('Incidents');
+                    $resolvedIncident = $incidentsTable->get($activeIncident->id);
+
+                    $this->alertService->dispatch($monitor, $resolvedIncident);
+                    Log::info("Incident resolved and recovery alerts dispatched for monitor {$monitor->id}");
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error("Failed to handle incidents/alerts for monitor {$monitor->id}: {$e->getMessage()}");
+        }
     }
 
     /**
