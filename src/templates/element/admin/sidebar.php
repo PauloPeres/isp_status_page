@@ -120,6 +120,17 @@ function isActive($currentController, $targetController, $currentAction = null, 
 
             <?php if ($canManageSettings): ?>
             <?= $this->Html->link(
+                '<span class="nav-icon">🔑</span> ' . __('API Keys'),
+                ['controller' => 'ApiKeys', 'action' => 'index'],
+                [
+                    'escape' => false,
+                    'class' => 'nav-item' . (isActive($controller, 'ApiKeys') ? ' active' : '')
+                ]
+            ) ?>
+            <?php endif; ?>
+
+            <?php if ($canManageSettings): ?>
+            <?= $this->Html->link(
                 '<span class="nav-icon">⚙️</span> ' . __('Settings'),
                 ['controller' => 'Settings', 'action' => 'index'],
                 [
