@@ -20,6 +20,8 @@ class IncidentServiceTest extends TestCase
      * @var array<string>
      */
     protected array $fixtures = [
+        'app.Organizations',
+        'app.OrganizationUsers',
         'app.Monitors',
         'app.Incidents',
         'app.MonitorChecks',

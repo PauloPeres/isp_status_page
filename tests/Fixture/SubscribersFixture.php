@@ -18,6 +18,7 @@ class SubscribersFixture extends TestFixture
     public array $records = [
         [
             'id' => 1,
+            'organization_id' => 1,
             'email' => 'subscriber1@example.com',
             'active' => true,
             'verified' => true,
@@ -27,6 +28,7 @@ class SubscribersFixture extends TestFixture
         ],
         [
             'id' => 2,
+            'organization_id' => 1,
             'email' => 'subscriber2@example.com',
             'active' => true,
             'verified' => true,
@@ -36,6 +38,7 @@ class SubscribersFixture extends TestFixture
         ],
         [
             'id' => 3,
+            'organization_id' => 1,
             'email' => 'inactive@example.com',
             'active' => false,
             'verified' => true,

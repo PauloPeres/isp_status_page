@@ -26,6 +26,8 @@ class AlertLogsTableTest extends TestCase
      * @var array<string>
      */
     protected array $fixtures = [
+        'app.Organizations',
+        'app.OrganizationUsers',
         'app.AlertLogs',
         'app.AlertRules',
         'app.Monitors',
