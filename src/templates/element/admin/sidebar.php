@@ -143,17 +143,48 @@ function isActive($currentController, $targetController, $currentAction = null, 
 </aside>
 
 <script>
-// Close sidebar on mobile
-document.getElementById('sidebarClose')?.addEventListener('click', function() {
-    document.querySelector('.admin-sidebar')?.classList.remove('mobile-open');
-});
+(function() {
+    var sidebar = document.querySelector('.admin-sidebar');
+    var overlay = document.getElementById('sidebarOverlay');
 
-// Close sidebar when clicking on nav item (mobile)
-document.querySelectorAll('.admin-sidebar .nav-item').forEach(item => {
-    item.addEventListener('click', function() {
-        if (window.innerWidth <= 768) {
-            document.querySelector('.admin-sidebar')?.classList.remove('mobile-open');
+    function closeSidebar() {
+        if (sidebar) sidebar.classList.remove('mobile-open');
+        if (overlay) overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    function openSidebar() {
+        if (sidebar) sidebar.classList.add('mobile-open');
+        if (overlay) overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    // Close sidebar on mobile
+    document.getElementById('sidebarClose')?.addEventListener('click', closeSidebar);
+
+    // Close sidebar when clicking overlay
+    if (overlay) {
+        overlay.addEventListener('click', closeSidebar);
+    }
+
+    // Close sidebar when clicking on nav item (mobile)
+    document.querySelectorAll('.admin-sidebar .nav-item').forEach(function(item) {
+        item.addEventListener('click', function() {
+            if (window.innerWidth <= 768) {
+                closeSidebar();
+            }
+        });
+    });
+
+    // Close sidebar on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && window.innerWidth <= 768) {
+            closeSidebar();
         }
     });
-});
+
+    // Expose openSidebar for the navbar toggle button
+    window.adminSidebarOpen = openSidebar;
+    window.adminSidebarClose = closeSidebar;
+})();
 </script>

@@ -278,8 +278,13 @@ $this->assign('title', __d('monitors', 'Edit Monitor'));
 }
 
 @media (max-width: 768px) {
+    .monitors-form {
+        max-width: 100%;
+    }
+
     .page-header {
         flex-direction: column;
+        gap: 12px;
     }
 
     .page-header > div {
@@ -290,12 +295,23 @@ $this->assign('title', __d('monitors', 'Edit Monitor'));
         grid-template-columns: 1fr;
     }
 
+    .form-control {
+        font-size: 16px;
+        min-height: 44px;
+    }
+
     .form-actions {
         flex-direction: column;
     }
 
     .form-actions .btn {
         width: 100%;
+        min-height: 44px;
+    }
+
+    .form-section {
+        margin-bottom: 20px;
+        padding-bottom: 20px;
     }
 }
 </style>

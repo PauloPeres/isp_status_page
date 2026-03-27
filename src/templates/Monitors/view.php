@@ -432,6 +432,19 @@ $this->assign('title', __d('monitors', 'Monitor Details'));
 
     .actions-grid .btn {
         width: 100%;
+        min-height: 44px;
+    }
+
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
     }
 }
 </style>

@@ -187,10 +187,27 @@ $this->assign('title', 'Dashboard');
     font-size: 14px;
 }
 
+@media (max-width: 1024px) {
+    .charts-grid { grid-template-columns: 1fr; }
+    .tables-grid { grid-template-columns: 1fr; }
+}
+
 @media (max-width: 768px) {
     .summary-grid { grid-template-columns: repeat(2, 1fr); }
     .charts-grid { grid-template-columns: 1fr; }
+    .charts-grid .chart-card { min-width: 0; }
     .tables-grid { grid-template-columns: 1fr; }
+    .tables-grid .table-card { min-width: 0; }
+    .dashboard-header h1 { font-size: 22px; }
+    .summary-card .card-value { font-size: 24px; }
+    .chart-wrapper { max-height: 250px; }
+    .table-card table { min-width: 500px; }
+    .table-card { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+}
+
+@media (max-width: 480px) {
+    .summary-grid { grid-template-columns: 1fr; }
+    .chart-wrapper { max-height: 200px; }
 }
 </style>
 

@@ -10,6 +10,9 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
     }
 
+    // Detect mobile for chart option adjustments
+    var isMobile = window.innerWidth <= 768;
+
     // Color palette
     var colors = {
         primary: '#3b82f6',
@@ -45,8 +48,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     backgroundColor: colors.primaryLight,
                     pointBackgroundColor: pointColors,
                     pointBorderColor: pointColors,
-                    pointRadius: 5,
-                    pointHoverRadius: 7,
+                    pointRadius: isMobile ? 3 : 5,
+                    pointHoverRadius: isMobile ? 5 : 7,
                     fill: true,
                     tension: 0.3
                 }]
@@ -54,6 +57,7 @@ document.addEventListener('DOMContentLoaded', function () {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                resizeDelay: 100,
                 scales: {
                     y: {
                         beginAtZero: true,
@@ -61,13 +65,20 @@ document.addEventListener('DOMContentLoaded', function () {
                         ticks: {
                             callback: function (value) {
                                 return value + '%';
+                            },
+                            font: {
+                                size: isMobile ? 10 : 12
                             }
                         }
                     },
                     x: {
                         ticks: {
-                            maxRotation: 45,
-                            minRotation: 0
+                            maxRotation: isMobile ? 90 : 45,
+                            minRotation: 0,
+                            font: {
+                                size: isMobile ? 9 : 12
+                            },
+                            maxTicksLimit: isMobile ? 6 : undefined
                         }
                     }
                 },
@@ -116,19 +127,27 @@ document.addEventListener('DOMContentLoaded', function () {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                resizeDelay: 100,
                 scales: {
                     y: {
                         beginAtZero: true,
                         ticks: {
                             callback: function (value) {
                                 return value + ' ms';
+                            },
+                            font: {
+                                size: isMobile ? 10 : 12
                             }
                         }
                     },
                     x: {
                         ticks: {
-                            maxRotation: 45,
-                            minRotation: 0
+                            maxRotation: isMobile ? 90 : 45,
+                            minRotation: 0,
+                            font: {
+                                size: isMobile ? 9 : 12
+                            },
+                            maxTicksLimit: isMobile ? 6 : undefined
                         }
                     }
                 },

@@ -237,13 +237,88 @@
             text-decoration: underline;
         }
 
-        @media (max-width: 480px) {
+        /* Mobile */
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+
             .login-box {
-                padding: 40px 30px;
+                padding: 40px 28px;
+            }
+
+            .logo {
+                width: 64px;
+                height: 64px;
+            }
+
+            .logo-container {
+                margin-bottom: 30px;
             }
 
             h1 {
                 font-size: 24px;
+            }
+
+            .subtitle {
+                font-size: 14px;
+                margin-bottom: 30px;
+            }
+
+            input {
+                padding: 14px 16px;
+                font-size: 16px;
+                min-height: 48px;
+            }
+
+            .btn {
+                padding: 16px;
+                font-size: 16px;
+                min-height: 48px;
+            }
+
+            .forgot-password {
+                padding: 10px 0;
+                min-height: 44px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+            }
+        }
+
+        /* Small Mobile */
+        @media (max-width: 480px) {
+            body {
+                padding: 12px;
+            }
+
+            .login-box {
+                padding: 32px 20px;
+                border-radius: 16px;
+            }
+
+            .logo {
+                width: 56px;
+                height: 56px;
+            }
+
+            h1 {
+                font-size: 22px;
+            }
+
+            .subtitle {
+                font-size: 13px;
+                margin-bottom: 24px;
+            }
+
+            label {
+                font-size: 13px;
+            }
+
+            .credentials {
+                font-size: 12px;
+                padding: 8px 12px;
             }
         }
     </style>

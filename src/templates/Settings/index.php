@@ -291,6 +291,26 @@ function getDescription($key, $descriptions, $fallback = '') {
 
         .tab-button {
             text-align: left;
+            min-height: 44px;
+            padding: 12px 16px;
+        }
+
+        .tab-content {
+            padding: 16px;
+        }
+
+        .settings-form {
+            max-width: 100%;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="number"],
+        .form-group input[type="password"],
+        .form-group select,
+        .form-group textarea {
+            font-size: 16px;
+            min-height: 44px;
         }
 
         .form-actions {
@@ -299,6 +319,7 @@ function getDescription($key, $descriptions, $fallback = '') {
 
         .btn {
             width: 100%;
+            min-height: 44px;
         }
     }
 </style>

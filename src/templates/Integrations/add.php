@@ -121,8 +121,31 @@ $this->assign('title', __('Nova Integracao'));
     }
 
     @media (max-width: 768px) {
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
         .form-row {
             grid-template-columns: 1fr;
+        }
+
+        .form-control,
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            font-size: 16px;
+            min-height: 44px;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .form-actions .btn {
+            width: 100%;
+            min-height: 44px;
         }
     }
 </style>

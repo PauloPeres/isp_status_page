@@ -391,7 +391,7 @@ $this->assign('title', __d('monitors', 'Monitors'));
         }
 
         .stats-grid {
-            grid-template-columns: 1fr;
+            grid-template-columns: repeat(2, 1fr);
         }
 
         .filters-row {
@@ -400,10 +400,31 @@ $this->assign('title', __d('monitors', 'Monitors'));
 
         .monitors-table {
             overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .monitors-table table {
+            min-width: 700px;
         }
 
         .action-buttons {
             flex-direction: column;
+            gap: 6px;
+        }
+
+        .btn-action {
+            min-height: 36px;
+            text-align: center;
+        }
+
+        .btn-add {
+            min-height: 44px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
         }
     }
 </style>

@@ -20,6 +20,7 @@
     <?= $this->element('admin/navbar') ?>
 
     <div class="admin-container">
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
         <?= $this->element('admin/sidebar') ?>
 
         <main class="admin-content">

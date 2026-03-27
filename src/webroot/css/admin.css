@@ -572,3 +572,367 @@ body {
     background: var(--color-primary-light);
     color: var(--color-dark);
 }
+
+/* ============================================
+   MOBILE RESPONSIVE STYLES
+   ============================================ */
+
+/* Sidebar overlay for mobile */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+}
+
+.sidebar-overlay.active {
+    display: block;
+}
+
+/* Table responsive wrapper */
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* ---- Tablet breakpoint (max-width: 1024px) ---- */
+@media (max-width: 1024px) {
+    :root {
+        --sidebar-width: 220px;
+    }
+
+    .content-wrapper {
+        padding: var(--space-lg);
+    }
+
+    /* Ensure charts grid stacks sooner */
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .tables-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ---- Mobile breakpoint (max-width: 768px) ---- */
+@media (max-width: 768px) {
+    /* Base font size for readability */
+    body {
+        font-size: 14px;
+    }
+
+    /* Navbar adjustments */
+    .admin-navbar {
+        padding: 0 var(--space-md);
+    }
+
+    .navbar-title {
+        font-size: 16px;
+    }
+
+    .navbar-logo {
+        width: 32px;
+        height: 32px;
+    }
+
+    .navbar-brand {
+        gap: var(--space-sm);
+    }
+
+    /* Hamburger menu visible */
+    .mobile-menu-toggle {
+        display: flex;
+    }
+
+    /* Hide user info text on mobile */
+    .user-info {
+        display: none;
+    }
+
+    /* Sidebar becomes slide-in drawer */
+    .admin-sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        z-index: 999;
+        width: 280px;
+        box-shadow: var(--shadow-lg);
+    }
+
+    .admin-sidebar.mobile-open {
+        transform: translateX(0);
+    }
+
+    .sidebar-close {
+        display: block;
+    }
+
+    /* Main content full width */
+    .admin-content {
+        margin-left: 0;
+    }
+
+    .content-wrapper {
+        padding: var(--space-md);
+    }
+
+    /* Buttons: touch-friendly sizing (min 44px) */
+    .btn,
+    .btn-add,
+    .btn-filter,
+    .btn-clear,
+    .btn-primary,
+    .btn-secondary,
+    .btn-success,
+    .btn-error {
+        min-height: 44px;
+        padding: var(--space-md) var(--space-lg);
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-action {
+        min-height: 36px;
+        padding: 6px 14px;
+        font-size: 13px;
+    }
+
+    /* Forms: full-width inputs */
+    .form-control,
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="url"],
+    input[type="number"],
+    input[type="search"],
+    input[type="tel"],
+    input[type="date"],
+    input[type="datetime-local"],
+    textarea,
+    select {
+        width: 100%;
+        max-width: 100%;
+        min-height: 44px;
+        font-size: 16px; /* Prevents iOS zoom on focus */
+    }
+
+    .form-row {
+        flex-direction: column;
+    }
+
+    .form-group {
+        width: 100%;
+    }
+
+    /* Cards: stack vertically */
+    .summary-grid,
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .charts-grid,
+    .tables-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Chart containers resize */
+    .chart-wrapper {
+        max-height: 250px;
+    }
+
+    .chart-card {
+        padding: var(--space-md);
+    }
+
+    /* Card adjustments */
+    .card {
+        padding: var(--space-md);
+        margin-bottom: var(--space-md);
+        border-radius: var(--radius-md);
+    }
+
+    .card-header {
+        font-size: 18px;
+        margin-bottom: var(--space-md);
+        padding-bottom: var(--space-sm);
+    }
+
+    /* Footer stacks */
+    .footer-content {
+        flex-direction: column;
+        gap: var(--space-md);
+        text-align: center;
+    }
+
+    .footer-left {
+        flex-direction: column;
+        gap: var(--space-sm);
+    }
+
+    .footer-right {
+        justify-content: center;
+    }
+
+    /* Filters stack */
+    .filters-row {
+        grid-template-columns: 1fr;
+    }
+
+    .filter-buttons {
+        flex-direction: column;
+    }
+
+    .filter-buttons .btn-filter,
+    .filter-buttons .btn-clear {
+        width: 100%;
+        text-align: center;
+    }
+
+    /* Page headers */
+    .monitors-header,
+    .incidents-header,
+    .checks-header,
+    .email-logs-header,
+    .subscribers-header,
+    .integrations-header,
+    .users-header,
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    /* Action buttons in tables */
+    .action-buttons {
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .action-buttons .btn-action {
+        text-align: center;
+    }
+
+    /* All table wrappers become scrollable */
+    .monitors-table,
+    .incidents-table,
+    .checks-table,
+    .subscribers-table,
+    .email-logs-table,
+    .table-container,
+    .table-card {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Minimum table width to prevent collapse */
+    .monitors-table table,
+    .incidents-table table,
+    .checks-table table,
+    .subscribers-table table,
+    .email-logs-table table,
+    .table-container table,
+    .table-card table {
+        min-width: 600px;
+    }
+
+    /* Pagination */
+    .pagination {
+        gap: 4px;
+    }
+
+    .pagination a,
+    .pagination span {
+        padding: 8px 10px;
+        font-size: 13px;
+        min-height: 40px;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    /* Dropdown menu adjustments */
+    .dropdown-menu {
+        min-width: 180px;
+        right: -8px;
+    }
+
+    .dropdown-item {
+        padding: var(--space-md);
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+    }
+
+    /* Stat cards on mobile */
+    .stat-card-mini {
+        padding: 12px;
+    }
+
+    .stat-value {
+        font-size: 24px;
+    }
+
+    /* Summary cards */
+    .summary-card .card-value {
+        font-size: 24px;
+    }
+
+    /* Severity badges wrap */
+    .severity-badges {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    /* Incidents summary */
+    .incidents-summary {
+        padding: var(--space-md);
+    }
+
+    /* Flash messages */
+    .message {
+        padding: var(--space-md);
+        font-size: 13px;
+    }
+
+    /* Nav items touch friendly */
+    .nav-item {
+        min-height: 44px;
+        padding: var(--space-md);
+    }
+}
+
+/* ---- Small mobile (max-width: 480px) ---- */
+@media (max-width: 480px) {
+    .summary-grid,
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .content-wrapper {
+        padding: var(--space-sm);
+    }
+
+    .admin-navbar {
+        padding: 0 var(--space-sm);
+    }
+
+    .navbar-title {
+        font-size: 14px;
+    }
+
+    h1, h2 {
+        font-size: 20px;
+    }
+
+    .dashboard-header h1 {
+        font-size: 22px;
+    }
+
+    .chart-wrapper {
+        max-height: 200px;
+    }
+}

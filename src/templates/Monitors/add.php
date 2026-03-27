@@ -218,8 +218,23 @@ $this->assign('title', __d('monitors', 'New Monitor'));
 }
 
 @media (max-width: 768px) {
+    .monitors-form {
+        max-width: 100%;
+    }
+
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
     .form-row {
         grid-template-columns: 1fr;
+    }
+
+    .form-control {
+        font-size: 16px;
+        min-height: 44px;
     }
 
     .form-actions {
@@ -228,6 +243,12 @@ $this->assign('title', __d('monitors', 'New Monitor'));
 
     .form-actions .btn {
         width: 100%;
+        min-height: 44px;
+    }
+
+    .form-section {
+        margin-bottom: 20px;
+        padding-bottom: 20px;
     }
 }
 </style>

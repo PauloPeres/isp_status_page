@@ -394,6 +394,18 @@ $this->assign('title', __d('incidents', 'Detalhes do Incidente'));
         .incident-header {
             flex-direction: column;
             align-items: flex-start;
+            gap: 12px;
+        }
+
+        .header-actions {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .header-actions .btn {
+            width: 100%;
+            min-height: 44px;
+            text-align: center;
         }
 
         .checks-grid {

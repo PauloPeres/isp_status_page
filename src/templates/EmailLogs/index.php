@@ -259,8 +259,13 @@ $this->assign('title', __('Logs de Emails'));
     }
 
     @media (max-width: 768px) {
+        .email-logs-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
         .stats-grid {
-            grid-template-columns: 1fr;
+            grid-template-columns: repeat(2, 1fr);
         }
 
         .filters-row {
@@ -269,6 +274,27 @@ $this->assign('title', __('Logs de Emails'));
 
         .email-logs-table {
             overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .email-logs-table table {
+            min-width: 600px;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .btn-action {
+            min-height: 36px;
+            text-align: center;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
         }
     }
 </style>

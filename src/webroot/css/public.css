@@ -544,38 +544,7 @@ body {
     color: var(--color-primary-hover);
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .header-content {
-        flex-direction: column;
-        gap: var(--space-md);
-    }
-
-    .header-nav {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .status-banner {
-        padding: var(--space-lg);
-    }
-
-    .status-icon {
-        font-size: 48px;
-    }
-
-    .status-title {
-        font-size: 24px;
-    }
-
-    .subscribe-form {
-        flex-direction: column;
-    }
-
-    .footer-grid {
-        grid-template-columns: 1fr;
-    }
-}
+/* Responsive — see comprehensive mobile rules at bottom of file */
 
 /* Utility Classes */
 .empty-state {
@@ -979,5 +948,381 @@ body {
 
     .timeline-marker {
         left: -32px;
+    }
+}
+
+/* ========================================
+   Mobile Responsive Enhancements
+   ======================================== */
+
+/* --- Tablet: max-width 1024px --- */
+@media (max-width: 1024px) {
+    .container {
+        padding: 0 var(--space-md);
+    }
+
+    .status-banner {
+        padding: var(--space-xl);
+    }
+
+    .status-title {
+        font-size: 26px;
+    }
+
+    .section-title {
+        font-size: 22px;
+    }
+
+    .subscribe-section {
+        padding: var(--space-xl);
+    }
+
+    .footer-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: var(--space-lg);
+    }
+
+    /* Ensure nav links are tappable on tablet */
+    .nav-link {
+        padding: var(--space-sm) var(--space-lg);
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+    }
+}
+
+/* --- Mobile: max-width 768px --- */
+@media (max-width: 768px) {
+    /* Typography: ensure readable sizes on mobile */
+    body {
+        font-size: 16px;
+    }
+
+    /* Container: tighter padding on mobile */
+    .container {
+        padding: 0 var(--space-md);
+    }
+
+    /* Header: stack vertically, improve touch targets */
+    .header-content {
+        flex-direction: column;
+        gap: var(--space-md);
+        padding: var(--space-md) 0;
+    }
+
+    .header-brand {
+        gap: var(--space-sm);
+    }
+
+    .header-logo {
+        width: 40px;
+        height: 40px;
+    }
+
+    .header-custom-logo {
+        height: 50px;
+        max-width: 220px;
+    }
+
+    .header-title h1 {
+        font-size: 20px;
+    }
+
+    .header-subtitle {
+        font-size: 13px;
+    }
+
+    .header-nav {
+        width: 100%;
+        justify-content: center;
+        gap: var(--space-sm);
+        flex-wrap: wrap;
+    }
+
+    .nav-link {
+        padding: var(--space-sm) var(--space-md);
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        font-size: 14px;
+        border-radius: var(--radius-md);
+    }
+
+    /* Main content: reduce vertical padding */
+    .public-main {
+        padding: var(--space-lg) 0;
+    }
+
+    /* Page header */
+    .page-header-status {
+        padding-top: var(--space-md);
+        margin-bottom: var(--space-lg);
+    }
+
+    .page-header-status h1 {
+        font-size: 24px;
+    }
+
+    /* Status Banner */
+    .status-banner {
+        padding: var(--space-lg);
+        border-radius: var(--radius-lg);
+        margin-bottom: var(--space-lg);
+    }
+
+    .status-icon {
+        font-size: 48px;
+    }
+
+    .status-title {
+        font-size: 22px;
+    }
+
+    .status-description {
+        font-size: 14px;
+    }
+
+    /* Service Cards: stack vertically on mobile */
+    .section-title {
+        font-size: 20px;
+        margin-bottom: var(--space-md);
+    }
+
+    .service-card {
+        padding: var(--space-md);
+        border-radius: var(--radius-md);
+    }
+
+    .service-card:hover {
+        transform: none;
+    }
+
+    .service-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-md);
+    }
+
+    .service-info {
+        width: 100%;
+    }
+
+    .service-name {
+        font-size: 16px;
+    }
+
+    .service-description {
+        font-size: 13px;
+    }
+
+    .service-badges {
+        flex-direction: row;
+        align-items: center;
+        width: 100%;
+        justify-content: flex-start;
+        gap: var(--space-sm);
+    }
+
+    .service-status-badge {
+        padding: var(--space-sm) var(--space-md);
+        font-size: 13px;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .uptime-badge {
+        padding: var(--space-xs) var(--space-md);
+    }
+
+    .uptime-percentage {
+        font-size: 18px;
+    }
+
+    .service-details {
+        flex-wrap: wrap;
+        gap: var(--space-sm);
+        font-size: 12px;
+    }
+
+    .detail-text.target {
+        font-size: 11px;
+        word-break: break-all;
+    }
+
+    /* Incident Cards */
+    .incident-card {
+        padding: var(--space-md);
+    }
+
+    .incident-header {
+        flex-direction: column;
+        gap: var(--space-sm);
+    }
+
+    .incident-title {
+        font-size: 16px;
+    }
+
+    .incident-meta {
+        flex-direction: column;
+        gap: var(--space-sm);
+    }
+
+    /* Incident Timeline */
+    .incident-timeline {
+        padding-left: var(--space-lg);
+    }
+
+    .timeline-content {
+        padding: var(--space-md);
+    }
+
+    .timeline-content:hover {
+        transform: none;
+    }
+
+    /* Subscribe Section */
+    .subscribe-section {
+        padding: var(--space-lg);
+        border-radius: var(--radius-lg);
+        margin-top: var(--space-lg);
+    }
+
+    .subscribe-title {
+        font-size: 20px;
+    }
+
+    .subscribe-description {
+        font-size: 13px;
+    }
+
+    .subscribe-form {
+        flex-direction: column;
+    }
+
+    .subscribe-input {
+        font-size: 16px;
+        padding: var(--space-md);
+        min-height: 44px;
+    }
+
+    .subscribe-button {
+        font-size: 16px;
+        padding: var(--space-md) var(--space-lg);
+        min-height: 44px;
+    }
+
+    /* Footer */
+    .public-footer {
+        padding: var(--space-lg) 0;
+        margin-top: var(--space-lg);
+    }
+
+    .footer-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-lg);
+    }
+
+    .footer-section h4 {
+        font-size: 15px;
+    }
+
+    .footer-links a {
+        font-size: 15px;
+        display: inline-block;
+        padding: var(--space-xs) 0;
+        min-height: 44px;
+        line-height: 36px;
+    }
+
+    .footer-bottom p {
+        font-size: 12px;
+    }
+
+    /* View history button: tappable size */
+    .btn-view-history {
+        padding: var(--space-md) var(--space-xl);
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        font-size: 15px;
+    }
+
+    /* Empty state */
+    .empty-state {
+        padding: var(--space-xl);
+    }
+
+    .empty-state-icon {
+        font-size: 48px;
+    }
+
+    /* Auto-reload indicator: reposition for mobile */
+    .auto-reload-indicator {
+        top: auto;
+        bottom: 12px;
+        left: 12px;
+        right: 12px;
+        text-align: center;
+        font-size: 11px;
+        padding: 6px 10px;
+    }
+}
+
+/* --- Small Mobile: max-width 480px --- */
+@media (max-width: 480px) {
+    .container {
+        padding: 0 var(--space-sm);
+    }
+
+    .header-title h1 {
+        font-size: 18px;
+    }
+
+    .status-banner {
+        padding: var(--space-md);
+    }
+
+    .status-icon {
+        font-size: 40px;
+    }
+
+    .status-title {
+        font-size: 20px;
+    }
+
+    .page-header-status h1 {
+        font-size: 20px;
+    }
+
+    .service-card {
+        padding: var(--space-sm) var(--space-md);
+    }
+
+    .service-header {
+        gap: var(--space-sm);
+    }
+
+    .service-details {
+        flex-direction: column;
+        gap: var(--space-xs);
+    }
+
+    .subscribe-section {
+        padding: var(--space-md);
+    }
+
+    .subscribe-title {
+        font-size: 18px;
+    }
+
+    .nav-link {
+        padding: var(--space-sm);
+        font-size: 13px;
+    }
+
+    .footer-grid {
+        gap: var(--space-md);
     }
 }

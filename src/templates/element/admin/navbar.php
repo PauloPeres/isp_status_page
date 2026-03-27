@@ -61,7 +61,16 @@ document.getElementById('userMenuToggle')?.addEventListener('click', function(e)
 
 // Mobile menu toggle
 document.getElementById('mobileMenuToggle')?.addEventListener('click', function() {
-    document.querySelector('.admin-sidebar')?.classList.toggle('mobile-open');
+    if (window.adminSidebarOpen) {
+        var sidebar = document.querySelector('.admin-sidebar');
+        if (sidebar && sidebar.classList.contains('mobile-open')) {
+            window.adminSidebarClose();
+        } else {
+            window.adminSidebarOpen();
+        }
+    } else {
+        document.querySelector('.admin-sidebar')?.classList.toggle('mobile-open');
+    }
 });
 
 // Close dropdown when clicking outside

@@ -237,30 +237,61 @@ $this->assign('title', __('Histórico de Incidentes'));
         transform: translateX(-5px);
     }
 
-    @media (max-width: 768px) {
+    /* Tablet */
+    @media (max-width: 1024px) {
+        .history-header {
+            padding: 30px 20px;
+            margin-bottom: 30px;
+        }
+
         .history-header h1 {
-            font-size: 24px;
-        }
-
-        .timeline::before {
-            left: 20px;
-        }
-
-        .date-badge {
-            margin-left: 50px;
-            font-size: 13px;
-            padding: 6px 15px;
+            font-size: 28px;
         }
 
         .incident-item {
-            margin-left: 50px;
-            padding: 15px;
+            padding: 18px;
+        }
+    }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+        .history-header {
+            padding: 24px 16px;
+            margin-bottom: 24px;
+            border-radius: 8px;
+        }
+
+        .history-header h1 {
+            font-size: 22px;
+        }
+
+        .history-header p {
+            font-size: 14px;
+        }
+
+        .timeline::before {
+            left: 15px;
+        }
+
+        .date-badge {
+            margin-left: 40px;
+            font-size: 13px;
+            padding: 6px 14px;
+        }
+
+        .incident-item {
+            margin-left: 40px;
+            padding: 14px;
         }
 
         .incident-item::before {
-            left: -43px;
+            left: -38px;
             width: 12px;
             height: 12px;
+        }
+
+        .incident-item:hover {
+            transform: none;
         }
 
         .incident-header {
@@ -270,15 +301,73 @@ $this->assign('title', __('Histórico de Incidentes'));
 
         .incident-badges {
             align-self: flex-start;
+            flex-wrap: wrap;
         }
 
         .incident-title {
             font-size: 16px;
         }
 
+        .incident-description {
+            font-size: 13px;
+        }
+
         .incident-meta {
             flex-direction: column;
             gap: 8px;
+            font-size: 12px;
+        }
+
+        .badge {
+            padding: 5px 12px;
+            font-size: 12px;
+            min-height: 32px;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .back-link {
+            padding: 12px 20px;
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+            font-size: 15px;
+        }
+    }
+
+    /* Small Mobile */
+    @media (max-width: 480px) {
+        .history-header {
+            padding: 20px 12px;
+        }
+
+        .history-header h1 {
+            font-size: 20px;
+        }
+
+        .timeline::before {
+            left: 10px;
+        }
+
+        .date-badge {
+            margin-left: 30px;
+            font-size: 12px;
+            padding: 5px 12px;
+        }
+
+        .incident-item {
+            margin-left: 30px;
+            padding: 12px;
+        }
+
+        .incident-item::before {
+            left: -30px;
+            width: 10px;
+            height: 10px;
+        }
+
+        .incident-title {
+            font-size: 15px;
         }
     }
 </style>

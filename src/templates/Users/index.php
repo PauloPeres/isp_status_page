@@ -341,8 +341,13 @@ $this->assign('title', __d('users', 'Users'));
 }
 
 @media (max-width: 768px) {
+    .users-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
     .stats-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
     }
 
     .filters-row {
@@ -351,10 +356,31 @@ $this->assign('title', __d('users', 'Users'));
 
     .table-container {
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table-container table {
+        min-width: 600px;
     }
 
     .action-buttons {
         flex-direction: column;
+        gap: 6px;
+    }
+
+    .btn-action {
+        min-height: 36px;
+        text-align: center;
+    }
+
+    .btn-add {
+        min-height: 44px;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
     }
 }
 </style>

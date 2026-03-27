@@ -147,12 +147,21 @@ $this->assign('title', __d('users', 'Edit Profile'));
         grid-template-columns: 1fr;
     }
 
+    .form-control,
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        font-size: 16px;
+        min-height: 44px;
+    }
+
     .form-buttons {
         flex-direction: column;
     }
 
     .form-buttons .btn {
         width: 100%;
+        min-height: 44px;
     }
 }
 </style>
