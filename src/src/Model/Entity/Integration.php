@@ -83,8 +83,12 @@ class Integration extends Entity
      * @param array|string $value Configuration array or JSON string
      * @return string
      */
-    protected function _setConfiguration(array|string $value): string
+    protected function _setConfiguration(array|string|null $value): string
     {
+        if ($value === null) {
+            return '{}';
+        }
+
         if (is_array($value)) {
             return json_encode($value);
         }

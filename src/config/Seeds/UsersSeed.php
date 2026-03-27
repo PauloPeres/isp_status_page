@@ -30,7 +30,7 @@ class UsersSeed extends AbstractSeed
             [
                 'username' => 'admin',
                 'password' => $hashedPassword,
-                'email' => 'admin@localhost',
+                'email' => 'admin@example.com',
                 'role' => 'admin',
                 'active' => 1,
                 'last_login' => null,

@@ -46,6 +46,8 @@ fi
 echo "Setting permissions..."
 chown -R www-data:www-data /var/www/html/tmp
 chown -R www-data:www-data /var/www/html/logs
+chown www-data:www-data /var/www/html/database.db
+chown www-data:www-data /var/www/html
 chmod -R 777 /var/www/html/tmp
 chmod -R 777 /var/www/html/logs
 

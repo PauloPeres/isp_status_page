@@ -73,7 +73,6 @@ class IntegrationsTable extends Table
             ->notEmptyString('type');
 
         $validator
-            ->scalar('configuration')
             ->requirePresence('configuration', 'create')
             ->notEmptyString('configuration');
 
