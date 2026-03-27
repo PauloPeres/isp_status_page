@@ -73,6 +73,55 @@ return function (RouteBuilder $routes): void {
         );
 
         /*
+         * Public registration routes (TASK-700)
+         */
+        $builder->connect(
+            '/register',
+            ['controller' => 'Registration', 'action' => 'register']
+        );
+        $builder->connect(
+            '/verify-email/*',
+            ['controller' => 'Registration', 'action' => 'verifyEmail']
+        );
+
+        /*
+         * Billing routes (TASK-802)
+         */
+        $builder->connect(
+            '/billing',
+            ['controller' => 'Billing', 'action' => 'plans']
+        );
+        $builder->connect(
+            '/billing/plans',
+            ['controller' => 'Billing', 'action' => 'plans']
+        );
+        $builder->connect(
+            '/billing/checkout/{planSlug}',
+            ['controller' => 'Billing', 'action' => 'checkout'],
+            ['pass' => ['planSlug'], 'planSlug' => '[a-z]+']
+        );
+        $builder->connect(
+            '/billing/portal',
+            ['controller' => 'Billing', 'action' => 'portal']
+        );
+        $builder->connect(
+            '/billing/success',
+            ['controller' => 'Billing', 'action' => 'success']
+        );
+        $builder->connect(
+            '/billing/cancel',
+            ['controller' => 'Billing', 'action' => 'cancel']
+        );
+
+        /*
+         * Stripe webhook route (TASK-803)
+         */
+        $builder->connect(
+            '/webhooks/stripe',
+            ['controller' => 'Webhooks', 'action' => 'stripe']
+        );
+
+        /*
          * ...and connect the rest of 'Pages' controller's URLs.
          */
         $builder->connect('/pages/*', 'Pages::display');

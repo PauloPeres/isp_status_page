@@ -139,6 +139,20 @@ function isActive($currentController, $targetController, $currentAction = null, 
                 ]
             ) ?>
             <?php endif; ?>
+
+            <?php
+            $canManageBilling = $role === null || $role === 'owner';
+            ?>
+            <?php if ($canManageBilling): ?>
+            <?= $this->Html->link(
+                '<span class="nav-icon">💳</span> ' . __('Billing'),
+                ['controller' => 'Billing', 'action' => 'plans'],
+                [
+                    'escape' => false,
+                    'class' => 'nav-item' . (isActive($controller, 'Billing') ? ' active' : '')
+                ]
+            ) ?>
+            <?php endif; ?>
         </div>
 
         <div class="nav-section">
