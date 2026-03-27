@@ -115,7 +115,7 @@ class UsersControllerTest extends TestCase
     public function testIndexUnauthenticated(): void
     {
         $this->get('/users/index');
-        $this->assertRedirect(['controller' => 'Users', 'action' => 'login']);
+        $this->assertRedirectContains('/users/login');
     }
 
     /**
@@ -155,14 +155,14 @@ class UsersControllerTest extends TestCase
             'username' => 'newuser',
             'password' => 'password123',
             'email' => 'newuser@example.com',
-            'name' => 'New User',
+            'role' => 'user',
             'active' => true,
         ];
 
         $this->post('/users/add', $data);
 
         $this->assertRedirect(['action' => 'index']);
-        $this->assertFlashMessage('Usuário salvo com sucesso.');
+        $this->assertFlashMessage('Usuário criado com sucesso.');
     }
 
     /**

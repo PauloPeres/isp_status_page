@@ -43,7 +43,7 @@ class PagesController extends AppController
 
         if ($identity) {
             // User is logged in, redirect to admin dashboard
-            return $this->redirect(['controller' => 'Admin', 'action' => 'index']);
+            return $this->redirect(['controller' => 'Dashboard', 'action' => 'index']);
         }
 
         // User is not logged in, redirect to login page

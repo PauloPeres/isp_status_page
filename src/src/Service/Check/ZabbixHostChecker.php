@@ -40,6 +40,22 @@ class ZabbixHostChecker extends AbstractChecker
     }
 
     /**
+     * Execute the check with specific error messages for missing fields
+     *
+     * @param \App\Model\Entity\Monitor $monitor The monitor to check
+     * @return array Check result
+     */
+    public function check(Monitor $monitor): array
+    {
+        $config = $monitor->getConfiguration();
+        if (empty($config['host_id'])) {
+            return $this->buildErrorResult('Missing host_id in monitor configuration');
+        }
+
+        return parent::check($monitor);
+    }
+
+    /**
      * Execute the Zabbix host availability check
      *
      * @param \App\Model\Entity\Monitor $monitor The monitor to check

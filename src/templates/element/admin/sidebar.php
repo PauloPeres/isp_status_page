@@ -2,6 +2,7 @@
 $controller = $this->request->getParam('controller');
 $action = $this->request->getParam('action');
 
+if (!function_exists('isActive')) {
 function isActive($currentController, $targetController, $currentAction = null, $targetAction = null) {
     if ($currentController !== $targetController) {
         return false;
@@ -10,6 +11,7 @@ function isActive($currentController, $targetController, $currentAction = null, 
         return false;
     }
     return true;
+}
 }
 ?>
 
@@ -25,10 +27,10 @@ function isActive($currentController, $targetController, $currentAction = null, 
 
             <?= $this->Html->link(
                 '<span class="nav-icon">📊</span> ' . __('Dashboard'),
-                ['controller' => 'Admin', 'action' => 'index'],
+                ['controller' => 'Dashboard', 'action' => 'index'],
                 [
                     'escape' => false,
-                    'class' => 'nav-item' . (isActive($controller, 'Admin', $action, 'index') ? ' active' : '')
+                    'class' => 'nav-item' . (isActive($controller, 'Dashboard', $action, 'index') ? ' active' : '')
                 ]
             ) ?>
         </div>

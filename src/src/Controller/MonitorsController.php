@@ -43,7 +43,6 @@ class MonitorsController extends AppController
             $query->where([
                 'OR' => [
                     'name LIKE' => '%' . $search . '%',
-                    'target LIKE' => '%' . $search . '%',
                     'description LIKE' => '%' . $search . '%',
                 ]
             ]);

@@ -40,6 +40,22 @@ class ZabbixTriggerChecker extends AbstractChecker
     }
 
     /**
+     * Execute the check with specific error messages for missing fields
+     *
+     * @param \App\Model\Entity\Monitor $monitor The monitor to check
+     * @return array Check result
+     */
+    public function check(Monitor $monitor): array
+    {
+        $config = $monitor->getConfiguration();
+        if (empty($config['trigger_id'])) {
+            return $this->buildErrorResult('Missing trigger_id in monitor configuration');
+        }
+
+        return parent::check($monitor);
+    }
+
+    /**
      * Execute the Zabbix trigger state check
      *
      * @param \App\Model\Entity\Monitor $monitor The monitor to check

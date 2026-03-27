@@ -69,6 +69,8 @@ class RestApiAdapter extends AbstractIntegration
             $this->logInfo('REST API connection configured successfully');
 
             return true;
+        } catch (\InvalidArgumentException $e) {
+            throw $e;
         } catch (\Exception $e) {
             $this->setLastError($e->getMessage());
             $this->logError('Failed to configure REST API connection: ' . $e->getMessage());

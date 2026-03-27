@@ -65,6 +65,7 @@ class Monitor extends Entity
         'name' => true,
         'description' => true,
         'type' => true,
+        'target' => true,
         'configuration' => true,
         'check_interval' => true,
         'timeout' => true,
@@ -115,7 +116,8 @@ class Monitor extends Entity
     /**
      * Get target from configuration (virtual field)
      *
-     * Extracts the target/host from configuration based on monitor type
+     * Extracts the target/host from configuration based on monitor type.
+     * Falls back to a directly set _target value if configuration doesn't provide one.
      *
      * @return string|null
      */
@@ -123,7 +125,7 @@ class Monitor extends Entity
     {
         $config = $this->getConfiguration();
 
-        return match ($this->type) {
+        $configTarget = match ($this->type) {
             self::TYPE_HTTP => $config['url'] ?? null,
             self::TYPE_PING => $config['host'] ?? null,
             self::TYPE_PORT => isset($config['host'], $config['port'])
@@ -131,6 +133,9 @@ class Monitor extends Entity
                 : null,
             default => null,
         };
+
+        // Fall back to directly set target value
+        return $configTarget ?? ($this->_fields['target'] ?? null);
     }
 
     /**
