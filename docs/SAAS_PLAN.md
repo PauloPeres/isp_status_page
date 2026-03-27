@@ -109,11 +109,11 @@ Transforming the existing ISP Status Page (CakePHP 5.x) into a full SaaS UptimeR
 - **Result:** Implemented lightweight RBAC using a PermissionService approach (simpler than full cakephp/authorization plugin). Added `cakephp/authorization: ^3.0` to composer.json for future use. Created four policy classes (OrganizationPolicy, MonitorPolicy, IntegrationPolicy, AlertRulePolicy) enforcing the permission matrix: owner (full access), admin (team+settings+resources), member (resources only), viewer (read-only). Created `PermissionService` with a declarative permission matrix, role lookup via OrganizationUsers table, and convenience methods (canManageBilling, canManageTeam, canManageSettings, canManageResources, canView). Updated `AppController` with `$currentUserRole` property loaded from OrganizationUsers on each request, `checkPermission()` helper that throws ForbiddenException, and role passed to all views. Updated admin sidebar to conditionally show/hide Users and Settings menu items for owner/admin only. Added viewer fixture record to OrganizationUsersFixture. Created 23 tests (93 assertions) covering all role-permission combinations, non-member rejection, TenantContext integration, and policy classes.
 
 ### TASK-704: OAuth/Social Login (Google, GitHub)
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Description:** OAuth controller with redirect/callback flow. Migration adds oauth_provider, oauth_id to users.
 - **Files to create:** OAuthController, OAuthService, migration
 - **Depends on:** TASK-700
-- **Result:** _pending_
+- **Result:** Created migration `20260328000012_AddOAuthToUsers.php` adding `oauth_provider` (VARCHAR(50), NULL) and `oauth_id` (VARCHAR(255), NULL) columns with a unique composite index on (oauth_provider, oauth_id). Created `OAuthService.php` with `getAuthorizationUrl(string $provider): string` and `handleCallback(string $provider, array $queryParams): ?User` methods supporting Google and GitHub providers. Uses environment variables GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET. If user with matching email exists, links OAuth credentials to existing account. If not, creates new user + organization + OrganizationUser (owner role) in a transaction. Created `OAuthController.php` with `redirect($provider)` (redirects to provider authorization URL) and `callback($provider)` (handles OAuth callback, creates/links user, logs in via Authentication plugin) actions, both marked as unauthenticated. Added routes `/auth/{provider}/redirect` and `/auth/{provider}/callback` for google and github. Added "Sign in with Google" and "Sign in with GitHub" buttons with SVG icons to both login and register templates. Updated User entity with oauth_provider, oauth_id, language, and timezone in $_accessible.
 
 ### TASK-705: Organization Switcher
 - **Status:** COMPLETED
@@ -263,24 +263,24 @@ Transforming the existing ISP Status Page (CakePHP 5.x) into a full SaaS UptimeR
 ## Phase 6: i18n & Polish
 
 ### TASK-1100: Per-User Language Selection
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Description:** Add language/timezone columns to users. AppController reads from user → org → system default.
 - **Files to create:** Migration
 - **Files to modify:** AppController, User entity
-- **Result:** _pending_
+- **Result:** Created migration `20260328000050_AddLanguageTimezoneToUsers.php` adding `language` (VARCHAR(10), DEFAULT 'en') and `timezone` (VARCHAR(50), DEFAULT 'UTC') columns to the users table. Updated `AppController::initialize()` to implement a three-tier locale/timezone resolution chain: (1) system default from SettingService, (2) organization-level language/timezone from TenantContext's currentOrganization, (3) per-user language/timezone override from the authenticated user's record. Applied via `I18n::setLocale($language)` and `DateTime::setDefaultTimezone($timezone)` with fallback error handling. Updated User entity $_accessible to include language and timezone fields.
 
 ### TASK-1101: Complete i18n Coverage
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Description:** Audit all templates for hardcoded strings. Create .po files for new domains (billing, api, onboarding, status_pages, organizations) in en, pt_BR, es.
 - **Files to create:** ~15 new .po files
 - **Files to modify:** All templates from Phases 1-5
-- **Result:** _pending_
+- **Result:** Created 12 new .po files across 4 domains (billing, api, onboarding, organizations) in 3 locales (en, pt_BR, es). Each .po file contains 15+ translated strings for its domain. billing.po: plan names, pricing labels, upgrade/downgrade, subscription management, trial, payment failure messages. api.po: API key labels, permissions (read/write/admin), rate limiting messages, key status labels, creation confirmation. onboarding.po: step labels, welcome messages, setup instructions, organization creation, monitor setup, team invitation. organizations.po: team management, invitation status labels, role names (owner/admin/member/viewer), organization settings, switch/leave/delete actions. All files follow the existing .po format with proper headers and plural forms per locale.
 
 ### TASK-1102: Timezone per Organization
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Description:** Set timezone from org in AppController. Use org timezone for all date displays.
 - **Files to modify:** AppController, IncidentService, date-displaying templates
-- **Result:** _pending_
+- **Result:** Updated `AppController::initialize()` to read timezone from the current organization's `timezone` field (already present in the organizations table from TASK-600). The timezone resolution chain is: UTC default -> organization timezone -> per-user timezone override (from TASK-1100). Applied via `Cake\I18n\DateTime::setDefaultTimezone($timezone)` which affects all date/time rendering across CakePHP views and helpers. Includes error handling for invalid timezone values with fallback to UTC.
 
 ### TASK-1103: UI Polish
 - **Status:** PENDING

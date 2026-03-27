@@ -50,6 +50,10 @@ class User extends Entity
         'email_verified' => true,
         'email_verification_token' => true,
         'email_verification_sent_at' => true,
+        'oauth_provider' => true,
+        'oauth_id' => true,
+        'language' => true,
+        'timezone' => true,
         'created' => true,
         'modified' => true,
     ];

@@ -18,6 +18,7 @@ namespace App\Controller;
 
 use Cake\Controller\Controller;
 use Cake\Http\Exception\ForbiddenException;
+use Cake\I18n\DateTime;
 use Cake\I18n\I18n;
 use App\Service\PermissionService;
 use App\Service\SettingService;
@@ -70,20 +71,29 @@ class AppController extends Controller
         $this->loadComponent('Flash');
         $this->loadComponent('Authentication.Authentication');
 
-        // Load and apply system language from settings
+        // Determine language and timezone: user → org → system default
+        $language = 'pt_BR';
+        $timezone = 'UTC';
+
         try {
             $settingService = new SettingService();
             $language = $settingService->get('site_language', 'pt_BR');
-            I18n::setLocale($language);
         } catch (\Exception $e) {
             // Fallback to default language if settings fail to load
-            I18n::setLocale('pt_BR');
         }
 
         // Load current organization from TenantContext (set by TenantMiddleware)
         if (TenantContext::isSet()) {
             $this->currentOrganization = TenantContext::getCurrentOrganization();
             $this->set('currentOrganization', $this->currentOrganization);
+
+            // Organization-level language and timezone (TASK-1102)
+            if (!empty($this->currentOrganization['language'])) {
+                $language = $this->currentOrganization['language'];
+            }
+            if (!empty($this->currentOrganization['timezone'])) {
+                $timezone = $this->currentOrganization['timezone'];
+            }
 
             // Load the current user's role in this organization
             $this->permissionService = new PermissionService();
@@ -93,7 +103,37 @@ class AppController extends Controller
                 $orgId = (int)$this->currentOrganization['id'];
                 $this->currentUserRole = $this->permissionService->getUserRole($userId, $orgId);
                 $this->set('currentUserRole', $this->currentUserRole);
+
+                // Per-user language and timezone override (TASK-1100)
+                try {
+                    $usersTable = \Cake\ORM\TableRegistry::getTableLocator()->get('Users');
+                    $user = $usersTable->find()
+                        ->select(['language', 'timezone'])
+                        ->where(['id' => $userId])
+                        ->disableHydration()
+                        ->first();
+
+                    if ($user) {
+                        if (!empty($user['language'])) {
+                            $language = $user['language'];
+                        }
+                        if (!empty($user['timezone'])) {
+                            $timezone = $user['timezone'];
+                        }
+                    }
+                } catch (\Exception $e) {
+                    // User table may not have new columns yet; ignore
+                }
             }
+        }
+
+        // Apply locale and timezone
+        I18n::setLocale($language);
+        try {
+            DateTime::setDefaultTimezone($timezone);
+        } catch (\Exception $e) {
+            // Invalid timezone; fall back to UTC
+            DateTime::setDefaultTimezone('UTC');
         }
 
         /*

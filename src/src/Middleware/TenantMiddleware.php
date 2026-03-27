@@ -45,6 +45,7 @@ class TenantMiddleware implements MiddlewareInterface
         '/api/v1/',
         '/api/docs',
         '/incidents/acknowledge/',
+        '/auth/',
     ];
 
     /**

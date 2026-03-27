@@ -1,0 +1,69 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ISP Status Page\n"
+"POT-Creation-Date: 2026-03-27 00:00-0300\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "API Keys"
+msgstr "API Keys"
+
+msgid "Create API Key"
+msgstr "Create API Key"
+
+msgid "Revoke API Key"
+msgstr "Revoke API Key"
+
+msgid "Key Name"
+msgstr "Key Name"
+
+msgid "Key Prefix"
+msgstr "Key Prefix"
+
+msgid "Permissions"
+msgstr "Permissions"
+
+msgid "Read"
+msgstr "Read"
+
+msgid "Write"
+msgstr "Write"
+
+msgid "Admin"
+msgstr "Admin"
+
+msgid "Rate Limit"
+msgstr "Rate Limit"
+
+msgid "requests per hour"
+msgstr "requests per hour"
+
+msgid "Last Used"
+msgstr "Last Used"
+
+msgid "Expires At"
+msgstr "Expires At"
+
+msgid "Never"
+msgstr "Never"
+
+msgid "Active"
+msgstr "Active"
+
+msgid "Revoked"
+msgstr "Revoked"
+
+msgid "Expired"
+msgstr "Expired"
+
+msgid "Rate limit exceeded. Please try again later."
+msgstr "Rate limit exceeded. Please try again later."
+
+msgid "Invalid API key."
+msgstr "Invalid API key."
+
+msgid "API key created successfully. Copy it now — it will not be shown again."
+msgstr "API key created successfully. Copy it now — it will not be shown again."

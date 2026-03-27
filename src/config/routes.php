@@ -77,7 +77,7 @@ return function (RouteBuilder $routes): void {
          */
         $builder->connect(
             '/auth/{provider}/redirect',
-            ['controller' => 'OAuth', 'action' => 'redirect'],
+            ['controller' => 'OAuth', 'action' => 'redirectToProvider'],
             ['pass' => ['provider'], 'provider' => '(google|github)']
         );
         $builder->connect(

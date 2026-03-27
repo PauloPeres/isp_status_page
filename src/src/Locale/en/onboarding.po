@@ -1,0 +1,66 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ISP Status Page\n"
+"POT-Creation-Date: 2026-03-27 00:00-0300\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Welcome to ISP Status"
+msgstr "Welcome to ISP Status"
+
+msgid "Let's set up your monitoring"
+msgstr "Let's set up your monitoring"
+
+msgid "Step 1: Create Your Organization"
+msgstr "Step 1: Create Your Organization"
+
+msgid "Step 2: Add Your First Monitor"
+msgstr "Step 2: Add Your First Monitor"
+
+msgid "Step 3: Invite Your Team"
+msgstr "Step 3: Invite Your Team"
+
+msgid "Organization Name"
+msgstr "Organization Name"
+
+msgid "Organization Slug"
+msgstr "Organization Slug"
+
+msgid "Choose a unique URL for your status page"
+msgstr "Choose a unique URL for your status page"
+
+msgid "Next Step"
+msgstr "Next Step"
+
+msgid "Previous Step"
+msgstr "Previous Step"
+
+msgid "Skip This Step"
+msgstr "Skip This Step"
+
+msgid "Complete Setup"
+msgstr "Complete Setup"
+
+msgid "Your setup is complete!"
+msgstr "Your setup is complete!"
+
+msgid "Go to Dashboard"
+msgstr "Go to Dashboard"
+
+msgid "Monitor URL or IP"
+msgstr "Monitor URL or IP"
+
+msgid "Select monitor type"
+msgstr "Select monitor type"
+
+msgid "Enter team member email"
+msgstr "Enter team member email"
+
+msgid "Select role"
+msgstr "Select role"
+
+msgid "Send Invitation"
+msgstr "Send Invitation"

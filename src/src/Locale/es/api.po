@@ -1,0 +1,69 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ISP Status Page\n"
+"POT-Creation-Date: 2026-03-27 00:00-0300\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "API Keys"
+msgstr "Claves de API"
+
+msgid "Create API Key"
+msgstr "Crear Clave de API"
+
+msgid "Revoke API Key"
+msgstr "Revocar Clave de API"
+
+msgid "Key Name"
+msgstr "Nombre de la Clave"
+
+msgid "Key Prefix"
+msgstr "Prefijo de la Clave"
+
+msgid "Permissions"
+msgstr "Permisos"
+
+msgid "Read"
+msgstr "Lectura"
+
+msgid "Write"
+msgstr "Escritura"
+
+msgid "Admin"
+msgstr "Administrador"
+
+msgid "Rate Limit"
+msgstr "Limite de Solicitudes"
+
+msgid "requests per hour"
+msgstr "solicitudes por hora"
+
+msgid "Last Used"
+msgstr "Ultimo Uso"
+
+msgid "Expires At"
+msgstr "Expira En"
+
+msgid "Never"
+msgstr "Nunca"
+
+msgid "Active"
+msgstr "Activa"
+
+msgid "Revoked"
+msgstr "Revocada"
+
+msgid "Expired"
+msgstr "Expirada"
+
+msgid "Rate limit exceeded. Please try again later."
+msgstr "Limite de solicitudes excedido. Intente nuevamente mas tarde."
+
+msgid "Invalid API key."
+msgstr "Clave de API invalida."
+
+msgid "API key created successfully. Copy it now — it will not be shown again."
+msgstr "Clave de API creada exitosamente. Copiala ahora — no se mostrara de nuevo."

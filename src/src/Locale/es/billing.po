@@ -1,0 +1,69 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ISP Status Page\n"
+"POT-Creation-Date: 2026-03-27 00:00-0300\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Plans & Pricing"
+msgstr "Planes y Precios"
+
+msgid "Free Plan"
+msgstr "Plan Gratuito"
+
+msgid "Pro Plan"
+msgstr "Plan Pro"
+
+msgid "Business Plan"
+msgstr "Plan Business"
+
+msgid "Current Plan"
+msgstr "Plan Actual"
+
+msgid "Upgrade"
+msgstr "Mejorar Plan"
+
+msgid "Downgrade"
+msgstr "Reducir Plan"
+
+msgid "Monthly"
+msgstr "Mensual"
+
+msgid "Yearly"
+msgstr "Anual"
+
+msgid "per month"
+msgstr "por mes"
+
+msgid "per year"
+msgstr "por ano"
+
+msgid "Manage Subscription"
+msgstr "Gestionar Suscripcion"
+
+msgid "Cancel Subscription"
+msgstr "Cancelar Suscripcion"
+
+msgid "Payment Method"
+msgstr "Metodo de Pago"
+
+msgid "Billing History"
+msgstr "Historial de Facturacion"
+
+msgid "You have reached the monitor limit for your plan."
+msgstr "Has alcanzado el limite de monitores de tu plan."
+
+msgid "Upgrade to add more monitors."
+msgstr "Mejora tu plan para agregar mas monitores."
+
+msgid "Trial expires in {0} days"
+msgstr "La prueba expira en {0} dias"
+
+msgid "Subscription active"
+msgstr "Suscripcion activa"
+
+msgid "Payment failed. Please update your payment method."
+msgstr "Pago fallido. Por favor, actualiza tu metodo de pago."
