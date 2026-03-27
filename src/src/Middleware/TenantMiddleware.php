@@ -36,6 +36,8 @@ class TenantMiddleware implements MiddlewareInterface
         '/users/login',
         '/users/register',
         '/users/logout',
+        '/register',
+        '/verify-email',
         '/registration/',
         '/status',
         '/heartbeat/',

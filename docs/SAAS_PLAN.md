@@ -81,11 +81,11 @@ Transforming the existing ISP Status Page (CakePHP 5.x) into a full SaaS UptimeR
 ## Phase 2: Auth & Onboarding
 
 ### TASK-700: Public Registration Flow
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Description:** Registration form (name, email, password). Creates User + Organization + OrganizationUser (role=owner). Email verification with token. Migration adds email_verified, email_verification_token columns to users.
 - **Files to create:** RegistrationController, templates, email template, migration, tests
 - **Depends on:** Phase 1
-- **Result:** _pending_
+- **Result:** Created migration `20260328000010_AddEmailVerificationToUsers.php` adding email_verified (BOOLEAN), email_verification_token (VARCHAR(64)), and email_verification_sent_at (DATETIME) to users table. Created `RegistrationController.php` with register() and verifyEmail() actions as public endpoints. Registration creates User + Organization + OrganizationUser (role=owner) in a DB transaction, sends verification email, and redirects to check-your-email page. Email verification auto-logs user in and redirects to /dashboard. Updated User entity with generateEmailVerificationToken(), markEmailVerified(), isEmailVerificationTokenValid() (24h expiry). Created 3 templates matching the login page design system. Added routes /register and /verify-email/*. Updated login page with register link. Added sendEmailVerification() to EmailService. 13 tests passing (46 assertions).
 
 ### TASK-701: Organization Creation & Onboarding Wizard
 - **Status:** PENDING

@@ -355,6 +355,61 @@ class EmailService
     }
 
     /**
+     * Send email verification email for new user registration
+     *
+     * @param object $user User entity with email and username properties
+     * @param string $verifyLink Full URL to email verification page
+     * @return array Result with 'success' (bool), 'message' (string), and optional 'technical_error'
+     */
+    public function sendEmailVerification($user, string $verifyLink): array
+    {
+        try {
+            $mailer = new Mailer();
+            $this->configureSMTP($mailer);
+
+            // Get site settings
+            $siteName = $this->settingService->get('site_name', 'ISP Status');
+            $fromEmail = $this->settingService->get('email_from', 'noreply@localhost');
+            $fromName = $this->settingService->get('email_from_name', $siteName);
+
+            $mailer
+                ->setEmailFormat('html')
+                ->setFrom([$fromEmail => $fromName])
+                ->setTo($user->email)
+                ->setSubject("Verify your email - {$siteName}")
+                ->setViewVars([
+                    'user' => $user,
+                    'verifyLink' => $verifyLink,
+                    'siteName' => $siteName,
+                ])
+                ->viewBuilder()
+                    ->setTemplate('verify_email')
+                    ->setLayout('default');
+
+            $mailer->deliver();
+
+            // Log success
+            error_log("Email verification sent successfully to {$user->email}");
+
+            return [
+                'success' => true,
+                'message' => 'Verification email sent successfully.',
+            ];
+        } catch (\Exception $e) {
+            $errorMessage = $e->getMessage();
+
+            // Log detailed error
+            error_log("Failed to send verification email to {$user->email}: {$errorMessage}");
+
+            return [
+                'success' => false,
+                'message' => 'Failed to send verification email.',
+                'technical_error' => $errorMessage,
+            ];
+        }
+    }
+
+    /**
      * Test email configuration by sending a test email
      *
      * @param string $toEmail Email address to send test to

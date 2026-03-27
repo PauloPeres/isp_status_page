@@ -19,6 +19,9 @@ use Authentication\PasswordHasher\DefaultPasswordHasher;
  * @property \Cake\I18n\DateTime|null $last_login
  * @property string|null $reset_token
  * @property \Cake\I18n\DateTime|null $reset_token_expires
+ * @property bool $email_verified
+ * @property string|null $email_verification_token
+ * @property \Cake\I18n\DateTime|null $email_verification_sent_at
  * @property \Cake\I18n\DateTime $created
  * @property \Cake\I18n\DateTime $modified
  */
@@ -39,10 +42,14 @@ class User extends Entity
         'email' => true,
         'role' => true,
         'active' => true,
+        'organization_id' => true,
         'force_password_change' => true,
         'last_login' => true,
         'reset_token' => true,
         'reset_token_expires' => true,
+        'email_verified' => true,
+        'email_verification_token' => true,
+        'email_verification_sent_at' => true,
         'created' => true,
         'modified' => true,
     ];
@@ -142,5 +149,49 @@ class User extends Entity
     {
         $this->reset_token = null;
         $this->reset_token_expires = null;
+    }
+
+    /**
+     * Generate a unique email verification token
+     *
+     * @return void
+     */
+    public function generateEmailVerificationToken(): void
+    {
+        $this->email_verification_token = bin2hex(random_bytes(32)); // 64 character hex string
+        $this->email_verification_sent_at = new \DateTime();
+        $this->email_verified = false;
+    }
+
+    /**
+     * Mark email as verified and clear the verification token
+     *
+     * @return void
+     */
+    public function markEmailVerified(): void
+    {
+        $this->email_verified = true;
+        $this->email_verification_token = null;
+    }
+
+    /**
+     * Check if email verification token is still valid (24 hours)
+     *
+     * @return bool
+     */
+    public function isEmailVerificationTokenValid(): bool
+    {
+        if (!$this->email_verification_token || !$this->email_verification_sent_at) {
+            return false;
+        }
+
+        $sentAt = $this->email_verification_sent_at;
+        if ($sentAt instanceof \Cake\I18n\DateTime) {
+            $expires = $sentAt->modify('+24 hours');
+        } else {
+            $expires = (new \DateTime($sentAt->format('Y-m-d H:i:s')))->modify('+24 hours');
+        }
+
+        return new \DateTime() < $expires;
     }
 }

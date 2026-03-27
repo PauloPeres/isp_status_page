@@ -114,6 +114,15 @@ return function (RouteBuilder $routes): void {
         );
 
         /*
+         * Heartbeat ping route (TASK-1000)
+         */
+        $builder->connect(
+            '/heartbeat/{token}',
+            ['controller' => 'Heartbeat', 'action' => 'ping'],
+            ['pass' => ['token'], 'token' => '[a-f0-9]{64}']
+        );
+
+        /*
          * Stripe webhook route (TASK-803)
          */
         $builder->connect(
@@ -143,18 +152,38 @@ return function (RouteBuilder $routes): void {
     });
 
     /*
-     * If you need a different set of middleware or none at all,
-     * open new scope and define routes there.
+     * REST API v1 routes (TASK-902)
      *
-     * ```
-     * $routes->scope('/api', function (RouteBuilder $builder): void {
-     *     // No $builder->applyMiddleware() here.
-     *
-     *     // Parse specified extensions from URLs
-     *     // $builder->setExtensions(['json', 'xml']);
-     *
-     *     // Connect API actions here.
-     * });
-     * ```
+     * Auth handled by ApiAuthMiddleware; CSRF skipped for /api/* in Application.php.
      */
+    $routes->scope('/api/v1', function (RouteBuilder $builder): void {
+        $builder->setExtensions(['json']);
+
+        // --- Monitors ---
+        $builder->connect('/monitors', ['controller' => 'Monitors', 'action' => 'index', 'prefix' => 'Api/V1', '_method' => 'GET']);
+        $builder->connect('/monitors', ['controller' => 'Monitors', 'action' => 'add', 'prefix' => 'Api/V1', '_method' => 'POST']);
+        $builder->connect('/monitors/{id}', ['controller' => 'Monitors', 'action' => 'view', 'prefix' => 'Api/V1', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/monitors/{id}', ['controller' => 'Monitors', 'action' => 'edit', 'prefix' => 'Api/V1', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/monitors/{id}', ['controller' => 'Monitors', 'action' => 'delete', 'prefix' => 'Api/V1', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/monitors/{id}/checks', ['controller' => 'Monitors', 'action' => 'checks', 'prefix' => 'Api/V1', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/monitors/{id}/pause', ['controller' => 'Monitors', 'action' => 'pause', 'prefix' => 'Api/V1', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/monitors/{id}/resume', ['controller' => 'Monitors', 'action' => 'resume', 'prefix' => 'Api/V1', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
+
+        // --- Incidents ---
+        $builder->connect('/incidents', ['controller' => 'Incidents', 'action' => 'index', 'prefix' => 'Api/V1', '_method' => 'GET']);
+        $builder->connect('/incidents', ['controller' => 'Incidents', 'action' => 'add', 'prefix' => 'Api/V1', '_method' => 'POST']);
+        $builder->connect('/incidents/{id}', ['controller' => 'Incidents', 'action' => 'view', 'prefix' => 'Api/V1', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/incidents/{id}', ['controller' => 'Incidents', 'action' => 'edit', 'prefix' => 'Api/V1', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
+
+        // --- Checks (read-only) ---
+        $builder->connect('/checks', ['controller' => 'Checks', 'action' => 'index', 'prefix' => 'Api/V1', '_method' => 'GET']);
+        $builder->connect('/checks/{id}', ['controller' => 'Checks', 'action' => 'view', 'prefix' => 'Api/V1', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
+
+        // --- Alert Rules ---
+        $builder->connect('/alert-rules', ['controller' => 'AlertRules', 'action' => 'index', 'prefix' => 'Api/V1', '_method' => 'GET']);
+        $builder->connect('/alert-rules', ['controller' => 'AlertRules', 'action' => 'add', 'prefix' => 'Api/V1', '_method' => 'POST']);
+        $builder->connect('/alert-rules/{id}', ['controller' => 'AlertRules', 'action' => 'view', 'prefix' => 'Api/V1', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/alert-rules/{id}', ['controller' => 'AlertRules', 'action' => 'edit', 'prefix' => 'Api/V1', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/alert-rules/{id}', ['controller' => 'AlertRules', 'action' => 'delete', 'prefix' => 'Api/V1', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
+    });
 };

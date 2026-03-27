@@ -1,23 +1,23 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><?= __d('users', 'Login') ?> - ISP Status</title>
+    <title><?= __('Register') ?> - ISP Status</title>
     <style>
         :root {
-            /* Cores Primárias */
+            /* Primary Colors */
             --color-primary: #1E88E5;
             --color-success: #43A047;
             --color-dark: #263238;
             --color-white: #FFFFFF;
 
-            /* Cores Secundárias */
+            /* Secondary Colors */
             --color-primary-light: #90CAF9;
             --color-warning: #FDD835;
             --color-error: #E53935;
 
-            /* Tons Neutros */
+            /* Neutral Tones */
             --color-gray-light: #ECEFF1;
             --color-gray-medium: #B0BEC5;
 
@@ -25,7 +25,7 @@
             --color-primary-hover: #1976D2;
             --color-error-hover: #D32F2F;
 
-            /* Espaçamento */
+            /* Spacing */
             --space-md: 16px;
             --space-lg: 24px;
             --space-xl: 32px;
@@ -35,7 +35,7 @@
             --radius-lg: 12px;
             --radius-xl: 20px;
 
-            /* Sombras */
+            /* Shadows */
             --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
             --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
@@ -56,7 +56,7 @@
             padding: 20px;
         }
 
-        .login-box {
+        .register-box {
             background: var(--color-white);
             border-radius: var(--radius-xl);
             box-shadow: var(--shadow-lg);
@@ -204,27 +204,16 @@
             border-left: 4px solid var(--color-primary);
         }
 
-        .footer {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid var(--color-gray-light);
-            text-align: center;
+        .error-message {
+            color: var(--color-error);
+            font-size: 12px;
+            margin-top: 4px;
         }
 
-        .credentials {
-            display: inline-block;
-            background: var(--color-gray-light);
-            padding: 10px 16px;
-            border-radius: var(--radius-md);
-            font-size: 13px;
-            color: var(--color-gray-medium);
-            font-family: 'Courier New', monospace;
-        }
-
-        .forgot-password {
+        .login-link {
             display: block;
             text-align: center;
-            margin-top: 16px;
+            margin-top: 24px;
             color: var(--color-primary);
             text-decoration: none;
             font-size: 14px;
@@ -232,7 +221,7 @@
             transition: color 0.3s ease;
         }
 
-        .forgot-password:hover {
+        .login-link:hover {
             color: var(--color-primary-hover);
             text-decoration: underline;
         }
@@ -243,7 +232,7 @@
                 padding: 16px;
             }
 
-            .login-box {
+            .register-box {
                 padding: 40px 28px;
             }
 
@@ -277,7 +266,7 @@
                 min-height: 48px;
             }
 
-            .forgot-password {
+            .login-link {
                 padding: 10px 0;
                 min-height: 44px;
                 display: inline-flex;
@@ -293,7 +282,7 @@
                 padding: 12px;
             }
 
-            .login-box {
+            .register-box {
                 padding: 32px 20px;
                 border-radius: 16px;
             }
@@ -315,49 +304,61 @@
             label {
                 font-size: 13px;
             }
-
-            .credentials {
-                font-size: 12px;
-                padding: 8px 12px;
-            }
         }
     </style>
 </head>
 <body>
-    <div class="login-box">
+    <div class="register-box">
         <div class="logo-container">
             <img src="/img/icon_isp_status_page.png" alt="ISP Status" class="logo">
             <h1>ISP Status</h1>
-            <p class="subtitle"><?= __d('users', 'Sign in to your account') ?></p>
+            <p class="subtitle"><?= __('Create your account') ?></p>
         </div>
 
         <?php
         // Show flash messages
         echo $this->Flash->render();
-
-        // Show login error if authentication failed
-        if (isset($result) && $result !== null && $this->request->is('post') && !$result->isValid()):
         ?>
+
+        <?php if (isset($user) && $user->getErrors()): ?>
             <div class="alert alert-error">
-                ⚠️ <?= __d('users', 'Invalid username or password. Please try again.') ?>
+                <?php foreach ($user->getErrors() as $field => $errors): ?>
+                    <?php foreach ($errors as $error): ?>
+                        <div><?= h($error) ?></div>
+                    <?php endforeach; ?>
+                <?php endforeach; ?>
             </div>
         <?php endif; ?>
 
-        <form method="post" action="/users/login">
+        <form method="post" action="<?= $this->Url->build(['controller' => 'Registration', 'action' => 'register']) ?>">
             <?php if (isset($this->request)): ?>
                 <input type="hidden" name="_csrfToken" value="<?= $this->request->getAttribute('csrfToken') ?>">
             <?php endif; ?>
 
             <div class="input-group">
-                <label for="username"><?= __d('users', 'Username or Email') ?></label>
+                <label for="username"><?= __('Username') ?></label>
                 <input
                     type="text"
                     id="username"
                     name="username"
-                    placeholder="<?= __d('users', 'Enter your username or email') ?>"
+                    placeholder="<?= __('Choose a username') ?>"
+                    value="<?= h($this->request->getData('username', '')) ?>"
                     required
                     autofocus
                     autocomplete="username"
+                >
+            </div>
+
+            <div class="input-group">
+                <label for="email"><?= __('Email') ?></label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="<?= __('Enter your email address') ?>"
+                    value="<?= h($this->request->getData('email', '')) ?>"
+                    required
+                    autocomplete="email"
                 >
             </div>
 
@@ -367,30 +368,32 @@
                     type="password"
                     id="password"
                     name="password"
-                    placeholder="<?= __d('users', 'Enter your password') ?>"
+                    placeholder="<?= __('At least 8 characters') ?>"
                     required
-                    autocomplete="current-password"
+                    autocomplete="new-password"
+                    minlength="8"
                 >
             </div>
 
-            <button type="submit" class="btn"><?= __d('users', 'Sign In') ?></button>
+            <div class="input-group">
+                <label for="password_confirm"><?= __('Confirm Password') ?></label>
+                <input
+                    type="password"
+                    id="password_confirm"
+                    name="password_confirm"
+                    placeholder="<?= __('Repeat your password') ?>"
+                    required
+                    autocomplete="new-password"
+                    minlength="8"
+                >
+            </div>
+
+            <button type="submit" class="btn"><?= __('Create Account') ?></button>
         </form>
 
-        <a href="<?= $this->Url->build(['controller' => 'Users', 'action' => 'forgotPassword']) ?>" class="forgot-password">
-            <?= __('Esqueci minha senha') ?>
+        <a href="<?= $this->Url->build(['controller' => 'Users', 'action' => 'login']) ?>" class="login-link">
+            <?= __('Already have an account? Sign in') ?>
         </a>
-
-        <a href="<?= $this->Url->build(['controller' => 'Registration', 'action' => 'register']) ?>" class="forgot-password">
-            <?= __("Don't have an account? Register") ?>
-        </a>
-
-        <?php if (!isset($hasUserWithChangedPassword) || !$hasUserWithChangedPassword): ?>
-        <div class="footer">
-            <div class="credentials">
-                admin / admin123
-            </div>
-        </div>
-        <?php endif; ?>
     </div>
 </body>
 </html>
