@@ -85,6 +85,45 @@ return function (RouteBuilder $routes): void {
         );
 
         /*
+         * Onboarding routes (TASK-701)
+         */
+        $builder->connect(
+            '/onboarding/step1',
+            ['controller' => 'Onboarding', 'action' => 'step1']
+        );
+        $builder->connect(
+            '/onboarding/step2',
+            ['controller' => 'Onboarding', 'action' => 'step2']
+        );
+        $builder->connect(
+            '/onboarding/step3',
+            ['controller' => 'Onboarding', 'action' => 'step3']
+        );
+        $builder->connect(
+            '/onboarding/complete',
+            ['controller' => 'Onboarding', 'action' => 'complete']
+        );
+
+        /*
+         * Badge routes (TASK-1005)
+         */
+        $builder->connect(
+            '/badges/{token}/uptime.svg',
+            ['controller' => 'Badges', 'action' => 'uptime'],
+            ['pass' => ['token'], 'token' => '[a-f0-9]{32,64}']
+        );
+        $builder->connect(
+            '/badges/{token}/status.svg',
+            ['controller' => 'Badges', 'action' => 'status'],
+            ['pass' => ['token'], 'token' => '[a-f0-9]{32,64}']
+        );
+        $builder->connect(
+            '/badges/{token}/response-time.svg',
+            ['controller' => 'Badges', 'action' => 'responseTime'],
+            ['pass' => ['token'], 'token' => '[a-f0-9]{32,64}']
+        );
+
+        /*
          * Billing routes (TASK-802)
          */
         $builder->connect(

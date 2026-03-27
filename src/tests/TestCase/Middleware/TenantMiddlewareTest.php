@@ -143,11 +143,14 @@ class TenantMiddlewareTest extends TestCase
     }
 
     /**
-     * Test X-Organization-Id header resolution for API requests.
+     * Test /api/v1/ routes are treated as public and skipped by TenantMiddleware.
+     *
+     * API authentication and tenant resolution for /api/v1/* is handled by
+     * ApiAuthMiddleware which runs after TenantMiddleware.
      *
      * @return void
      */
-    public function testApiHeaderResolution(): void
+    public function testApiV1RoutesSkippedByTenantMiddleware(): void
     {
         $request = new ServerRequest([
             'url' => '/api/v1/monitors',
@@ -163,30 +166,32 @@ class TenantMiddlewareTest extends TestCase
 
         $this->middleware->process($request, $this->handler);
 
-        $this->assertEquals(1, TenantContext::getCurrentOrgId());
+        // TenantMiddleware skips /api/v1/ — it does NOT set tenant context.
+        // ApiAuthMiddleware handles this downstream.
+        $this->assertNull(TenantContext::getCurrentOrgId());
     }
 
     /**
-     * Test API request without org header returns 403 JSON response.
+     * Test /api/v1/ request without org header is still passed through
+     * (ApiAuthMiddleware handles auth, not TenantMiddleware).
      *
      * @return void
      */
-    public function testApiRequestWithoutOrgReturns403(): void
+    public function testApiV1RequestWithoutOrgPassesThrough(): void
     {
         $request = new ServerRequest([
             'url' => '/api/v1/monitors',
         ]);
 
-        // The handler should NOT be called since we return a 403
+        // The handler should be called since /api/v1/ is public to TenantMiddleware
         $handler = $this->createMock(RequestHandlerInterface::class);
-        $handler->expects($this->never())
-            ->method('handle');
+        $handler->expects($this->once())
+            ->method('handle')
+            ->willReturn(new Response());
 
         $response = $this->middleware->process($request, $handler);
 
-        $this->assertEquals(403, $response->getStatusCode());
-        $body = json_decode((string)$response->getBody(), true);
-        $this->assertArrayHasKey('error', $body);
+        $this->assertNull(TenantContext::getCurrentOrgId());
     }
 
     /**
@@ -289,7 +294,7 @@ class TenantMiddlewareTest extends TestCase
     }
 
     /**
-     * Test that inactive org is not resolved.
+     * Test that inactive org is not resolved (non-API route).
      *
      * @return void
      */
@@ -302,19 +307,21 @@ class TenantMiddlewareTest extends TestCase
         $orgsTable->save($org);
 
         $request = new ServerRequest([
-            'url' => '/api/v1/monitors',
+            'url' => '/monitors',
             'environment' => [
-                'HTTP_X_ORGANIZATION_ID' => '1',
+                'HTTP_HOST' => 'acme-isp.statuspage.io',
             ],
         ]);
 
+        // Handler is called because no org was resolved and this is a web request
+        // (unauthenticated user, non-public route — falls through to auth middleware)
         $handler = $this->createMock(RequestHandlerInterface::class);
-        $handler->expects($this->never())
-            ->method('handle');
+        $handler->expects($this->once())
+            ->method('handle')
+            ->willReturn(new Response());
 
         $response = $this->middleware->process($request, $handler);
 
-        $this->assertEquals(403, $response->getStatusCode());
         $this->assertNull(TenantContext::getCurrentOrgId());
     }
 
