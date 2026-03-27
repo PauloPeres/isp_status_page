@@ -162,6 +162,14 @@ return function (RouteBuilder $routes): void {
         );
 
         /*
+         * API documentation route (TASK-903)
+         */
+        $builder->connect(
+            '/api/docs',
+            ['controller' => 'Docs', 'action' => 'index', 'prefix' => 'Api']
+        );
+
+        /*
          * Stripe webhook route (TASK-803)
          */
         $builder->connect(

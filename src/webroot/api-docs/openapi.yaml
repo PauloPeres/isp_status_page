@@ -1,0 +1,971 @@
+openapi: 3.0.3
+info:
+  title: ISP Status Page API
+  version: "1.0.0"
+  description: |
+    REST API for the ISP Status Page multi-tenant monitoring platform.
+    Authenticate using a Bearer token (API key) generated in the admin panel.
+  contact:
+    name: ISP Status Page Support
+  license:
+    name: MIT
+
+servers:
+  - url: /api/v1
+    description: API v1
+
+security:
+  - BearerAuth: []
+
+paths:
+  /monitors:
+    get:
+      summary: List all monitors
+      operationId: listMonitors
+      tags:
+        - Monitors
+      responses:
+        "200":
+          description: List of monitors for the current organization
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Monitor"
+              example:
+                success: true
+                data:
+                  - id: 1
+                    name: "Main Website"
+                    type: "http"
+                    status: "up"
+                    check_interval: 60
+                    timeout: 30
+                    active: true
+                    uptime_percentage: "99.95"
+                    created: "2026-01-15T10:00:00+00:00"
+                    modified: "2026-03-27T12:30:00+00:00"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    post:
+      summary: Create a new monitor
+      operationId: createMonitor
+      tags:
+        - Monitors
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MonitorInput"
+            example:
+              name: "API Server"
+              type: "http"
+              configuration:
+                url: "https://api.example.com/health"
+                method: "GET"
+                expected_status: 200
+              check_interval: 60
+              timeout: 30
+              active: true
+      responses:
+        "201":
+          description: Monitor created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: "#/components/schemas/Monitor"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /monitors/{id}:
+    get:
+      summary: Get a single monitor
+      operationId: getMonitor
+      tags:
+        - Monitors
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: Monitor details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: "#/components/schemas/Monitor"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      summary: Update a monitor
+      operationId: updateMonitor
+      tags:
+        - Monitors
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MonitorInput"
+            example:
+              name: "API Server (Updated)"
+              check_interval: 120
+      responses:
+        "200":
+          description: Monitor updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: "#/components/schemas/Monitor"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      summary: Delete a monitor
+      operationId: deleteMonitor
+      tags:
+        - Monitors
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: Monitor deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Monitor deleted"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /monitors/{id}/checks:
+    get:
+      summary: List checks for a monitor
+      operationId: listMonitorChecks
+      tags:
+        - Monitors
+      parameters:
+        - $ref: "#/components/parameters/Id"
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+          description: Number of results to return
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+          description: Page number
+      responses:
+        "200":
+          description: List of check results for the monitor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Check"
+              example:
+                success: true
+                data:
+                  - id: 100
+                    monitor_id: 1
+                    status: "up"
+                    response_time: 245
+                    status_code: 200
+                    created: "2026-03-27T12:30:00+00:00"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /monitors/{id}/pause:
+    post:
+      summary: Pause a monitor
+      operationId: pauseMonitor
+      tags:
+        - Monitors
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: Monitor paused
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: "#/components/schemas/Monitor"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /monitors/{id}/resume:
+    post:
+      summary: Resume a monitor
+      operationId: resumeMonitor
+      tags:
+        - Monitors
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: Monitor resumed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: "#/components/schemas/Monitor"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /incidents:
+    get:
+      summary: List all incidents
+      operationId: listIncidents
+      tags:
+        - Incidents
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [open, resolved, acknowledged]
+          description: Filter by incident status
+      responses:
+        "200":
+          description: List of incidents
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Incident"
+              example:
+                success: true
+                data:
+                  - id: 10
+                    monitor_id: 1
+                    title: "Main Website is DOWN"
+                    status: "open"
+                    severity: "critical"
+                    started_at: "2026-03-27T11:00:00+00:00"
+                    resolved_at: null
+                    created: "2026-03-27T11:00:00+00:00"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    post:
+      summary: Create a manual incident
+      operationId: createIncident
+      tags:
+        - Incidents
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IncidentInput"
+            example:
+              monitor_id: 1
+              title: "Scheduled maintenance"
+              description: "Planned database migration"
+              severity: "minor"
+              status: "open"
+      responses:
+        "201":
+          description: Incident created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: "#/components/schemas/Incident"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /incidents/{id}:
+    get:
+      summary: Get a single incident
+      operationId: getIncident
+      tags:
+        - Incidents
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: Incident details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: "#/components/schemas/Incident"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      summary: Update an incident
+      operationId: updateIncident
+      tags:
+        - Incidents
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IncidentInput"
+            example:
+              status: "resolved"
+              description: "Issue has been resolved"
+      responses:
+        "200":
+          description: Incident updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: "#/components/schemas/Incident"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /checks:
+    get:
+      summary: List recent checks across all monitors
+      operationId: listChecks
+      tags:
+        - Checks
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+          description: Number of results to return
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+          description: Page number
+        - name: monitor_id
+          in: query
+          schema:
+            type: integer
+          description: Filter by monitor ID
+      responses:
+        "200":
+          description: List of check results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Check"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /alert-rules:
+    get:
+      summary: List all alert rules
+      operationId: listAlertRules
+      tags:
+        - Alert Rules
+      responses:
+        "200":
+          description: List of alert rules
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/AlertRule"
+              example:
+                success: true
+                data:
+                  - id: 1
+                    monitor_id: 1
+                    name: "Email on down"
+                    trigger_type: "down"
+                    channel: "email"
+                    recipients: '["admin@example.com"]'
+                    cooldown_minutes: 15
+                    active: true
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    post:
+      summary: Create a new alert rule
+      operationId: createAlertRule
+      tags:
+        - Alert Rules
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AlertRuleInput"
+            example:
+              monitor_id: 1
+              name: "Slack on down"
+              trigger_type: "down"
+              channel: "slack"
+              recipients: '["https://hooks.slack.com/services/xxx"]'
+              cooldown_minutes: 30
+              active: true
+      responses:
+        "201":
+          description: Alert rule created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: "#/components/schemas/AlertRule"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /alert-rules/{id}:
+    get:
+      summary: Get a single alert rule
+      operationId: getAlertRule
+      tags:
+        - Alert Rules
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: Alert rule details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: "#/components/schemas/AlertRule"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      summary: Update an alert rule
+      operationId: updateAlertRule
+      tags:
+        - Alert Rules
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AlertRuleInput"
+      responses:
+        "200":
+          description: Alert rule updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: "#/components/schemas/AlertRule"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      summary: Delete an alert rule
+      operationId: deleteAlertRule
+      tags:
+        - Alert Rules
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: Alert rule deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Alert rule deleted"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: |
+        API key authentication. Generate an API key in the admin panel under System > API Keys.
+        Include it in the Authorization header as: `Bearer sk_live_...`
+
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: Resource ID
+
+  responses:
+    Unauthorized:
+      description: Authentication required or invalid API key
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            success: false
+            error:
+              message: "Invalid or missing API key"
+              code: 401
+    BadRequest:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            success: false
+            error:
+              message: "Validation failed"
+              code: 400
+              errors:
+                name: ["This field is required"]
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            success: false
+            error:
+              message: "Record not found"
+              code: 404
+
+  schemas:
+    Monitor:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Main Website"
+        description:
+          type: string
+          nullable: true
+          example: "Primary website monitor"
+        type:
+          type: string
+          enum: [http, ping, port, api, ixc, zabbix, heartbeat, keyword, ssl]
+          example: "http"
+        configuration:
+          type: string
+          nullable: true
+          description: JSON-encoded configuration object
+          example: '{"url":"https://example.com","method":"GET","expected_status":200}'
+        check_interval:
+          type: integer
+          description: Check interval in seconds
+          example: 60
+        timeout:
+          type: integer
+          description: Timeout in seconds
+          example: 30
+        retry_count:
+          type: integer
+          example: 3
+        status:
+          type: string
+          enum: [up, down, degraded, unknown]
+          example: "up"
+        last_check_at:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2026-03-27T12:30:00+00:00"
+        next_check_at:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2026-03-27T12:31:00+00:00"
+        uptime_percentage:
+          type: string
+          nullable: true
+          example: "99.95"
+        active:
+          type: boolean
+          example: true
+        visible_on_status_page:
+          type: boolean
+          example: true
+        display_order:
+          type: integer
+          example: 0
+        created:
+          type: string
+          format: date-time
+          example: "2026-01-15T10:00:00+00:00"
+        modified:
+          type: string
+          format: date-time
+          example: "2026-03-27T12:30:00+00:00"
+
+    MonitorInput:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "API Server"
+        description:
+          type: string
+          nullable: true
+        type:
+          type: string
+          enum: [http, ping, port, api, ixc, zabbix, heartbeat, keyword, ssl]
+        configuration:
+          type: object
+          description: Configuration varies by monitor type
+        check_interval:
+          type: integer
+          description: Check interval in seconds
+        timeout:
+          type: integer
+          description: Timeout in seconds
+        retry_count:
+          type: integer
+        active:
+          type: boolean
+        visible_on_status_page:
+          type: boolean
+        display_order:
+          type: integer
+      required:
+        - name
+        - type
+
+    Incident:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 10
+        monitor_id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: "Main Website is DOWN"
+        description:
+          type: string
+          nullable: true
+          example: "HTTP check returned status 500"
+        status:
+          type: string
+          enum: [open, resolved, acknowledged]
+          example: "open"
+        severity:
+          type: string
+          enum: [critical, major, minor, info]
+          example: "critical"
+        started_at:
+          type: string
+          format: date-time
+          example: "2026-03-27T11:00:00+00:00"
+        resolved_at:
+          type: string
+          format: date-time
+          nullable: true
+          example: null
+        acknowledged_at:
+          type: string
+          format: date-time
+          nullable: true
+          example: null
+        acknowledged_via:
+          type: string
+          nullable: true
+          enum: [email, web, telegram, sms, null]
+          example: null
+        created:
+          type: string
+          format: date-time
+          example: "2026-03-27T11:00:00+00:00"
+        modified:
+          type: string
+          format: date-time
+          example: "2026-03-27T11:00:00+00:00"
+
+    IncidentInput:
+      type: object
+      properties:
+        monitor_id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [open, resolved, acknowledged]
+        severity:
+          type: string
+          enum: [critical, major, minor, info]
+
+    Check:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 100
+        monitor_id:
+          type: integer
+          example: 1
+        status:
+          type: string
+          enum: [up, down, degraded, unknown]
+          example: "up"
+        response_time:
+          type: integer
+          description: Response time in milliseconds
+          nullable: true
+          example: 245
+        status_code:
+          type: integer
+          nullable: true
+          example: 200
+        details:
+          type: string
+          nullable: true
+          description: JSON-encoded check details
+        region_id:
+          type: integer
+          nullable: true
+          description: Check region ID (multi-region checks)
+          example: null
+        created:
+          type: string
+          format: date-time
+          example: "2026-03-27T12:30:00+00:00"
+
+    AlertRule:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        monitor_id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Email on down"
+        trigger_type:
+          type: string
+          enum: [down, up, degraded, any]
+          example: "down"
+        channel:
+          type: string
+          enum: [email, slack, discord, telegram, webhook, sms, phone, push]
+          example: "email"
+        recipients:
+          type: string
+          description: JSON array of recipient addresses/URLs
+          example: '["admin@example.com"]'
+        template:
+          type: string
+          nullable: true
+          description: Optional JSON template configuration
+        cooldown_minutes:
+          type: integer
+          example: 15
+        active:
+          type: boolean
+          example: true
+        created:
+          type: string
+          format: date-time
+        modified:
+          type: string
+          format: date-time
+
+    AlertRuleInput:
+      type: object
+      properties:
+        monitor_id:
+          type: integer
+        name:
+          type: string
+        trigger_type:
+          type: string
+          enum: [down, up, degraded, any]
+        channel:
+          type: string
+          enum: [email, slack, discord, telegram, webhook, sms, phone, push]
+        recipients:
+          type: string
+          description: JSON array of recipient addresses/URLs
+        template:
+          type: string
+          nullable: true
+        cooldown_minutes:
+          type: integer
+        active:
+          type: boolean
+      required:
+        - monitor_id
+        - name
+        - trigger_type
+        - channel
+        - recipients
+
+    Error:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "An error occurred"
+            code:
+              type: integer
+              example: 400
+            errors:
+              type: object
+              description: Field-level validation errors
+              additionalProperties:
+                type: array
+                items:
+                  type: string

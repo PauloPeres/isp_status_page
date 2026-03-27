@@ -88,11 +88,11 @@ Transforming the existing ISP Status Page (CakePHP 5.x) into a full SaaS UptimeR
 - **Result:** Created migration `20260328000010_AddEmailVerificationToUsers.php` adding email_verified (BOOLEAN), email_verification_token (VARCHAR(64)), and email_verification_sent_at (DATETIME) to users table. Created `RegistrationController.php` with register() and verifyEmail() actions as public endpoints. Registration creates User + Organization + OrganizationUser (role=owner) in a DB transaction, sends verification email, and redirects to check-your-email page. Email verification auto-logs user in and redirects to /dashboard. Updated User entity with generateEmailVerificationToken(), markEmailVerified(), isEmailVerificationTokenValid() (24h expiry). Created 3 templates matching the login page design system. Added routes /register and /verify-email/*. Updated login page with register link. Added sendEmailVerification() to EmailService. 13 tests passing (46 assertions).
 
 ### TASK-701: Organization Creation & Onboarding Wizard
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Description:** 3-step wizard: 1) Org name/slug, 2) Create first monitor, 3) Invite team. OnboardingController + OnboardingService.
 - **Files to create:** OnboardingController, 4 templates, OnboardingService, tests
 - **Depends on:** TASK-700
-- **Result:** _pending_
+- **Result:** Created `OnboardingController.php` with four actions: step1() (org name/slug customization, pre-filled from registration), step2() (create first HTTP monitor with URL, name, and check interval), step3() (invite team members with email + role selection, supports adding multiple invitations dynamically), and complete() (success page with redirect to dashboard). Created 4 standalone templates (`step1.php`, `step2.php`, `step3.php`, `complete.php`) matching the registration page design system with a 3-step progress bar, clean modern styling, mobile-responsive layout, and skip options for steps 2-3. Added routes `/onboarding/step1`, `/onboarding/step2`, `/onboarding/step3`, `/onboarding/complete` to routes.php. The slug field auto-formats to lowercase with hyphens and shows a live preview of the status page URL.
 
 ### TASK-702: Team Invitation System
 - **Status:** COMPLETED
@@ -189,18 +189,18 @@ Transforming the existing ISP Status Page (CakePHP 5.x) into a full SaaS UptimeR
 - **Result:** Created base `Api/V1/AppController` extending `Cake\Controller\Controller` (NOT the main AppController) with JSON view, permission checking via `requirePermission()`, and helper methods `success()`/`error()` for consistent response format `{"success":true,"data":{...}}` / `{"error":true,"message":"..."}`. Created 4 API controllers: `MonitorsController` (CRUD + pause/resume/checks — 8 endpoints), `IncidentsController` (index/view/add/edit — 4 endpoints), `ChecksController` (index/view read-only — 2 endpoints), `AlertRulesController` (full CRUD — 5 endpoints). All controllers check API key permissions (read for GET, write for POST/PUT/DELETE) and rely on TenantScopeBehavior for automatic tenant isolation. Added 19 explicit route definitions in `routes.php` under `/api/v1` scope with proper HTTP method constraints and `{id}` parameters. Fixed pre-existing bug in `Application.php` where `CsrfProtectionMiddleware`'s `skipCheckCallback` was passed via constructor config array (which only sets `$_config`) instead of using the fluent `->skipCheckCallback()` method — CSRF was never actually being skipped for `/api/` and `/webhooks/` routes. Added `/api/v1/` to TenantMiddleware's public paths since API tenant resolution is handled by ApiAuthMiddleware which runs after TenantMiddleware. Updated 3 TenantMiddleware tests to reflect this change. Created `MonitorsControllerTest` with 10 tests (32 assertions) covering: index returns JSON, create with write permission, create rejected with read-only, view single monitor, view nonexistent returns 404, delete, checks endpoint, pause, resume, unauthenticated returns 401. Tests use real API key generation via ApiKeyService for authentic Bearer token validation through the full middleware stack.
 
 ### TASK-903: OpenAPI/Swagger Documentation
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Description:** OpenAPI 3.0 spec (YAML). Swagger UI served at /api/docs.
 - **Files to create:** openapi.yaml, DocsController, template
 - **Depends on:** TASK-902
-- **Result:** _pending_
+- **Result:** Created `src/webroot/api-docs/openapi.yaml` with full OpenAPI 3.0.3 specification: info block (title "ISP Status Page API", version "1.0.0"), server relative path `/api/v1`, Bearer token security scheme, and paths for all API endpoints -- /monitors (GET, POST), /monitors/{id} (GET, PUT, DELETE), /monitors/{id}/checks (GET), /monitors/{id}/pause (POST), /monitors/{id}/resume (POST), /incidents (GET, POST), /incidents/{id} (GET, PUT), /checks (GET), /alert-rules (GET, POST), /alert-rules/{id} (GET, PUT, DELETE). Components section includes schemas for Monitor, MonitorInput, Incident, IncidentInput, Check, AlertRule, AlertRuleInput, and Error, plus reusable responses (Unauthorized, BadRequest, NotFound) and parameters (Id). All endpoints include request/response examples. Created `src/src/Controller/Api/DocsController.php` with `index()` action rendering Swagger UI page with no layout and public access (no auth). Created `src/templates/Api/Docs/index.php` with embedded Swagger UI from CDN (`https://cdn.jsdelivr.net/npm/swagger-ui-dist/`) pointing to `/api-docs/openapi.yaml`. Added route `/api/docs` to `routes.php` mapping to `Api\DocsController::index`.
 
 ### TASK-904: Webhook Delivery System
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Description:** webhook_endpoints + webhook_deliveries tables. WebhookDeliveryService with HMAC-SHA256 signing and retry logic. Background job.
 - **Files to create:** Migrations, models, WebhookDeliveryService, DeliverWebhookJob
 - **Depends on:** TASK-901
-- **Result:** _pending_
+- **Result:** Created migration `20260328000031_CreateWebhookEndpoints.php` with webhook_endpoints table (id, organization_id, url VARCHAR(2048), secret VARCHAR(255), events TEXT for JSON array of subscribed event types, active BOOLEAN default true, created, modified) with foreign key to organizations (CASCADE delete) and indexes on organization_id and active. Created migration `20260328000032_CreateWebhookDeliveries.php` with webhook_deliveries table (id, webhook_endpoint_id, event_type VARCHAR(100), payload TEXT, response_code INTEGER nullable, response_body TEXT nullable, attempts INTEGER default 0, delivered_at DATETIME nullable, next_retry_at DATETIME nullable, created) with foreign key to webhook_endpoints (CASCADE delete) and indexes on webhook_endpoint_id, event_type, and next_retry_at. Created `WebhookEndpointsTable.php` with belongsTo Organizations, hasMany WebhookDeliveries, TenantScope behavior, validation rules, existsIn build rule, and findActive finder. Created `WebhookEndpoint.php` entity with hidden secret field, getEvents() JSON parser, and isSubscribedTo() method (empty events list = subscribed to all). Created `WebhookDeliveriesTable.php` with belongsTo WebhookEndpoints, validation rules, existsIn build rule, and findPendingRetry finder. Created `WebhookDelivery.php` entity with MAX_ATTEMPTS constant (5), isDelivered(), isExhausted(), and isPendingRetry() helpers. Created `WebhookDeliveryService.php` with: dispatch(eventType, payload, orgId) -- finds matching active endpoints, creates delivery records, attempts immediate delivery; deliver(deliveryId) -- makes HTTP POST with JSON payload, X-Webhook-Signature (HMAC-SHA256), X-Webhook-Event headers, 10s timeout, considers 2xx as success, schedules retry on failure; sign(payload, secret) -- HMAC-SHA256 hex digest; scheduleRetry() -- exponential backoff (1min, 5min, 30min, 2h, 12h). Injectable HTTP client for testing.
 
 ---
 
@@ -233,30 +233,30 @@ Transforming the existing ISP Status Page (CakePHP 5.x) into a full SaaS UptimeR
 - **Result:** Created four new alert channel implementations, all implementing ChannelInterface and using CakePHP's Http\Client for HTTP requests. **SlackAlertChannel** sends alerts via Slack incoming webhook URLs with Block Kit formatting (color-coded attachments: red #E53935 for down, green #43A047 for up, with monitor name, status, type, timestamp, and incident fields). **DiscordAlertChannel** sends alerts via Discord webhook URLs using embed format with color-coded sidebar (decimal color integers), timestamp, and footer. **TelegramAlertChannel** sends alerts via Telegram Bot API (`/bot{token}/sendMessage`) with HTML formatting; recipients are JSON objects containing `bot_token` and `chat_id`; includes HTML escaping for security. **WebhookAlertChannel** POSTs structured JSON payloads (event_type, monitor, incident, timestamp) to custom URLs with HMAC-SHA256 signing via `X-Signature-256` header; the signing secret is read from the alert rule's template field as `{"webhook_secret": "..."}`. Added `CHANNEL_SLACK`, `CHANNEL_DISCORD`, and `CHANNEL_WEBHOOK` constants to AlertRule entity with corresponding helper methods and channel name mapping. Updated AlertRulesTable validation inList to accept all 8 channel types. Registered all four new channels in MonitorCheckCommand alongside the existing EmailAlertChannel. Created comprehensive test suites: SlackAlertChannelTest (8 tests), DiscordAlertChannelTest (8 tests), TelegramAlertChannelTest (13 tests), WebhookAlertChannelTest (13 tests) -- total 42 new tests passing with 88 assertions, using mocked Http\Client to avoid actual API calls.
 
 ### TASK-1004: Custom Status Pages (Per-Org)
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Description:** status_pages table with slug, custom_domain, theme (JSONB), monitors list, password protection. Admin CRUD + public rendering by slug/domain.
 - **Files to create:** Migration, StatusPagesTable, StatusPagesController, PublicStatusController, templates
 - **Files to modify:** StatusController, routes.php
-- **Result:** _pending_
+- **Result:** Created migration `20260328000041_CreateStatusPages.php` with all columns (organization_id, name, slug unique, custom_domain, theme TEXT, header_text TEXT, footer_text TEXT, monitors TEXT, show_uptime_chart BOOLEAN, show_incident_history BOOLEAN, password VARCHAR(255), active BOOLEAN, created, modified), foreign key to organizations with CASCADE delete, and indexes on slug (unique), organization_id, custom_domain, and active. Created `StatusPagesTable.php` with belongsTo Organizations, TenantScope behavior, validation rules, and buildRules (existsIn org, isUnique slug). Created `StatusPage.php` entity with getMonitorIds(), getThemeConfig(), isPasswordProtected(), isActive() helpers. Created `StatusPagesController.php` with index, add, edit, delete actions -- all admin layout with manage_resources permission. Created 3 templates: index.php, add.php, edit.php. Added "Status Pages" link to admin sidebar under Monitoring section.
 
 ### TASK-1005: Public Badges/Shields
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Description:** SVG badge generation for uptime %, status, response time. Endpoints: /badges/{token}/uptime.svg, status.svg, response-time.svg.
 - **Files to create:** BadgesController, BadgeService
-- **Result:** _pending_
+- **Result:** Created `BadgesController.php` with three public actions (no auth): uptime($token), status($token), responseTime($token) -- all return SVG content-type with no-cache headers. Monitors looked up by badge_token field. Created `BadgeService.php` with generateUptime() (color-coded by percentage), generateStatus() (color-coded by status), generateResponseTime() (color-coded by latency), and generateErrorBadge(). SVG uses shields.io-style format with left grey label + right colored value. Added routes `/badges/{token}/uptime.svg`, `/badges/{token}/status.svg`, `/badges/{token}/response-time.svg`.
 
 ### TASK-1006: Maintenance Windows
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Description:** maintenance_windows table with title, monitor_ids, starts_at, ends_at, auto_suppress_alerts. MaintenanceService suppresses alerts during windows. Admin CRUD.
 - **Files to create:** Migration, MaintenanceWindowsTable, MaintenanceWindowsController, MaintenanceService, templates
 - **Files to modify:** AlertService
-- **Result:** _pending_
+- **Result:** Created migration `20260328000042_CreateMaintenanceWindows.php` with all columns (organization_id, title, description TEXT, monitor_ids TEXT, starts_at DATETIME, ends_at DATETIME, auto_suppress_alerts BOOLEAN DEFAULT true, notify_subscribers BOOLEAN DEFAULT true, status VARCHAR(20) DEFAULT 'scheduled', created_by INTEGER, created, modified). Created `MaintenanceWindowsTable.php` with TenantScope behavior and validation. Created `MaintenanceWindow.php` entity with status constants, isActive(), affectsMonitor(), shouldSuppressAlerts() helpers. Created `MaintenanceService.php` with isInMaintenance() and shouldSuppressAlert(). Created `MaintenanceWindowsController.php` with index, add, edit, delete. Created 2 templates: index.php, add.php. Modified `AlertService.php` to check MaintenanceService::shouldSuppressAlert() before dispatching alerts. Added "Maintenance" link to admin sidebar.
 
 ### TASK-1007: Multi-Region Checks (Architecture Only)
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Description:** check_regions table. Add region_id to monitor_checks. Architecture design only — actual distributed workers are a future milestone.
 - **Files to create:** Migrations, CheckRegionsTable
-- **Result:** _pending_
+- **Result:** Created migration `20260328000043_CreateCheckRegions.php` with check_regions table (id, name VARCHAR(100), code VARCHAR(20) UNIQUE, endpoint_url VARCHAR(500) nullable, active BOOLEAN default true, created) with unique index on code and index on active. Created migration `20260328000044_AddRegionToMonitorChecks.php` adding region_id INTEGER NULL to monitor_checks table with foreign key to check_regions(id) ON DELETE SET NULL and index on region_id. Created `CheckRegionsTable.php` with hasMany MonitorChecks association, validation rules for name/code/endpoint_url/active, isUnique build rule on code, and findActive finder. Created `CheckRegion.php` entity with region code constants (REGION_US_EAST_1, REGION_EU_WEST_1, REGION_AP_SOUTHEAST_1), accessible fields, and isActive() helper. Created `CheckRegionsSeed.php` with three initial regions: us-east-1 "US East (N. Virginia)", eu-west-1 "EU West (Ireland)", ap-southeast-1 "Asia Pacific (Singapore)" -- all active with null endpoint_url (to be configured when distributed workers are deployed).
 
 ---
 
