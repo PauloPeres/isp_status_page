@@ -137,9 +137,15 @@ if ($cacheDriver === 'redis' && $redisUrl) {
     ];
 }
 
-// Build session configuration
+// Build session configuration (TASK-AUTH-007: secure cookie flags)
 $sessionConfig = [
     'defaults' => 'php',
+    'ini' => [
+        'session.cookie_httponly' => true,
+        'session.cookie_samesite' => 'Lax',
+        'session.use_strict_mode' => true,
+        // For production, also enable: 'session.cookie_secure' => true,
+    ],
 ];
 
 if ($sessionDriver === 'redis' && $redisUrl) {
@@ -148,6 +154,10 @@ if ($sessionDriver === 'redis' && $redisUrl) {
         'ini' => [
             'session.save_handler' => 'redis',
             'session.save_path' => "tcp://{$redisHost}:{$redisPort}?database=3",
+            'session.cookie_httponly' => true,
+            'session.cookie_samesite' => 'Lax',
+            'session.use_strict_mode' => true,
+            // For production, also enable: 'session.cookie_secure' => true,
         ],
     ];
 }

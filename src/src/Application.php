@@ -34,6 +34,7 @@ use Cake\Routing\Middleware\RoutingMiddleware;
 use App\Middleware\ApiAuthMiddleware;
 use App\Middleware\ApiRateLimitMiddleware;
 use App\Middleware\PlanLimitMiddleware;
+use App\Middleware\SecurityHeadersMiddleware;
 use App\Middleware\SuperAdminMiddleware;
 use App\Middleware\TenantMiddleware;
 use Psr\Http\Message\ServerRequestInterface;
@@ -87,6 +88,9 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
     public function middleware(MiddlewareQueue $middlewareQueue): MiddlewareQueue
     {
         $middlewareQueue
+            // Security headers on all responses (TASK-AUTH-008)
+            ->add(new SecurityHeadersMiddleware())
+
             // Catch any exceptions in the lower layers,
             // and make an error page/response
             ->add(new ErrorHandlerMiddleware(Configure::read('Error'), $this))

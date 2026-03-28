@@ -275,6 +275,19 @@ $this->assign('title', __d('users', 'Edit Profile'));
 
             <div class="form-row">
                 <div class="form-group">
+                    <label><?= __d('users', 'Current Password') ?></label>
+                    <?= $this->Form->control('current_password', [
+                        'label' => false,
+                        'type' => 'password',
+                        'required' => false,
+                        'value' => '',
+                        'placeholder' => __d('users', 'Enter your current password')
+                    ]) ?>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
                     <label><?= __d('users', 'New Password') ?></label>
                     <?= $this->Form->control('new_password', [
                         'label' => false,

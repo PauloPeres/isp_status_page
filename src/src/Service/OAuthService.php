@@ -354,8 +354,8 @@ class OAuthService
             ->first();
 
         if ($existingEmailUser) {
-            $existingEmailUser->oauth_provider = $provider;
-            $existingEmailUser->oauth_id = $providerUser['id'];
+            $existingEmailUser->set('oauth_provider', $provider);
+            $existingEmailUser->set('oauth_id', $providerUser['id']);
 
             if ($usersTable->save($existingEmailUser)) {
                 $this->log("Linked OAuth {$provider} to existing user: {$existingEmailUser->email}", 'info');
@@ -396,16 +396,17 @@ class OAuthService
                 $username = $this->generateUsername($providerUser['name'], $providerUser['email']);
 
                 // Create user (no password needed for OAuth-only accounts)
+                // Only mass-assign safe fields; set sensitive fields directly
                 $user = $usersTable->newEntity([
                     'username' => $username,
                     'email' => $providerUser['email'],
                     'password' => bin2hex(random_bytes(32)), // Random password (won't be used)
-                    'role' => 'admin',
-                    'active' => true,
-                    'email_verified' => true,
-                    'oauth_provider' => $provider,
-                    'oauth_id' => $providerUser['id'],
                 ]);
+                $user->set('role', 'admin');
+                $user->set('active', true);
+                $user->set('email_verified', true);
+                $user->set('oauth_provider', $provider);
+                $user->set('oauth_id', $providerUser['id']);
 
                 if (!$usersTable->save($user)) {
                     $this->log('Failed to create OAuth user: ' . json_encode($user->getErrors()), 'error');
