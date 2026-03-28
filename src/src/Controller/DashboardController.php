@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Service\MonitorCacheService;
+use App\Service\SlaService;
 use App\Service\UptimeCalculationService;
 use Cake\I18n\DateTime;
 
@@ -121,6 +122,10 @@ class DashboardController extends AppController
             ->limit(10)
             ->all();
 
+        // SLA summary for dashboard
+        $slaService = new SlaService();
+        $slaSummary = $slaService->getDashboardSummary($orgId);
+
         $this->set(compact(
             'summary',
             'activeIncidents',
@@ -128,7 +133,8 @@ class DashboardController extends AppController
             'uptimeData',
             'responseTimeData',
             'recentChecks',
-            'recentAlerts'
+            'recentAlerts',
+            'slaSummary'
         ));
     }
 }

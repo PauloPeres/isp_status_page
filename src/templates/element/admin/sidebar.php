@@ -109,6 +109,15 @@ function isActive($currentController, $targetController, $currentAction = null, 
                     'class' => 'nav-item' . (isActive($controller, 'Reports') ? ' active' : '')
                 ]
             ) ?>
+
+            <?= $this->Html->link(
+                '<span class="nav-icon">&#x1F4DD;</span> ' . __('SLA'),
+                ['controller' => 'Sla', 'action' => 'index'],
+                [
+                    'escape' => false,
+                    'class' => 'nav-item' . (isActive($controller, 'Sla') ? ' active' : '')
+                ]
+            ) ?>
         </div>
 
         <div class="nav-section">

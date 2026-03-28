@@ -282,6 +282,38 @@ return function (RouteBuilder $routes): void {
         );
 
         /*
+         * SLA Tracking routes (P4-004)
+         */
+        $builder->connect(
+            '/sla',
+            ['controller' => 'Sla', 'action' => 'index']
+        );
+        $builder->connect(
+            '/sla/add',
+            ['controller' => 'Sla', 'action' => 'add']
+        );
+        $builder->connect(
+            '/sla/edit/{id}',
+            ['controller' => 'Sla', 'action' => 'edit'],
+            ['pass' => ['id'], 'id' => '\d+']
+        );
+        $builder->connect(
+            '/sla/delete/{id}',
+            ['controller' => 'Sla', 'action' => 'delete'],
+            ['pass' => ['id'], 'id' => '\d+']
+        );
+        $builder->connect(
+            '/sla/report/{id}',
+            ['controller' => 'Sla', 'action' => 'report'],
+            ['pass' => ['id'], 'id' => '\d+']
+        );
+        $builder->connect(
+            '/sla/export/{id}',
+            ['controller' => 'Sla', 'action' => 'exportReport'],
+            ['pass' => ['id'], 'id' => '\d+']
+        );
+
+        /*
          * Monitor bulk operations routes (P2-013)
          */
         $builder->connect(

@@ -257,7 +257,29 @@ class MonitorsController extends AppController
             ];
         }
 
-        $this->set(compact('monitor', 'uptime', 'avgResponseTime', 'totalChecks', 'responseTimeData', 'uptimeData', 'timeRange'));
+        // SLA integration: check if this monitor has an SLA definition
+        $slaData = null;
+        try {
+            $slaDefinitionsTable = $this->fetchTable('SlaDefinitions');
+            $slaDef = $slaDefinitionsTable->find()
+                ->where(['SlaDefinitions.monitor_id' => $id, 'SlaDefinitions.active' => true])
+                ->first();
+            if ($slaDef) {
+                $slaService = new \App\Service\SlaService();
+                $slaData = $slaService->calculateCurrentSla(
+                    (int)$id,
+                    $slaDef->measurement_period,
+                    (float)$slaDef->target_uptime,
+                    $slaDef->warning_threshold !== null ? (float)$slaDef->warning_threshold : null
+                );
+                $slaData['sla_id'] = $slaDef->id;
+                $slaData['sla_name'] = $slaDef->name;
+            }
+        } catch (\Exception $e) {
+            // SLA tables may not exist yet; silently ignore
+        }
+
+        $this->set(compact('monitor', 'uptime', 'avgResponseTime', 'totalChecks', 'responseTimeData', 'uptimeData', 'timeRange', 'slaData'));
     }
 
     /**

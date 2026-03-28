@@ -377,11 +377,12 @@
 - **Complexity:** Medium
 - **Dependencies:** Alert channel infrastructure (completed)
 
-### P4-004: SLA tracking
+### P4-004: SLA tracking -- DONE
 - **Source:** PROJECT_SUMMARY.md (2026 Q1-Q2 planned)
 - **Description:** SLA definition per monitor, tracking actual vs. committed uptime, SLA breach alerts, and SLA reports.
 - **Complexity:** Large
 - **Dependencies:** Rollup data (DB-007)
+- **Resolution:** Full SLA tracking system implemented. Migrations for sla_definitions and sla_reports tables. SlaService with calculateCurrentSla(), generateReport(), checkAllSlas(), getDashboardSummary(). SlaController with index/add/edit/delete/report/exportReport actions. Templates for all views including trend charts (Chart.js) and downtime budget visualizations. Dashboard integration showing SLA summary card. Monitor view integration showing SLA status and budget bar when monitor has an SLA. Sidebar link and routes added.
 
 ### P4-005: TimescaleDB evaluation and migration
 - **Source:** DB_OPTIMIZATION_PLAN.md (DB-012), DB_SPECIALIST_FINDINGS.md

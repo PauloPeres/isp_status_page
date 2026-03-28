@@ -8,6 +8,7 @@
  * @var array $responseTimeData
  * @var array $uptimeData
  * @var string $timeRange
+ * @var array|null $slaData
  */
 $this->assign('title', __d('monitors', 'Monitor Details'));
 ?>
@@ -49,6 +50,65 @@ $this->assign('title', __d('monitors', 'Monitor Details'));
             </div>
         </div>
     </div>
+
+    <!-- SLA Status (if monitor has an SLA) -->
+    <?php if (!empty($slaData)): ?>
+        <?php
+        $slaStatusBadge = match ($slaData['status']) {
+            'compliant' => 'badge-success',
+            'at_risk' => 'badge-warning',
+            'breached' => 'badge-danger',
+            default => 'badge-secondary',
+        };
+        $slaStatusLabel = match ($slaData['status']) {
+            'compliant' => __d('monitors', 'Compliant'),
+            'at_risk' => __d('monitors', 'At Risk'),
+            'breached' => __d('monitors', 'Breached'),
+            default => __d('monitors', 'Unknown'),
+        };
+        $slaUsage = $slaData['allowed_downtime_minutes'] > 0
+            ? min(100, ($slaData['downtime_minutes'] / $slaData['allowed_downtime_minutes']) * 100)
+            : 100;
+        $slaBarColor = $slaUsage > 90 ? 'var(--color-error)' :
+                      ($slaUsage > 70 ? 'var(--color-warning)' : 'var(--color-success)');
+        ?>
+        <div class="card" style="margin-bottom: 24px;">
+            <div class="card-header" style="display: flex; align-items: center; justify-content: space-between;">
+                <span><?= __d('monitors', 'SLA: {0}', h($slaData['sla_name'])) ?></span>
+                <span class="badge <?= $slaStatusBadge ?>"><?= $slaStatusLabel ?></span>
+            </div>
+            <div style="padding: 20px;">
+                <div style="display: flex; align-items: center; gap: 24px; flex-wrap: wrap; margin-bottom: 16px;">
+                    <div>
+                        <span style="font-size: 13px; color: var(--color-gray-medium);"><?= __d('monitors', 'Target') ?></span><br>
+                        <strong style="font-size: 20px;"><?= number_format($slaData['target_uptime'], 3) ?>%</strong>
+                    </div>
+                    <div>
+                        <span style="font-size: 13px; color: var(--color-gray-medium);"><?= __d('monitors', 'Current') ?></span><br>
+                        <strong style="font-size: 20px;"><?= number_format($slaData['actual_uptime'], 3) ?>%</strong>
+                    </div>
+                    <div>
+                        <span style="font-size: 13px; color: var(--color-gray-medium);"><?= __d('monitors', 'Remaining Budget') ?></span><br>
+                        <strong style="font-size: 20px;"><?= number_format($slaData['remaining_downtime_minutes'], 1) ?> min</strong>
+                    </div>
+                </div>
+                <div style="margin-bottom: 12px;">
+                    <div style="width: 100%; height: 10px; background: var(--color-gray-light); border-radius: 5px; overflow: hidden;">
+                        <div style="width: <?= number_format($slaUsage, 1) ?>%; height: 100%; background: <?= $slaBarColor ?>; border-radius: 5px; transition: width 0.3s;"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--color-gray-medium); margin-top: 4px;">
+                        <span><?= number_format($slaData['downtime_minutes'], 1) ?> min used</span>
+                        <span><?= number_format($slaData['allowed_downtime_minutes'], 1) ?> min allowed</span>
+                    </div>
+                </div>
+                <?= $this->Html->link(
+                    __d('monitors', 'View Full SLA Report'),
+                    ['controller' => 'Sla', 'action' => 'report', $slaData['sla_id']],
+                    ['class' => 'btn btn-primary', 'style' => 'font-size: 13px; padding: 6px 16px;']
+                ) ?>
+            </div>
+        </div>
+    <?php endif; ?>
 
     <!-- Statistics -->
     <div class="stats-grid">
