@@ -35,7 +35,7 @@ The monitor_checks table is the highest-volume table in the system. At SaaS scal
 - **Depends on:** DB-004
 
 ### TASK-DB-006: PostgreSQL Table Partitioning
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Priority:** HIGH (defer for small/medium scale)
 - **Description:** Weekly range partitions on checked_at. ManagePartitionsCommand for creating future/dropping expired partitions. BIGSERIAL PK.
 
