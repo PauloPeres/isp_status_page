@@ -32,6 +32,8 @@ use Cake\ORM\Entity;
  * @property \App\Model\Entity\MonitorCheck[] $monitor_checks
  * @property \App\Model\Entity\Subscription[] $subscriptions
  * @property string|null $tags
+ * @property int|null $escalation_policy_id
+ * @property \App\Model\Entity\EscalationPolicy|null $escalation_policy
  */
 class Monitor extends Entity
 {
@@ -90,6 +92,8 @@ class Monitor extends Entity
         'monitor_checks' => true,
         'subscriptions' => true,
         'tags' => true,
+        'escalation_policy_id' => true,
+        'escalation_policy' => true,
     ];
 
     /**

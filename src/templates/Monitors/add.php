@@ -208,6 +208,20 @@ $this->assign('title', __d('monitors', 'New Monitor'));
             <?= $this->element('monitor/form_ssl', ['monitor' => $monitor]) ?>
         </div>
 
+        <?php if (!empty($escalationPolicies)): ?>
+        <div class="form-section">
+            <h3 class="form-section-title"><?= __('Escalation Policy') ?></h3>
+            <div class="form-group">
+                <label><?= __('Escalation Policy') ?></label>
+                <?= $this->Form->select('escalation_policy_id', $escalationPolicies, [
+                    'empty' => __('-- None (no escalation) --'),
+                    'class' => 'form-control',
+                ]) ?>
+                <small class="form-help"><?= __('Optional: automatically escalate alerts if incidents are not acknowledged') ?></small>
+            </div>
+        </div>
+        <?php endif; ?>
+
         <div class="form-section">
             <h3 class="form-section-title"><?= __d('monitors', 'Check Settings') ?></h3>
 

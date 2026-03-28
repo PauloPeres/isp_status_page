@@ -396,11 +396,12 @@
 - **Complexity:** Large
 - **Dependencies:** TASK-1007 (completed architecture)
 
-### P4-007: Alert escalation policies
+### P4-007: Alert escalation policies -- DONE
 - **Source:** USER_TESTING_POWER_USER.md (Recommendation #7)
 - **Description:** Define escalation policies: if no acknowledgment in 5 minutes, escalate to phone call; if no acknowledgment in 15 minutes, page the team lead. Critical for on-call teams.
 - **Complexity:** Large
 - **Dependencies:** Alert channels, acknowledgment system (completed)
+- **Resolution:** Full escalation policy system implemented. Three migrations: escalation_policies, escalation_steps, and escalation_policy_id on monitors. EscalationPolicy/EscalationStep entities and tables with proper associations and validation. EscalationService processes escalation steps based on incident duration, checking alert_logs to avoid duplicate executions, with optional repeat cycle support. EscalationCheckCommand runs every minute via cron, finding unresolved unacknowledged incidents and triggering appropriate escalation steps. EscalationPoliciesController with full CRUD (index/add/edit/delete/view). Templates include dynamic step builder with JavaScript for add/remove, visual escalation timeline on view page, and monitor linkage display. Monitor add/edit forms include optional escalation policy dropdown. Sidebar link added under Monitoring section. Routes for /escalation-policies. Docker entrypoint updated with escalation_check cron job. AlertService extended with dispatchToChannel() method for escalation use.
 
 ### P4-008: Notification scheduling (quiet hours)
 - **Source:** USER_TESTING_POWER_USER.md

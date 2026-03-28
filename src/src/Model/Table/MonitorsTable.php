@@ -71,6 +71,10 @@ class MonitorsTable extends Table
             'foreignKey' => 'organization_id',
             'joinType' => 'INNER',
         ]);
+        $this->belongsTo('EscalationPolicies', [
+            'foreignKey' => 'escalation_policy_id',
+            'joinType' => 'LEFT',
+        ]);
     }
 
     /**

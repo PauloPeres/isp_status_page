@@ -314,6 +314,33 @@ return function (RouteBuilder $routes): void {
         );
 
         /*
+         * Escalation Policies routes (P4-007)
+         */
+        $builder->connect(
+            '/escalation-policies',
+            ['controller' => 'EscalationPolicies', 'action' => 'index']
+        );
+        $builder->connect(
+            '/escalation-policies/add',
+            ['controller' => 'EscalationPolicies', 'action' => 'add']
+        );
+        $builder->connect(
+            '/escalation-policies/edit/{id}',
+            ['controller' => 'EscalationPolicies', 'action' => 'edit'],
+            ['pass' => ['id'], 'id' => '\d+']
+        );
+        $builder->connect(
+            '/escalation-policies/delete/{id}',
+            ['controller' => 'EscalationPolicies', 'action' => 'delete'],
+            ['pass' => ['id'], 'id' => '\d+']
+        );
+        $builder->connect(
+            '/escalation-policies/view/{id}',
+            ['controller' => 'EscalationPolicies', 'action' => 'view'],
+            ['pass' => ['id'], 'id' => '\d+']
+        );
+
+        /*
          * Monitor bulk operations routes (P2-013)
          */
         $builder->connect(

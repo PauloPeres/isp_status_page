@@ -327,7 +327,9 @@ class MonitorsController extends AppController
             $this->Flash->error(__d('monitors', 'Unable to create monitor. Please try again.'));
         }
 
-        $this->set(compact('monitor'));
+        // Load escalation policies for dropdown
+        $escalationPolicies = $this->getEscalationPoliciesForDropdown();
+        $this->set(compact('monitor', 'escalationPolicies'));
     }
 
     /**
@@ -374,7 +376,9 @@ class MonitorsController extends AppController
             $this->Flash->error(__d('monitors', 'Unable to update monitor. Please try again.'));
         }
 
-        $this->set(compact('monitor'));
+        // Load escalation policies for dropdown
+        $escalationPolicies = $this->getEscalationPoliciesForDropdown();
+        $this->set(compact('monitor', 'escalationPolicies'));
     }
 
     /**
@@ -847,6 +851,27 @@ class MonitorsController extends AppController
             if ($created > 0) {
                 return $this->redirect(['action' => 'index']);
             }
+        }
+    }
+
+    /**
+     * Get escalation policies available for dropdown selection.
+     *
+     * @return array<int, string> Policy options for dropdown
+     */
+    private function getEscalationPoliciesForDropdown(): array
+    {
+        try {
+            $policiesTable = $this->fetchTable('EscalationPolicies');
+
+            return $policiesTable->find()
+                ->where(['EscalationPolicies.active' => true])
+                ->orderBy(['EscalationPolicies.name' => 'ASC'])
+                ->find('list', keyField: 'id', valueField: 'name')
+                ->toArray();
+        } catch (\Exception $e) {
+            // Table may not exist yet
+            return [];
         }
     }
 }

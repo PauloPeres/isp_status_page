@@ -102,11 +102,28 @@ EOF
 
     chmod +x /usr/local/bin/monitor-check-cron.sh
 
+    # Create wrapper script for escalation checks
+    cat > /usr/local/bin/escalation-check-cron.sh <<EOF
+#!/bin/bash
+export DATABASE_URL="${DATABASE_URL}"
+export REDIS_URL="${REDIS_URL}"
+export CACHE_DRIVER="${CACHE_DRIVER}"
+export SESSION_DRIVER="${SESSION_DRIVER}"
+cd /var/www/html
+bin/cake escalation_check
+EOF
+
+    chmod +x /usr/local/bin/escalation-check-cron.sh
+
     # Create cron job file
     cat > /etc/cron.d/isp-status-cron <<EOF
 # ISP Status Page - Monitor Check Cron
 # Runs every minute to check all monitors
 * * * * * www-data /usr/local/bin/monitor-check-cron.sh >> /var/www/html/logs/cron.log 2>&1
+
+# ISP Status Page - Escalation Check Cron
+# Runs every minute to process escalation policies for unacknowledged incidents
+* * * * * www-data /usr/local/bin/escalation-check-cron.sh >> /var/www/html/logs/escalation.log 2>&1
 
 EOF
 

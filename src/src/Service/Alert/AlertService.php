@@ -251,6 +251,54 @@ class AlertService
     }
 
     /**
+     * Dispatch an alert directly to a specific channel with explicit recipients.
+     * Used by the EscalationService to send escalation step alerts.
+     *
+     * @param string $channelType The channel type (email, slack, discord, etc.)
+     * @param array $recipients List of recipients
+     * @param \App\Model\Entity\Monitor $monitor The monitor
+     * @param \App\Model\Entity\Incident $incident The incident
+     * @param string $message Custom message to send
+     * @return bool True if the alert was sent successfully
+     */
+    public function dispatchToChannel(
+        string $channelType,
+        array $recipients,
+        Monitor $monitor,
+        Incident $incident,
+        string $message = '',
+    ): bool {
+        $channel = $this->getChannel($channelType);
+
+        if ($channel === null) {
+            Log::warning("Escalation: No channel registered for type: {$channelType}");
+
+            return false;
+        }
+
+        try {
+            // Create a temporary AlertRule-like entity for the channel
+            $alertRulesTable = $this->fetchTable('AlertRules');
+            $tempRule = $alertRulesTable->newEmptyEntity();
+            $tempRule->channel = $channelType;
+            $tempRule->recipients = json_encode($recipients);
+            $tempRule->template = $message;
+            $tempRule->monitor_id = $monitor->id;
+            $tempRule->trigger_on = AlertRule::TRIGGER_ON_DOWN;
+            $tempRule->active = true;
+            $tempRule->throttle_minutes = 0;
+
+            $result = $channel->send($tempRule, $monitor, $incident);
+
+            return !empty($result['success']);
+        } catch (\Exception $e) {
+            Log::error("Escalation dispatchToChannel failed for {$channelType}: {$e->getMessage()}");
+
+            return false;
+        }
+    }
+
+    /**
      * Log an alert dispatch result
      *
      * @param \App\Model\Entity\AlertRule $rule The alert rule

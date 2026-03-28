@@ -75,6 +75,15 @@ function isActive($currentController, $targetController, $currentAction = null, 
             ) ?>
 
             <?= $this->Html->link(
+                '<span class="nav-icon">&#x26A1;</span> ' . __('Escalation'),
+                ['controller' => 'EscalationPolicies', 'action' => 'index'],
+                [
+                    'escape' => false,
+                    'class' => 'nav-item' . (isActive($controller, 'EscalationPolicies') ? ' active' : '')
+                ]
+            ) ?>
+
+            <?= $this->Html->link(
                 '<span class="nav-icon">🔗</span> ' . __('Integrations'),
                 ['controller' => 'Integrations', 'action' => 'index'],
                 [
