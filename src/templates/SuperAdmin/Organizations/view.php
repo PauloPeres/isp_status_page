@@ -8,6 +8,9 @@
  * @var \Cake\Collection\CollectionInterface $monitors
  * @var \Cake\Collection\CollectionInterface $recentChecks
  * @var \Cake\Collection\CollectionInterface $recentIncidents
+ * @var \App\Model\Entity\NotificationCredit $credits
+ * @var array $creditUsage
+ * @var \Cake\Collection\CollectionInterface $creditTransactions
  */
 $this->assign('title', h($org->name));
 ?>
@@ -141,6 +144,125 @@ $this->assign('title', h($org->name));
             </tbody>
         </table>
     </div>
+</div>
+
+<!-- Notification Credits -->
+<div class="table-card" style="margin-top: 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 style="margin: 0;"><?= __('Notification Credits') ?></h3>
+    </div>
+
+    <div class="summary-grid" style="margin-bottom: 16px;">
+        <div class="summary-card">
+            <div class="card-label"><?= __('Current Balance') ?></div>
+            <div class="card-value" style="color: #3b82f6; font-size: 1.5rem;"><?= h($credits->balance) ?></div>
+        </div>
+        <div class="summary-card">
+            <div class="card-label"><?= __('Monthly Grant') ?></div>
+            <div class="card-value"><?= h($credits->monthly_grant) ?></div>
+        </div>
+        <div class="summary-card">
+            <div class="card-label"><?= __('Used This Month') ?></div>
+            <div class="card-value" style="color: #ef4444;"><?= h($creditUsage['used'] ?? 0) ?></div>
+        </div>
+        <div class="summary-card">
+            <div class="card-label"><?= __('Auto-Recharge') ?></div>
+            <div class="card-value">
+                <?php if ($credits->auto_recharge): ?>
+                    <span class="badge badge-success"><?= __('On') ?></span>
+                <?php else: ?>
+                    <span class="badge badge-secondary"><?= __('Off') ?></span>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grant Credits Form -->
+    <div style="background: #f8fafc; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+        <h4 style="margin-top: 0; margin-bottom: 12px;"><?= __('Grant Credits') ?></h4>
+        <?= $this->Form->create(null, [
+            'url' => ['action' => 'grantCredits', $org->id],
+            'style' => 'display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;',
+        ]) ?>
+            <div style="flex: 0 0 120px;">
+                <label style="display: block; font-size: 0.85rem; margin-bottom: 4px; color: #64748b;"><?= __('Amount') ?></label>
+                <?= $this->Form->number('amount', [
+                    'min' => 1,
+                    'value' => 50,
+                    'style' => 'width: 100%; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px;',
+                    'required' => true,
+                ]) ?>
+            </div>
+            <div style="flex: 1; min-width: 200px;">
+                <label style="display: block; font-size: 0.85rem; margin-bottom: 4px; color: #64748b;"><?= __('Reason') ?></label>
+                <?= $this->Form->text('reason', [
+                    'value' => 'Manual grant by admin',
+                    'style' => 'width: 100%; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px;',
+                ]) ?>
+            </div>
+            <button type="submit" class="btn btn-primary" style="padding: 8px 20px; white-space: nowrap;"
+                onclick="return confirm('<?= __('Grant credits to this organization?') ?>')">
+                <?= __('Grant Credits') ?>
+            </button>
+        <?= $this->Form->end() ?>
+    </div>
+
+    <!-- Recent Credit Transactions -->
+    <?php if (!$creditTransactions->isEmpty()): ?>
+    <h4><?= __('Recent Credit Transactions') ?></h4>
+    <div class="table-responsive">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th><?= __('Date') ?></th>
+                    <th><?= __('Type') ?></th>
+                    <th><?= __('Amount') ?></th>
+                    <th><?= __('Balance After') ?></th>
+                    <th><?= __('Channel') ?></th>
+                    <th><?= __('Description') ?></th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($creditTransactions as $tx): ?>
+                <tr>
+                    <td>
+                        <?php if ($tx->created): ?>
+                            <span class="utc-datetime" data-utc="<?= $tx->created->format('c') ?>">
+                                <?= $tx->created->nice() ?>
+                            </span>
+                        <?php else: ?>
+                            -
+                        <?php endif; ?>
+                    </td>
+                    <td>
+                        <?php
+                        $typeBadge = match ($tx->type) {
+                            'usage' => 'badge-danger',
+                            'purchase' => 'badge-info',
+                            'monthly_grant' => 'badge-success',
+                            'manual_adjustment' => 'badge-warning',
+                            'refund' => 'badge-secondary',
+                            default => 'badge-secondary',
+                        };
+                        ?>
+                        <span class="badge <?= $typeBadge ?>"><?= h(ucfirst(str_replace('_', ' ', $tx->type))) ?></span>
+                    </td>
+                    <td>
+                        <span style="color: <?= $tx->amount >= 0 ? '#22c55e' : '#ef4444' ?>; font-weight: 600;">
+                            <?= $tx->amount >= 0 ? '+' : '' ?><?= h($tx->amount) ?>
+                        </span>
+                    </td>
+                    <td><?= h($tx->balance_after) ?></td>
+                    <td><?= $tx->channel ? h(ucfirst($tx->channel)) : '-' ?></td>
+                    <td><?= h($tx->description ?? '-') ?></td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php else: ?>
+    <p style="color: #94a3b8; text-align: center; padding: 16px;"><?= __('No credit transactions yet.') ?></p>
+    <?php endif; ?>
 </div>
 
 <!-- Team Members -->

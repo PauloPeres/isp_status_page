@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Model\Entity\Plan;
+use App\Service\Billing\NotificationCreditService;
 use App\Service\Billing\StripeService;
 use App\Service\Billing\UsageService;
 use Cake\ORM\Locator\LocatorAwareTrait;
@@ -48,7 +49,54 @@ class BillingController extends AppController
             $limits = $usageService->getLimits($orgId);
         }
 
-        $this->set(compact('plans', 'currentPlan', 'usage', 'limits'));
+        $credits = null;
+        $recentTransactions = [];
+        $monthlyUsage = [];
+        if ($orgId) {
+            $creditService = new NotificationCreditService();
+            $credits = $creditService->getCredits($orgId);
+            $monthlyUsage = $creditService->getMonthlyUsage($orgId);
+            $recentTransactions = $this->fetchTable('NotificationCreditTransactions')
+                ->find()
+                ->where(['organization_id' => $orgId])
+                ->orderBy(['created' => 'DESC'])
+                ->limit(10)
+                ->all();
+        }
+
+        $this->set(compact('plans', 'currentPlan', 'usage', 'limits', 'credits', 'recentTransactions', 'monthlyUsage'));
+    }
+
+    /**
+     * Purchase notification credits via Stripe.
+     *
+     * POST action that creates a Stripe checkout session for credit purchase.
+     *
+     * @return \Cake\Http\Response|null
+     */
+    public function purchaseCredits()
+    {
+        $this->request->allowMethod(['post']);
+
+        if (!$this->currentOrganization) {
+            $this->Flash->error(__('No organization selected.'));
+
+            return $this->redirect(['action' => 'plans']);
+        }
+
+        $this->checkPermission('manage_billing');
+
+        $amount = (int)$this->request->getData('amount', 100);
+        $creditService = new NotificationCreditService();
+        $url = $creditService->purchaseCredits($this->currentOrganization['id'], $amount);
+
+        if ($url) {
+            return $this->redirect($url);
+        }
+
+        $this->Flash->error(__('Could not process credit purchase. Please try again.'));
+
+        return $this->redirect(['action' => 'plans']);
     }
 
     /**

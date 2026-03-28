@@ -102,6 +102,19 @@ EOF
 
     chmod +x /usr/local/bin/monitor-check-cron.sh
 
+    # Create wrapper script for monthly credit grants
+    cat > /usr/local/bin/grant-monthly-credits-cron.sh <<EOF
+#!/bin/bash
+export DATABASE_URL="${DATABASE_URL}"
+export REDIS_URL="${REDIS_URL}"
+export CACHE_DRIVER="${CACHE_DRIVER}"
+export SESSION_DRIVER="${SESSION_DRIVER}"
+cd /var/www/html
+bin/cake grant_monthly_credits
+EOF
+
+    chmod +x /usr/local/bin/grant-monthly-credits-cron.sh
+
     # Create wrapper script for escalation checks
     cat > /usr/local/bin/escalation-check-cron.sh <<EOF
 #!/bin/bash
@@ -124,6 +137,10 @@ EOF
 # ISP Status Page - Escalation Check Cron
 # Runs every minute to process escalation policies for unacknowledged incidents
 * * * * * www-data /usr/local/bin/escalation-check-cron.sh >> /var/www/html/logs/escalation.log 2>&1
+
+# ISP Status Page - Monthly Credit Grant
+# Runs at midnight on the 1st of each month to grant notification credits
+0 0 1 * * www-data /usr/local/bin/grant-monthly-credits-cron.sh >> /var/www/html/logs/credit-grants.log 2>&1
 
 EOF
 

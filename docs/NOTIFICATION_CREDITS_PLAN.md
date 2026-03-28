@@ -75,19 +75,19 @@ WhatsApp and SMS have real per-message costs ($0.04-0.08/msg for Brazil). To pro
 - **Result:** WhatsAppAlertChannel created at src/Service/Alert/WhatsAppAlertChannel.php. Uses same Twilio Messages API with 'whatsapp:' prefix on numbers. Env var: TWILIO_WHATSAPP_NUMBER. Registered in MonitorCheckCommand. Tests in tests/TestCase/Service/Alert/WhatsAppAlertChannelTest.php (14 tests).
 
 ### TASK-NC-006: Credits Dashboard UI
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Description:** Credit balance display, usage history, buy credits button (Stripe), auto-recharge toggle. Part of Billing page.
-- **Result:** _pending_
+- **Result:** Added Notification Credits section to Billing plans page (src/templates/Billing/plans.php) with current balance display, monthly grant info, usage bar, recent transactions table, buy credits button ($5/100 credits), and auto-recharge toggle. Created NotificationCreditService (src/Service/Billing/NotificationCreditService.php), Table/Entity classes for NotificationCredits and NotificationCreditTransactions. Added purchaseCredits() action to BillingController.
 
 ### TASK-NC-007: Super Admin Credit Management
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Description:** Super Admin view of credit usage across all orgs. Manual credit grant/adjustment. Revenue tracking from credit purchases.
-- **Result:** _pending_
+- **Result:** Added credit stats (total balance, used this month, purchased this month) to SuperAdmin DashboardController. Added Notification Credits card to SuperAdmin Organizations view (src/templates/SuperAdmin/Organizations/view.php) showing balance, monthly grant, usage, auto-recharge status, grant credits form, and recent transactions. Added grantCredits() action to SuperAdmin/OrganizationsController with audit logging.
 
 ### TASK-NC-008: Monthly Credit Grant Command
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Description:** Cron command that grants monthly credits to Pro/Business orgs on their billing cycle.
-- **Result:** _pending_
+- **Result:** Created GrantMonthlyCreditsCommand (src/Command/GrantMonthlyCreditsCommand.php) that iterates active non-free orgs, checks idempotency via last_grant_at, and grants plan-based credits (Pro=50, Business=200). Supports --dry-run flag. Added monthly cron job to docker/entrypoint.sh (runs midnight on 1st of each month).
 
 ---
 

@@ -8,6 +8,7 @@
  * @var array $customers
  * @var array $health
  * @var array $trials
+ * @var array $creditStats
  */
 $this->assign('title', __('Super Admin Dashboard'));
 ?>
@@ -38,6 +39,28 @@ $this->assign('title', __('Super Admin Dashboard'));
         </div>
     </div>
 </div>
+
+<!-- Notification Credits Row -->
+<?php if (!empty($creditStats)): ?>
+<div class="summary-grid" style="margin-top: 16px;">
+    <div class="summary-card">
+        <div class="card-label"><?= __('Total Credit Balance') ?></div>
+        <div class="card-value" style="color: #8b5cf6;"><?= number_format($creditStats['total_balance']) ?></div>
+    </div>
+    <div class="summary-card">
+        <div class="card-label"><?= __('Credits Used This Month') ?></div>
+        <div class="card-value" style="color: #ef4444;"><?= number_format($creditStats['total_used_this_month']) ?></div>
+    </div>
+    <div class="summary-card">
+        <div class="card-label"><?= __('Credits Purchased This Month') ?></div>
+        <div class="card-value" style="color: #22c55e;"><?= number_format($creditStats['total_purchased_this_month']) ?></div>
+    </div>
+    <div class="summary-card">
+        <div class="card-label"><?= __('Credit Purchase Revenue') ?></div>
+        <div class="card-value" style="color: #22c55e;">$<?= number_format($creditStats['total_purchased_this_month'] * 0.05, 2) ?></div>
+    </div>
+</div>
+<?php endif; ?>
 
 <!-- Second Row: Charts -->
 <div class="charts-grid">

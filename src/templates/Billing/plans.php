@@ -5,6 +5,9 @@
  * @var string $currentPlan
  * @var array $usage
  * @var array $limits
+ * @var \App\Model\Entity\NotificationCredit|null $credits
+ * @var \Cake\Collection\CollectionInterface $recentTransactions
+ * @var array $monthlyUsage
  */
 
 $this->assign('title', __('Plans & Pricing'));
@@ -169,6 +172,131 @@ $planFeatures = [
                 </span>
             </div>
         </div>
+    </div>
+    <?php endif; ?>
+
+    <?php if ($credits): ?>
+    <div class="credits-section">
+        <h3><?= __('Notification Credits') ?></h3>
+        <p class="credits-subtitle"><?= __('Credits are used for SMS and WhatsApp notifications. Free channels (Email, Slack, Discord, Telegram, Webhook) remain unlimited.') ?></p>
+
+        <div class="credits-overview">
+            <div class="credits-balance-card">
+                <div class="credits-balance-number"><?= h($credits->balance) ?></div>
+                <div class="credits-balance-label"><?= __('Credits Available') ?></div>
+                <?php if ($credits->monthly_grant > 0): ?>
+                    <div class="credits-grant-info">
+                        <?= __('%d credits/month included in your %s plan', $credits->monthly_grant, ucfirst($currentPlan)) ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+
+            <div class="credits-stats-card">
+                <div class="credits-stat">
+                    <span class="credits-stat-value"><?= h($monthlyUsage['used'] ?? 0) ?></span>
+                    <span class="credits-stat-label"><?= __('Used This Month') ?></span>
+                </div>
+                <div class="credits-stat">
+                    <span class="credits-stat-value"><?= h($monthlyUsage['granted'] ?? 0) ?></span>
+                    <span class="credits-stat-label"><?= __('Granted This Month') ?></span>
+                </div>
+                <div class="credits-stat">
+                    <span class="credits-stat-value"><?= h($monthlyUsage['purchased'] ?? 0) ?></span>
+                    <span class="credits-stat-label"><?= __('Purchased This Month') ?></span>
+                </div>
+            </div>
+        </div>
+
+        <?php
+        $totalAvailable = $credits->monthly_grant > 0 ? $credits->monthly_grant : max($credits->balance, 1);
+        $usedThisMonth = $monthlyUsage['used'] ?? 0;
+        $usagePercent = $totalAvailable > 0 ? min(100, round(($usedThisMonth / $totalAvailable) * 100)) : 0;
+        ?>
+        <div class="credits-usage-bar-container">
+            <div class="credits-usage-bar-header">
+                <span><?= __('Monthly Usage') ?></span>
+                <span><?= h($usedThisMonth) ?> / <?= h($totalAvailable) ?> <?= __('credits') ?></span>
+            </div>
+            <div class="credits-usage-bar">
+                <div class="credits-usage-bar-fill <?= $usagePercent > 80 ? 'usage-high' : ($usagePercent > 50 ? 'usage-medium' : 'usage-low') ?>" style="width: <?= $usagePercent ?>%"></div>
+            </div>
+        </div>
+
+        <div class="credits-actions">
+            <?= $this->Form->create(null, [
+                'url' => ['action' => 'purchaseCredits'],
+                'class' => 'credits-purchase-form',
+            ]) ?>
+                <?= $this->Form->hidden('amount', ['value' => 100]) ?>
+                <button type="submit" class="btn btn-primary credits-buy-btn">
+                    <?= __('Buy 100 Credits') ?> &mdash; $5
+                </button>
+            <?= $this->Form->end() ?>
+
+            <div class="credits-auto-recharge">
+                <label class="auto-recharge-toggle">
+                    <input type="checkbox" <?= $credits->auto_recharge ? 'checked' : '' ?> disabled>
+                    <span class="toggle-slider-sm"></span>
+                    <span class="auto-recharge-label">
+                        <?= __('Auto-recharge when balance falls below %d credits', $credits->auto_recharge_threshold) ?>
+                    </span>
+                </label>
+            </div>
+        </div>
+
+        <?php if (!$recentTransactions->isEmpty()): ?>
+        <div class="credits-transactions">
+            <h4><?= __('Recent Transactions') ?></h4>
+            <div class="table-responsive">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th><?= __('Date') ?></th>
+                            <th><?= __('Type') ?></th>
+                            <th><?= __('Amount') ?></th>
+                            <th><?= __('Channel') ?></th>
+                            <th><?= __('Description') ?></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($recentTransactions as $tx): ?>
+                        <tr>
+                            <td>
+                                <?php if ($tx->created): ?>
+                                    <span class="utc-datetime" data-utc="<?= $tx->created->format('c') ?>">
+                                        <?= $tx->created->nice() ?>
+                                    </span>
+                                <?php else: ?>
+                                    -
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <?php
+                                $typeBadge = match ($tx->type) {
+                                    'usage' => 'badge-danger',
+                                    'purchase' => 'badge-info',
+                                    'monthly_grant' => 'badge-success',
+                                    'manual_adjustment' => 'badge-warning',
+                                    'refund' => 'badge-secondary',
+                                    default => 'badge-secondary',
+                                };
+                                ?>
+                                <span class="badge <?= $typeBadge ?>"><?= h(ucfirst(str_replace('_', ' ', $tx->type))) ?></span>
+                            </td>
+                            <td>
+                                <span class="<?= $tx->amount >= 0 ? 'text-success' : 'text-danger' ?>">
+                                    <?= $tx->amount >= 0 ? '+' : '' ?><?= h($tx->amount) ?>
+                                </span>
+                            </td>
+                            <td><?= $tx->channel ? h(ucfirst($tx->channel)) : '-' ?></td>
+                            <td><?= h($tx->description ?? '-') ?></td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <?php endif; ?>
     </div>
     <?php endif; ?>
 </div>
@@ -465,6 +593,180 @@ input:checked + .toggle-slider:before {
     color: var(--color-primary, #1E88E5);
 }
 
+/* Notification Credits Section */
+.credits-section {
+    background: var(--color-bg, #fff);
+    border: 1px solid var(--color-border, #e0e0e0);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 2rem;
+}
+
+.credits-section h3 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    color: var(--color-text, #333);
+}
+
+.credits-subtitle {
+    color: var(--color-text-muted, #6c757d);
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+}
+
+.credits-overview {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.credits-balance-card {
+    background: var(--color-bg-secondary, #f5f5f5);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.credits-balance-number {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--color-primary, #1E88E5);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
+.credits-balance-label {
+    font-size: 0.9rem;
+    color: var(--color-text-muted, #6c757d);
+    font-weight: 500;
+}
+
+.credits-grant-info {
+    margin-top: 0.75rem;
+    font-size: 0.8rem;
+    color: var(--color-success, #43A047);
+    font-weight: 500;
+}
+
+.credits-stats-card {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.credits-stat {
+    background: var(--color-bg-secondary, #f5f5f5);
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.credits-stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text, #333);
+}
+
+.credits-stat-label {
+    font-size: 0.8rem;
+    color: var(--color-text-muted, #6c757d);
+    margin-top: 0.25rem;
+}
+
+.credits-usage-bar-container {
+    margin-bottom: 1.5rem;
+}
+
+.credits-usage-bar-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--color-text-muted, #6c757d);
+}
+
+.credits-usage-bar {
+    height: 8px;
+    background: var(--color-bg-secondary, #e0e0e0);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.credits-usage-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.credits-usage-bar-fill.usage-low {
+    background: var(--color-success, #43A047);
+}
+
+.credits-usage-bar-fill.usage-medium {
+    background: var(--color-warning, #FDD835);
+}
+
+.credits-usage-bar-fill.usage-high {
+    background: var(--color-danger, #E53935);
+}
+
+.credits-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.credits-buy-btn {
+    padding: 0.6rem 1.5rem;
+    font-weight: 600;
+    border-radius: 8px;
+    white-space: nowrap;
+}
+
+.credits-auto-recharge {
+    display: flex;
+    align-items: center;
+}
+
+.auto-recharge-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--color-text-muted, #6c757d);
+}
+
+.auto-recharge-toggle input {
+    width: 36px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.credits-transactions {
+    margin-top: 1rem;
+}
+
+.credits-transactions h4 {
+    margin-bottom: 0.75rem;
+    color: var(--color-text, #333);
+}
+
+.text-success {
+    color: var(--color-success, #43A047);
+    font-weight: 600;
+}
+
+.text-danger {
+    color: var(--color-danger, #E53935);
+    font-weight: 600;
+}
+
 @media (max-width: 768px) {
     .plans-grid {
         grid-template-columns: 1fr;
@@ -476,6 +778,19 @@ input:checked + .toggle-slider:before {
 
     .price-amount {
         font-size: 1.5rem;
+    }
+
+    .credits-overview {
+        grid-template-columns: 1fr;
+    }
+
+    .credits-stats-card {
+        grid-template-columns: 1fr;
+    }
+
+    .credits-actions {
+        flex-direction: column;
+        align-items: flex-start;
     }
 }
 </style>

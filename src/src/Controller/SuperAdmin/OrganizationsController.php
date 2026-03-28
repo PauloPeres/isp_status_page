@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Controller\SuperAdmin;
 
 use App\Service\AuditLogService;
+use App\Service\Billing\NotificationCreditService;
 
 /**
  * Organizations Controller (Super Admin)
@@ -106,7 +107,18 @@ class OrganizationsController extends AppController
             ->limit(5)
             ->all();
 
-        $this->set(compact('org', 'monitors', 'recentChecks', 'recentIncidents'));
+        // Notification credit data
+        $creditService = new NotificationCreditService();
+        $credits = $creditService->getCredits((int)$id);
+        $creditUsage = $creditService->getMonthlyUsage((int)$id);
+        $creditTransactions = $this->fetchTable('NotificationCreditTransactions')
+            ->find()
+            ->where(['organization_id' => $id])
+            ->orderBy(['created' => 'DESC'])
+            ->limit(10)
+            ->all();
+
+        $this->set(compact('org', 'monitors', 'recentChecks', 'recentIncidents', 'credits', 'creditUsage', 'creditTransactions'));
     }
 
     /**
@@ -138,6 +150,49 @@ class OrganizationsController extends AppController
         $this->Flash->success(__('Now impersonating: {0}', $org->name));
 
         return $this->redirect(['prefix' => false, 'controller' => 'Dashboard', 'action' => 'index']);
+    }
+
+    /**
+     * Grant notification credits to an organization (manual adjustment by super admin).
+     *
+     * @param string|null $id Organization ID.
+     * @return \Cake\Http\Response|null
+     */
+    public function grantCredits($id = null)
+    {
+        $this->request->allowMethod(['post']);
+
+        $org = $this->fetchTable('Organizations')->get($id);
+        $amount = (int)$this->request->getData('amount');
+        $reason = $this->request->getData('reason', 'Manual grant by admin');
+
+        if ($amount <= 0) {
+            $this->Flash->error(__('Amount must be greater than zero.'));
+
+            return $this->redirect(['action' => 'view', $id]);
+        }
+
+        $creditService = new NotificationCreditService();
+        $creditService->addCredits((int)$id, $amount, 'manual_adjustment', $reason);
+
+        // Audit log the manual grant
+        $identity = $this->Authentication->getIdentity();
+        $this->audit->log(
+            'credit_grant',
+            $identity ? (int)$identity->id : null,
+            $this->request->clientIp(),
+            $this->request->getHeaderLine('User-Agent'),
+            [
+                'organization_id' => $org->id,
+                'organization_name' => $org->name,
+                'amount' => $amount,
+                'reason' => $reason,
+            ]
+        );
+
+        $this->Flash->success(__('Granted %d credits to %s', $amount, $org->name));
+
+        return $this->redirect(['action' => 'view', $id]);
     }
 
     /**
