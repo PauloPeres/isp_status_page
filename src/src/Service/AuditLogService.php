@@ -42,7 +42,8 @@ class AuditLogService
             $table->save($entry);
         } catch (\Exception $e) {
             // Never let audit logging break the main flow
-            $this->log("Failed to write audit log ({$eventType}): {$e->getMessage()}", 'error');
+            // Use LogTrait::log() via explicit level-based call
+            \Cake\Log\Log::write('error', "Failed to write audit log ({$eventType}): {$e->getMessage()}");
         }
     }
 }
