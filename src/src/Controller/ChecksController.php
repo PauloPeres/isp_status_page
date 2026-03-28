@@ -136,7 +136,7 @@ class ChecksController extends AppController
         $this->viewBuilder()->setLayout('admin');
 
         $check = $this->MonitorChecks->get($id, [
-            'contain' => ['Monitors'],
+            'contain' => ['Monitors', 'MonitorCheckDetails'],
         ]);
 
         // Get surrounding checks for context (5 before, 5 after)

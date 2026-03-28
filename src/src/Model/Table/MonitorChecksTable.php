@@ -56,6 +56,10 @@ class MonitorChecksTable extends Table
             'foreignKey' => 'organization_id',
             'joinType' => 'INNER',
         ]);
+        $this->hasOne('MonitorCheckDetails', [
+            'foreignKey' => 'check_id',
+            'dependent' => true,
+        ]);
     }
 
     /**
