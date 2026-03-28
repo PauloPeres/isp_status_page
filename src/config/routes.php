@@ -341,6 +341,38 @@ return function (RouteBuilder $routes): void {
         );
 
         /*
+         * Scheduled Reports routes (P4-010)
+         */
+        $builder->connect(
+            '/scheduled-reports',
+            ['controller' => 'ScheduledReports', 'action' => 'index']
+        );
+        $builder->connect(
+            '/scheduled-reports/add',
+            ['controller' => 'ScheduledReports', 'action' => 'add']
+        );
+        $builder->connect(
+            '/scheduled-reports/edit/{id}',
+            ['controller' => 'ScheduledReports', 'action' => 'edit'],
+            ['pass' => ['id'], 'id' => '\d+']
+        );
+        $builder->connect(
+            '/scheduled-reports/delete/{id}',
+            ['controller' => 'ScheduledReports', 'action' => 'delete'],
+            ['pass' => ['id'], 'id' => '\d+']
+        );
+        $builder->connect(
+            '/scheduled-reports/preview/{id}',
+            ['controller' => 'ScheduledReports', 'action' => 'preview'],
+            ['pass' => ['id'], 'id' => '\d+']
+        );
+        $builder->connect(
+            '/scheduled-reports/send-now/{id}',
+            ['controller' => 'ScheduledReports', 'action' => 'sendNow'],
+            ['pass' => ['id'], 'id' => '\d+']
+        );
+
+        /*
          * Monitor bulk operations routes (P2-013)
          */
         $builder->connect(

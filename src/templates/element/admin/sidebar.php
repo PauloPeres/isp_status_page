@@ -120,6 +120,15 @@ function isActive($currentController, $targetController, $currentAction = null, 
             ) ?>
 
             <?= $this->Html->link(
+                '<span class="nav-icon">&#x1F4E8;</span> ' . __('Scheduled Reports'),
+                ['controller' => 'ScheduledReports', 'action' => 'index'],
+                [
+                    'escape' => false,
+                    'class' => 'nav-item' . (isActive($controller, 'ScheduledReports') ? ' active' : '')
+                ]
+            ) ?>
+
+            <?= $this->Html->link(
                 '<span class="nav-icon">&#x1F4DD;</span> ' . __('SLA'),
                 ['controller' => 'Sla', 'action' => 'index'],
                 [

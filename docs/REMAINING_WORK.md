@@ -415,11 +415,12 @@
 - **Complexity:** Large
 - **Dependencies:** API (completed)
 
-### P4-010: Scheduled email reports
+### P4-010: Scheduled email reports -- DONE
 - **Source:** USER_TESTING_POWER_USER.md
 - **Description:** Automated weekly/monthly uptime reports delivered via email.
 - **Complexity:** Medium
 - **Dependencies:** Report export (P3-010)
+- **Resolution:** Full scheduled email report system implemented. Migration creates scheduled_reports table with organization FK, frequency (weekly/monthly), recipients (JSON), section toggles (uptime/response time/incidents/SLA), and scheduling timestamps. ScheduledReport entity and table with validation and findDue/findActive finders. ScheduledReportService generates report data (per-monitor uptime, response time, incidents, SLA status), sends via CakePHP Mailer, and processes all due reports. Professional HTML and plain text email templates with summary cards, per-monitor table, and SLA section. ScheduledReportsController with index/add/edit/delete/preview/sendNow actions. SendScheduledReportsCommand for hourly cron execution with dry-run option. Routes at /scheduled-reports/*. Sidebar link added. Docker entrypoint updated with hourly cron job.
 
 ### P4-011: Monitor import from UptimeRobot/Pingdom/CSV
 - **Source:** USER_TESTING_POWER_USER.md

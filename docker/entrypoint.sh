@@ -115,6 +115,19 @@ EOF
 
     chmod +x /usr/local/bin/grant-monthly-credits-cron.sh
 
+    # Create wrapper script for scheduled reports (P4-010)
+    cat > /usr/local/bin/send-scheduled-reports-cron.sh <<EOF
+#!/bin/bash
+export DATABASE_URL="${DATABASE_URL}"
+export REDIS_URL="${REDIS_URL}"
+export CACHE_DRIVER="${CACHE_DRIVER}"
+export SESSION_DRIVER="${SESSION_DRIVER}"
+cd /var/www/html
+bin/cake send_scheduled_reports
+EOF
+
+    chmod +x /usr/local/bin/send-scheduled-reports-cron.sh
+
     # Create wrapper script for escalation checks
     cat > /usr/local/bin/escalation-check-cron.sh <<EOF
 #!/bin/bash
@@ -137,6 +150,10 @@ EOF
 # ISP Status Page - Escalation Check Cron
 # Runs every minute to process escalation policies for unacknowledged incidents
 * * * * * www-data /usr/local/bin/escalation-check-cron.sh >> /var/www/html/logs/escalation.log 2>&1
+
+# ISP Status Page - Scheduled Reports (P4-010)
+# Runs every hour to process due scheduled email reports
+0 * * * * www-data /usr/local/bin/send-scheduled-reports-cron.sh >> /var/www/html/logs/scheduled-reports.log 2>&1
 
 # ISP Status Page - Monthly Credit Grant
 # Runs at midnight on the 1st of each month to grant notification credits
