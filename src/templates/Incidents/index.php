@@ -5,400 +5,13 @@
  * @var array $stats
  * @var array $monitors
  */
-$this->assign('title', __d('incidents', 'Incidentes'));
+$this->assign('title', __d('incidents', 'Incidents'));
 ?>
 
-<style>
-    .incidents-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 24px;
-    }
-
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 16px;
-        margin-bottom: 24px;
-    }
-
-    .stat-card-mini {
-        background: white;
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        padding: 16px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    }
-
-    .stat-label {
-        font-size: 12px;
-        color: #666;
-        text-transform: uppercase;
-        font-weight: 600;
-        margin-bottom: 8px;
-    }
-
-    .stat-value {
-        font-size: 28px;
-        font-weight: bold;
-        color: #333;
-    }
-
-    .stat-value.success { color: #22c55e; }
-    .stat-value.error { color: #ef4444; }
-    .stat-value.info { color: #3b82f6; }
-    .stat-value.warning { color: #f59e0b; }
-
-    .filters-card {
-        background: white;
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        padding: 20px;
-        margin-bottom: 24px;
-    }
-
-    .filters-row {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 16px;
-        margin-bottom: 16px;
-    }
-
-    .filter-group {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .filter-group label {
-        font-size: 13px;
-        font-weight: 600;
-        color: #444;
-        margin-bottom: 6px;
-    }
-
-    .filter-group input,
-    .filter-group select {
-        padding: 8px 12px;
-        border: 1px solid #d0d0d0;
-        border-radius: 6px;
-        font-size: 14px;
-        background: white;
-    }
-
-    .filter-buttons {
-        display: flex;
-        gap: 8px;
-    }
-
-    .btn-filter {
-        padding: 8px 16px;
-        background: #3b82f6;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: 500;
-        text-decoration: none;
-        display: inline-block;
-    }
-
-    .btn-filter:hover {
-        background: #2563eb;
-    }
-
-    .btn-clear {
-        padding: 8px 16px;
-        background: white;
-        color: #666;
-        border: 1px solid #d0d0d0;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 14px;
-        text-decoration: none;
-        display: inline-block;
-    }
-
-    .btn-clear:hover {
-        background: #f8f9fa;
-    }
-
-    .incidents-table {
-        width: 100%;
-        background: white;
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        overflow: hidden;
-    }
-
-    .incidents-table table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    .incidents-table th {
-        background: #f8f9fa;
-        padding: 12px 16px;
-        text-align: left;
-        font-size: 13px;
-        font-weight: 600;
-        color: #666;
-        text-transform: uppercase;
-        border-bottom: 2px solid #e0e0e0;
-    }
-
-    .incidents-table th a {
-        color: #666;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-    }
-
-    .incidents-table th a:hover {
-        color: #3b82f6;
-    }
-
-    .incidents-table th a::after {
-        content: '⇅';
-        opacity: 0.3;
-        font-size: 12px;
-    }
-
-    .incidents-table th a.asc::after {
-        content: '↑';
-        opacity: 1;
-        color: #3b82f6;
-    }
-
-    .incidents-table th a.desc::after {
-        content: '↓';
-        opacity: 1;
-        color: #3b82f6;
-    }
-
-    .incidents-table td {
-        padding: 12px 16px;
-        border-bottom: 1px solid #f0f0f0;
-        font-size: 14px;
-        vertical-align: top;
-    }
-
-    .incidents-table tr:last-child td {
-        border-bottom: none;
-    }
-
-    .incidents-table tbody tr:hover {
-        background: #f8f9fa;
-    }
-
-    .incidents-table tbody tr.resolved {
-        opacity: 0.65;
-    }
-
-    .badge {
-        display: inline-block;
-        padding: 4px 12px;
-        border-radius: 12px;
-        font-size: 12px;
-        font-weight: 600;
-        text-transform: uppercase;
-        white-space: nowrap;
-    }
-
-    .badge-success {
-        background: #dcfce7;
-        color: #16a34a;
-    }
-
-    .badge-danger {
-        background: #fee2e2;
-        color: #dc2626;
-    }
-
-    .badge-warning {
-        background: #fef3c7;
-        color: #d97706;
-    }
-
-    .badge-info {
-        background: #dbeafe;
-        color: #1d4ed8;
-    }
-
-    .badge-secondary {
-        background: #f3f4f6;
-        color: #6b7280;
-    }
-
-    .incident-title {
-        font-weight: 600;
-        color: #333;
-        margin-bottom: 4px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .incident-description {
-        font-size: 13px;
-        color: #666;
-        margin-top: 4px;
-        max-width: 400px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .monitor-link {
-        color: #3b82f6;
-        text-decoration: none;
-        font-weight: 500;
-    }
-
-    .monitor-link:hover {
-        text-decoration: underline;
-    }
-
-    .action-buttons {
-        display: flex;
-        gap: 4px;
-    }
-
-    .btn-action {
-        padding: 4px 12px;
-        border-radius: 4px;
-        font-size: 12px;
-        text-decoration: none;
-        border: none;
-        cursor: pointer;
-        font-weight: 500;
-        display: inline-block;
-    }
-
-    .btn-action-view {
-        background: #3b82f6;
-        color: white;
-    }
-
-    .btn-action-view:hover {
-        background: #2563eb;
-    }
-
-    .btn-action-edit {
-        background: #f59e0b;
-        color: white;
-    }
-
-    .btn-action-edit:hover {
-        background: #d97706;
-    }
-
-    .btn-action-resolve {
-        background: #22c55e;
-        color: white;
-    }
-
-    .btn-action-resolve:hover {
-        background: #16a34a;
-    }
-
-    .no-incidents {
-        text-align: center;
-        padding: 60px 20px;
-        color: #999;
-    }
-
-    .pagination {
-        margin-top: 24px;
-        display: flex;
-        justify-content: center;
-        gap: 8px;
-        flex-wrap: wrap;
-    }
-
-    .pagination a,
-    .pagination span {
-        padding: 8px 12px;
-        border: 1px solid #d0d0d0;
-        border-radius: 4px;
-        color: #666;
-        text-decoration: none;
-        font-size: 14px;
-    }
-
-    .pagination a:hover {
-        background: #f8f9fa;
-        border-color: #3b82f6;
-        color: #3b82f6;
-    }
-
-    .pagination .active {
-        background: #3b82f6;
-        color: white;
-        border-color: #3b82f6;
-    }
-
-    .pagination .disabled {
-        color: #ccc;
-        cursor: not-allowed;
-    }
-
-    .pagination-info {
-        text-align: center;
-        margin-top: 12px;
-        font-size: 13px;
-        color: #666;
-    }
-
-    @media (max-width: 768px) {
-        .incidents-header {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .stats-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-
-        .filters-row {
-            grid-template-columns: 1fr;
-        }
-
-        .incidents-table {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .incidents-table table {
-            min-width: 700px;
-        }
-
-        .action-buttons {
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .btn-action {
-            min-height: 36px;
-            text-align: center;
-        }
-
-        .incident-description {
-            max-width: 250px;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .stats-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-</style>
+<!-- Styles provided by admin.css -->
 
 <div class="incidents-header">
-    <h2>🚨 <?= __d('incidents', 'Incidentes') ?></h2>
+    <h2>🚨 <?= __d('incidents', 'Incidents') ?></h2>
 </div>
 
 <!-- Statistics Cards -->
@@ -408,15 +21,15 @@ $this->assign('title', __d('incidents', 'Incidentes'));
         <div class="stat-value info"><?= number_format($stats['total']) ?></div>
     </div>
     <div class="stat-card-mini">
-        <div class="stat-label"><?= __d('incidents', 'Ativos') ?></div>
+        <div class="stat-label"><?= __d('incidents', 'Active') ?></div>
         <div class="stat-value error"><?= number_format($stats['active']) ?></div>
     </div>
     <div class="stat-card-mini">
-        <div class="stat-label"><?= __d('incidents', 'Resolvidos') ?></div>
+        <div class="stat-label"><?= __d('incidents', 'Resolved') ?></div>
         <div class="stat-value success"><?= number_format($stats['resolved']) ?></div>
     </div>
     <div class="stat-card-mini">
-        <div class="stat-label"><?= __d('incidents', 'Críticos') ?></div>
+        <div class="stat-label"><?= __d('incidents', 'Critical') ?></div>
         <div class="stat-value warning"><?= number_format($stats['critical']) ?></div>
     </div>
 </div>
@@ -426,10 +39,10 @@ $this->assign('title', __d('incidents', 'Incidentes'));
     <?= $this->Form->create(null, ['type' => 'get', 'id' => 'filters-form']) ?>
     <div class="filters-row">
         <div class="filter-group">
-            <label><?= __d('incidents', 'Buscar') ?></label>
+            <label><?= __d('incidents', 'Search') ?></label>
             <?= $this->Form->control('search', [
                 'label' => false,
-                'placeholder' => __d('incidents', 'Título ou descrição...'),
+                'placeholder' => __d('incidents', 'Title or description...'),
                 'value' => $this->request->getQuery('search'),
                 'class' => 'form-control',
             ]) ?>
@@ -440,12 +53,12 @@ $this->assign('title', __d('incidents', 'Incidentes'));
             <?= $this->Form->control('status', [
                 'label' => false,
                 'options' => [
-                    '' => __d('incidents', 'Todos'),
-                    'active' => __d('incidents', 'Ativos'),
-                    'investigating' => __d('incidents', 'Investigando'),
-                    'identified' => __d('incidents', 'Identificado'),
-                    'monitoring' => __d('incidents', 'Monitorando'),
-                    'resolved' => __d('incidents', 'Resolvido'),
+                    '' => __d('incidents', 'All'),
+                    'active' => __d('incidents', 'Active'),
+                    'investigating' => __d('incidents', 'Investigating'),
+                    'identified' => __d('incidents', 'Identified'),
+                    'monitoring' => __d('incidents', 'Monitoring'),
+                    'resolved' => __d('incidents', 'Resolved'),
                 ],
                 'value' => $this->request->getQuery('status'),
                 'empty' => false,
@@ -454,15 +67,15 @@ $this->assign('title', __d('incidents', 'Incidentes'));
         </div>
 
         <div class="filter-group">
-            <label><?= __d('incidents', 'Severidade') ?></label>
+            <label><?= __d('incidents', 'Severity') ?></label>
             <?= $this->Form->control('severity', [
                 'label' => false,
                 'options' => [
-                    '' => __d('incidents', 'Todas'),
-                    'critical' => __d('incidents', 'Crítica'),
+                    '' => __d('incidents', 'All'),
+                    'critical' => __d('incidents', 'Critical'),
                     'major' => __d('incidents', 'Major'),
                     'minor' => __d('incidents', 'Minor'),
-                    'maintenance' => __d('incidents', 'Manutenção'),
+                    'maintenance' => __d('incidents', 'Maintenance'),
                 ],
                 'value' => $this->request->getQuery('severity'),
                 'empty' => false,
@@ -474,7 +87,7 @@ $this->assign('title', __d('incidents', 'Incidentes'));
             <label><?= __d('incidents', 'Monitor') ?></label>
             <?= $this->Form->control('monitor_id', [
                 'label' => false,
-                'options' => ['' => __d('incidents', 'Todos os Monitores')] + $monitors,
+                'options' => ['' => __d('incidents', 'All Monitors')] + $monitors,
                 'value' => $this->request->getQuery('monitor_id'),
                 'empty' => false,
                 'class' => 'form-control',
@@ -483,8 +96,8 @@ $this->assign('title', __d('incidents', 'Incidentes'));
     </div>
 
     <div class="filter-buttons">
-        <?= $this->Form->button(__d('incidents', 'Filtrar'), ['type' => 'submit', 'class' => 'btn-filter']) ?>
-        <?= $this->Html->link(__d('incidents', 'Limpar'), ['action' => 'index'], ['class' => 'btn-clear']) ?>
+        <?= $this->Form->button(__d('incidents', 'Filter'), ['type' => 'submit', 'class' => 'btn-filter']) ?>
+        <?= $this->Html->link(__d('incidents', 'Clear'), ['action' => 'index'], ['class' => 'btn-clear']) ?>
     </div>
     <?= $this->Form->end() ?>
 </div>
@@ -496,12 +109,12 @@ $this->assign('title', __d('incidents', 'Incidentes'));
             <thead>
                 <tr>
                     <th><?= $this->Paginator->sort('status', __d('incidents', 'Status')) ?></th>
-                    <th><?= $this->Paginator->sort('title', __d('incidents', 'Incidente')) ?></th>
+                    <th><?= $this->Paginator->sort('title', __d('incidents', 'Incident')) ?></th>
                     <th><?= $this->Paginator->sort('monitor_id', __d('incidents', 'Monitor')) ?></th>
-                    <th><?= $this->Paginator->sort('severity', __d('incidents', 'Severidade')) ?></th>
-                    <th><?= $this->Paginator->sort('started_at', __d('incidents', 'Iniciado')) ?></th>
-                    <th><?= $this->Paginator->sort('duration', __d('incidents', 'Duração')) ?></th>
-                    <th style="text-align: right;"><?= __d('incidents', 'Ações') ?></th>
+                    <th><?= $this->Paginator->sort('severity', __d('incidents', 'Severity')) ?></th>
+                    <th><?= $this->Paginator->sort('started_at', __d('incidents', 'Started')) ?></th>
+                    <th><?= $this->Paginator->sort('duration', __d('incidents', 'Duration')) ?></th>
+                    <th style="text-align: right;"><?= __d('incidents', 'Actions') ?></th>
                 </tr>
             </thead>
             <tbody>
@@ -565,30 +178,30 @@ $this->assign('title', __d('incidents', 'Incidentes'));
                                 </span>
                             <?php else: ?>
                                 <span style="color: #999; font-size: 13px;">
-                                    <?= $incident->isResolved() ? __d('incidents', 'N/A') : __d('incidents', 'Em andamento') ?>
+                                    <?= $incident->isResolved() ? __d('incidents', 'N/A') : __d('incidents', 'In progress') ?>
                                 </span>
                             <?php endif; ?>
                         </td>
                         <td style="text-align: right;">
                             <div class="action-buttons">
                                 <?= $this->Html->link(
-                                    __d('incidents', 'Ver'),
+                                    __d('incidents', 'View'),
                                     ['action' => 'view', $incident->id],
-                                    ['class' => 'btn-action btn-action-view', 'title' => __d('incidents', 'Ver detalhes')]
+                                    ['class' => 'btn-action btn-action-view', 'title' => __d('incidents', 'View details')]
                                 ) ?>
                                 <?php if (!$incident->isResolved()): ?>
                                     <?= $this->Html->link(
-                                        __d('incidents', 'Editar'),
+                                        __d('incidents', 'Edit'),
                                         ['action' => 'edit', $incident->id],
-                                        ['class' => 'btn-action btn-action-edit', 'title' => __d('incidents', 'Editar')]
+                                        ['class' => 'btn-action btn-action-edit', 'title' => __d('incidents', 'Edit')]
                                     ) ?>
                                     <?= $this->Form->postLink(
-                                        __d('incidents', 'Resolver'),
+                                        __d('incidents', 'Resolve'),
                                         ['action' => 'resolve', $incident->id],
                                         [
                                             'class' => 'btn-action btn-action-resolve',
-                                            'title' => __d('incidents', 'Resolver'),
-                                            'confirm' => __d('incidents', 'Tem certeza que deseja resolver este incidente?')
+                                            'title' => __d('incidents', 'Resolve'),
+                                            'confirm' => __d('incidents', 'Are you sure you want to resolve this incident?')
                                         ]
                                     ) ?>
                                 <?php endif; ?>
@@ -610,13 +223,13 @@ $this->assign('title', __d('incidents', 'Incidentes'));
 <!-- Pagination -->
 <?php if ($incidents->count() > 0): ?>
     <div class="pagination">
-        <?= $this->Paginator->first(__d('incidents', '« Primeira')) ?>
-        <?= $this->Paginator->prev(__d('incidents', '‹ Anterior')) ?>
+        <?= $this->Paginator->first(__d('incidents', '« First')) ?>
+        <?= $this->Paginator->prev(__d('incidents', '‹ Previous')) ?>
         <?= $this->Paginator->numbers() ?>
-        <?= $this->Paginator->next(__d('incidents', 'Próxima ›')) ?>
-        <?= $this->Paginator->last(__d('incidents', 'Última »')) ?>
+        <?= $this->Paginator->next(__d('incidents', 'Next ›')) ?>
+        <?= $this->Paginator->last(__d('incidents', 'Last »')) ?>
     </div>
     <div class="pagination-info">
-        <?= $this->Paginator->counter(__d('incidents', 'Página {{page}} de {{pages}}, mostrando {{current}} registro(s) de {{count}} no total')) ?>
+        <?= $this->Paginator->counter(__d('incidents', 'Page {{page}} of {{pages}}, showing {{current}} record(s) of {{count}} total')) ?>
     </div>
 <?php endif; ?>
