@@ -177,6 +177,12 @@ class TenantMiddleware implements MiddlewareInterface
             return $orgId;
         }
 
+        // 2.5. Impersonation — super admin overriding tenant context (TASK-SA-010)
+        $orgId = $this->resolveFromImpersonation($request);
+        if ($orgId) {
+            return $orgId;
+        }
+
         // 3. Session
         $orgId = $this->resolveFromSession($request);
         if ($orgId) {
@@ -258,6 +264,58 @@ class TenantMiddleware implements MiddlewareInterface
                 }
             }
         }
+
+        return null;
+    }
+
+    /**
+     * Resolve org from super admin impersonation session (TASK-SA-010).
+     *
+     * Only honoured when the authenticated user has is_super_admin = true.
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $request The request.
+     * @return int|null
+     */
+    private function resolveFromImpersonation(ServerRequestInterface $request): ?int
+    {
+        $session = $request->getAttribute('session');
+        if (!$session) {
+            return null;
+        }
+
+        $impersonatingOrgId = $session->read('impersonating_org_id');
+        if (!$impersonatingOrgId) {
+            return null;
+        }
+
+        // Verify the current user is a super admin
+        $identity = $request->getAttribute('identity');
+        if (!$identity) {
+            // Not authenticated — clear impersonation data
+            $session->delete('impersonating_org_id');
+            $session->delete('impersonating_org_name');
+
+            return null;
+        }
+
+        try {
+            $usersTable = $this->fetchTable('Users');
+            $user = $usersTable->find()
+                ->select(['id', 'is_super_admin'])
+                ->where(['id' => $identity->getIdentifier()])
+                ->disableHydration()
+                ->first();
+
+            if ($user && !empty($user['is_super_admin'])) {
+                return (int)$impersonatingOrgId;
+            }
+        } catch (\Exception $e) {
+            // Column may not exist yet — ignore
+        }
+
+        // Not a super admin — clear impersonation data
+        $session->delete('impersonating_org_id');
+        $session->delete('impersonating_org_name');
 
         return null;
     }

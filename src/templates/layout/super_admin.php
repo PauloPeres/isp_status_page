@@ -17,10 +17,18 @@
     <?= $this->fetch('css') ?>
 </head>
 <body class="super-admin-body">
-    <?php if (!empty($impersonating)): ?>
+    <?php
+    $impersonatingOrgName = $this->request->getSession()->read('impersonating_org_name');
+    ?>
+    <?php if ($impersonatingOrgName): ?>
     <div class="impersonation-banner">
-        <?= __('You are impersonating organization: {0}', h($impersonatingOrgName ?? 'Unknown')) ?>
-        <a href="<?= $this->Url->build(['prefix' => 'SuperAdmin', 'controller' => 'Organizations', 'action' => 'stopImpersonation']) ?>"><?= __('Stop Impersonation') ?></a>
+        <?= __('Impersonating: {0}', h($impersonatingOrgName)) ?>
+        &mdash;
+        <?= $this->Html->link(
+            __('Stop Impersonation'),
+            ['prefix' => 'SuperAdmin', 'controller' => 'Organizations', 'action' => 'stopImpersonation'],
+            ['style' => 'color: white; text-decoration: underline; font-weight: bold;']
+        ) ?>
     </div>
     <?php endif; ?>
 

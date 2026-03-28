@@ -17,6 +17,21 @@
     <?= $this->fetch('css') ?>
 </head>
 <body>
+    <?php
+    $impersonatingOrgName = $this->request->getSession()->read('impersonating_org_name');
+    ?>
+    <?php if ($impersonatingOrgName): ?>
+    <div class="impersonation-banner">
+        <?= __('Impersonating: {0}', h($impersonatingOrgName)) ?>
+        &mdash;
+        <?= $this->Html->link(
+            __('Stop Impersonation'),
+            ['prefix' => 'SuperAdmin', 'controller' => 'Organizations', 'action' => 'stopImpersonation'],
+            ['style' => 'color: white; text-decoration: underline; font-weight: bold;']
+        ) ?>
+    </div>
+    <?php endif; ?>
+
     <?= $this->element('admin/navbar') ?>
 
     <div class="admin-container">
