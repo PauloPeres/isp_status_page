@@ -66,6 +66,15 @@ function isActive($currentController, $targetController, $currentAction = null, 
             ) ?>
 
             <?= $this->Html->link(
+                '<span class="nav-icon">&#x1F514;</span> ' . __('Alert Rules'),
+                ['controller' => 'AlertRules', 'action' => 'index'],
+                [
+                    'escape' => false,
+                    'class' => 'nav-item' . (isActive($controller, 'AlertRules') ? ' active' : '')
+                ]
+            ) ?>
+
+            <?= $this->Html->link(
                 '<span class="nav-icon">🔗</span> ' . __('Integrations'),
                 ['controller' => 'Integrations', 'action' => 'index'],
                 [

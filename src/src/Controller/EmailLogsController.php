@@ -144,16 +144,46 @@ class EmailLogsController extends AppController
     {
         $this->request->allowMethod(['post']);
 
-        $emailLog = $this->AlertLogs->get($id);
+        $emailLog = $this->AlertLogs->get($id, contain: ['AlertRules', 'Monitors', 'Incidents']);
 
         // Verify it's an email log
         if ($emailLog->channel !== 'email') {
-            $this->Flash->error(__('Este não é um log de email.'));
+            $this->Flash->error(__('This is not an email log.'));
             return $this->redirect(['action' => 'index']);
         }
 
-        // TODO: Implement email resend when EmailService is ready
-        $this->Flash->info(__('Funcionalidade de reenvio será implementada quando o serviço de email estiver configurado.'));
+        try {
+            $alertService = new \App\Service\Alert\AlertService();
+            $alertService->registerChannel(new \App\Service\Alert\EmailAlertChannel());
+
+            $channel = $alertService->getChannel('email');
+            if (!$channel) {
+                $this->Flash->error(__('Email channel is not available.'));
+                return $this->redirect($this->referer(['action' => 'view', $id]));
+            }
+
+            if (empty($emailLog->alert_rule) || empty($emailLog->monitor) || empty($emailLog->incident)) {
+                $this->Flash->error(__('Cannot resend: related alert rule, monitor, or incident no longer exists.'));
+                return $this->redirect($this->referer(['action' => 'view', $id]));
+            }
+
+            $result = $channel->send($emailLog->alert_rule, $emailLog->monitor, $emailLog->incident);
+
+            if (!empty($result['success'])) {
+                $this->Flash->success(__('Email resent successfully.'));
+            } else {
+                $errors = [];
+                foreach (($result['results'] ?? []) as $r) {
+                    if (!empty($r['error'])) {
+                        $errors[] = $r['error'];
+                    }
+                }
+                $errorMsg = !empty($errors) ? implode('; ', $errors) : 'Unknown error';
+                $this->Flash->error(__('Failed to resend email: {0}', $errorMsg));
+            }
+        } catch (\Exception $e) {
+            $this->Flash->error(__('Failed to resend email: {0}', $e->getMessage()));
+        }
 
         return $this->redirect($this->referer(['action' => 'view', $id]));
     }

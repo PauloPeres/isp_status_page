@@ -20,35 +20,40 @@
 - **Complexity:** Small
 - **Dependencies:** None
 
-### P1-003: Remove hardcoded security salt from app_local.php
+### P1-003: Remove hardcoded security salt from app_local.php -- DONE
 - **Source:** AUTH_SECURITY_PLAN.md (TASK-AUTH-003, not completed)
 - **Description:** `src/config/app_local.php` contains a hardcoded fallback security salt (`51020f949eb...`). Production deployments should require `SECURITY_SALT` env var with no fallback.
 - **Complexity:** Small
 - **Dependencies:** None
+- **Resolution:** Replaced hardcoded salt with trigger_error for production, test-safe fallback for CLI/test.
 
-### P1-004: Remove hardcoded DB credentials from docker-compose.yml
+### P1-004: Remove hardcoded DB credentials from docker-compose.yml -- DONE
 - **Source:** AUTH_SECURITY_PLAN.md (TASK-AUTH-004, not completed)
 - **Description:** `docker-compose.yml` contains `POSTGRES_PASSWORD: isp_secret` hardcoded. Should use env vars or Docker secrets.
 - **Complexity:** Small
 - **Dependencies:** None
+- **Resolution:** All secrets now use ${VAR:-default} pattern. Created .env.example. Ports bound to 127.0.0.1. Redis requires password.
 
-### P1-005: Fix migration 90 (PartitionMonitorChecks) failure
+### P1-005: Fix migration 90 (PartitionMonitorChecks) failure -- DONE
 - **Source:** QA_CHECKLIST.md (Note #3)
 - **Description:** Migration 90 (PartitionMonitorChecks) fails with "relation monitor_checks_id_seq already exists". Tables were created manually as workaround. This needs a proper fix for clean deployments.
 - **Complexity:** Medium
 - **Dependencies:** None
+- **Resolution:** Added DROP SEQUENCE IF EXISTS before rename. Used IF EXISTS on sequence operations to make migration idempotent.
 
-### P1-006: Implement the MonitorsController test connection action
+### P1-006: Implement the MonitorsController test connection action -- DONE
 - **Source:** Codebase TODO at `src/src/Controller/MonitorsController.php:313`
 - **Description:** The `testConnection` action has a TODO comment: "Implement actual connection test based on monitor type". Currently non-functional.
 - **Complexity:** Medium
 - **Dependencies:** None
+- **Resolution:** Implemented real connection tests: HTTP (cURL HEAD request), Ping (exec ping), Port (fsockopen). Returns JSON with success, response_time, status_code, message.
 
-### P1-007: Implement email resend in EmailLogsController
+### P1-007: Implement email resend in EmailLogsController -- DONE
 - **Source:** Codebase TODO at `src/src/Controller/EmailLogsController.php:155`
 - **Description:** The resend action has a TODO comment: "Implement email resend when EmailService is ready". Currently non-functional.
 - **Complexity:** Small
 - **Dependencies:** None
+- **Resolution:** Implemented using AlertService/EmailAlertChannel to re-dispatch the original alert rule, monitor, and incident data.
 
 ### P1-008: Super Admin link in regular admin sidebar
 - **Source:** SUPER_ADMIN_PLAN.md (TASK-SA-015, PENDING)
@@ -91,11 +96,12 @@
 - **Complexity:** Medium
 - **Dependencies:** None
 
-### P2-004: Alert rules management UI in admin panel
+### P2-004: Alert rules management UI in admin panel -- DONE
 - **Source:** USER_TESTING_POWER_USER.md, QA_CHECKLIST.md
 - **Description:** Alert rules currently can only be managed via API (`/api/v1/alert-rules`). There is no admin panel UI for creating, editing, or deleting alert rules. This is a critical UX gap.
 - **Complexity:** Medium
 - **Dependencies:** None
+- **Resolution:** Created AlertRulesController (web) with index/add/edit/delete, templates, and sidebar link under Monitoring section.
 
 ### P2-005: Super Admin integration tests
 - **Source:** SUPER_ADMIN_PLAN.md (TASK-SA-016, PENDING)

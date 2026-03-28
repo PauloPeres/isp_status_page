@@ -68,10 +68,12 @@ $sessionDriver = getenv('SESSION_DRIVER') ?: 'php';
 
 $redisHost = '127.0.0.1';
 $redisPort = 6379;
+$redisPassword = '';
 if ($redisUrl) {
     $parsedRedis = parse_url($redisUrl);
     $redisHost = $parsedRedis['host'] ?? '127.0.0.1';
     $redisPort = $parsedRedis['port'] ?? 6379;
+    $redisPassword = $parsedRedis['pass'] ?? '';
 }
 
 // Build cache configuration
@@ -82,6 +84,7 @@ if ($cacheDriver === 'redis' && $redisUrl) {
         'className' => RedisEngine::class,
         'host' => $redisHost,
         'port' => $redisPort,
+        'password' => $redisPassword ?: null,
         'database' => 0,
         'prefix' => 'isp_status_',
         'duration' => '+1 hours',
@@ -90,6 +93,7 @@ if ($cacheDriver === 'redis' && $redisUrl) {
         'className' => RedisEngine::class,
         'host' => $redisHost,
         'port' => $redisPort,
+        'password' => $redisPassword ?: null,
         'database' => 1,
         'prefix' => 'isp_cake_core_',
         'duration' => '+1 years',
@@ -98,6 +102,7 @@ if ($cacheDriver === 'redis' && $redisUrl) {
         'className' => RedisEngine::class,
         'host' => $redisHost,
         'port' => $redisPort,
+        'password' => $redisPassword ?: null,
         'database' => 2,
         'prefix' => 'isp_cake_model_',
         'duration' => '+1 years',
@@ -106,6 +111,7 @@ if ($cacheDriver === 'redis' && $redisUrl) {
         'className' => RedisEngine::class,
         'host' => $redisHost,
         'port' => $redisPort,
+        'password' => $redisPassword ?: null,
         'database' => 4,
         'duration' => 300,
         'prefix' => 'sa_',
@@ -153,7 +159,9 @@ if ($sessionDriver === 'redis' && $redisUrl) {
         'defaults' => 'php',
         'ini' => [
             'session.save_handler' => 'redis',
-            'session.save_path' => "tcp://{$redisHost}:{$redisPort}?database=3",
+            'session.save_path' => $redisPassword
+                ? "tcp://{$redisHost}:{$redisPort}?auth={$redisPassword}&database=3"
+                : "tcp://{$redisHost}:{$redisPort}?database=3",
             'session.cookie_httponly' => true,
             'session.cookie_samesite' => 'Lax',
             'session.use_strict_mode' => true,
@@ -164,7 +172,15 @@ if ($sessionDriver === 'redis' && $redisUrl) {
 
 return [
     'debug' => filter_var(getenv('DEBUG') ?: 'false', FILTER_VALIDATE_BOOLEAN),
-    'Security' => ['salt' => getenv('SECURITY_SALT') ?: '51020f949eb03194749d9a2d18e999948ac48734d110476e1fe0890716813604'],
+    'Security' => [
+        'salt' => env('SECURITY_SALT') ?: (function() {
+            if (PHP_SAPI === 'cli' || env('APP_ENV') === 'test') {
+                return 'test-salt-not-for-production-use-change-me';
+            }
+            trigger_error('SECURITY_SALT environment variable must be set', E_USER_ERROR);
+            return '';
+        })(),
+    ],
     'Datasources' => [
         'default' => $config,
         'test' => [

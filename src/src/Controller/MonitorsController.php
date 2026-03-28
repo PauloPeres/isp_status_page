@@ -309,19 +309,121 @@ class MonitorsController extends AppController
         $this->viewBuilder()->setClassName('Json');
 
         $monitor = $this->Monitors->get($id);
+        $config = is_array($monitor->configuration) ? $monitor->configuration : (json_decode((string)$monitor->configuration, true) ?? []);
 
-        // TODO: Implement actual connection test based on monitor type
-        // For now, return mock data
-        $result = [
-            'success' => true,
-            'response_time' => rand(50, 300),
-            'status_code' => 200,
-            'message' => 'Conexão bem-sucedida',
-        ];
+        $result = ['success' => false, 'response_time' => null, 'status_code' => null, 'message' => ''];
+
+        try {
+            $startTime = microtime(true);
+
+            switch ($monitor->type) {
+                case 'http':
+                    $url = $config['url'] ?? '';
+                    if (empty($url)) {
+                        $result['message'] = 'No URL configured for this monitor.';
+                        break;
+                    }
+
+                    $ch = curl_init($url);
+                    curl_setopt_array($ch, [
+                        CURLOPT_RETURNTRANSFER => true,
+                        CURLOPT_NOBODY => true,
+                        CURLOPT_TIMEOUT => 10,
+                        CURLOPT_CONNECTTIMEOUT => 5,
+                        CURLOPT_FOLLOWLOCATION => !empty($config['follow_redirects']),
+                        CURLOPT_SSL_VERIFYPEER => ($config['verify_ssl'] ?? true) ? true : false,
+                    ]);
+
+                    if (!empty($config['headers']) && is_array($config['headers'])) {
+                        $headers = [];
+                        foreach ($config['headers'] as $key => $value) {
+                            $headers[] = "{$key}: {$value}";
+                        }
+                        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                    }
+
+                    curl_exec($ch);
+                    $elapsed = round((microtime(true) - $startTime) * 1000);
+                    $httpCode = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                    $error = curl_error($ch);
+                    curl_close($ch);
+
+                    if ($error) {
+                        $result['message'] = "Connection failed: {$error}";
+                    } else {
+                        $expectedCode = (int)($config['expected_status_code'] ?? 200);
+                        $result['success'] = ($httpCode >= 200 && $httpCode < 400) || $httpCode === $expectedCode;
+                        $result['response_time'] = $elapsed;
+                        $result['status_code'] = $httpCode;
+                        $result['message'] = $result['success']
+                            ? "Connection successful (HTTP {$httpCode}, {$elapsed}ms)"
+                            : "Unexpected status code: {$httpCode} (expected {$expectedCode})";
+                    }
+                    break;
+
+                case 'ping':
+                    $host = $config['host'] ?? '';
+                    if (empty($host)) {
+                        $result['message'] = 'No host configured for this monitor.';
+                        break;
+                    }
+
+                    $host = escapeshellarg($host);
+                    $output = [];
+                    $returnCode = 0;
+                    exec("ping -c 1 -W 5 {$host} 2>&1", $output, $returnCode);
+                    $elapsed = round((microtime(true) - $startTime) * 1000);
+
+                    if ($returnCode === 0) {
+                        // Extract time from ping output
+                        $pingTime = $elapsed;
+                        foreach ($output as $line) {
+                            if (preg_match('/time[=<](\d+\.?\d*)/', $line, $matches)) {
+                                $pingTime = (int)round((float)$matches[1]);
+                            }
+                        }
+                        $result['success'] = true;
+                        $result['response_time'] = $pingTime;
+                        $result['message'] = "Ping successful ({$pingTime}ms)";
+                    } else {
+                        $result['message'] = 'Ping failed: host unreachable';
+                    }
+                    break;
+
+                case 'port':
+                    $host = $config['host'] ?? '';
+                    $port = (int)($config['port'] ?? 0);
+                    if (empty($host) || $port <= 0) {
+                        $result['message'] = 'No host/port configured for this monitor.';
+                        break;
+                    }
+
+                    $errno = 0;
+                    $errstr = '';
+                    $socket = @fsockopen($host, $port, $errno, $errstr, 5);
+                    $elapsed = round((microtime(true) - $startTime) * 1000);
+
+                    if ($socket) {
+                        fclose($socket);
+                        $result['success'] = true;
+                        $result['response_time'] = $elapsed;
+                        $result['message'] = "Port {$port} is open ({$elapsed}ms)";
+                    } else {
+                        $result['message'] = "Port {$port} is closed: {$errstr}";
+                    }
+                    break;
+
+                default:
+                    $result['message'] = "Test connection not supported for type: {$monitor->type}";
+                    break;
+            }
+        } catch (\Exception $e) {
+            $result['message'] = 'Connection test error: ' . $e->getMessage();
+        }
 
         $this->set([
             'result' => $result,
-            '_serialize' => ['result']
+            '_serialize' => ['result'],
         ]);
     }
 }

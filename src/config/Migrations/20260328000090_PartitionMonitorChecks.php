@@ -78,8 +78,10 @@ class PartitionMonitorChecks extends AbstractMigration
 
         // 7. Swap tables: rename old table out, rename partitioned table in
         $this->execute("ALTER TABLE monitor_checks RENAME TO monitor_checks_old");
+        // Drop the old sequence to avoid naming conflict when renaming
+        $this->execute("DROP SEQUENCE IF EXISTS monitor_checks_id_seq");
         $this->execute("ALTER TABLE monitor_checks_partitioned RENAME TO monitor_checks");
-        $this->execute("ALTER SEQUENCE monitor_checks_partitioned_id_seq RENAME TO monitor_checks_id_seq");
+        $this->execute("ALTER SEQUENCE IF EXISTS monitor_checks_partitioned_id_seq RENAME TO monitor_checks_id_seq");
     }
 
     /**
@@ -92,9 +94,12 @@ class PartitionMonitorChecks extends AbstractMigration
     public function down(): void
     {
         // Rename partitioned table away and restore the original
-        $this->execute("ALTER SEQUENCE monitor_checks_id_seq RENAME TO monitor_checks_partitioned_id_seq");
+        $this->execute("ALTER SEQUENCE IF EXISTS monitor_checks_id_seq RENAME TO monitor_checks_partitioned_id_seq");
         $this->execute("ALTER TABLE monitor_checks RENAME TO monitor_checks_partitioned");
         $this->execute("ALTER TABLE monitor_checks_old RENAME TO monitor_checks");
+        // Recreate the original sequence if needed
+        $this->execute("DROP SEQUENCE IF EXISTS monitor_checks_id_seq");
+        $this->execute("SELECT setval(pg_get_serial_sequence('monitor_checks', 'id'), (SELECT COALESCE(MAX(id), 0) + 1 FROM monitor_checks))");
 
         // Drop the partitioned table and all its partitions
         $this->execute("DROP TABLE IF EXISTS monitor_checks_partitioned CASCADE");
