@@ -37,11 +37,12 @@ Sistema completo com:
 - Timezone e locale brasileiros
 - Entende o contexto de provedores regionais
 
-### 3. Simples e Confiável
-- SQLite (sem servidor de banco complexo)
-- CakePHP (framework maduro e estável)
-- Arquitetura simples e manutenível
-- Fácil deploy e backup
+### 3. Robusto e Escalavel
+- PostgreSQL 16 (banco de dados production-grade)
+- Redis 7 (cache, sessoes e fila de jobs)
+- CakePHP (framework maduro e estavel)
+- Arquitetura multi-tenant e escalavel
+- Docker Compose para deploy simplificado
 
 ### 4. Integrações Prontas
 - IXC Soft (gestão de ISP)
@@ -52,10 +53,14 @@ Sistema completo com:
 ## Arquitetura Técnica
 
 ### Stack
-- **Backend**: PHP 8.1+ / CakePHP 5.x
-- **Database**: SQLite (migração para MySQL/PostgreSQL possível)
-- **Frontend**: HTML5, Tailwind CSS, Alpine.js
-- **Background**: Cron jobs para verificações
+- **Backend**: PHP 8.4 / CakePHP 5.x
+- **Database**: PostgreSQL 16 (SQLite para testes)
+- **Cache/Queue**: Redis 7 (sessoes, cache, fila de jobs)
+- **Billing**: Stripe (planos free / pro / business)
+- **Auth API**: JWT (firebase/php-jwt)
+- **Frontend**: HTML5, Tailwind CSS, Alpine.js, Chart.js
+- **Infrastructure**: Docker Compose (app + postgres + redis)
+- **Background**: CakePHP Queue (Redis-backed) + Cron jobs
 
 ### Componentes Principais
 
@@ -94,27 +99,41 @@ Sistema completo com:
 
 ## Funcionalidades
 
-### MVP (Fase 1)
-- ✅ Monitores HTTP/HTTPS, Ping, Port
-- ✅ Página de status pública com códigos HTTP inteligentes
-- ✅ Painel administrativo completo
-- ✅ Sistema de incidentes automático
-- ✅ Alertas por email
-- ✅ Sistema de assinaturas
+### MVP (Fase 1) -- COMPLETED
+- Monitores HTTP/HTTPS, Ping, Port
+- Pagina de status publica com codigos HTTP inteligentes
+- Painel administrativo completo
+- Sistema de incidentes automatico
+- Alertas por email
+- Sistema de assinaturas
 
-### Fase 2 (Integrações)
-- ✅ Integração com IXC Soft
-- ✅ Integração com Zabbix
-- ✅ API REST genérica
+### Fase 2 (Integracoes) -- COMPLETED
+- Integracao com IXC Soft
+- Integracao com Zabbix
+- API REST generica
+- Dashboard com Chart.js
+- Backup FTP/SFTP
 
-### Fase 3 (Futuro)
-- 🔄 WhatsApp Business API
-- 🔄 Telegram Bot
-- 🔄 SMS Gateway
-- 🔄 Sistema de telefonia
-- 🔄 Dashboard com métricas avançadas
-- 🔄 SLA tracking
-- 🔄 Multi-idiomas
+### Fase 3 (SaaS Platform) -- COMPLETED
+- Multi-tenancy com isolamento por organizacao
+- Stripe billing (planos free / pro / business)
+- PostgreSQL 16 como banco principal
+- Redis 7 para cache, sessoes e filas
+- API REST com autenticacao JWT
+- Convites e papeis por organizacao (owner, admin, member, viewer)
+- Dominios customizados e status pages por organizacao
+- Webhook endpoints com rastreamento de entregas
+- Heartbeat monitoring
+- Janelas de manutencao programadas
+- Regioes de verificacao distribuida
+- API keys por organizacao
+
+### Futuro
+- WhatsApp Business API
+- Telegram Bot
+- SMS Gateway
+- SLA tracking
+- Multi-idiomas completo
 
 ## Casos de Uso
 
@@ -170,31 +189,25 @@ Sistema completo com:
 
 ## Timeline de Desenvolvimento
 
-### Setup e Fundação (2 semanas)
-- Instalação CakePHP
-- Autenticação e usuários
-- Layouts e UI base
-- Database migrations
+### Fase 1 -- Setup e Core (5 semanas) -- COMPLETED
+- Instalacao CakePHP, autenticacao, layouts
+- CRUD de monitores, motor de verificacao
+- Sistema de incidentes, pagina de status
+- Alertas por email, subscribers
+- Dashboard admin com Chart.js
 
-### Core Features (3 semanas)
-- CRUD de monitores
-- Motor de verificação
-- Sistema de incidentes
-- Página de status
-- Alertas por email
+### Fase 2 -- Integracoes (2 semanas) -- COMPLETED
+- Integracao IXC + Zabbix + REST API
+- IntegrationsController CRUD + test connection
+- Backup FTP/SFTP
 
-### Integrações (2 semanas)
-- Integração IXC
-- Integração Zabbix
-- API REST genérica
+### Fase 3 -- SaaS Transformation (3 semanas) -- COMPLETED
+- PostgreSQL 16 + Redis 7 infrastructure
+- Multi-tenancy, organizations, roles
+- Stripe billing, JWT API, webhooks
+- Heartbeats, maintenance windows, check regions
 
-### Polimento (1 semana)
-- Dashboard admin
-- Testes finais
-- Documentação
-- Deploy
-
-**Total: ~8 semanas** (pode ser reduzido com equipe maior)
+**Total: ~10 semanas**
 
 ## Requisitos de Infraestrutura
 
@@ -210,8 +223,8 @@ Sistema completo com:
 
 ### Escalado (200+ monitores)
 - **VPS**: 4 vCPU, 4GB RAM, 80GB SSD
-- **Custo**: ~R$ 150-200/mês
-- **Migrar**: SQLite → PostgreSQL/MySQL
+- **Custo**: ~R$ 150-200/mes
+- PostgreSQL + Redis ja inclusos na stack padrao
 
 ## Riscos e Mitigações
 
@@ -249,30 +262,30 @@ Sistema completo com:
 | **Suporte** | Comunidade | Oficial | Comunidade | Comunidade |
 | **Manutenção** | Ativa | Ativa | Média | Baixa |
 
-## Roadmap Público
+## Roadmap Publico
 
-### Q1 2025
-- [ ] MVP completo
-- [ ] Integração IXC
-- [ ] Integração Zabbix
-- [ ] Release 1.0
+### 2025 H1 -- COMPLETED
+- [x] MVP completo (monitors, incidents, alerts, status page)
+- [x] Integracao IXC + Zabbix + REST API
+- [x] Dashboard com Chart.js
+- [x] Backup FTP/SFTP
+- [x] Release 1.0
 
-### Q2 2025
-- [ ] WhatsApp integration
+### 2025 H2 -- COMPLETED
+- [x] PostgreSQL 16 + Redis 7 infrastructure
+- [x] Multi-tenancy (organizations, roles, invitations)
+- [x] Stripe billing integration
+- [x] JWT-based REST API
+- [x] Webhooks, heartbeats, maintenance windows
+- [x] Release 2.0 (SaaS)
+
+### 2026 Q1-Q2 -- PLANNED
+- [ ] WhatsApp Business API
 - [ ] Telegram Bot
-- [ ] Dashboard avançado
-- [ ] Release 1.1
-
-### Q3 2025
 - [ ] SMS Gateway
-- [ ] Multi-idiomas
 - [ ] SLA tracking
-- [ ] Release 2.0
-
-### Q4 2025
-- [ ] API pública completa
-- [ ] Mobile app (opcional)
-- [ ] Integrações adicionais
+- [ ] Multi-idiomas completo
+- [ ] Release 2.1
 
 ## Conclusão
 
@@ -293,6 +306,6 @@ O ISP Status Page é uma solução completa, focada e acessível para provedores
 
 ---
 
-**Versão do documento**: 1.0
-**Última atualização**: Outubro 2024
-**Status do projeto**: 🚧 Em desenvolvimento inicial
+**Versao do documento**: 2.0
+**Ultima atualizacao**: Marco 2026
+**Status do projeto**: Production-ready SaaS platform

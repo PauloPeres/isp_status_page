@@ -236,15 +236,42 @@ class SettingsController extends AppController
     /**
      * Test FTP/SFTP connection
      *
-     * @return \Cake\Http\Response|null Redirects to index
+     * Tests the FTP/SFTP connection using settings from the request body
+     * (for unsaved form values) or from SettingService (for saved settings).
+     * Returns JSON when called via AJAX, otherwise redirects.
+     *
+     * @return \Cake\Http\Response|null JSON response or redirect
      */
     public function testFtpConnection()
     {
         $this->request->allowMethod(['post']);
 
+        $isAjax = $this->request->is('ajax')
+            || $this->request->getHeaderLine('Accept') === 'application/json';
+
+        // Read FTP settings from request body (unsaved form) or fall back to SettingService
+        $requestData = $this->request->getData();
+        if (!empty($requestData['backup_ftp_host'])) {
+            // Override SettingService values with request data so users can test before saving
+            foreach ($requestData as $key => $value) {
+                if (str_starts_with($key, 'backup_ftp_')) {
+                    $this->settingService->set($key, $value);
+                }
+            }
+        }
+
         try {
             $uploader = new BackupUploaderService($this->settingService);
             $result = $uploader->testConnection();
+
+            if ($isAjax) {
+                return $this->response
+                    ->withType('application/json')
+                    ->withStringBody(json_encode([
+                        'success' => $result['success'],
+                        'message' => $result['message'],
+                    ]));
+            }
 
             if ($result['success']) {
                 $this->Flash->success(__d('settings', 'Conexao FTP/SFTP realizada com sucesso! {0}', $result['message']));
@@ -252,6 +279,15 @@ class SettingsController extends AppController
                 $this->Flash->error(__d('settings', 'Falha na conexao FTP/SFTP: {0}', $result['message']));
             }
         } catch (\Exception $e) {
+            if ($isAjax) {
+                return $this->response
+                    ->withType('application/json')
+                    ->withStringBody(json_encode([
+                        'success' => false,
+                        'message' => $e->getMessage(),
+                    ]));
+            }
+
             $this->Flash->error(__d('settings', 'Erro ao testar conexao: {0}', $e->getMessage()));
         }
 

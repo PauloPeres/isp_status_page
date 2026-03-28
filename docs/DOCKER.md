@@ -106,29 +106,46 @@ make clean-all       # Limpar tudo (containers + volumes)
 
 ### Containers
 
-O ambiente cria 2 containers:
+O ambiente cria 3 containers principais:
 
-1. **app** (`isp-status-app`): Aplicação PHP + Apache
-   - Porta: 8765 → 80
+1. **app** (`isp-status-app`): Aplicacao PHP + Apache
+   - Porta: 8765 -> 80
    - Apache com mod_rewrite
-   - PHP 8.2 com extensões necessárias
+   - PHP 8.4 com extensoes necessarias (pdo_pgsql, pgsql, phpredis, intl, mbstring, curl, xml)
    - Composer
+   - Aguarda PostgreSQL estar pronto antes de iniciar
 
-2. **cron** (`isp-status-cron`): Background jobs
-   - Executa verificações de monitores
-   - Tarefas de limpeza
-   - Backups automáticos
+2. **postgres** (`isp-status-postgres`): PostgreSQL 16
+   - Porta: 5432
+   - Banco de dados principal da aplicacao
+   - Volume persistente para dados
+   - Healthcheck via pg_isready
+
+3. **redis** (`isp-status-redis`): Redis 7
+   - Porta: 6379
+   - Cache, sessoes e fila de jobs
+   - Databases: 0 (cache default), 1 (cache _cake_model_), 2 (cache _cake_routes_), 3 (sessoes)
+   - Healthcheck via redis-cli ping
 
 ### Volumes
 
 Desenvolvimento monta os seguintes volumes:
-- `./src` → `/var/www/html` (código fonte - hot reload)
-- `./src/database.db` → `/var/www/html/database.db` (banco)
-- `./src/logs` → `/var/www/html/logs` (logs)
+- `./src` -> `/var/www/html` (codigo fonte - hot reload)
+- `./src/logs` -> `/var/www/html/logs` (logs)
+- `postgres-data` -> `/var/lib/postgresql/data` (dados PostgreSQL)
+- `redis-data` -> `/data` (dados Redis)
 
 ### Network
 
-Usa network bridge `isp-status-network` para comunicação entre containers.
+Usa network bridge `isp-status-network` para comunicacao entre containers.
+
+### Infraestrutura
+
+| Servico    | Imagem           | Porta | Finalidade                        |
+|-----------|------------------|-------|-----------------------------------|
+| app       | php:8.4-apache   | 8765  | Aplicacao CakePHP                 |
+| postgres  | postgres:16      | 5432  | Banco de dados principal          |
+| redis     | redis:7-alpine   | 6379  | Cache, sessoes, fila de jobs      |
 
 ## Desenvolvimento com Hot Reload
 
@@ -415,42 +432,83 @@ docker-compose top
 # Via Makefile
 make backup
 
-# Manual
-docker cp isp-status-app:/var/www/html/database.db ./backup-$(date +%Y%m%d).db
+# Manual (pg_dump)
+docker-compose exec postgres pg_dump -U isp_status isp_status_page > backup-$(date +%Y%m%d).sql
 ```
 
 ### Restore
 
 ```bash
 # Via Makefile
-make restore FILE=backups/database-20241031.db
+make restore FILE=backups/database-20241031.sql
 
-# Manual
-docker cp backup-20241031.db isp-status-app:/var/www/html/database.db
-docker-compose exec app chown www-data:www-data database.db
-docker-compose restart
+# Manual (psql)
+docker-compose exec -T postgres psql -U isp_status isp_status_page < backup-20241031.sql
 ```
 
-## Migração para MySQL/PostgreSQL
+## Docker Compose (Referencia)
 
-Se necessário escalar:
-
-1. Adicionar serviço de banco no `docker-compose.yml`:
+Exemplo da configuracao atual com 3 servicos:
 
 ```yaml
 services:
-  db:
-    image: mysql:8.0
+  app:
+    build: .
+    ports:
+      - "8765:80"
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: isp_status
+      DATABASE_URL: "postgres://isp_status:isp_status@postgres:5432/isp_status_page"
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     volumes:
-      - mysql-data:/var/lib/mysql
+      - ./src:/var/www/html
+    networks:
+      - isp-status-network
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: isp_status
+      POSTGRES_PASSWORD: isp_status
+      POSTGRES_DB: isp_status_page
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U isp_status"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - isp-status-network
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - isp-status-network
+
+volumes:
+  postgres-data:
+  redis-data:
+
+networks:
+  isp-status-network:
 ```
-
-2. Atualizar `app_local.php` ou usar `DATABASE_URL`
-
-3. Executar migrations no novo banco
 
 ## CI/CD com Docker
 

@@ -4,27 +4,31 @@ Este guia descreve como instalar e configurar o ISP Status Page.
 
 ## Requisitos
 
-### Software Necessário
+### Software Necessario
 
-- **PHP**: 8.1 ou superior
+- **PHP**: 8.1 ou superior (8.4 recomendado)
 - **Composer**: 2.x
-- **SQLite3**: Incluído no PHP
+- **PostgreSQL**: 16+
+- **Redis**: 7+
 - **Web Server**: Apache, Nginx ou built-in PHP server
-- **Cron**: Para execução de tarefas agendadas
+- **Cron**: Para execucao de tarefas agendadas
 
-### Extensões PHP Necessárias
+### Extensoes PHP Necessarias
 
 ```bash
 # Ubuntu/Debian
-sudo apt-get install php8.1-cli php8.1-sqlite3 php8.1-mbstring php8.1-xml php8.1-curl php8.1-intl
+sudo apt-get install php8.4-cli php8.4-pgsql php8.4-mbstring php8.4-xml php8.4-curl php8.4-intl php8.4-redis postgresql-16 redis-server
 
 # macOS (com Homebrew)
-brew install php@8.1
+brew install php@8.4 postgresql@16 redis
 brew install composer
+pecl install redis
 
 # Windows
 # Baixe PHP de https://windows.php.net/download/
 # Instale Composer de https://getcomposer.org/download/
+# Instale PostgreSQL de https://www.postgresql.org/download/windows/
+# Instale Redis via WSL ou Memurai (Windows Redis alternative)
 ```
 
 ## Instalação - Desenvolvimento
@@ -58,8 +62,8 @@ APP_NAME="ISP Status Page"
 APP_DEBUG=true
 SECURITY_SALT="gere-um-salt-aleatorio-aqui"
 
-# Banco de dados (SQLite é o padrão)
-DATABASE_URL="sqlite:///database.db"
+# Banco de dados (PostgreSQL)
+DATABASE_URL="postgres://isp_status:isp_status@localhost:5432/isp_status_page"
 
 # Email (configure se quiser testar alertas)
 EMAIL_HOST="smtp.gmail.com"
@@ -78,8 +82,9 @@ bin/cake security generate_salt
 ### 4. Crie o Banco de Dados
 
 ```bash
-# Criar arquivo do banco (se não existir)
-touch database.db
+# Criar banco PostgreSQL
+sudo -u postgres createuser isp_status --pwprompt
+sudo -u postgres createdb isp_status_page --owner=isp_status
 
 # Executar migrations
 bin/cake migrations migrate
@@ -88,16 +93,15 @@ bin/cake migrations migrate
 bin/cake migrations seed
 ```
 
-### 5. Configure Permissões
+### 5. Configure Permissoes
 
 ```bash
 # Linux/macOS
 chmod -R 777 tmp/
 chmod -R 777 logs/
-chmod 666 database.db
 
 # Ou com www-data (Apache/Nginx)
-sudo chown -R www-data:www-data tmp/ logs/ database.db
+sudo chown -R www-data:www-data tmp/ logs/
 ```
 
 ### 6. Inicie o Servidor
@@ -130,7 +134,7 @@ Credenciais padrão (seeds):
 ```bash
 # Ubuntu/Debian com Apache
 sudo apt-get update
-sudo apt-get install apache2 php8.1 php8.1-cli php8.1-sqlite3 php8.1-mbstring php8.1-xml php8.1-curl php8.1-intl composer git
+sudo apt-get install apache2 php8.4 php8.4-cli php8.4-pgsql php8.4-mbstring php8.4-xml php8.4-curl php8.4-intl php8.4-redis postgresql-16 redis-server composer git
 
 # Habilitar módulos Apache
 sudo a2enmod rewrite
@@ -157,7 +161,9 @@ sudo nano .env
 **Configurações de produção**:
 ```env
 APP_DEBUG=false
-DATABASE_URL="sqlite:///database.db"
+DATABASE_URL="postgres://isp_status:senha-segura@localhost:5432/isp_status_page"
+REDIS_HOST=localhost
+REDIS_PORT=6379
 SECURITY_SALT="salt-super-seguro-gerado"
 
 # Email real
@@ -173,18 +179,22 @@ STATUS_PAGE_PUBLIC=true
 ### 3. Configure Banco de Dados
 
 ```bash
+# Criar banco PostgreSQL
+sudo -u postgres createuser isp_status --pwprompt
+sudo -u postgres createdb isp_status_page --owner=isp_status
+
+# Executar migrations e seeds
 sudo bin/cake migrations migrate
 sudo bin/cake migrations seed
 ```
 
-### 4. Configure Permissões
+### 4. Configure Permissoes
 
 ```bash
 sudo chown -R www-data:www-data /var/www/isp_status_page
 sudo chmod -R 755 /var/www/isp_status_page
 sudo chmod -R 777 /var/www/isp_status_page/tmp
 sudo chmod -R 777 /var/www/isp_status_page/logs
-sudo chmod 666 /var/www/isp_status_page/database.db
 ```
 
 ### 5. Configure Apache Virtual Host
@@ -240,17 +250,19 @@ Adicione:
 0 2 * * * cd /var/www/isp_status_page && bin/cake backup >> /dev/null 2>&1
 ```
 
-## Instalação - Docker (Futuro)
-
-```dockerfile
-# Dockerfile será criado em desenvolvimento futuro
-FROM php:8.1-apache
-# ... configurações
-```
+## Instalacao - Docker (Recomendado)
 
 ```bash
+# Instalacao completa em um comando
+make quick-start
+
+# Ou manualmente
 docker-compose up -d
+
+# Acesse: http://localhost:8765
 ```
+
+Veja `docs/DOCKER.md` para detalhes completos sobre a configuracao Docker com 3 containers (app, postgres, redis).
 
 ## Configuração Nginx (Alternativa ao Apache)
 
@@ -318,16 +330,19 @@ tail -f logs/debug.log
 
 ### Erro: "Unable to connect to database"
 
-**Solução**:
+**Solucao**:
 ```bash
-# Verifique se o arquivo existe
-ls -l database.db
+# Verifique se o PostgreSQL esta rodando
+sudo systemctl status postgresql
 
-# Verifique permissões
-chmod 666 database.db
+# Verifique a conexao
+psql -h localhost -U isp_status -d isp_status_page -c "SELECT 1;"
 
-# Verifique configuração
-cat config/app_local.php | grep database
+# Verifique a variavel DATABASE_URL no .env
+grep DATABASE_URL .env
+
+# Verifique se o Redis esta rodando
+redis-cli ping
 ```
 
 ### Erro: "tmp directory is not writable"
@@ -366,16 +381,19 @@ tail -f logs/error.log | grep Email
 
 ### Performance lenta
 
-**Soluções**:
+**Solucoes**:
 ```bash
 # Limpar cache
 bin/cake cache clear_all
 
-# Otimizar banco
-sqlite3 database.db "VACUUM;"
+# Limpar cache Redis
+redis-cli FLUSHALL
+
+# Otimizar banco PostgreSQL
+psql -U isp_status -d isp_status_page -c "VACUUM ANALYZE;"
 
 # Verificar tamanho do banco
-ls -lh database.db
+psql -U isp_status -d isp_status_page -c "SELECT pg_size_pretty(pg_database_size('isp_status_page'));"
 
 # Executar cleanup
 bin/cake cleanup
@@ -410,53 +428,20 @@ sudo systemctl restart apache2
 ### Backup Manual
 
 ```bash
-# Backup completo
-tar -czf backup-$(date +%Y%m%d).tar.gz database.db config/ logs/
+# Backup completo (PostgreSQL + config + logs)
+pg_dump -h localhost -U isp_status isp_status_page > backups/database-$(date +%Y%m%d).sql
+tar -czf backup-$(date +%Y%m%d).tar.gz backups/database-$(date +%Y%m%d).sql config/ logs/
 
 # Apenas banco
-cp database.db backups/database-$(date +%Y%m%d).db
+pg_dump -h localhost -U isp_status isp_status_page > backups/database-$(date +%Y%m%d).sql
 ```
 
 ### Restore
 
 ```bash
 # Restaurar banco
-cp backups/database-20241031.db database.db
-
-# Ou de tar
-tar -xzf backup-20241031.tar.gz
+psql -h localhost -U isp_status isp_status_page < backups/database-20241031.sql
 ```
-
-## Migração de SQLite para MySQL/PostgreSQL
-
-### 1. Exportar dados
-
-```bash
-# Exportar para SQL
-sqlite3 database.db .dump > export.sql
-```
-
-### 2. Criar novo banco
-
-```sql
--- MySQL
-CREATE DATABASE isp_status_page CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-```
-
-### 3. Atualizar configuração
-
-```env
-# .env
-DATABASE_URL="mysql://user:pass@localhost/isp_status_page?encoding=utf8mb4"
-```
-
-### 4. Executar migrations no novo banco
-
-```bash
-bin/cake migrations migrate
-```
-
-### 5. Importar dados (manualmente ou via script)
 
 ## Monitoramento da Aplicação
 
@@ -476,17 +461,17 @@ tail -f logs/queries.log
 tail -f /var/log/apache2/isp_status_error.log
 ```
 
-### Métricas
+### Metricas
 
 ```bash
 # Tamanho do banco
-ls -lh database.db
+psql -U isp_status -d isp_status_page -c "SELECT pg_size_pretty(pg_database_size('isp_status_page'));"
 
-# Número de monitores ativos
-sqlite3 database.db "SELECT COUNT(*) FROM monitors WHERE active=1;"
+# Numero de monitores ativos
+psql -U isp_status -d isp_status_page -c "SELECT COUNT(*) FROM monitors WHERE active=true;"
 
-# Últimas verificações
-sqlite3 database.db "SELECT * FROM monitor_checks ORDER BY created DESC LIMIT 10;"
+# Ultimas verificacoes
+psql -U isp_status -d isp_status_page -c "SELECT * FROM monitor_checks ORDER BY created DESC LIMIT 10;"
 ```
 
 ## Segurança

@@ -2,7 +2,7 @@
 
 ## Visão Geral
 
-O sistema utiliza SQLite como banco de dados, proporcionando simplicidade e portabilidade. As tabelas seguem as convenções do CakePHP para aproveitar ao máximo o ORM.
+O sistema utiliza PostgreSQL 16 como banco de dados principal, oferecendo robustez, concorrencia e recursos avancados como JSONB. O SQLite ainda e utilizado na suite de testes (PHPUnit) para manter os testes rapidos e isolados. As tabelas seguem as convencoes do CakePHP para aproveitar ao maximo o ORM.
 
 ## Diagrama de Relacionamentos (ERD)
 
@@ -142,7 +142,7 @@ Armazena a configuração de todos os monitores do sistema.
 
 ```sql
 CREATE TABLE monitors (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description TEXT,
     type VARCHAR(50) NOT NULL,  -- 'http', 'ping', 'port', 'api', 'ixc', 'zabbix'
@@ -215,7 +215,7 @@ Histórico de todas as verificações executadas.
 
 ```sql
 CREATE TABLE monitor_checks (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     monitor_id INTEGER NOT NULL,
     status VARCHAR(20) NOT NULL,  -- 'success', 'failure', 'timeout', 'error'
     response_time INTEGER,  -- milisegundos
@@ -239,7 +239,7 @@ Registra incidentes quando serviços ficam indisponíveis.
 
 ```sql
 CREATE TABLE incidents (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     monitor_id INTEGER NOT NULL,
     title VARCHAR(255) NOT NULL,
     description TEXT,
@@ -266,7 +266,7 @@ Usuários que se inscrevem para receber notificações.
 
 ```sql
 CREATE TABLE subscribers (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
     name VARCHAR(255),
     verification_token VARCHAR(255),
@@ -288,7 +288,7 @@ Relaciona subscribers com monitors específicos.
 
 ```sql
 CREATE TABLE subscriptions (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     subscriber_id INTEGER NOT NULL,
     monitor_id INTEGER,  -- NULL = todos os monitores
     notify_on_down BOOLEAN DEFAULT 1,
@@ -310,7 +310,7 @@ Configuração de integrações com sistemas externos.
 
 ```sql
 CREATE TABLE integrations (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     type VARCHAR(50) NOT NULL,  -- 'ixc', 'zabbix', 'rest_api'
     configuration TEXT NOT NULL,  -- JSON encriptado
@@ -351,7 +351,7 @@ Log de sincronizações com sistemas externos.
 
 ```sql
 CREATE TABLE integration_logs (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     integration_id INTEGER NOT NULL,
     action VARCHAR(100) NOT NULL,
     status VARCHAR(20) NOT NULL,  -- 'success', 'error', 'warning'
@@ -373,7 +373,7 @@ Regras de notificação para cada monitor.
 
 ```sql
 CREATE TABLE alert_rules (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     monitor_id INTEGER NOT NULL,
     channel VARCHAR(50) NOT NULL,  -- 'email', 'whatsapp', 'telegram', 'sms', 'phone'
     trigger_on VARCHAR(50) NOT NULL,  -- 'on_down', 'on_up', 'on_degraded', 'on_change'
@@ -396,7 +396,7 @@ Log de alertas enviados.
 
 ```sql
 CREATE TABLE alert_logs (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     alert_rule_id INTEGER NOT NULL,
     incident_id INTEGER,
     monitor_id INTEGER NOT NULL,
@@ -424,7 +424,7 @@ Configurações gerais do sistema.
 
 ```sql
 CREATE TABLE settings (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     key VARCHAR(100) NOT NULL UNIQUE,
     value TEXT,
     type VARCHAR(20) DEFAULT 'string',  -- 'string', 'integer', 'boolean', 'json'
@@ -458,7 +458,7 @@ Usuários do painel administrativo.
 
 ```sql
 CREATE TABLE users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     username VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,  -- bcrypt hash
     email VARCHAR(255) NOT NULL UNIQUE,
@@ -473,9 +473,259 @@ CREATE INDEX idx_users_username ON users(username);
 CREATE INDEX idx_users_email ON users(email);
 ```
 
+### 12. organizations (SaaS)
+
+Tabela de organizacoes para multi-tenancy.
+
+```sql
+CREATE TABLE organizations (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    slug VARCHAR(100) NOT NULL UNIQUE,
+    plan VARCHAR(20) NOT NULL DEFAULT 'free',  -- 'free', 'pro', 'business'
+    stripe_customer_id VARCHAR(255),
+    stripe_subscription_id VARCHAR(255),
+    trial_ends_at TIMESTAMP,
+    timezone VARCHAR(50) DEFAULT 'America/Sao_Paulo',
+    language VARCHAR(10) DEFAULT 'pt_BR',
+    custom_domain VARCHAR(255),
+    logo_url VARCHAR(500),
+    settings TEXT,  -- JSONB in PostgreSQL
+    active BOOLEAN DEFAULT true,
+    created TIMESTAMP NOT NULL,
+    modified TIMESTAMP NOT NULL
+);
+
+CREATE UNIQUE INDEX idx_organizations_slug ON organizations(slug);
+CREATE INDEX idx_organizations_stripe ON organizations(stripe_customer_id);
+CREATE INDEX idx_organizations_domain ON organizations(custom_domain);
+```
+
+### 13. organization_users (SaaS)
+
+Tabela de associacao entre usuarios e organizacoes com papeis.
+
+```sql
+CREATE TABLE organization_users (
+    id SERIAL PRIMARY KEY,
+    organization_id INTEGER NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    role VARCHAR(20) NOT NULL DEFAULT 'member',  -- 'owner', 'admin', 'member', 'viewer'
+    invited_by INTEGER,
+    invited_at TIMESTAMP,
+    accepted_at TIMESTAMP,
+    created TIMESTAMP NOT NULL,
+    modified TIMESTAMP NOT NULL,
+    UNIQUE (organization_id, user_id)
+);
+
+CREATE INDEX idx_org_users_org ON organization_users(organization_id);
+CREATE INDEX idx_org_users_user ON organization_users(user_id);
+CREATE INDEX idx_org_users_role ON organization_users(role);
+```
+
+### 14. plans (SaaS)
+
+Definicoes de planos de assinatura.
+
+```sql
+CREATE TABLE plans (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    slug VARCHAR(50) NOT NULL UNIQUE,
+    stripe_price_id VARCHAR(255),
+    monitor_limit INTEGER NOT NULL DEFAULT 5,
+    check_interval_min INTEGER NOT NULL DEFAULT 300,
+    retention_days INTEGER NOT NULL DEFAULT 30,
+    features TEXT,  -- JSON array of feature flags
+    price_monthly DECIMAL(10,2),
+    price_yearly DECIMAL(10,2),
+    active BOOLEAN DEFAULT true,
+    created TIMESTAMP NOT NULL,
+    modified TIMESTAMP NOT NULL
+);
+```
+
+### 15. api_keys (SaaS)
+
+Chaves de API por organizacao para acesso programatico.
+
+```sql
+CREATE TABLE api_keys (
+    id SERIAL PRIMARY KEY,
+    organization_id INTEGER NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+    user_id INTEGER NOT NULL REFERENCES users(id),
+    name VARCHAR(255) NOT NULL,
+    key_prefix VARCHAR(10) NOT NULL,
+    key_hash VARCHAR(255) NOT NULL,
+    scopes TEXT,  -- JSON array of allowed scopes
+    last_used_at TIMESTAMP,
+    expires_at TIMESTAMP,
+    active BOOLEAN DEFAULT true,
+    created TIMESTAMP NOT NULL,
+    modified TIMESTAMP NOT NULL
+);
+
+CREATE INDEX idx_api_keys_org ON api_keys(organization_id);
+CREATE INDEX idx_api_keys_prefix ON api_keys(key_prefix);
+```
+
+### 16. invitations (SaaS)
+
+Convites para organizacao.
+
+```sql
+CREATE TABLE invitations (
+    id SERIAL PRIMARY KEY,
+    organization_id INTEGER NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+    email VARCHAR(255) NOT NULL,
+    role VARCHAR(20) NOT NULL DEFAULT 'member',
+    token VARCHAR(255) NOT NULL UNIQUE,
+    invited_by INTEGER REFERENCES users(id),
+    accepted_at TIMESTAMP,
+    expires_at TIMESTAMP NOT NULL,
+    created TIMESTAMP NOT NULL,
+    modified TIMESTAMP NOT NULL
+);
+
+CREATE INDEX idx_invitations_org ON invitations(organization_id);
+CREATE INDEX idx_invitations_token ON invitations(token);
+```
+
+### 17. heartbeats (SaaS)
+
+Monitores do tipo heartbeat (cron job ping-in).
+
+```sql
+CREATE TABLE heartbeats (
+    id SERIAL PRIMARY KEY,
+    organization_id INTEGER NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+    monitor_id INTEGER NOT NULL REFERENCES monitors(id) ON DELETE CASCADE,
+    token VARCHAR(255) NOT NULL UNIQUE,
+    interval_seconds INTEGER NOT NULL DEFAULT 300,
+    grace_seconds INTEGER NOT NULL DEFAULT 60,
+    last_ping_at TIMESTAMP,
+    status VARCHAR(20) DEFAULT 'waiting',  -- 'up', 'down', 'waiting'
+    created TIMESTAMP NOT NULL,
+    modified TIMESTAMP NOT NULL
+);
+
+CREATE INDEX idx_heartbeats_token ON heartbeats(token);
+CREATE INDEX idx_heartbeats_org ON heartbeats(organization_id);
+```
+
+### 18. status_pages (SaaS)
+
+Paginas de status customizaveis por organizacao.
+
+```sql
+CREATE TABLE status_pages (
+    id SERIAL PRIMARY KEY,
+    organization_id INTEGER NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+    name VARCHAR(255) NOT NULL,
+    slug VARCHAR(100) NOT NULL,
+    custom_domain VARCHAR(255),
+    theme TEXT,  -- JSON with color/logo/branding config
+    header_text TEXT,
+    footer_text TEXT,
+    is_public BOOLEAN DEFAULT true,
+    created TIMESTAMP NOT NULL,
+    modified TIMESTAMP NOT NULL,
+    UNIQUE (organization_id, slug)
+);
+
+CREATE INDEX idx_status_pages_org ON status_pages(organization_id);
+CREATE INDEX idx_status_pages_domain ON status_pages(custom_domain);
+```
+
+### 19. maintenance_windows (SaaS)
+
+Janelas de manutencao programadas.
+
+```sql
+CREATE TABLE maintenance_windows (
+    id SERIAL PRIMARY KEY,
+    organization_id INTEGER NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+    monitor_id INTEGER REFERENCES monitors(id) ON DELETE CASCADE,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    scheduled_start TIMESTAMP NOT NULL,
+    scheduled_end TIMESTAMP NOT NULL,
+    actual_start TIMESTAMP,
+    actual_end TIMESTAMP,
+    status VARCHAR(20) DEFAULT 'scheduled',  -- 'scheduled', 'in_progress', 'completed', 'cancelled'
+    suppress_alerts BOOLEAN DEFAULT true,
+    created TIMESTAMP NOT NULL,
+    modified TIMESTAMP NOT NULL
+);
+
+CREATE INDEX idx_maint_org ON maintenance_windows(organization_id);
+CREATE INDEX idx_maint_schedule ON maintenance_windows(scheduled_start, scheduled_end);
+```
+
+### 20. webhook_endpoints (SaaS)
+
+Endpoints de webhook configurados por organizacao.
+
+```sql
+CREATE TABLE webhook_endpoints (
+    id SERIAL PRIMARY KEY,
+    organization_id INTEGER NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+    url VARCHAR(500) NOT NULL,
+    secret VARCHAR(255) NOT NULL,
+    events TEXT NOT NULL,  -- JSON array of event types
+    active BOOLEAN DEFAULT true,
+    created TIMESTAMP NOT NULL,
+    modified TIMESTAMP NOT NULL
+);
+
+CREATE INDEX idx_webhook_ep_org ON webhook_endpoints(organization_id);
+```
+
+### 21. webhook_deliveries (SaaS)
+
+Log de entregas de webhook.
+
+```sql
+CREATE TABLE webhook_deliveries (
+    id SERIAL PRIMARY KEY,
+    webhook_endpoint_id INTEGER NOT NULL REFERENCES webhook_endpoints(id) ON DELETE CASCADE,
+    event VARCHAR(100) NOT NULL,
+    payload TEXT NOT NULL,
+    response_status INTEGER,
+    response_body TEXT,
+    attempts INTEGER DEFAULT 0,
+    delivered_at TIMESTAMP,
+    next_retry_at TIMESTAMP,
+    created TIMESTAMP NOT NULL
+);
+
+CREATE INDEX idx_webhook_del_ep ON webhook_deliveries(webhook_endpoint_id);
+CREATE INDEX idx_webhook_del_retry ON webhook_deliveries(next_retry_at);
+```
+
+### 22. check_regions (SaaS)
+
+Regioes de verificacao distribuida.
+
+```sql
+CREATE TABLE check_regions (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    slug VARCHAR(50) NOT NULL UNIQUE,
+    location VARCHAR(255),
+    endpoint_url VARCHAR(500),
+    active BOOLEAN DEFAULT true,
+    created TIMESTAMP NOT NULL,
+    modified TIMESTAMP NOT NULL
+);
+
+CREATE INDEX idx_check_regions_slug ON check_regions(slug);
+```
+
 ## Migrations CakePHP
 
-As migrations serão criadas na ordem:
+As migrations sao criadas na ordem:
 1. Users
 2. Settings
 3. Integrations
@@ -487,6 +737,18 @@ As migrations serão criadas na ordem:
 9. Subscriptions
 10. Alert_rules
 11. Alert_logs
+12. Organizations (SaaS)
+13. Organization_users (SaaS)
+14. Add organization_id FK to all tenant tables (SaaS)
+15. Plans (SaaS)
+16. Api_keys (SaaS)
+17. Invitations (SaaS)
+18. Heartbeats (SaaS)
+19. Status_pages (SaaS)
+20. Maintenance_windows (SaaS)
+21. Webhook_endpoints (SaaS)
+22. Webhook_deliveries (SaaS)
+23. Check_regions (SaaS)
 
 ## Seeds (Dados Iniciais)
 
@@ -515,24 +777,21 @@ Cron jobs para:
 - Deletar `integration_logs` com mais de 7 dias
 - Deletar `alert_logs` com mais de 30 dias
 
-### Vacuum SQLite
-Executar `VACUUM` semanalmente para otimizar o banco.
+### Vacuum / Maintenance PostgreSQL
+Executar `VACUUM ANALYZE` periodicamente para otimizar o banco. O autovacuum do PostgreSQL cuida da maioria dos casos automaticamente.
 
 ## Backup
 
-Script de backup automático:
+Script de backup automatico (via pg_dump):
 ```bash
 #!/bin/bash
-cp database.db backups/database_$(date +%Y%m%d_%H%M%S).db
-# Manter apenas últimos 30 backups
+pg_dump -h localhost -U isp_status isp_status_page > backups/database_$(date +%Y%m%d_%H%M%S).sql
+# Manter apenas ultimos 30 backups
 ```
 
-## Migrações Futuras
+## Nota sobre SQLite (Testes)
 
-Se necessário migrar para PostgreSQL/MySQL:
-- CakePHP facilita a migração
-- Apenas ajustar tipos de dados específicos (TEXT para JSON nativo, etc)
-- Migrations existentes podem ser adaptadas
+O SQLite e utilizado exclusivamente na suite de testes PHPUnit para manter a execucao rapida e sem dependencias externas. As migrations sao compativeis com ambos os bancos gracas ao uso da API Phinx (sem SQL raw). Ao escrever queries raw, use sintaxe ANSI SQL compativel com PostgreSQL e SQLite.
 
 ## Queries Importantes
 
@@ -550,11 +809,11 @@ WHERE status != 'resolved'
 ORDER BY severity, started_at;
 ```
 
-### Próximos monitores a verificar
+### Proximos monitores a verificar
 ```sql
 SELECT * FROM monitors
-WHERE active = 1
-AND next_check_at <= datetime('now')
+WHERE active = true
+AND next_check_at <= NOW()
 ORDER BY next_check_at
 LIMIT 100;
 ```
@@ -570,6 +829,6 @@ SELECT
         2
     ) as uptime_percentage
 FROM monitor_checks
-WHERE checked_at >= datetime('now', '-30 days')
+WHERE checked_at >= NOW() - INTERVAL '30 days'
 GROUP BY monitor_id;
 ```
