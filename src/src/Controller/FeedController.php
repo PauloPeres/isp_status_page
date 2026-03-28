@@ -41,7 +41,7 @@ class FeedController extends AppController
         $siteUrl = (new \App\Service\SettingService())->get('site_url', '');
 
         $this->set(compact('incidents', 'siteName', 'siteUrl'));
-        $this->viewBuilder()->setLayout(false);
+        $this->viewBuilder()->disableAutoLayout();
         $this->response = $this->response->withType('application/rss+xml');
     }
 }
