@@ -59,6 +59,8 @@ if [ "$TABLES_COUNT" -lt "5" ]; then
     echo "Database appears empty (found $TABLES_COUNT tables). Running seeds..."
     if [ -d /var/www/html/config/Seeds ]; then
         bin/cake migrations seed || echo "Seeds failed"
+        # Ensure admin user has an organization membership
+        bin/cake migrations seed --seed AdminOrgSeed || echo "AdminOrgSeed failed"
     fi
 else
     echo "Database already seeded (found $TABLES_COUNT tables). Skipping seeds."

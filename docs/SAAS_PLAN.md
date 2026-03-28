@@ -313,3 +313,56 @@ Transforming the existing ISP Status Page (CakePHP 5.x) into a full SaaS UptimeR
 **Sprint 4:** TASK-802+803, TASK-902+903+904, TASK-704+705 (parallel)
 **Sprint 5:** All Phase 5 tasks (maximum parallelism — 7 agents)
 **Sprint 6:** Phase 6 tasks (3 agents)
+
+---
+
+## QA Bug Fixes
+
+> Applied: 2026-03-27
+
+Eight bugs identified during QA testing, all resolved:
+
+### BUG 1: Infinite redirect loop for users without organizations
+- **File:** `src/src/Middleware/TenantMiddleware.php`
+- **Problem:** Users without an organization membership hit an infinite redirect loop because `/organizations/select`, `/organizations/switch`, and `/onboarding/` were not in the `$publicPaths` array, so the middleware kept redirecting to `/organizations/select` which itself required tenant resolution.
+- **Fix:** Added `/organizations/select`, `/organizations/switch`, and `/onboarding/` to `$publicPaths`.
+
+### BUG 2: /api/docs returns 500 -- TypeError
+- **File:** `src/src/Controller/Api/DocsController.php`
+- **Problem:** `$this->viewBuilder()->setLayout(false)` throws a TypeError in CakePHP 5.x because `setLayout()` expects a string, not a boolean.
+- **Fix:** Changed to `$this->viewBuilder()->disableAutoLayout()`.
+
+### BUG 3: API key creation fails -- key_prefix column too small
+- **Files:** `src/config/Migrations/20260328000030_CreateApiKeys.php`, new migration `20260328000060_FixApiKeyPrefixLength.php`
+- **Problem:** The `key_prefix` column was defined with `limit => 10` but generated prefixes are 12 characters, causing insert failures.
+- **Fix:** Updated the original migration to `limit => 16` and created a new migration (`20260328000060`) to alter the column in already-deployed databases.
+
+### BUG 4: /status-pages returns 403 -- path matching collision
+- **File:** `src/src/Middleware/TenantMiddleware.php`
+- **Problem:** The `$publicPaths` array contained `'/status'` which matched `/status-pages` due to `str_starts_with()` prefix matching, causing the status-pages admin route to bypass tenant resolution and fail.
+- **Fix:** Changed `isPublicRoute()` to check for exact match OR prefix followed by `/` or `?`. Paths ending with `/` (like `/registration/`) retain the old prefix behavior for backward compatibility.
+
+### BUG 5: Badge endpoints crash -- missing badge_token column
+- **File:** New migration `src/config/Migrations/20260328000061_AddBadgeTokenToMonitors.php`
+- **Problem:** `BadgesController` looks up monitors by `badge_token` field, but the column was never created in any migration.
+- **Fix:** Created migration adding `badge_token` VARCHAR(64) NULL UNIQUE to the monitors table, with random hex tokens generated for all existing monitors.
+
+### BUG 6: Registration PK sequence conflict
+- **File:** New migration `src/config/Migrations/20260328000062_FixOrganizationSequence.php`
+- **Problem:** Migration `20260328000003` inserts a Default Organization with explicit `id=1`, leaving the PostgreSQL auto-increment sequence at 1. The next `INSERT` via registration gets `nextval()=1`, causing a primary key conflict.
+- **Fix:** Created a migration that resets the `organizations_id_seq` sequence to `MAX(id)` from the organizations table. Only runs on PostgreSQL (SQLite does not use sequences).
+
+### BUG 7: Missing email text templates for team invites (and others)
+- **Files created:**
+  - `src/templates/email/text/team_invite.php`
+  - `src/templates/email/text/verify_email.php`
+  - `src/templates/email/text/incident_acknowledged.php`
+  - `src/templates/email/text/alert_incident_down.php`
+  - `src/templates/email/text/alert_incident_up.php`
+- **Problem:** CakePHP Mailer can send multipart emails (HTML + plain text), but only HTML templates existed. Email clients that prefer plain text (or spam filters that check for a text part) would show empty content or lower deliverability scores.
+- **Fix:** Created plain-text versions of all five email templates with equivalent content.
+
+### BUG 8: Admin user has no organization membership
+- **File:** New seed `src/config/Seeds/AdminOrgSeed.php`, modified `docker/entrypoint.sh`
+- **Problem:** The `UsersSeed` creates an admin user but does not create an organization or link the user to one. After login, the admin user has no org membership, triggering the org-selection redirect (which, before BUG 1 fix, was an infinite loop).
+- **Fix:** Created `AdminOrgSeed` that creates a "Default Organization" (if not already present from the migration) and links user 1 to it as owner. Updated `entrypoint.sh` to run this seed after the default seeds on first boot.

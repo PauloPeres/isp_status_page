@@ -20,7 +20,7 @@ class DocsController extends AppController
      */
     public function index(): void
     {
-        $this->viewBuilder()->setLayout(false);
+        $this->viewBuilder()->disableAutoLayout();
     }
 
     /**

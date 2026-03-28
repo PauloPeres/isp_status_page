@@ -39,7 +39,7 @@ class CreateApiKeys extends AbstractMigration
                 'comment' => 'Bcrypt hash of the API key',
             ])
             ->addColumn('key_prefix', 'string', [
-                'limit' => 10,
+                'limit' => 16,
                 'null' => false,
                 'comment' => 'First 12 chars of key for lookup',
             ])

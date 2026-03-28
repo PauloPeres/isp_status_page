@@ -46,6 +46,9 @@ class TenantMiddleware implements MiddlewareInterface
         '/api/docs',
         '/incidents/acknowledge/',
         '/auth/',
+        '/organizations/select',
+        '/organizations/switch',
+        '/onboarding/',
     ];
 
     /**
@@ -125,7 +128,11 @@ class TenantMiddleware implements MiddlewareInterface
     private function isPublicRoute(string $path): bool
     {
         foreach ($this->publicPaths as $publicPath) {
-            if (str_starts_with($path, $publicPath)) {
+            if ($path === $publicPath || str_starts_with($path, $publicPath . '/') || str_starts_with($path, $publicPath . '?')) {
+                return true;
+            }
+            // Also match if the public path ends with '/' (prefix-style match)
+            if (str_ends_with($publicPath, '/') && str_starts_with($path, $publicPath)) {
                 return true;
             }
         }
