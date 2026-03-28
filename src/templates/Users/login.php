@@ -373,8 +373,26 @@
                 >
             </div>
 
+            <div class="input-group" style="margin-bottom: 20px;">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 400;">
+                    <input type="checkbox" name="remember_me" value="1" style="width: auto; margin: 0;">
+                    <span style="font-size: 14px; color: var(--color-dark);"><?= __d('users', 'Remember me') ?></span>
+                </label>
+            </div>
+
             <button type="submit" class="btn"><?= __d('users', 'Sign In') ?></button>
         </form>
+
+    <script>
+    (function() {
+        var form = document.querySelector('form');
+        form.addEventListener('submit', function() {
+            var btn = form.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.textContent = 'Please wait...';
+        });
+    })();
+    </script>
 
         <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--color-gray-light);">
             <p style="text-align: center; color: var(--color-gray-medium); font-size: 13px; margin-bottom: 16px;"><?= __('Or sign in with') ?></p>
@@ -398,13 +416,7 @@
             <?= __("Don't have an account? Register") ?>
         </a>
 
-        <?php if (!isset($hasUserWithChangedPassword) || !$hasUserWithChangedPassword): ?>
-        <div class="footer">
-            <div class="credentials">
-                admin / admin123
-            </div>
-        </div>
-        <?php endif; ?>
+        <!-- Default credentials removed for security (TASK-AUTH-011) -->
     </div>
 </body>
 </html>

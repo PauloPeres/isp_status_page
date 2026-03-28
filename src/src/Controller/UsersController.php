@@ -39,6 +39,15 @@ class UsersController extends AppController
 
         // If user is logged in redirect them away
         if ($result && $result->isValid()) {
+            // Regenerate session ID to prevent session fixation attacks (TASK-AUTH-006)
+            $this->request->getSession()->renew();
+
+            // Handle "Remember me" checkbox (TASK-AUTH-012)
+            if ($this->request->getData('remember_me')) {
+                $this->request->getSession()->write('Config.timeout', 60 * 24 * 30); // 30 days
+                ini_set('session.cookie_lifetime', 60 * 60 * 24 * 30);
+            }
+
             $user = $this->Authentication->getIdentity();
 
             // Check if user needs to change password
@@ -47,26 +56,20 @@ class UsersController extends AppController
                 return $this->redirect(['action' => 'changePassword']);
             }
 
-            // Get redirect parameter or default to /admin
-            $redirect = $this->request->getQuery('redirect', [
-                'controller' => 'Admin',
-                'action' => 'index',
-            ]);
+            // Get redirect parameter or default to /admin (TASK-AUTH-009: validate redirect to prevent open redirect)
+            $redirect = $this->request->getQuery('redirect', '/admin');
+            if (!is_string($redirect) || !str_starts_with($redirect, '/') || str_starts_with($redirect, '//')) {
+                $redirect = '/admin';
+            }
 
             return $this->redirect($redirect);
         }
 
-        // Check if at least one user has already changed their password
-        $hasUserWithChangedPassword = $this->Users->find()
-            ->where(['force_password_change' => false])
-            ->count() > 0;
-
         // Pass result to view only when it's a POST (login attempt)
         if ($this->request->is('post')) {
-            $this->set(compact('result', 'hasUserWithChangedPassword'));
+            $this->set(compact('result'));
         } else {
             $this->set('result', null);
-            $this->set(compact('hasUserWithChangedPassword'));
         }
     }
 
@@ -152,8 +155,8 @@ class UsersController extends AppController
                         $this->log("Failed to send password reset email to {$user->email}: " .
                             ($result['technical_error'] ?? $result['message']), 'error');
 
-                        // Also log the reset link for development/recovery
-                        $this->log("Password reset link (email failed): {$resetLink}", 'info');
+                        // Log that the reset link was generated (do not log the actual token)
+                        $this->log("Password reset link generated for user {$user->email} (email delivery failed)", 'info');
                     }
                 } else {
                     $this->Flash->error(__('Erro ao processar solicitação. Tente novamente.'));
@@ -300,7 +303,7 @@ class UsersController extends AppController
 
             // Update password and remove force change flag
             $userEntity->password = $newPassword;
-            $userEntity->force_password_change = false;
+            $userEntity->set('force_password_change', false);
 
             if ($this->Users->save($userEntity)) {
                 $this->Flash->success(__('Senha alterada com sucesso! Você já pode acessar o sistema.'));
@@ -412,7 +415,20 @@ class UsersController extends AppController
             // Remover campos extras antes de salvar
             unset($data['confirm_password'], $data['generate_password'], $data['send_invite']);
 
+            // Extract sensitive fields before mass assignment
+            $role = $data['role'] ?? 'user';
+            $active = $data['active'] ?? true;
+            $forcePasswordChange = $data['force_password_change'] ?? false;
+            unset($data['role'], $data['active'], $data['force_password_change'],
+                  $data['is_super_admin'], $data['email_verified'], $data['reset_token'],
+                  $data['oauth_provider'], $data['oauth_id']);
+
             $user = $this->Users->patchEntity($user, $data);
+
+            // Set sensitive fields directly (not mass-assignable)
+            $user->set('role', $role);
+            $user->set('active', $active);
+            $user->set('force_password_change', $forcePasswordChange);
 
             if ($this->Users->save($user)) {
                 $successMessage = __('Usuário criado com sucesso.');
@@ -436,8 +452,8 @@ class UsersController extends AppController
                         $this->log("Failed to send invitation email to {$user->email}: " .
                             ($result['technical_error'] ?? $result['message']), 'error');
 
-                        // Log credentials for recovery
-                        $this->log("User credentials (email failed): Username={$user->username}, Password={$generatedPassword}", 'info');
+                        // Log that credentials were generated (do not log actual password)
+                        $this->log("Generated credentials for user {$user->username} (email delivery failed, password not logged for security)", 'warning');
                     }
                 }
 
@@ -475,10 +491,20 @@ class UsersController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $data = $this->request->getData();
 
-            // Handle password change
+            // Handle password change (TASK-AUTH-010: require current password)
             if (!empty($data['new_password'])) {
+                // Verify current password first
+                $currentPassword = $data['current_password'] ?? '';
+                $hasher = new \Authentication\PasswordHasher\DefaultPasswordHasher();
+                if (empty($currentPassword) || !$hasher->check($currentPassword, $user->password)) {
+                    $this->Flash->error(__('Current password is incorrect.'));
+                    unset($data['new_password'], $data['confirm_password'], $data['current_password']);
+                    $this->set(compact('user'));
+                    return;
+                }
+
                 // Validate password confirmation
-                if ($data['new_password'] !== $data['confirm_password']) {
+                if ($data['new_password'] !== ($data['confirm_password'] ?? '')) {
                     $this->Flash->error(__('As senhas não coincidem.'));
                 } else {
                     // Set the new password
@@ -487,7 +513,7 @@ class UsersController extends AppController
             }
 
             // Remove temporary password fields
-            unset($data['new_password'], $data['confirm_password']);
+            unset($data['new_password'], $data['confirm_password'], $data['current_password']);
 
             // Don't allow changing role or active status through profile edit
             unset($data['role'], $data['active']);

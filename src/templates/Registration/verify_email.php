@@ -198,6 +198,18 @@
             <?= __('The verification link will expire in 24 hours. If you do not see the email, please check your spam/junk folder.') ?>
         </div>
 
+        <?php if (!empty($email)): ?>
+        <div style="margin-bottom: 24px; text-align: center;">
+            <p style="color: var(--color-gray-medium); font-size: 14px; margin-bottom: 12px;">
+                <?= __("Didn't receive the email?") ?>
+            </p>
+            <a href="<?= $this->Url->build('/resend-verification?email=' . urlencode($email)) ?>"
+               style="display: inline-block; padding: 12px 24px; background: var(--color-primary); color: var(--color-white); border-radius: var(--radius-lg); text-decoration: none; font-size: 14px; font-weight: 600; transition: all 0.3s ease;">
+                <?= __('Resend Verification Email') ?>
+            </a>
+        </div>
+        <?php endif; ?>
+
         <div class="links">
             <a href="<?= $this->Url->build(['controller' => 'Users', 'action' => 'login']) ?>">
                 <?= __('Back to Login') ?>

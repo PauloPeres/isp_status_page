@@ -25,7 +25,7 @@ class RegistrationController extends AppController
         parent::beforeFilter($event);
 
         // Allow public access to registration and email verification
-        $this->Authentication->addUnauthenticatedActions(['register', 'verifyEmail']);
+        $this->Authentication->addUnauthenticatedActions(['register', 'verifyEmail', 'resendVerification']);
     }
 
     /**
@@ -74,18 +74,20 @@ class RegistrationController extends AppController
                 return;
             }
 
-            // Prepare user data
+            // Prepare user data - only mass-assignable fields
             $userData = [
                 'username' => $data['username'] ?? '',
                 'email' => $data['email'] ?? '',
                 'password' => $data['password'],
-                'role' => 'admin', // Default role for self-registered users
-                'active' => true,
-                'email_verified' => false,
-                'force_password_change' => false,
             ];
 
             $user = $usersTable->patchEntity($user, $userData);
+
+            // Set sensitive fields directly (not mass-assignable)
+            $user->set('role', 'admin'); // Default role for self-registered users
+            $user->set('active', true);
+            $user->set('email_verified', false);
+            $user->set('force_password_change', false);
 
             // Generate email verification token
             $user->generateEmailVerificationToken();
@@ -213,6 +215,61 @@ class RegistrationController extends AppController
     }
 
     /**
+     * Resend verification email action (TASK-AUTH-013)
+     *
+     * Rate limited: max 1 resend per 60 seconds
+     *
+     * @return \Cake\Http\Response|null|void
+     */
+    public function resendVerification()
+    {
+        $this->viewBuilder()->disableAutoLayout();
+
+        $email = $this->request->getQuery('email', '');
+
+        if (empty($email)) {
+            $this->Flash->error(__('Email address is required.'));
+            return $this->redirect(['controller' => 'Users', 'action' => 'login']);
+        }
+
+        $usersTable = $this->fetchTable('Users');
+        $user = $usersTable->find()
+            ->where(['email' => $email, 'email_verified' => false])
+            ->first();
+
+        if (!$user) {
+            // Don't reveal whether the email exists - show generic success
+            $this->Flash->success(__('If your email is registered and unverified, a new verification link has been sent.'));
+            return $this->redirect(['action' => 'verifyEmail', '?' => ['email' => $email]]);
+        }
+
+        // Rate limit: max 1 resend per 60 seconds
+        if ($user->email_verification_sent_at) {
+            $sentAt = $user->email_verification_sent_at;
+            if ($sentAt instanceof \Cake\I18n\DateTime || $sentAt instanceof \DateTimeInterface) {
+                $secondsSinceSent = time() - $sentAt->getTimestamp();
+                if ($secondsSinceSent < 60) {
+                    $waitSeconds = 60 - $secondsSinceSent;
+                    $this->Flash->warning(__('Please wait {0} seconds before requesting another verification email.', $waitSeconds));
+                    return $this->redirect(['action' => 'verifyEmail', '?' => ['email' => $email]]);
+                }
+            }
+        }
+
+        // Regenerate token and resend
+        $user->generateEmailVerificationToken();
+
+        if ($usersTable->save($user)) {
+            $this->sendVerificationEmail($user);
+            $this->Flash->success(__('A new verification email has been sent. Please check your inbox.'));
+        } else {
+            $this->Flash->error(__('Could not resend verification email. Please try again.'));
+        }
+
+        return $this->redirect(['action' => 'verifyEmail', '?' => ['email' => $email]]);
+    }
+
+    /**
      * Generate a unique slug for an organization based on a username
      *
      * @param \Cake\ORM\Table $organizationsTable Organizations table
@@ -265,18 +322,13 @@ class RegistrationController extends AppController
             } else {
                 Log::error("Failed to send verification email to {$user->email}: " .
                     ($result['technical_error'] ?? $result['message']));
-                // Log the verification link for development/recovery
-                Log::info("Verification link (email failed): {$verifyLink}");
+                // Log that verification was attempted (do not log the actual token)
+                Log::info("Email verification link generated for {$user->email} (email delivery failed)");
             }
         } catch (\Exception $e) {
             Log::error("Error sending verification email: " . $e->getMessage());
-            // Log the verification link for development
-            $verifyLink = Router::url([
-                'controller' => 'Registration',
-                'action' => 'verifyEmail',
-                $user->email_verification_token,
-            ], true);
-            Log::info("Verification link (email error): {$verifyLink}");
+            // Log that verification was attempted (do not log the actual token)
+            Log::info("Email verification link generated for {$user->email} (email send error)");
         }
     }
 }

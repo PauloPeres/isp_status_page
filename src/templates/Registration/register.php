@@ -210,6 +210,41 @@
             margin-top: 4px;
         }
 
+        .field-error { color: #E53935; font-size: 12px; display: block; margin-top: 4px; }
+
+        .password-requirements {
+            background: var(--color-gray-light);
+            border-radius: var(--radius-md);
+            padding: 10px 14px;
+            margin-top: 8px;
+        }
+
+        .password-requirements small {
+            color: var(--color-gray-medium);
+            font-size: 12px;
+        }
+
+        .strength-bar {
+            height: 4px;
+            border-radius: 2px;
+            background: var(--color-gray-light);
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .strength-bar-fill {
+            height: 100%;
+            border-radius: 2px;
+            width: 0;
+            transition: width 0.3s ease, background-color 0.3s ease;
+        }
+
+        .strength-label {
+            font-size: 12px;
+            margin-top: 4px;
+            color: var(--color-gray-medium);
+        }
+
         .login-link {
             display: block;
             text-align: center;
@@ -320,15 +355,7 @@
         echo $this->Flash->render();
         ?>
 
-        <?php if (isset($user) && $user->getErrors()): ?>
-            <div class="alert alert-error">
-                <?php foreach ($user->getErrors() as $field => $errors): ?>
-                    <?php foreach ($errors as $error): ?>
-                        <div><?= h($error) ?></div>
-                    <?php endforeach; ?>
-                <?php endforeach; ?>
-            </div>
-        <?php endif; ?>
+        <?php /* Per-field validation errors shown inline below each field (TASK-AUTH-016) */ ?>
 
         <form method="post" action="<?= $this->Url->build(['controller' => 'Registration', 'action' => 'register']) ?>">
             <?php if (isset($this->request)): ?>
@@ -347,6 +374,9 @@
                     autofocus
                     autocomplete="username"
                 >
+                <?php if (!empty($user) && $user->getError('username')): ?>
+                    <span class="field-error"><?= implode(', ', $user->getError('username')) ?></span>
+                <?php endif; ?>
             </div>
 
             <div class="input-group">
@@ -360,6 +390,9 @@
                     required
                     autocomplete="email"
                 >
+                <?php if (!empty($user) && $user->getError('email')): ?>
+                    <span class="field-error"><?= implode(', ', $user->getError('email')) ?></span>
+                <?php endif; ?>
             </div>
 
             <div class="input-group">
@@ -373,6 +406,14 @@
                     autocomplete="new-password"
                     minlength="8"
                 >
+                <?php if (!empty($user) && $user->getError('password')): ?>
+                    <span class="field-error"><?= implode(', ', $user->getError('password')) ?></span>
+                <?php endif; ?>
+                <div class="password-requirements">
+                    <small><?= __('Password must be at least 8 characters') ?></small>
+                </div>
+                <div class="strength-bar"><div class="strength-bar-fill" id="strengthBarFill"></div></div>
+                <div class="strength-label" id="strengthLabel"></div>
             </div>
 
             <div class="input-group">
@@ -386,10 +427,59 @@
                     autocomplete="new-password"
                     minlength="8"
                 >
+                <?php if (!empty($user) && $user->getError('password_confirm')): ?>
+                    <span class="field-error"><?= implode(', ', $user->getError('password_confirm')) ?></span>
+                <?php endif; ?>
+            </div>
+
+            <div class="input-group" style="margin-bottom: 20px;">
+                <label style="display: flex; align-items: flex-start; gap: 8px; cursor: pointer;">
+                    <input type="checkbox" name="agree_terms" required style="margin-top: 4px; width: auto;">
+                    <span style="font-size: 13px; color: #666; font-weight: 400;">
+                        <?= __('I agree to the') ?> <a href="/terms" target="_blank"><?= __('Terms of Service') ?></a>
+                        <?= __('and') ?> <a href="/privacy" target="_blank"><?= __('Privacy Policy') ?></a>
+                    </span>
+                </label>
             </div>
 
             <button type="submit" class="btn"><?= __('Create Account') ?></button>
         </form>
+
+    <script>
+    (function() {
+        // Password strength meter (TASK-AUTH-015 bonus)
+        var passwordInput = document.getElementById('password');
+        var strengthBarFill = document.getElementById('strengthBarFill');
+        var strengthLabel = document.getElementById('strengthLabel');
+
+        var labels = ['', 'Weak', 'Fair', 'Good', 'Strong', 'Very Strong'];
+        var colors = ['', '#E53935', '#FF9800', '#FDD835', '#43A047', '#2E7D32'];
+
+        passwordInput.addEventListener('input', function() {
+            var strength = 0;
+            var val = this.value;
+            if (val.length >= 8) strength++;
+            if (val.length >= 12) strength++;
+            if (/[A-Z]/.test(val)) strength++;
+            if (/[0-9]/.test(val)) strength++;
+            if (/[^A-Za-z0-9]/.test(val)) strength++;
+
+            var pct = (strength / 5) * 100;
+            strengthBarFill.style.width = pct + '%';
+            strengthBarFill.style.backgroundColor = colors[strength] || '';
+            strengthLabel.textContent = val.length > 0 ? labels[strength] : '';
+            strengthLabel.style.color = colors[strength] || '';
+        });
+
+        // Form submission loading state
+        var form = document.querySelector('form');
+        form.addEventListener('submit', function() {
+            var btn = form.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.textContent = 'Please wait...';
+        });
+    })();
+    </script>
 
         <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--color-gray-light);">
             <p style="text-align: center; color: var(--color-gray-medium); font-size: 13px; margin-bottom: 16px;"><?= __('Or sign up with') ?></p>

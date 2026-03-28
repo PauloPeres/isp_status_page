@@ -97,6 +97,10 @@ return function (RouteBuilder $routes): void {
             '/verify-email/*',
             ['controller' => 'Registration', 'action' => 'verifyEmail']
         );
+        $builder->connect(
+            '/resend-verification',
+            ['controller' => 'Registration', 'action' => 'resendVerification']
+        );
 
         /*
          * Onboarding routes (TASK-701)
