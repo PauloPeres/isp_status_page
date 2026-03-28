@@ -132,7 +132,7 @@ class BadgeService
         $totalChecks = $checksTable->find()
             ->where([
                 'monitor_id' => $monitorId,
-                'created >=' => $since,
+                'checked_at >=' => $since,
             ])
             ->count();
 
@@ -143,8 +143,8 @@ class BadgeService
         $successChecks = $checksTable->find()
             ->where([
                 'monitor_id' => $monitorId,
-                'status' => 'up',
-                'created >=' => $since,
+                'status' => 'success',
+                'checked_at >=' => $since,
             ])
             ->count();
 
@@ -165,7 +165,7 @@ class BadgeService
         $result = $checksTable->find()
             ->where([
                 'monitor_id' => $monitorId,
-                'created >=' => $since,
+                'checked_at >=' => $since,
                 'response_time IS NOT' => null,
             ])
             ->select(['avg_time' => $checksTable->find()->func()->avg('response_time')])
