@@ -1864,3 +1864,18 @@ body {
 
 /* Business plan badge (P3-018) */
 .badge-gold { background: #fef3c7; color: #92400e; }
+
+/* Incident Updates Timeline */
+.incident-timeline { position: relative; padding-left: 24px; }
+.timeline-entry { position: relative; padding-bottom: 24px; padding-left: 20px; border-left: 2px solid #e5e7eb; }
+.timeline-entry:last-child { border-left-color: transparent; }
+.timeline-dot { position: absolute; left: -9px; top: 4px; width: 16px; height: 16px; border-radius: 50%; background: #9ca3af; border: 2px solid white; }
+.timeline-investigating .timeline-dot { background: #f59e0b; }
+.timeline-identified .timeline-dot { background: #3b82f6; }
+.timeline-monitoring .timeline-dot { background: #8b5cf6; }
+.timeline-resolved .timeline-dot { background: #22c55e; }
+.timeline-update .timeline-dot { background: #6b7280; }
+.timeline-header { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 4px; font-size: 13px; }
+.timeline-author { color: #6b7280; }
+.timeline-message { font-size: 14px; color: #374151; line-height: 1.5; }
+.update-form { margin-bottom: 24px; padding: 16px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb; }

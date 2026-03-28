@@ -5,6 +5,7 @@ namespace App\Service;
 
 use App\Model\Entity\Incident;
 use App\Model\Entity\Monitor;
+use App\Model\Table\IncidentUpdatesTable;
 use App\Model\Table\IncidentsTable;
 use Cake\I18n\DateTime;
 use Cake\ORM\Locator\LocatorAwareTrait;
@@ -32,11 +33,19 @@ class IncidentService
     private IncidentsTable $Incidents;
 
     /**
+     * IncidentUpdates table instance
+     *
+     * @var \App\Model\Table\IncidentUpdatesTable
+     */
+    private IncidentUpdatesTable $IncidentUpdates;
+
+    /**
      * Constructor
      */
     public function __construct()
     {
         $this->Incidents = $this->fetchTable('Incidents');
+        $this->IncidentUpdates = $this->fetchTable('IncidentUpdates');
     }
 
     /**
@@ -85,6 +94,14 @@ class IncidentService
         $savedIncident = $this->Incidents->save($incident);
 
         if ($savedIncident) {
+            // Auto-create timeline entry for incident creation
+            $this->createSystemUpdate(
+                $savedIncident,
+                'investigating',
+                'Incident detected automatically',
+                'system'
+            );
+
             if ($this->logger) {
                 $this->logger->info('Incident created automatically', [
                     'incident_id' => $savedIncident->id,
@@ -174,6 +191,14 @@ class IncidentService
         $result = $this->Incidents->save($incident);
 
         if ($result) {
+            // Auto-create timeline entry for incident resolution
+            $this->createSystemUpdate(
+                $result,
+                'resolved',
+                'Service recovered',
+                'system'
+            );
+
             if ($this->logger) {
                 $this->logger->info('Incident resolved automatically', [
                     'incident_id' => $incident->id,
@@ -252,6 +277,66 @@ class IncidentService
         return $this->Incidents
             ->find('activeByMonitor', ['monitorId' => $monitorId])
             ->first();
+    }
+
+    /**
+     * Create a system-generated update in an incident's timeline
+     *
+     * @param \App\Model\Entity\Incident $incident The incident
+     * @param string $status The status for the update
+     * @param string $message The update message
+     * @param string $source The source of the update
+     * @param int|null $userId Optional user ID
+     * @return void
+     */
+    public function createSystemUpdate(
+        Incident $incident,
+        string $status,
+        string $message,
+        string $source = 'system',
+        ?int $userId = null,
+    ): void {
+        try {
+            $update = $this->IncidentUpdates->newEntity([
+                'incident_id' => $incident->id,
+                'organization_id' => $incident->organization_id,
+                'user_id' => $userId,
+                'status' => $status,
+                'message' => $message,
+                'is_public' => true,
+                'source' => $source,
+            ]);
+
+            $this->IncidentUpdates->save($update);
+        } catch (\Exception $e) {
+            if ($this->logger) {
+                $this->logger->error('Failed to create incident update: ' . $e->getMessage(), [
+                    'incident_id' => $incident->id,
+                    'status' => $status,
+                ]);
+            }
+        }
+    }
+
+    /**
+     * Create an acknowledgement update in an incident's timeline
+     *
+     * @param \App\Model\Entity\Incident $incident The incident
+     * @param string $userName The name of the user who acknowledged
+     * @param string $channel The channel used to acknowledge (web, email, telegram, sms)
+     * @return void
+     */
+    public function createAcknowledgementUpdate(
+        Incident $incident,
+        string $userName,
+        string $channel,
+    ): void {
+        $this->createSystemUpdate(
+            $incident,
+            'update',
+            sprintf('Incident acknowledged by %s via %s', $userName, $channel),
+            $channel
+        );
     }
 
     /**

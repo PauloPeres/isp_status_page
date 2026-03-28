@@ -71,6 +71,12 @@ return function (RouteBuilder $routes): void {
             ['controller' => 'Incidents', 'action' => 'acknowledgeAdmin'],
             ['pass' => ['id'], 'id' => '\d+']
         );
+        // Incident timeline update
+        $builder->connect(
+            '/incidents/{id}/update',
+            ['controller' => 'Incidents', 'action' => 'addUpdate'],
+            ['pass' => ['id'], 'id' => '\d+']
+        );
 
         /*
          * OAuth/Social login routes (TASK-704)

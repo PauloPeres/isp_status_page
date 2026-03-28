@@ -3,6 +3,7 @@
  * @var \App\View\AppView $this
  * @var \App\Model\Entity\Incident $incident
  * @var array $timeline
+ * @var \Cake\Collection\CollectionInterface $incidentUpdates
  * @var \Cake\Collection\CollectionInterface $recentChecks
  */
 $this->assign('title', __d('incidents', 'Incident Details'));
@@ -618,6 +619,75 @@ $this->assign('title', __d('incidents', 'Incident Details'));
             </div>
         <?php endforeach; ?>
     </div>
+</div>
+
+<!-- Incident Updates Timeline -->
+<div class="timeline-section">
+    <h3><?= __d('incidents', 'Incident Updates') ?></h3>
+
+    <!-- Post update form -->
+    <?php if (!$incident->isResolved()): ?>
+    <div class="update-form">
+        <?= $this->Form->create(null, [
+            'url' => ['controller' => 'Incidents', 'action' => 'addUpdate', $incident->id],
+            'type' => 'post',
+        ]) ?>
+            <div style="display: flex; gap: 12px; align-items: flex-start; flex-wrap: wrap;">
+                <div style="flex: 0 0 auto;">
+                    <label for="update-status" style="font-size: 13px; font-weight: 600; color: #666; display: block; margin-bottom: 4px;"><?= __d('incidents', 'Status') ?></label>
+                    <select name="status" id="update-status" style="padding: 8px 12px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 14px;">
+                        <option value="update"><?= __d('incidents', 'General Update') ?></option>
+                        <option value="investigating"><?= __d('incidents', 'Investigating') ?></option>
+                        <option value="identified"><?= __d('incidents', 'Identified') ?></option>
+                        <option value="monitoring"><?= __d('incidents', 'Monitoring') ?></option>
+                        <option value="resolved"><?= __d('incidents', 'Resolved') ?></option>
+                    </select>
+                </div>
+                <div style="flex: 1; min-width: 250px;">
+                    <label for="update-message" style="font-size: 13px; font-weight: 600; color: #666; display: block; margin-bottom: 4px;"><?= __d('incidents', 'Message') ?></label>
+                    <textarea name="message" id="update-message" placeholder="<?= __d('incidents', 'Post an update...') ?>" required style="width: 100%; min-height: 80px; padding: 8px 12px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 14px; font-family: inherit; resize: vertical;"></textarea>
+                </div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
+                <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: #666; cursor: pointer;">
+                    <input type="hidden" name="is_public" value="0">
+                    <input type="checkbox" name="is_public" value="1" checked style="cursor: pointer;">
+                    <?= __d('incidents', 'Show on public status page') ?>
+                </label>
+                <button type="submit" class="btn btn-primary" style="padding: 8px 20px;"><?= __d('incidents', 'Post Update') ?></button>
+            </div>
+        <?= $this->Form->end() ?>
+    </div>
+    <?php endif; ?>
+
+    <!-- Timeline entries -->
+    <?php if ($incidentUpdates->count() > 0): ?>
+    <div class="incident-timeline" style="margin-top: 20px;">
+        <?php foreach ($incidentUpdates as $update): ?>
+        <div class="timeline-entry timeline-<?= h($update->status) ?>">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content" style="background: white; padding: 12px 16px; border-radius: 8px; border: 1px solid #e0e0e0;">
+                <div class="timeline-header">
+                    <span class="badge badge-<?= h($update->getStatusBadgeClass()) ?>"><?= h($update->getStatusLabel()) ?></span>
+                    <span class="timeline-time"><?= h($update->created->nice()) ?></span>
+                    <?php if ($update->user): ?>
+                        <span class="timeline-author"><?= __d('incidents', 'by {0}', h($update->user->username)) ?></span>
+                    <?php endif; ?>
+                    <?php if ($update->source !== 'web'): ?>
+                        <span class="badge badge-secondary"><?= h(ucfirst($update->source)) ?></span>
+                    <?php endif; ?>
+                    <?php if (!$update->is_public): ?>
+                        <span class="badge badge-secondary"><?= __d('incidents', 'Internal') ?></span>
+                    <?php endif; ?>
+                </div>
+                <div class="timeline-message" style="margin-top: 6px;"><?= nl2br(h($update->message)) ?></div>
+            </div>
+        </div>
+        <?php endforeach; ?>
+    </div>
+    <?php else: ?>
+    <p style="color: #999; font-size: 14px; margin-top: 12px;"><?= __d('incidents', 'No updates posted yet.') ?></p>
+    <?php endif; ?>
 </div>
 
 <!-- Recent Monitor Checks -->

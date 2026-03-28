@@ -177,6 +177,14 @@ class IncidentsController extends AppController
         // Build timeline of events
         $timeline = $this->buildTimeline($incident);
 
+        // Load incident updates for the timeline
+        $incidentUpdates = $this->fetchTable('IncidentUpdates')
+            ->find()
+            ->contain(['Users'])
+            ->where(['IncidentUpdates.incident_id' => $id])
+            ->orderBy(['IncidentUpdates.created' => 'ASC'])
+            ->all();
+
         // Get monitor's recent checks
         $recentChecks = $this->Incidents->Monitors->MonitorChecks
             ->find()
@@ -185,7 +193,7 @@ class IncidentsController extends AppController
             ->limit(20)
             ->all();
 
-        $this->set(compact('incident', 'timeline', 'recentChecks'));
+        $this->set(compact('incident', 'timeline', 'incidentUpdates', 'recentChecks'));
     }
 
     /**
@@ -317,6 +325,9 @@ class IncidentsController extends AppController
         if ($this->Incidents->save($incident)) {
             $this->Flash->success(__d('incidents', 'Incident acknowledged successfully.'));
 
+            // Create timeline entry for acknowledgement
+            $this->incidentService->createAcknowledgementUpdate($incident, 'Email link', 'email');
+
             // Notify other recipients
             $this->notifyAcknowledgement($incident, 'Email link');
 
@@ -363,8 +374,11 @@ class IncidentsController extends AppController
         if ($this->Incidents->save($incident)) {
             $this->Flash->success(__d('incidents', 'Incident acknowledged successfully.'));
 
-            // Notify other recipients
+            // Create timeline entry for acknowledgement
             $userName = $user ? ($user->get('username') ?? 'Admin') : 'Admin';
+            $this->incidentService->createAcknowledgementUpdate($incident, $userName, 'web');
+
+            // Notify other recipients
             $this->notifyAcknowledgement($incident, $userName);
         } else {
             $this->Flash->error(__d('incidents', 'Error acknowledging incident.'));
@@ -442,6 +456,53 @@ class IncidentsController extends AppController
         } catch (\Exception $e) {
             Log::error("Failed to notify acknowledgement: {$e->getMessage()}");
         }
+    }
+
+    /**
+     * Add an update to an incident's timeline
+     *
+     * POST /incidents/{id}/update
+     *
+     * @param string|null $id Incident id
+     * @return \Cake\Http\Response|null Redirects to view
+     */
+    public function addUpdate($id = null)
+    {
+        $this->request->allowMethod(['post']);
+
+        $incident = $this->Incidents->get($id);
+
+        $update = $this->fetchTable('IncidentUpdates')->newEntity([
+            'incident_id' => (int)$id,
+            'organization_id' => $incident->organization_id,
+            'user_id' => $this->Authentication->getIdentity()->getIdentifier(),
+            'status' => $this->request->getData('status', 'update'),
+            'message' => $this->request->getData('message'),
+            'is_public' => (bool)$this->request->getData('is_public', true),
+            'source' => 'web',
+        ]);
+
+        if ($this->fetchTable('IncidentUpdates')->save($update)) {
+            // If status changed, update the incident status too
+            if (in_array($update->status, ['investigating', 'identified', 'monitoring', 'resolved'])) {
+                $incident->set('status', $update->status);
+                if ($update->status === 'identified' && $incident->identified_at === null) {
+                    $incident->set('identified_at', DateTime::now());
+                }
+                if ($update->status === 'resolved') {
+                    $incident->set('resolved_at', DateTime::now());
+                    if ($incident->started_at) {
+                        $incident->set('duration', DateTime::now()->diffInSeconds($incident->started_at));
+                    }
+                }
+                $this->Incidents->save($incident);
+            }
+            $this->Flash->success(__('Update posted'));
+        } else {
+            $this->Flash->error(__('Could not post update'));
+        }
+
+        return $this->redirect(['action' => 'view', $id]);
     }
 
     /**

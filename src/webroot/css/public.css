@@ -1380,3 +1380,68 @@ body {
         padding: 4px 8px 2px !important;
     }
 }
+
+/* Public Incident Updates Timeline */
+.public-incident-updates {
+    margin-top: 12px;
+    padding-left: 16px;
+    border-left: 2px solid #e5e7eb;
+}
+
+.public-update-entry {
+    position: relative;
+    padding: 8px 0 8px 16px;
+}
+
+.public-update-dot {
+    position: absolute;
+    left: -7px;
+    top: 14px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #9ca3af;
+    border: 2px solid white;
+}
+
+.public-update-investigating .public-update-dot { background: #f59e0b; }
+.public-update-identified .public-update-dot { background: #3b82f6; }
+.public-update-monitoring .public-update-dot { background: #8b5cf6; }
+.public-update-resolved .public-update-dot { background: #22c55e; }
+.public-update-update .public-update-dot { background: #6b7280; }
+
+.public-update-content {
+    font-size: 13px;
+}
+
+.public-update-status {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-right: 6px;
+}
+
+.public-update-status-warning { background: #fef3c7; color: #d97706; }
+.public-update-status-info { background: #dbeafe; color: #1d4ed8; }
+.public-update-status-success { background: #dcfce7; color: #16a34a; }
+.public-update-status-secondary { background: #f3f4f6; color: #6b7280; }
+
+.public-update-time {
+    color: #9ca3af;
+    font-size: 12px;
+}
+
+.public-update-author {
+    color: #6b7280;
+    font-size: 12px;
+    margin-left: 4px;
+}
+
+.public-update-message {
+    margin-top: 4px;
+    color: #374151;
+    line-height: 1.5;
+}

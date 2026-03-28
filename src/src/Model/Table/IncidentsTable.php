@@ -63,6 +63,9 @@ class IncidentsTable extends Table
         $this->hasMany('AlertLogs', [
             'foreignKey' => 'incident_id',
         ]);
+        $this->hasMany('IncidentUpdates', [
+            'foreignKey' => 'incident_id',
+        ]);
         $this->belongsTo('Organizations', [
             'foreignKey' => 'organization_id',
             'joinType' => 'INNER',

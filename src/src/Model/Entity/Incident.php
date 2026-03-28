@@ -30,6 +30,7 @@ use Cake\ORM\Entity;
  * @property \App\Model\Entity\Monitor $monitor
  * @property \App\Model\Entity\User|null $acknowledged_by_user
  * @property \App\Model\Entity\AlertLog[] $alert_logs
+ * @property \App\Model\Entity\IncidentUpdate[] $incident_updates
  */
 class Incident extends Entity
 {
@@ -92,6 +93,7 @@ class Incident extends Entity
         'monitor' => true,
         'acknowledged_by_user' => true,
         'alert_logs' => true,
+        'incident_updates' => true,
     ];
 
     /**

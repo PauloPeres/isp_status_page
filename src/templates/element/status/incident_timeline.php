@@ -75,6 +75,26 @@ if ($incidents->count() === 0) {
                             </span>
                         <?php endif; ?>
                     </div>
+
+                    <?php if (!empty($incident->incident_updates)): ?>
+                    <div class="public-incident-updates">
+                        <?php foreach ($incident->incident_updates as $update): ?>
+                        <div class="public-update-entry public-update-<?= h($update->status) ?>">
+                            <div class="public-update-dot"></div>
+                            <div class="public-update-content">
+                                <span class="public-update-status public-update-status-<?= h($update->getStatusBadgeClass()) ?>"><?= h($update->getStatusLabel()) ?></span>
+                                <span class="public-update-time">
+                                    <span class="local-datetime" data-utc="<?= $update->created->format('c') ?>"></span>
+                                </span>
+                                <?php if ($update->user): ?>
+                                    <span class="public-update-author"><?= __('by {0}', h($update->user->username)) ?></span>
+                                <?php endif; ?>
+                                <div class="public-update-message"><?= nl2br(h($update->message)) ?></div>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
         <?php endforeach; ?>

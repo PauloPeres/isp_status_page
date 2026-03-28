@@ -457,6 +457,17 @@
 
 ---
 
+## Recently Completed
+
+### Incident Timeline/Updates System -- DONE
+- **Source:** Feature request (Statuspage.io/BetterUptime parity)
+- **Description:** Team members can post updates about incidents with status changes (Investigating, Identified, Monitoring, Resolved) and general updates. Updates show on both the admin incident detail page and the public status page. System auto-creates timeline entries when incidents are created, resolved, or acknowledged. Each update has a public/internal toggle.
+- **Complexity:** Medium
+- **Dependencies:** None
+- **Resolution:** Created `incident_updates` table via migration (20260328000160). IncidentUpdate entity with status badge/label helpers. IncidentUpdatesTable with TenantScope, validation, and finders. IncidentsController::addUpdate() action with automatic incident status sync. IncidentService extended with createSystemUpdate() and createAcknowledgementUpdate() for auto-generated timeline entries on incident creation, resolution, and acknowledgement. Admin view shows update form and full timeline. Public status page and history page show public updates under each incident. CSS added to both admin.css and public.css. Route: POST /incidents/{id}/update.
+
+---
+
 ## Summary Statistics
 
 | Priority | Count | Notes |

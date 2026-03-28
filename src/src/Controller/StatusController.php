@@ -115,13 +115,19 @@ class StatusController extends AppController
             $systemIcon = '🟢';
         }
 
-        // Get recent incidents (last 7 days)
+        // Get recent incidents (last 7 days) with public updates
         $recentIncidents = $this->fetchTable('Incidents')
             ->find()
+            ->contain(['IncidentUpdates' => function ($q) {
+                return $q
+                    ->where(['IncidentUpdates.is_public' => true])
+                    ->contain(['Users'])
+                    ->orderBy(['IncidentUpdates.created' => 'ASC']);
+            }])
             ->where([
-                'created >=' => date('Y-m-d H:i:s', strtotime('-7 days'))
+                'Incidents.created >=' => date('Y-m-d H:i:s', strtotime('-7 days'))
             ])
-            ->orderBy(['created' => 'DESC'])
+            ->orderBy(['Incidents.created' => 'DESC'])
             ->limit(5)
             ->all();
 
@@ -233,13 +239,19 @@ class StatusController extends AppController
 
         $this->viewBuilder()->setLayout('public');
 
-        // Get incidents from last 30 days
+        // Get incidents from last 30 days with public updates
         $incidents = $this->fetchTable('Incidents')
             ->find()
+            ->contain(['IncidentUpdates' => function ($q) {
+                return $q
+                    ->where(['IncidentUpdates.is_public' => true])
+                    ->contain(['Users'])
+                    ->orderBy(['IncidentUpdates.created' => 'ASC']);
+            }])
             ->where([
-                'created >=' => date('Y-m-d H:i:s', strtotime('-30 days'))
+                'Incidents.created >=' => date('Y-m-d H:i:s', strtotime('-30 days'))
             ])
-            ->orderBy(['created' => 'DESC'])
+            ->orderBy(['Incidents.created' => 'DESC'])
             ->all();
 
         // Group incidents by date
