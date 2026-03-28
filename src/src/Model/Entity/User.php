@@ -55,6 +55,7 @@ class User extends Entity
         'language' => true,
         'timezone' => true,
         'created' => true,
+        'is_super_admin' => true,
         'modified' => true,
     ];
 
@@ -89,6 +90,16 @@ class User extends Entity
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
+    }
+
+    /**
+     * Check if user is a super admin
+     *
+     * @return bool
+     */
+    public function isSuperAdmin(): bool
+    {
+        return (bool)($this->is_super_admin ?? false);
     }
 
     /**

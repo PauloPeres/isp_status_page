@@ -34,6 +34,7 @@ use Cake\Routing\Middleware\RoutingMiddleware;
 use App\Middleware\ApiAuthMiddleware;
 use App\Middleware\ApiRateLimitMiddleware;
 use App\Middleware\PlanLimitMiddleware;
+use App\Middleware\SuperAdminMiddleware;
 use App\Middleware\TenantMiddleware;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -106,6 +107,9 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
 
             // Resolve the current tenant (organization) from subdomain, session, header, etc.
             ->add(new TenantMiddleware())
+
+            // Super admin gate — only activates on /super-admin/* paths
+            ->add(new SuperAdminMiddleware())
 
             // API authentication via Bearer token (API key) — only activates on /api/v1/* paths
             ->add(new ApiAuthMiddleware())

@@ -195,6 +195,17 @@ function isActive($currentController, $targetController, $currentAction = null, 
                 ]
             ) ?>
         </div>
+
+        <?php if (!empty($isSuperAdmin)): ?>
+        <div class="nav-section">
+            <span class="nav-section-title"><?= __('Platform') ?></span>
+            <?= $this->Html->link(
+                '<span class="nav-icon">&#x1F451;</span> ' . __('Super Admin'),
+                ['prefix' => 'SuperAdmin', 'controller' => 'Dashboard', 'action' => 'index'],
+                ['escape' => false, 'class' => 'nav-item']
+            ) ?>
+        </div>
+        <?php endif; ?>
     </nav>
 
     <div class="sidebar-footer">

@@ -102,6 +102,14 @@ if ($cacheDriver === 'redis' && $redisUrl) {
         'prefix' => 'isp_cake_model_',
         'duration' => '+1 years',
     ];
+    $cacheConfig['super_admin'] = [
+        'className' => RedisEngine::class,
+        'host' => $redisHost,
+        'port' => $redisPort,
+        'database' => 4,
+        'duration' => 300,
+        'prefix' => 'sa_',
+    ];
 } else {
     $cacheConfig['default'] = [
         'className' => FileEngine::class,
@@ -120,6 +128,12 @@ if ($cacheDriver === 'redis' && $redisUrl) {
         'path' => CACHE . 'models' . DS,
         'serialize' => true,
         'duration' => '+1 years',
+    ];
+    $cacheConfig['super_admin'] = [
+        'className' => FileEngine::class,
+        'path' => CACHE . 'super_admin' . DS,
+        'duration' => 300,
+        'prefix' => 'sa_',
     ];
 }
 

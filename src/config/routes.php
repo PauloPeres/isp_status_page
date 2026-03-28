@@ -257,6 +257,22 @@ return function (RouteBuilder $routes): void {
     });
 
     /*
+     * Super Admin routes (TASK-SA-005)
+     */
+    $routes->prefix('SuperAdmin', ['path' => '/super-admin'], function (RouteBuilder $builder): void {
+        $builder->connect('/', ['controller' => 'Dashboard', 'action' => 'index']);
+        $builder->connect('/organizations', ['controller' => 'Organizations', 'action' => 'index']);
+        $builder->connect('/organizations/{id}', ['controller' => 'Organizations', 'action' => 'view'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/organizations/{id}/impersonate', ['controller' => 'Organizations', 'action' => 'impersonate'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/organizations/stop-impersonation', ['controller' => 'Organizations', 'action' => 'stopImpersonation']);
+        $builder->connect('/users', ['controller' => 'Users', 'action' => 'index']);
+        $builder->connect('/users/{id}', ['controller' => 'Users', 'action' => 'view'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/revenue', ['controller' => 'Revenue', 'action' => 'index']);
+        $builder->connect('/health', ['controller' => 'Health', 'action' => 'index']);
+        $builder->fallbacks();
+    });
+
+    /*
      * REST API v1 routes (TASK-902)
      *
      * Auth handled by ApiAuthMiddleware; CSRF skipped for /api/* in Application.php.

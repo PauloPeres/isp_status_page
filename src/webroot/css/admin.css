@@ -1757,3 +1757,12 @@ body {
 /* Loading Spinner */
 .loading-spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid var(--color-gray-light); border-top-color: var(--color-primary); border-radius: 50%; animation: spin 0.6s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* Super Admin Styles */
+.super-admin-sidebar { background: #1a1a2e; }
+.super-admin-sidebar .nav-item { color: #e0e0e0; }
+.super-admin-sidebar .nav-item:hover { background: #16213e; color: #e94560; }
+.super-admin-sidebar .nav-item.active { background: #e94560; color: white; }
+.super-admin-navbar { background: #1a1a2e; }
+.impersonation-banner { background: #e94560; color: white; padding: 8px 16px; text-align: center; font-weight: 600; }
+.impersonation-banner a { color: white; text-decoration: underline; margin-left: 12px; }

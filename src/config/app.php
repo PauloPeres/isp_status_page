@@ -130,6 +130,17 @@ return [
             'duration' => '+1 years',
             'url' => env('CACHE_CAKEMODEL_URL', null),
         ],
+
+        /*
+         * Super Admin metrics cache.
+         * 5-minute duration for dashboard KPI data.
+         */
+        'super_admin' => [
+            'className' => FileEngine::class,
+            'path' => CACHE . 'super_admin' . DS,
+            'duration' => 300,
+            'prefix' => 'sa_',
+        ],
     ],
 
     /*

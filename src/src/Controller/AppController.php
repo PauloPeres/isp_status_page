@@ -108,7 +108,7 @@ class AppController extends Controller
                 try {
                     $usersTable = \Cake\ORM\TableRegistry::getTableLocator()->get('Users');
                     $user = $usersTable->find()
-                        ->select(['language', 'timezone'])
+                        ->select(['language', 'timezone', 'is_super_admin'])
                         ->where(['id' => $userId])
                         ->disableHydration()
                         ->first();
@@ -119,6 +119,9 @@ class AppController extends Controller
                         }
                         if (!empty($user['timezone'])) {
                             $timezone = $user['timezone'];
+                        }
+                        if (!empty($user['is_super_admin'])) {
+                            $this->set('isSuperAdmin', true);
                         }
                     }
                 } catch (\Exception $e) {

@@ -50,6 +50,7 @@ class TenantMiddleware implements MiddlewareInterface
         '/organizations/switch',
         '/onboarding/',
         '/s/',
+        '/super-admin',
     ];
 
     /**
