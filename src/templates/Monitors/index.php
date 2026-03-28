@@ -3,6 +3,8 @@
  * @var \App\View\AppView $this
  * @var \Cake\Collection\CollectionInterface $monitors
  * @var array $stats
+ * @var array $monitorsUptimeData
+ * @var array $allTags
  */
 $this->assign('title', __d('monitors', 'Monitors'));
 ?>
@@ -98,6 +100,19 @@ $this->assign('title', __d('monitors', 'Monitors'));
                 'class' => 'form-control',
             ]) ?>
         </div>
+
+        <?php if (!empty($allTags)): ?>
+        <div class="filter-group">
+            <label><?= __d('monitors', 'Tag') ?></label>
+            <?= $this->Form->control('tag', [
+                'label' => false,
+                'options' => $allTags,
+                'value' => $this->request->getQuery('tag'),
+                'empty' => __('All'),
+                'class' => 'form-control',
+            ]) ?>
+        </div>
+        <?php endif; ?>
     </div>
 
     <div class="filter-buttons">
@@ -119,6 +134,7 @@ $this->assign('title', __d('monitors', 'Monitors'));
                     <th><?= $this->Paginator->sort('target', __d('monitors', 'Target')) ?></th>
                     <th><?= $this->Paginator->sort('last_check_at', __d('monitors', 'Last Check')) ?></th>
                     <th><?= __d('monitors', 'Response Time') ?></th>
+                    <th style="min-width: 150px;"><?= __d('monitors', 'Uptime (30d)') ?></th>
                     <th><?= $this->Paginator->sort('active', __d('monitors', 'State')) ?></th>
                     <th style="text-align: right;"><?= __('Actions') ?></th>
                 </tr>
@@ -132,7 +148,16 @@ $this->assign('title', __d('monitors', 'Monitors'));
                             </span>
                         </td>
                         <td>
-                            <div class="monitor-name"><?= h($monitor->name) ?></div>
+                            <div class="monitor-name">
+                                <?= h($monitor->name) ?>
+                                <?php
+                                $tags = $monitor->getTags();
+                                foreach ($tags as $tag):
+                                    $color = \App\Model\Entity\Monitor::getTagColor($tag);
+                                ?>
+                                    <span class="tag-pill tag-pill-<?= h($color) ?>"><?= h($tag) ?></span>
+                                <?php endforeach; ?>
+                            </div>
                             <?php if ($monitor->description): ?>
                                 <div class="monitor-description"><?= h($monitor->description) ?></div>
                             <?php endif; ?>
@@ -155,6 +180,17 @@ $this->assign('title', __d('monitors', 'Monitors'));
                                 <span style="font-family: 'Courier New', monospace; color: #666;">
                                     <?= number_format($monitor->response_time, 0) ?>ms
                                 </span>
+                            <?php else: ?>
+                                <span style="color: #ccc;">-</span>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <?php if (!empty($monitorsUptimeData[$monitor->id])): ?>
+                                <?= $this->element('monitor/uptime_bar', [
+                                    'uptimeData' => $monitorsUptimeData[$monitor->id],
+                                    'days' => 30,
+                                    'compact' => true,
+                                ]) ?>
                             <?php else: ?>
                                 <span style="color: #ccc;">-</span>
                             <?php endif; ?>

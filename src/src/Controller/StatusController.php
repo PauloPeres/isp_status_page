@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Service\SettingService;
+use Cake\I18n\DateTime;
 
 /**
  * Status Controller
@@ -137,6 +138,51 @@ class StatusController extends AppController
             $this->response = $this->response->withStatus(200); // Degraded but page renders OK
         }
 
+        // P2-011: Compute 30-day uptime bars for each monitor on the status page
+        $monitorIds = [];
+        foreach ($monitors as $m) {
+            $monitorIds[] = $m->id;
+        }
+
+        $monitorsUptimeData = [];
+        if (!empty($monitorIds)) {
+            $checksTable = $this->fetchTable('MonitorChecks');
+            $conn = $checksTable->getConnection();
+            $placeholders = implode(',', array_fill(0, count($monitorIds), '?'));
+            $since = DateTime::now()->subDays(29)->startOfDay()->format('Y-m-d H:i:s');
+            $params = array_merge($monitorIds, [$since]);
+
+            $stmt = $conn->execute(
+                "SELECT monitor_id, DATE(checked_at) as check_date,
+                        COUNT(*) as total,
+                        SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) as success_count
+                 FROM monitor_checks
+                 WHERE monitor_id IN ({$placeholders}) AND checked_at >= ?
+                 GROUP BY monitor_id, DATE(checked_at)
+                 ORDER BY check_date ASC",
+                $params
+            );
+            $dailyByMonitor = [];
+            foreach ($stmt->fetchAll('assoc') as $row) {
+                $dailyByMonitor[$row['monitor_id']][$row['check_date']] = $row;
+            }
+
+            foreach ($monitorIds as $mid) {
+                $data = [];
+                for ($i = 29; $i >= 0; $i--) {
+                    $dayStr = DateTime::now()->subDays($i)->format('Y-m-d');
+                    $total = (int)($dailyByMonitor[$mid][$dayStr]['total'] ?? 0);
+                    $success = (int)($dailyByMonitor[$mid][$dayStr]['success_count'] ?? 0);
+                    $data[] = [
+                        'date' => $dayStr,
+                        'uptime' => $total > 0 ? ($success / $total) * 100 : 0,
+                        'checks' => $total,
+                    ];
+                }
+                $monitorsUptimeData[$mid] = $data;
+            }
+        }
+
         $this->set(compact(
             'monitors',
             'systemStatus',
@@ -150,7 +196,8 @@ class StatusController extends AppController
             'siteName',
             'statusPageTitle',
             'logoUrl',
-            'supportEmail'
+            'supportEmail',
+            'monitorsUptimeData'
         ));
     }
 

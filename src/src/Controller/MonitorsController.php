@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Service\PlanService;
+use Cake\I18n\DateTime;
 
 /**
  * Monitors Controller
@@ -50,6 +51,12 @@ class MonitorsController extends AppController
             ]);
         }
 
+        // Filter by tag
+        if ($this->request->getQuery('tag')) {
+            $tag = $this->request->getQuery('tag');
+            $query->where(['tags LIKE' => '%"' . str_replace(['%', '_'], ['\\%', '\\_'], $tag) . '"%']);
+        }
+
         $monitors = $this->paginate($query->orderBy(['created' => 'DESC']));
 
         // Estatísticas
@@ -60,7 +67,68 @@ class MonitorsController extends AppController
             'offline' => $this->Monitors->find()->where(['status' => 'down'])->count(),
         ];
 
-        $this->set(compact('monitors', 'stats'));
+        // P2-011: Compute 30-day uptime bars for each monitor
+        $monitorIds = [];
+        foreach ($monitors as $m) {
+            $monitorIds[] = $m->id;
+        }
+
+        $monitorsUptimeData = [];
+        if (!empty($monitorIds)) {
+            $checksTable = $this->Monitors->MonitorChecks;
+            $conn = $checksTable->getConnection();
+            $placeholders = implode(',', array_fill(0, count($monitorIds), '?'));
+            $since = DateTime::now()->subDays(29)->startOfDay()->format('Y-m-d H:i:s');
+            $params = array_merge($monitorIds, [$since]);
+
+            $stmt = $conn->execute(
+                "SELECT monitor_id, DATE(checked_at) as check_date,
+                        COUNT(*) as total,
+                        SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) as success_count
+                 FROM monitor_checks
+                 WHERE monitor_id IN ({$placeholders}) AND checked_at >= ?
+                 GROUP BY monitor_id, DATE(checked_at)
+                 ORDER BY check_date ASC",
+                $params
+            );
+            $dailyByMonitor = [];
+            foreach ($stmt->fetchAll('assoc') as $row) {
+                $dailyByMonitor[$row['monitor_id']][$row['check_date']] = $row;
+            }
+
+            foreach ($monitorIds as $mid) {
+                $data = [];
+                for ($i = 29; $i >= 0; $i--) {
+                    $dayStr = DateTime::now()->subDays($i)->format('Y-m-d');
+                    $total = (int)($dailyByMonitor[$mid][$dayStr]['total'] ?? 0);
+                    $success = (int)($dailyByMonitor[$mid][$dayStr]['success_count'] ?? 0);
+                    $data[] = [
+                        'date' => $dayStr,
+                        'uptime' => $total > 0 ? ($success / $total) * 100 : 0,
+                        'checks' => $total,
+                    ];
+                }
+                $monitorsUptimeData[$mid] = $data;
+            }
+        }
+
+        // Collect all unique tags across all monitors for the filter dropdown
+        $allTags = [];
+        $allMonitorsForTags = $this->Monitors->find()
+            ->select(['tags'])
+            ->where(['tags IS NOT' => null])
+            ->all();
+        foreach ($allMonitorsForTags as $m) {
+            $decoded = json_decode((string)$m->tags, true);
+            if (is_array($decoded)) {
+                foreach ($decoded as $t) {
+                    $allTags[$t] = $t;
+                }
+            }
+        }
+        ksort($allTags);
+
+        $this->set(compact('monitors', 'stats', 'monitorsUptimeData', 'allTags'));
     }
 
     /**
@@ -120,7 +188,60 @@ class MonitorsController extends AppController
             ->first();
         $avgResponseTime = $avgResult && $avgResult->avg ? round((float)$avgResult->avg, 2) : null;
 
-        $this->set(compact('monitor', 'uptime', 'avgResponseTime', 'totalChecks'));
+        // P2-003: Response time graph data
+        $timeRange = $this->request->getQuery('range', '24h');
+        $rangeHours = match ($timeRange) {
+            '7d' => 168,
+            '30d' => 720,
+            default => 24,
+        };
+        $rangeSince = DateTime::now()->subHours($rangeHours);
+
+        $checks24h = $checksTable->find()
+            ->where(['monitor_id' => $id, 'checked_at >=' => $rangeSince])
+            ->orderBy(['checked_at' => 'ASC'])
+            ->all();
+
+        $responseTimeData = [];
+        foreach ($checks24h as $check) {
+            $format = $rangeHours <= 24 ? 'H:i' : 'M d H:i';
+            $responseTimeData[] = [
+                'time' => $check->checked_at->format($format),
+                'value' => $check->response_time,
+                'status' => $check->status,
+            ];
+        }
+
+        // P2-011: 30-day uptime history bars
+        $uptimeData = [];
+        $conn = $checksTable->getConnection();
+        $stmt = $conn->execute(
+            "SELECT DATE(checked_at) as check_date,
+                    COUNT(*) as total,
+                    SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) as success_count
+             FROM monitor_checks
+             WHERE monitor_id = ? AND checked_at >= ?
+             GROUP BY DATE(checked_at)
+             ORDER BY check_date ASC",
+            [$id, DateTime::now()->subDays(29)->startOfDay()->format('Y-m-d H:i:s')]
+        );
+        $dailyStats = [];
+        foreach ($stmt->fetchAll('assoc') as $row) {
+            $dailyStats[$row['check_date']] = $row;
+        }
+
+        for ($i = 29; $i >= 0; $i--) {
+            $dayStr = DateTime::now()->subDays($i)->format('Y-m-d');
+            $total = (int)($dailyStats[$dayStr]['total'] ?? 0);
+            $success = (int)($dailyStats[$dayStr]['success_count'] ?? 0);
+            $uptimeData[] = [
+                'date' => $dayStr,
+                'uptime' => $total > 0 ? ($success / $total) * 100 : 0,
+                'checks' => $total,
+            ];
+        }
+
+        $this->set(compact('monitor', 'uptime', 'avgResponseTime', 'totalChecks', 'responseTimeData', 'uptimeData', 'timeRange'));
     }
 
     /**
@@ -148,6 +269,9 @@ class MonitorsController extends AppController
             }
 
             $data = $this->request->getData();
+
+            // Parse comma-separated tags into JSON array
+            $data = $this->parseTagsFromData($data);
 
             // Filter configuration fields based on monitor type
             if (isset($data['type']) && isset($data['configuration'])) {
@@ -183,6 +307,9 @@ class MonitorsController extends AppController
 
         if ($this->request->is(['patch', 'post', 'put'])) {
             $data = $this->request->getData();
+
+            // Parse comma-separated tags into JSON array
+            $data = $this->parseTagsFromData($data);
 
             \Cake\Log\Log::debug('=== EDIT DEBUG ===');
             \Cake\Log\Log::debug('Original config from DB:', ['config' => $monitor->configuration]);
@@ -249,6 +376,27 @@ class MonitorsController extends AppController
         }
 
         return $filtered;
+    }
+
+    /**
+     * Parse comma-separated tags string from form data into JSON array
+     *
+     * @param array $data Request data
+     * @return array Modified data with tags as JSON string
+     */
+    private function parseTagsFromData(array $data): array
+    {
+        if (isset($data['tags']) && is_string($data['tags'])) {
+            $tagsString = $data['tags'];
+            if (trim($tagsString) === '') {
+                $data['tags'] = null;
+            } else {
+                $tags = array_values(array_unique(array_filter(array_map('trim', explode(',', $tagsString)))));
+                $data['tags'] = !empty($tags) ? json_encode($tags) : null;
+            }
+        }
+
+        return $data;
     }
 
     /**

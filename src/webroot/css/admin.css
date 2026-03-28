@@ -1758,6 +1758,32 @@ body {
 .loading-spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid var(--color-gray-light); border-top-color: var(--color-primary); border-radius: 50%; animation: spin 0.6s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* Tag Pills */
+.tag-pill { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 500; margin-right: 4px; vertical-align: middle; }
+.tag-pill-blue { background: #dbeafe; color: #1e40af; }
+.tag-pill-green { background: #dcfce7; color: #166534; }
+.tag-pill-purple { background: #f3e8ff; color: #6b21a8; }
+.tag-pill-orange { background: #ffedd5; color: #9a3412; }
+.tag-pill-gray { background: #f3f4f6; color: #374151; }
+
+/* Channel Cards (Notification Channels UI) */
+.channel-card { border: 1px solid #e0e0e0; border-radius: 8px; margin-bottom: 16px; background: white; }
+.channel-header { display: flex; align-items: center; gap: 12px; padding: 16px; border-bottom: 1px solid #f0f0f0; }
+.channel-header h4 { margin: 0; font-size: 16px; font-weight: 600; flex: 1; }
+.channel-icon { font-size: 24px; }
+.channel-body { padding: 16px; }
+.channel-body label { display: block; font-size: 13px; font-weight: 600; color: #333; margin-bottom: 4px; margin-top: 12px; }
+.channel-body label:first-child { margin-top: 0; }
+.channel-body input[type="text"],
+.channel-body input[type="url"],
+.channel-body input[type="password"] { width: 100%; padding: 8px 12px; border: 1px solid #d0d0d0; border-radius: 6px; font-size: 14px; }
+.channel-body .btn-sm { padding: 6px 14px; font-size: 13px; border: none; border-radius: 6px; cursor: pointer; margin-top: 12px; }
+.channel-body .btn-test { background: #e0e7ff; color: #3730a3; }
+.channel-body .btn-test:hover { background: #c7d2fe; }
+.channel-body .test-result { margin-top: 8px; padding: 8px 12px; border-radius: 6px; font-size: 13px; display: none; }
+.channel-body .test-result.success { display: block; background: #dcfce7; color: #166534; }
+.channel-body .test-result.error { display: block; background: #fee2e2; color: #991b1b; }
+
 /* Super Admin Styles */
 .super-admin-sidebar { background: #1a1a2e; }
 .super-admin-sidebar .nav-item { color: #e0e0e0; }
@@ -1766,3 +1792,12 @@ body {
 .super-admin-navbar { background: #1a1a2e; }
 .impersonation-banner { background: #e94560; color: white; padding: 8px 16px; text-align: center; font-weight: 600; }
 .impersonation-banner a { color: white; text-decoration: underline; margin-left: 12px; }
+
+/* Uptime History Bars (P2-011) */
+.uptime-bar { display: flex; gap: 1px; height: 28px; border-radius: 4px; overflow: hidden; }
+.uptime-bar-segment { flex: 1; min-width: 2px; transition: opacity 0.2s; cursor: pointer; }
+.uptime-bar-segment:hover { opacity: 0.7; }
+.uptime-bar-labels { display: flex; justify-content: space-between; font-size: 11px; color: #999; margin-top: 4px; }
+.uptime-bar-percentage { font-weight: 600; color: #333; }
+.uptime-bar-compact { height: 16px; border-radius: 3px; }
+.uptime-bar-compact .uptime-bar-segment { min-width: 1px; }

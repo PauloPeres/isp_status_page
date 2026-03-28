@@ -90,11 +90,12 @@
 - **Complexity:** Medium
 - **Dependencies:** DB-007
 
-### P2-003: Response time graphs on monitor detail pages
+### P2-003: Response time graphs on monitor detail pages -- DONE
 - **Source:** USER_TESTING_POWER_USER.md (Recommendation #2)
 - **Description:** Per-monitor response time charts over 24h/7d/30d time ranges. This is the single most expected feature from any monitoring tool and is currently absent from the monitor view page.
 - **Complexity:** Medium
 - **Dependencies:** None
+- **Resolution:** Added Chart.js line chart on monitor detail page with green/red dots for success/failure, time range selector (24h/7d/30d), and tooltips showing exact values.
 
 ### P2-004: Alert rules management UI in admin panel -- DONE
 - **Source:** USER_TESTING_POWER_USER.md, QA_CHECKLIST.md
@@ -139,11 +140,12 @@
 - **Complexity:** Medium
 - **Dependencies:** None
 
-### P2-011: Uptime history bars (30/60/90 day visual bars)
+### P2-011: Uptime history bars (30/60/90 day visual bars) -- DONE
 - **Source:** USER_TESTING_POWER_USER.md (Recommendation #8)
 - **Description:** The 30/60/90-day visual bar showing green/red segments by day is the most recognized UX pattern in monitoring tools. Should appear on monitor list, monitor detail, and status pages.
 - **Complexity:** Medium
 - **Dependencies:** DB-007 (rollup data)
+- **Resolution:** Created uptime_bar element with color-coded 30-day segments (green/yellow/red/grey). Displayed on monitor detail page, monitors index (compact), and public status page. Uses efficient GROUP BY DATE aggregate query.
 
 ### P2-012: Monitor groups/tags
 - **Source:** USER_TESTING_POWER_USER.md (Recommendation #5)

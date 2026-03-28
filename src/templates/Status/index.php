@@ -50,7 +50,7 @@ $this->assign('title', $statusPageTitle);
 
         <?php if ($monitors->count() > 0): ?>
             <?php foreach ($monitors as $monitor): ?>
-                <?= $this->element('status/monitor_card', ['monitor' => $monitor]) ?>
+                <?= $this->element('status/monitor_card', ['monitor' => $monitor, 'monitorsUptimeData' => $monitorsUptimeData]) ?>
             <?php endforeach; ?>
         <?php else: ?>
             <div class="empty-state">

@@ -5,6 +5,9 @@
  * @var float $uptime
  * @var float $avgResponseTime
  * @var int $totalChecks
+ * @var array $responseTimeData
+ * @var array $uptimeData
+ * @var string $timeRange
  */
 $this->assign('title', __d('monitors', 'Monitor Details'));
 ?>
@@ -74,6 +77,33 @@ $this->assign('title', __d('monitors', 'Monitor Details'));
                 <div class="stat-value"><?= $monitor->interval ?>s</div>
                 <div class="stat-label"><?= __d('monitors', 'Interval') ?></div>
             </div>
+        </div>
+    </div>
+
+    <!-- Uptime History Bar (P2-011) -->
+    <div class="card">
+        <div class="card-header">📊 <?= __d('monitors', '30-Day Uptime History') ?></div>
+        <div style="padding: 20px;">
+            <?= $this->element('monitor/uptime_bar', ['uptimeData' => $uptimeData, 'days' => 30]) ?>
+        </div>
+    </div>
+
+    <!-- Response Time Graph (P2-003) -->
+    <div class="card">
+        <div class="card-header">
+            <span>📈 <?= __d('monitors', 'Response Time') ?></span>
+            <div class="chart-range-buttons">
+                <?php
+                $ranges = ['24h' => __('24h'), '7d' => __('7d'), '30d' => __('30d')];
+                foreach ($ranges as $key => $label):
+                ?>
+                    <a href="<?= $this->Url->build(['action' => 'view', $monitor->id, '?' => ['range' => $key]]) ?>"
+                       class="btn-range<?= $timeRange === $key ? ' active' : '' ?>"><?= $label ?></a>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <div style="padding: 20px;">
+            <canvas id="responseTimeChart" height="80"></canvas>
         </div>
     </div>
 
@@ -447,4 +477,117 @@ $this->assign('title', __d('monitors', 'Monitor Details'));
         grid-template-columns: 1fr;
     }
 }
+
+/* Chart range buttons */
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.chart-range-buttons {
+    display: flex;
+    gap: 4px;
+}
+
+.btn-range {
+    padding: 4px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--color-gray-medium);
+    background: var(--color-gray-light);
+    transition: all 0.2s;
+}
+
+.btn-range:hover {
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+}
+
+.btn-range.active {
+    background: var(--color-primary);
+    color: var(--color-white);
+}
 </style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const rawData = <?= json_encode($responseTimeData) ?>;
+
+    if (rawData.length === 0) {
+        document.getElementById('responseTimeChart').parentElement.innerHTML =
+            '<p style="text-align:center;color:#999;padding:40px 0;">No response time data available for this period.</p>';
+        return;
+    }
+
+    const labels = rawData.map(d => d.time);
+    const values = rawData.map(d => d.value);
+    const pointColors = rawData.map(d => d.status === 'success' ? '#22c55e' : '#ef4444');
+    const pointRadius = rawData.length > 200 ? 0 : 3;
+
+    const ctx = document.getElementById('responseTimeChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Response Time (ms)',
+                data: values,
+                borderColor: '#1E88E5',
+                backgroundColor: 'rgba(30, 136, 229, 0.1)',
+                fill: true,
+                tension: 0.3,
+                pointBackgroundColor: pointColors,
+                pointBorderColor: pointColors,
+                pointRadius: pointRadius,
+                pointHoverRadius: 6,
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        title: function(items) {
+                            return items[0].label;
+                        },
+                        label: function(context) {
+                            const idx = context.dataIndex;
+                            const status = rawData[idx].status === 'success' ? 'OK' : 'FAIL';
+                            const val = context.parsed.y !== null ? context.parsed.y + ' ms' : 'N/A';
+                            return status + ': ' + val;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: { display: true, text: 'ms' },
+                    grid: { color: 'rgba(0,0,0,0.05)' }
+                },
+                x: {
+                    title: { display: true, text: 'Time' },
+                    grid: { display: false },
+                    ticks: {
+                        maxTicksLimit: 12,
+                        maxRotation: 0
+                    }
+                }
+            }
+        }
+    });
+});
+</script>

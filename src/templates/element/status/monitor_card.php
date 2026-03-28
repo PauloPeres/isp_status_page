@@ -51,6 +51,16 @@
         </div>
     </div>
 
+    <?php if (!empty($monitorsUptimeData[$monitor->id])): ?>
+        <div class="service-uptime-bar" style="padding: 8px 16px 4px;">
+            <?= $this->element('monitor/uptime_bar', [
+                'uptimeData' => $monitorsUptimeData[$monitor->id],
+                'days' => 30,
+                'compact' => false,
+            ]) ?>
+        </div>
+    <?php endif; ?>
+
     <div class="service-details">
         <div class="service-detail-item">
             <span class="detail-icon">🔍</span>
