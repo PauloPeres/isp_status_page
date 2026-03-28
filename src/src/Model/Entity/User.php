@@ -55,6 +55,9 @@ class User extends Entity
         'oauth_id' => false,
         'force_password_change' => false,
         'last_login' => false,
+        'two_factor_secret' => false,
+        'two_factor_enabled' => false,
+        'two_factor_recovery_codes' => false,
     ];
 
     /**
@@ -64,6 +67,8 @@ class User extends Entity
      */
     protected array $_hidden = [
         'password',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
     ];
 
     /**

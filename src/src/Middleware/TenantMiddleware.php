@@ -46,6 +46,7 @@ class TenantMiddleware implements MiddlewareInterface
         '/api/docs',
         '/incidents/acknowledge/',
         '/auth/',
+        '/two-factor/',
         '/organizations/select',
         '/organizations/switch',
         '/onboarding/',

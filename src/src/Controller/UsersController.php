@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Service\AuditLogService;
 use App\Service\LoginThrottleService;
 
 /**
@@ -12,6 +13,24 @@ use App\Service\LoginThrottleService;
  */
 class UsersController extends AppController
 {
+    /**
+     * Audit log service instance.
+     *
+     * @var \App\Service\AuditLogService
+     */
+    private AuditLogService $audit;
+
+    /**
+     * Initialize method.
+     *
+     * @return void
+     */
+    public function initialize(): void
+    {
+        parent::initialize();
+        $this->audit = new AuditLogService();
+    }
+
     /**
      * Before filter callback
      *
@@ -41,10 +60,12 @@ class UsersController extends AppController
         // TASK-AUTH-005: Brute force protection
         $throttleService = new LoginThrottleService();
         $clientIp = $this->request->clientIp();
+        $ua = $this->request->getHeaderLine('User-Agent');
 
         // Check if IP is locked out before processing authentication
         if ($this->request->is('post') && $throttleService->isLocked($clientIp)) {
             $this->Flash->error(__('Too many failed login attempts. Please try again in 15 minutes.'));
+            $this->audit->log('login_locked', null, $clientIp, $ua, ['reason' => 'ip_locked']);
             $this->set('result', null);
 
             return;
@@ -54,6 +75,7 @@ class UsersController extends AppController
         $username = $this->request->getData('username');
         if ($this->request->is('post') && !empty($username) && $throttleService->isLocked($username)) {
             $this->Flash->error(__('Too many failed login attempts for this account. Please try again in 15 minutes.'));
+            $this->audit->log('login_locked', null, $clientIp, $ua, ['reason' => 'account_locked', 'username' => $username]);
             $this->set('result', null);
 
             return;
@@ -80,6 +102,32 @@ class UsersController extends AppController
 
             $user = $this->Authentication->getIdentity();
 
+            // TASK-AUTH-018: Audit log successful login
+            $this->audit->log('login_success', $user ? (int)$user->id : null, $clientIp, $ua);
+
+            // TASK-AUTH-MFA: Check if user has 2FA enabled
+            if ($user) {
+                try {
+                    $usersTable = \Cake\ORM\TableRegistry::getTableLocator()->get('Users');
+                    $userEntity = $usersTable->find()
+                        ->select(['id', 'two_factor_enabled'])
+                        ->where(['id' => $user->getIdentifier()])
+                        ->disableHydration()
+                        ->first();
+
+                    if ($userEntity && !empty($userEntity['two_factor_enabled'])) {
+                        // Store user ID for 2FA verification, then logout to prevent access
+                        $pendingUserId = $user->getIdentifier();
+                        $this->Authentication->logout();
+                        $this->request->getSession()->write('pending_2fa_user_id', $pendingUserId);
+
+                        return $this->redirect('/two-factor/verify');
+                    }
+                } catch (\Exception $e) {
+                    // Column may not exist yet; proceed without 2FA check
+                }
+            }
+
             // Check if user needs to change password
             if ($user && $user->force_password_change) {
                 $this->Flash->warning(__('Por segurança, você deve alterar sua senha antes de continuar.'));
@@ -102,6 +150,9 @@ class UsersController extends AppController
             if (!empty($username)) {
                 $throttleService->recordFailure($username);
             }
+
+            // TASK-AUTH-018: Audit log failed login
+            $this->audit->log('login_failed', null, $clientIp, $ua, ['username' => $username]);
 
             $remaining = $throttleService->getRemainingAttempts($clientIp);
             if ($remaining > 0 && $remaining <= 3) {
@@ -161,6 +212,15 @@ class UsersController extends AppController
                 $user->generateResetToken(1); // Token expires in 1 hour
 
                 if ($this->Users->save($user)) {
+                    // TASK-AUTH-018: Audit log password reset request
+                    $this->audit->log(
+                        'password_reset_requested',
+                        (int)$user->id,
+                        $this->request->clientIp(),
+                        $this->request->getHeaderLine('User-Agent'),
+                        ['email' => $email]
+                    );
+
                     // Build reset link
                     $resetLink = \Cake\Routing\Router::url([
                         'controller' => 'Users',
@@ -275,6 +335,14 @@ class UsersController extends AppController
             $user->clearResetToken();
 
             if ($this->Users->save($user)) {
+                // TASK-AUTH-018: Audit log password reset completed
+                $this->audit->log(
+                    'password_reset_completed',
+                    (int)$user->id,
+                    $this->request->clientIp(),
+                    $this->request->getHeaderLine('User-Agent')
+                );
+
                 $this->Flash->success(__('Senha redefinida com sucesso! Você já pode fazer login.'));
                 return $this->redirect(['action' => 'login']);
             } else {
@@ -347,6 +415,14 @@ class UsersController extends AppController
             $userEntity->set('force_password_change', false);
 
             if ($this->Users->save($userEntity)) {
+                // TASK-AUTH-018: Audit log password changed
+                $this->audit->log(
+                    'password_changed',
+                    (int)$user->id,
+                    $this->request->clientIp(),
+                    $this->request->getHeaderLine('User-Agent')
+                );
+
                 $this->Flash->success(__('Senha alterada com sucesso! Você já pode acessar o sistema.'));
                 return $this->redirect(['controller' => 'Admin', 'action' => 'index']);
             } else {
@@ -472,6 +548,16 @@ class UsersController extends AppController
             $user->set('force_password_change', $forcePasswordChange);
 
             if ($this->Users->save($user)) {
+                // TASK-AUTH-018: Audit log user creation
+                $identity = $this->Authentication->getIdentity();
+                $this->audit->log(
+                    'user_created',
+                    $identity ? (int)$identity->id : null,
+                    $this->request->clientIp(),
+                    $this->request->getHeaderLine('User-Agent'),
+                    ['created_user_id' => $user->id, 'username' => $user->username, 'role' => $role]
+                );
+
                 $successMessage = __('Usuário criado com sucesso.');
 
                 // Send invitation email if requested
@@ -533,6 +619,7 @@ class UsersController extends AppController
             $data = $this->request->getData();
 
             // Handle password change (TASK-AUTH-010: require current password)
+            $passwordChanged = false;
             if (!empty($data['new_password'])) {
                 // Verify current password first
                 $currentPassword = $data['current_password'] ?? '';
@@ -550,6 +637,7 @@ class UsersController extends AppController
                 } else {
                     // Set the new password
                     $data['password'] = $data['new_password'];
+                    $passwordChanged = true;
                 }
             }
 
@@ -562,6 +650,17 @@ class UsersController extends AppController
             $user = $this->Users->patchEntity($user, $data);
 
             if ($this->Users->save($user)) {
+                // TASK-AUTH-018: Audit log password changed via profile edit
+                if ($passwordChanged) {
+                    $this->audit->log(
+                        'password_changed',
+                        (int)$user->id,
+                        $this->request->clientIp(),
+                        $this->request->getHeaderLine('User-Agent'),
+                        ['via' => 'profile_edit']
+                    );
+                }
+
                 $this->Flash->success(__('Perfil atualizado com sucesso.'));
 
                 return $this->redirect(['action' => 'view', $user->id]);
@@ -586,6 +685,16 @@ class UsersController extends AppController
         $user = $this->Users->get($id);
 
         if ($this->Users->delete($user)) {
+            // TASK-AUTH-018: Audit log user deletion
+            $identity = $this->Authentication->getIdentity();
+            $this->audit->log(
+                'user_deleted',
+                $identity ? (int)$identity->id : null,
+                $this->request->clientIp(),
+                $this->request->getHeaderLine('User-Agent'),
+                ['deleted_user_id' => (int)$id, 'username' => $user->username]
+            );
+
             $this->Flash->success(__('Usuário excluído com sucesso.'));
         } else {
             $this->Flash->error(__('Não foi possível excluir o usuário. Tente novamente.'));

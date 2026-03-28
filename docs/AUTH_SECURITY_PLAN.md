@@ -22,6 +22,9 @@
 - TASK-AUTH-015: Show password requirements on registration - COMPLETED
 - TASK-AUTH-016: Per-field validation errors on registration - COMPLETED
 
+## Two-Factor Authentication
+- TASK-AUTH-MFA: Two-Factor Authentication (2FA/TOTP) - COMPLETED
+
 ## Medium Priority
 - TASK-AUTH-017: Enforce email verification before access - COMPLETED
 - TASK-AUTH-018: Security audit logging table

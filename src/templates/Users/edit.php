@@ -318,4 +318,59 @@ $this->assign('title', __d('users', 'Edit Profile'));
 
         <?= $this->Form->end() ?>
     </div>
+
+    <!-- Two-Factor Authentication Section (TASK-AUTH-MFA) -->
+    <div class="card">
+        <div class="card-header"><?= __('Two-Factor Authentication') ?></div>
+
+        <?php
+        $twoFactorEnabled = !empty($user->two_factor_enabled);
+        ?>
+
+        <?php if ($twoFactorEnabled): ?>
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #43A047;"></span>
+                <span style="font-size: 14px; color: #333; font-weight: 500;"><?= __('Two-factor authentication is enabled.') ?></span>
+            </div>
+
+            <p style="font-size: 13px; color: #666; margin-bottom: 16px;">
+                <?= __('Your account is protected with TOTP-based two-factor authentication.') ?>
+            </p>
+
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
+                <?= $this->Html->link(__('View Recovery Codes'), '/two-factor/recovery-codes', ['class' => 'btn btn-secondary']) ?>
+            </div>
+
+            <div style="border-top: 1px solid #e0e0e0; padding-top: 16px; margin-top: 8px;">
+                <p style="font-size: 13px; color: #999; margin-bottom: 12px;">
+                    <?= __('To disable 2FA, enter your password and a current 2FA code.') ?>
+                </p>
+
+                <?= $this->Form->create(null, ['url' => '/two-factor/disable']) ?>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><?= __('Password') ?></label>
+                        <input type="password" name="password" required autocomplete="current-password" placeholder="<?= __('Enter your password') ?>" style="padding: 8px 12px; border: 1px solid #d0d0d0; border-radius: 6px; font-size: 14px;">
+                    </div>
+                    <div class="form-group">
+                        <label><?= __('2FA Code') ?></label>
+                        <input type="text" name="code" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" autocomplete="one-time-code" required placeholder="000000" style="padding: 8px 12px; border: 1px solid #d0d0d0; border-radius: 6px; font-size: 14px; letter-spacing: 2px; width: 120px;">
+                    </div>
+                </div>
+                <button type="submit" class="btn" style="background: #E53935; color: white;" onclick="return confirm('<?= __('Are you sure you want to disable two-factor authentication?') ?>');"><?= __('Disable 2FA') ?></button>
+                <?= $this->Form->end() ?>
+            </div>
+        <?php else: ?>
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #999;"></span>
+                <span style="font-size: 14px; color: #333; font-weight: 500;"><?= __('Two-factor authentication is not enabled.') ?></span>
+            </div>
+
+            <p style="font-size: 13px; color: #666; margin-bottom: 16px;">
+                <?= __('Add an extra layer of security to your account by enabling two-factor authentication with a TOTP authenticator app.') ?>
+            </p>
+
+            <?= $this->Html->link(__('Set Up 2FA'), '/two-factor/setup', ['class' => 'btn btn-primary', 'style' => 'background: #1E88E5; color: white;']) ?>
+        <?php endif; ?>
+    </div>
 </div>

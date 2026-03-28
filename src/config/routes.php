@@ -171,6 +171,26 @@ return function (RouteBuilder $routes): void {
         );
 
         /*
+         * Two-Factor Authentication routes (TASK-AUTH-MFA)
+         */
+        $builder->connect(
+            '/two-factor/setup',
+            ['controller' => 'TwoFactor', 'action' => 'setup']
+        );
+        $builder->connect(
+            '/two-factor/verify',
+            ['controller' => 'TwoFactor', 'action' => 'verify']
+        );
+        $builder->connect(
+            '/two-factor/disable',
+            ['controller' => 'TwoFactor', 'action' => 'disable']
+        );
+        $builder->connect(
+            '/two-factor/recovery-codes',
+            ['controller' => 'TwoFactor', 'action' => 'recoveryCodes']
+        );
+
+        /*
          * Public status page route
          */
         $builder->connect(
