@@ -24,12 +24,12 @@ The monitor_checks table is the highest-volume table in the system. At SaaS scal
 - **Description:** DashboardController runs 300 queries per load (3 per monitor). Replace with single GROUP BY aggregates. Fix ChecksController stats bug (mutated query builder). Fix MonitorsController memory issue.
 
 ### TASK-DB-004: Create monitor_checks_rollup Table
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Priority:** MUST-HAVE
 - **Description:** Rollup table with 5min/1hour/1day aggregations. ChecksAggregationService + AggregateChecksCommand for hourly cron. Replaces raw data for historical queries.
 
 ### TASK-DB-005: Plan-Aware Retention with Batched Deletes
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Priority:** MUST-HAVE
 - **Description:** Rewrite CleanupCommand: per-org retention based on plan tier, batched 10K-row deletes, only delete already-aggregated data.
 - **Depends on:** DB-004

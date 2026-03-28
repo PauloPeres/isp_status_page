@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Command;
 
+use App\Service\DataRetentionService;
 use Cake\Command\Command;
 use Cake\Console\Arguments;
 use Cake\Console\ConsoleIo;
@@ -15,6 +16,9 @@ use Cake\Database\Exception\DatabaseException;
  *
  * Cleans up old data from the database to maintain performance
  * and prevent excessive disk usage.
+ *
+ * Uses plan-aware retention for monitor checks (via DataRetentionService)
+ * and fixed retention for integration logs and alert logs.
  */
 class CleanupCommand extends Command
 {
@@ -32,11 +36,6 @@ class CleanupCommand extends Command
 
         $parser
             ->setDescription('Clean up old data from database')
-            ->addOption('checks-days', [
-                'short' => 'c',
-                'help' => 'Delete monitor checks older than N days (default: 30)',
-                'default' => 30,
-            ])
             ->addOption('logs-days', [
                 'short' => 'l',
                 'help' => 'Delete integration logs older than N days (default: 7)',
@@ -75,7 +74,6 @@ class CleanupCommand extends Command
         $io->out('<info>Starting database cleanup...</info>');
         $io->hr();
 
-        $checksDays = (int)$args->getOption('checks-days');
         $logsDays = (int)$args->getOption('logs-days');
         $alertsDays = (int)$args->getOption('alerts-days');
         $vacuum = (bool)$args->getOption('vacuum');
@@ -88,8 +86,12 @@ class CleanupCommand extends Command
 
         $totalDeleted = 0;
 
-        // Clean up monitor checks
-        $deleted = $this->cleanupMonitorChecks($checksDays, $dryRun, $io);
+        // Plan-aware cleanup of monitor checks
+        $deleted = $this->cleanupMonitorChecks($dryRun, $io);
+        $totalDeleted += $deleted;
+
+        // Clean up old rollup data
+        $deleted = $this->cleanupRollups($dryRun, $io);
         $totalDeleted += $deleted;
 
         // Clean up integration logs
@@ -117,41 +119,83 @@ class CleanupCommand extends Command
     }
 
     /**
-     * Clean up old monitor checks
+     * Clean up old monitor checks using plan-aware retention via DataRetentionService.
      *
-     * @param int $days Delete checks older than this many days
      * @param bool $dryRun Don't actually delete if true
      * @param \Cake\Console\ConsoleIo $io Console IO
-     * @return int Number of records that would be/were deleted
+     * @return int Number of records that were deleted
      */
-    private function cleanupMonitorChecks(int $days, bool $dryRun, ConsoleIo $io): int
+    private function cleanupMonitorChecks(bool $dryRun, ConsoleIo $io): int
     {
-        $io->out("<info>Cleaning monitor checks older than {$days} days...</info>");
+        $io->out('<info>Cleaning monitor checks (plan-aware retention)...</info>');
 
-        $table = $this->fetchTable('MonitorChecks');
-        $cutoffDate = date('Y-m-d H:i:s', strtotime("-{$days} days"));
+        if ($dryRun) {
+            $io->out('  <warning>Skipping in dry-run mode (plan-aware deletion uses batched SQL)</warning>');
 
-        $query = $table->find()
-            ->where(['checked_at <' => $cutoffDate]);
-
-        $count = $query->count();
-
-        if ($count === 0) {
-            $io->out('  <success>✓</success> No old monitor checks to delete');
             return 0;
         }
 
+        try {
+            $retentionService = new DataRetentionService();
+            $stats = $retentionService->cleanup();
+
+            $total = 0;
+            foreach ($stats as $orgSlug => $count) {
+                $io->out("  {$orgSlug}: <info>{$count}</info> checks deleted");
+                $total += $count;
+            }
+
+            if ($total === 0) {
+                $io->out('  <success>No old monitor checks to delete</success>');
+            } else {
+                $io->out("  <success>Total: {$total} monitor checks deleted</success>");
+            }
+
+            return $total;
+        } catch (\Exception $e) {
+            $io->error('  Error during plan-aware check cleanup: ' . $e->getMessage());
+
+            return 0;
+        }
+    }
+
+    /**
+     * Clean up old rollup data using DataRetentionService.
+     *
+     * @param bool $dryRun Don't actually delete if true
+     * @param \Cake\Console\ConsoleIo $io Console IO
+     * @return int Number of records that were deleted
+     */
+    private function cleanupRollups(bool $dryRun, ConsoleIo $io): int
+    {
+        $io->out('<info>Cleaning old rollup data...</info>');
+
         if ($dryRun) {
-            $io->out("  <warning>Would delete {$count} monitor checks</warning>");
-            return $count;
+            $io->out('  <warning>Skipping in dry-run mode (rollup deletion uses batched SQL)</warning>');
+
+            return 0;
         }
 
         try {
-            $deleted = $table->deleteAll(['checked_at <' => $cutoffDate]);
-            $io->out("  <success>✓</success> Deleted {$deleted} monitor checks");
-            return $deleted;
-        } catch (DatabaseException $e) {
-            $io->error('  ✗ Error deleting monitor checks: ' . $e->getMessage());
+            $retentionService = new DataRetentionService();
+            $stats = $retentionService->cleanupRollups();
+
+            $total = 0;
+            foreach ($stats as $periodType => $count) {
+                $io->out("  {$periodType}: <info>{$count}</info> rollup rows deleted");
+                $total += $count;
+            }
+
+            if ($total === 0) {
+                $io->out('  <success>No old rollup data to delete</success>');
+            } else {
+                $io->out("  <success>Total: {$total} rollup rows deleted</success>");
+            }
+
+            return $total;
+        } catch (\Exception $e) {
+            $io->error('  Error during rollup cleanup: ' . $e->getMessage());
+
             return 0;
         }
     }
@@ -177,21 +221,25 @@ class CleanupCommand extends Command
         $count = $query->count();
 
         if ($count === 0) {
-            $io->out('  <success>✓</success> No old integration logs to delete');
+            $io->out('  <success>No old integration logs to delete</success>');
+
             return 0;
         }
 
         if ($dryRun) {
             $io->out("  <warning>Would delete {$count} integration logs</warning>");
+
             return $count;
         }
 
         try {
             $deleted = $table->deleteAll(['created <' => $cutoffDate]);
-            $io->out("  <success>✓</success> Deleted {$deleted} integration logs");
+            $io->out("  <success>Deleted {$deleted} integration logs</success>");
+
             return $deleted;
         } catch (DatabaseException $e) {
-            $io->error('  ✗ Error deleting integration logs: ' . $e->getMessage());
+            $io->error('  Error deleting integration logs: ' . $e->getMessage());
+
             return 0;
         }
     }
@@ -217,21 +265,25 @@ class CleanupCommand extends Command
         $count = $query->count();
 
         if ($count === 0) {
-            $io->out('  <success>✓</success> No old alert logs to delete');
+            $io->out('  <success>No old alert logs to delete</success>');
+
             return 0;
         }
 
         if ($dryRun) {
             $io->out("  <warning>Would delete {$count} alert logs</warning>");
+
             return $count;
         }
 
         try {
             $deleted = $table->deleteAll(['created <' => $cutoffDate]);
-            $io->out("  <success>✓</success> Deleted {$deleted} alert logs");
+            $io->out("  <success>Deleted {$deleted} alert logs</success>");
+
             return $deleted;
         } catch (DatabaseException $e) {
-            $io->error('  ✗ Error deleting alert logs: ' . $e->getMessage());
+            $io->error('  Error deleting alert logs: ' . $e->getMessage());
+
             return 0;
         }
     }
@@ -252,14 +304,15 @@ class CleanupCommand extends Command
             // Check if it's SQLite
             $driver = $connection->getDriver();
             if (strpos(get_class($driver), 'Sqlite') === false) {
-                $io->out('  <warning>⚠</warning> VACUUM is only supported for SQLite databases');
+                $io->out('  <warning>VACUUM is only supported for SQLite databases</warning>');
+
                 return;
             }
 
             $connection->execute('VACUUM');
-            $io->out('  <success>✓</success> Database vacuumed successfully');
+            $io->out('  <success>Database vacuumed successfully</success>');
         } catch (\Exception $e) {
-            $io->error('  ✗ Error running VACUUM: ' . $e->getMessage());
+            $io->error('  Error running VACUUM: ' . $e->getMessage());
         }
     }
 }
