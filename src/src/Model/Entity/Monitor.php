@@ -31,6 +31,7 @@ use Cake\ORM\Entity;
  * @property \App\Model\Entity\Incident[] $incidents
  * @property \App\Model\Entity\MonitorCheck[] $monitor_checks
  * @property \App\Model\Entity\Subscription[] $subscriptions
+ * @property string|null $tags
  */
 class Monitor extends Entity
 {
@@ -88,6 +89,7 @@ class Monitor extends Entity
         'incidents' => true,
         'monitor_checks' => true,
         'subscriptions' => true,
+        'tags' => true,
     ];
 
     /**
@@ -273,5 +275,67 @@ class Monitor extends Entity
             self::TYPE_ZABBIX => 'Zabbix',
             default => 'Unknown',
         };
+    }
+
+    /**
+     * Tag pill color classes — cycles through available colors
+     */
+    private const TAG_COLORS = ['blue', 'green', 'purple', 'orange', 'gray'];
+
+    /**
+     * Get tags as an array
+     *
+     * @return array
+     */
+    public function getTags(): array
+    {
+        if (empty($this->tags)) {
+            return [];
+        }
+
+        if (is_array($this->tags)) {
+            return $this->tags;
+        }
+
+        $decoded = json_decode($this->tags, true);
+
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    /**
+     * Set tags from an array, encoding to JSON
+     *
+     * @param array $tags List of tag strings
+     * @return void
+     */
+    public function setTags(array $tags): void
+    {
+        // Clean up: trim whitespace, remove empties, unique values
+        $tags = array_values(array_unique(array_filter(array_map('trim', $tags))));
+        $this->tags = !empty($tags) ? json_encode($tags) : null;
+    }
+
+    /**
+     * Check if monitor has a specific tag
+     *
+     * @param string $tag The tag to check for
+     * @return bool
+     */
+    public function hasTag(string $tag): bool
+    {
+        return in_array($tag, $this->getTags(), true);
+    }
+
+    /**
+     * Get the pill color class for a given tag (deterministic based on tag name)
+     *
+     * @param string $tag The tag name
+     * @return string CSS class suffix (e.g., 'blue', 'green')
+     */
+    public static function getTagColor(string $tag): string
+    {
+        $index = crc32($tag) % count(self::TAG_COLORS);
+
+        return self::TAG_COLORS[abs($index)];
     }
 }

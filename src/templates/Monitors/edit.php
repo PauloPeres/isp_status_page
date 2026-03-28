@@ -51,6 +51,18 @@ $this->assign('title', __d('monitors', 'Edit Monitor'));
                 'class' => 'form-control',
             ]) ?>
 
+            <div class="form-group">
+                <label>
+                    <?= __d('monitors', 'Tags') ?>
+                </label>
+                <?= $this->Form->text('tags', [
+                    'placeholder' => __d('monitors', 'e.g. production, api, critical'),
+                    'class' => 'form-control',
+                    'value' => implode(', ', $monitor->getTags()),
+                ]) ?>
+                <small class="form-help"><?= __d('monitors', 'Comma-separated list of tags for grouping and filtering') ?></small>
+            </div>
+
             <div class="form-row">
                 <div class="form-group">
                     <label>

@@ -334,6 +334,7 @@ function getDescription($key, $descriptions, $fallback = '') {
         <button class="tab-button" data-tab="email"><?= __d('settings', 'Email') ?></button>
         <button class="tab-button" data-tab="monitoring"><?= __d('settings', 'Monitoring') ?></button>
         <button class="tab-button" data-tab="notifications"><?= __d('settings', 'Notifications') ?></button>
+        <button class="tab-button" data-tab="channels"><?= __d('settings', 'Channels') ?></button>
         <button class="tab-button" data-tab="backup"><?= __d('settings', 'Backup') ?></button>
     </div>
 
@@ -699,6 +700,148 @@ function getDescription($key, $descriptions, $fallback = '') {
         <?php endif; ?>
     </div>
 
+    <!-- Notification Channels -->
+    <div class="tab-content" id="channels">
+        <div class="settings-form">
+            <p style="margin-bottom: 20px; color: #666; font-size: 14px;">
+                <?= __d('settings', 'Configure notification channels to receive alerts when monitors go down or recover.') ?>
+            </p>
+
+            <?= $this->Form->create(null, ['url' => ['action' => 'saveChannels'], 'id' => 'channels-form']) ?>
+
+            <!-- Email Channel -->
+            <div class="channel-card">
+                <div class="channel-header">
+                    <span class="channel-icon">&#9993;</span>
+                    <h4><?= __d('settings', 'Email') ?></h4>
+                    <span class="badge badge-success"><?= __d('settings', 'Configured via SMTP') ?></span>
+                </div>
+                <div class="channel-body">
+                    <p style="color: #666; font-size: 13px;">
+                        <?= __d('settings', 'Email notifications are configured through the Email tab. SMTP settings are already available.') ?>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Slack Channel -->
+            <div class="channel-card">
+                <div class="channel-header">
+                    <span class="channel-icon">&#128172;</span>
+                    <h4>Slack</h4>
+                    <?php
+                    $slackUrl = $settings['channels']['channel_slack_webhook_url'] ?? '';
+                    ?>
+                    <?php if (!empty($slackUrl)): ?>
+                        <span class="badge badge-success"><?= __d('settings', 'Connected') ?></span>
+                    <?php else: ?>
+                        <span class="badge badge-secondary"><?= __d('settings', 'Not configured') ?></span>
+                    <?php endif; ?>
+                </div>
+                <div class="channel-body">
+                    <label><?= __d('settings', 'Webhook URL') ?></label>
+                    <input type="url" name="channel_slack_webhook_url"
+                           value="<?= h($slackUrl) ?>"
+                           placeholder="https://hooks.slack.com/services/...">
+                    <button type="button" class="btn-sm btn-test" onclick="testChannel('slack')"><?= __d('settings', 'Test') ?></button>
+                    <div id="test-result-slack" class="test-result"></div>
+                </div>
+            </div>
+
+            <!-- Discord Channel -->
+            <div class="channel-card">
+                <div class="channel-header">
+                    <span class="channel-icon">&#127918;</span>
+                    <h4>Discord</h4>
+                    <?php
+                    $discordUrl = $settings['channels']['channel_discord_webhook_url'] ?? '';
+                    ?>
+                    <?php if (!empty($discordUrl)): ?>
+                        <span class="badge badge-success"><?= __d('settings', 'Connected') ?></span>
+                    <?php else: ?>
+                        <span class="badge badge-secondary"><?= __d('settings', 'Not configured') ?></span>
+                    <?php endif; ?>
+                </div>
+                <div class="channel-body">
+                    <label><?= __d('settings', 'Webhook URL') ?></label>
+                    <input type="url" name="channel_discord_webhook_url"
+                           value="<?= h($discordUrl) ?>"
+                           placeholder="https://discord.com/api/webhooks/...">
+                    <button type="button" class="btn-sm btn-test" onclick="testChannel('discord')"><?= __d('settings', 'Test') ?></button>
+                    <div id="test-result-discord" class="test-result"></div>
+                </div>
+            </div>
+
+            <!-- Telegram Channel -->
+            <div class="channel-card">
+                <div class="channel-header">
+                    <span class="channel-icon">&#9992;</span>
+                    <h4>Telegram</h4>
+                    <?php
+                    $telegramToken = $settings['channels']['channel_telegram_bot_token'] ?? '';
+                    $telegramChatId = $settings['channels']['channel_telegram_chat_id'] ?? '';
+                    ?>
+                    <?php if (!empty($telegramToken) && !empty($telegramChatId)): ?>
+                        <span class="badge badge-success"><?= __d('settings', 'Connected') ?></span>
+                    <?php else: ?>
+                        <span class="badge badge-secondary"><?= __d('settings', 'Not configured') ?></span>
+                    <?php endif; ?>
+                </div>
+                <div class="channel-body">
+                    <label><?= __d('settings', 'Bot Token') ?></label>
+                    <input type="password" name="channel_telegram_bot_token"
+                           value="<?= h($telegramToken) ?>"
+                           placeholder="123456:ABC-DEF..."
+                           autocomplete="new-password">
+                    <label><?= __d('settings', 'Chat ID') ?></label>
+                    <input type="text" name="channel_telegram_chat_id"
+                           value="<?= h($telegramChatId) ?>"
+                           placeholder="-1001234567890">
+                    <button type="button" class="btn-sm btn-test" onclick="testChannel('telegram')"><?= __d('settings', 'Test') ?></button>
+                    <div id="test-result-telegram" class="test-result"></div>
+                </div>
+            </div>
+
+            <!-- Custom Webhook Channel -->
+            <div class="channel-card">
+                <div class="channel-header">
+                    <span class="channel-icon">&#128279;</span>
+                    <h4><?= __d('settings', 'Custom Webhook') ?></h4>
+                    <?php
+                    $webhookUrl = $settings['channels']['channel_webhook_url'] ?? '';
+                    $webhookSecret = $settings['channels']['channel_webhook_secret'] ?? '';
+                    ?>
+                    <?php if (!empty($webhookUrl)): ?>
+                        <span class="badge badge-success"><?= __d('settings', 'Connected') ?></span>
+                    <?php else: ?>
+                        <span class="badge badge-secondary"><?= __d('settings', 'Not configured') ?></span>
+                    <?php endif; ?>
+                </div>
+                <div class="channel-body">
+                    <label><?= __d('settings', 'Webhook URL') ?></label>
+                    <input type="url" name="channel_webhook_url"
+                           value="<?= h($webhookUrl) ?>"
+                           placeholder="https://your-server.com/webhook">
+                    <label><?= __d('settings', 'Secret (for HMAC signature)') ?></label>
+                    <input type="password" name="channel_webhook_secret"
+                           value="<?= h($webhookSecret) ?>"
+                           placeholder="<?= __d('settings', 'Optional shared secret') ?>"
+                           autocomplete="new-password">
+                    <button type="button" class="btn-sm btn-test" onclick="testChannel('webhook')"><?= __d('settings', 'Test') ?></button>
+                    <div id="test-result-webhook" class="test-result"></div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <?= $this->Form->button(__d('settings', 'Save Channel Settings'), [
+                    'type' => 'submit',
+                    'class' => 'btn btn-primary'
+                ]) ?>
+            </div>
+
+            <?= $this->Form->end() ?>
+        </div>
+    </div>
+
     <!-- Backup Settings -->
     <div class="tab-content" id="backup">
         <?php if (isset($settings['backup']) && count($settings['backup']) > 0): ?>
@@ -832,4 +975,42 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
+
+// Test notification channel
+function testChannel(channel) {
+    var resultDiv = document.getElementById('test-result-' + channel);
+    resultDiv.className = 'test-result';
+    resultDiv.style.display = 'block';
+    resultDiv.textContent = 'Testing...';
+    resultDiv.style.background = '#f3f4f6';
+    resultDiv.style.color = '#374151';
+
+    // Gather channel-specific data from the form
+    var form = document.getElementById('channels-form');
+    var formData = new FormData(form);
+    formData.append('channel', channel);
+
+    fetch('<?= $this->Url->build(['action' => 'testNotificationChannel']) ?>', {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'X-CSRF-Token': document.querySelector('input[name="_csrfToken"]')?.value || ''
+        },
+        body: formData
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+        if (data.success) {
+            resultDiv.className = 'test-result success';
+            resultDiv.textContent = data.message || 'Test message sent successfully!';
+        } else {
+            resultDiv.className = 'test-result error';
+            resultDiv.textContent = data.message || 'Test failed.';
+        }
+    })
+    .catch(function(err) {
+        resultDiv.className = 'test-result error';
+        resultDiv.textContent = 'Network error: ' + err.message;
+    });
+}
 </script>

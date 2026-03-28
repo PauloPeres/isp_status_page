@@ -79,6 +79,20 @@ class SettingsController extends AppController
             }
         }
 
+        // Load channel settings as key => value map for the Channels tab
+        $channelKeys = [
+            'channel_slack_webhook_url',
+            'channel_discord_webhook_url',
+            'channel_telegram_bot_token',
+            'channel_telegram_chat_id',
+            'channel_webhook_url',
+            'channel_webhook_secret',
+        ];
+        $settings['channels'] = [];
+        foreach ($channelKeys as $key) {
+            $settings['channels'][$key] = $this->settingService->getString($key, '');
+        }
+
         $this->set(compact('settings'));
     }
 
@@ -292,6 +306,197 @@ class SettingsController extends AppController
         }
 
         return $this->redirect(['action' => 'index', '#' => 'backup']);
+    }
+
+    /**
+     * Save notification channel settings
+     *
+     * @return \Cake\Http\Response|null Redirects to index
+     */
+    public function saveChannels()
+    {
+        $this->request->allowMethod(['post', 'put']);
+
+        $channelKeys = [
+            'channel_slack_webhook_url',
+            'channel_discord_webhook_url',
+            'channel_telegram_bot_token',
+            'channel_telegram_chat_id',
+            'channel_webhook_url',
+            'channel_webhook_secret',
+        ];
+
+        $successCount = 0;
+        $data = $this->request->getData();
+
+        foreach ($channelKeys as $key) {
+            if (array_key_exists($key, $data)) {
+                if ($this->settingService->set($key, (string)$data[$key], 'string')) {
+                    $successCount++;
+                }
+            }
+        }
+
+        if ($successCount > 0) {
+            $this->Flash->success(__d('settings', "{$successCount} channel setting(s) saved successfully."));
+        }
+
+        return $this->redirect(['action' => 'index', '#' => 'channels']);
+    }
+
+    /**
+     * Test a notification channel by sending a test message
+     *
+     * @return \Cake\Http\Response JSON response
+     */
+    public function testNotificationChannel()
+    {
+        $this->request->allowMethod(['post']);
+
+        $channel = $this->request->getData('channel');
+        $data = $this->request->getData();
+
+        $result = ['success' => false, 'message' => ''];
+
+        try {
+            switch ($channel) {
+                case 'slack':
+                    $url = $data['channel_slack_webhook_url'] ?? '';
+                    if (empty($url)) {
+                        $result['message'] = __d('settings', 'Slack Webhook URL is required.');
+                        break;
+                    }
+                    $payload = json_encode([
+                        'text' => 'ISP Status Page - Test notification. Your Slack channel is configured correctly!',
+                    ]);
+                    $response = $this->sendWebhookRequest($url, $payload, ['Content-Type: application/json']);
+                    if ($response['success']) {
+                        $result['success'] = true;
+                        $result['message'] = __d('settings', 'Test message sent to Slack successfully!');
+                    } else {
+                        $result['message'] = __d('settings', 'Slack test failed: {0}', $response['error']);
+                    }
+                    break;
+
+                case 'discord':
+                    $url = $data['channel_discord_webhook_url'] ?? '';
+                    if (empty($url)) {
+                        $result['message'] = __d('settings', 'Discord Webhook URL is required.');
+                        break;
+                    }
+                    $payload = json_encode([
+                        'content' => 'ISP Status Page - Test notification. Your Discord channel is configured correctly!',
+                    ]);
+                    $response = $this->sendWebhookRequest($url, $payload, ['Content-Type: application/json']);
+                    if ($response['success']) {
+                        $result['success'] = true;
+                        $result['message'] = __d('settings', 'Test message sent to Discord successfully!');
+                    } else {
+                        $result['message'] = __d('settings', 'Discord test failed: {0}', $response['error']);
+                    }
+                    break;
+
+                case 'telegram':
+                    $token = $data['channel_telegram_bot_token'] ?? '';
+                    $chatId = $data['channel_telegram_chat_id'] ?? '';
+                    if (empty($token) || empty($chatId)) {
+                        $result['message'] = __d('settings', 'Telegram Bot Token and Chat ID are required.');
+                        break;
+                    }
+                    $url = "https://api.telegram.org/bot{$token}/sendMessage";
+                    $payload = json_encode([
+                        'chat_id' => $chatId,
+                        'text' => 'ISP Status Page - Test notification. Your Telegram channel is configured correctly!',
+                        'parse_mode' => 'HTML',
+                    ]);
+                    $response = $this->sendWebhookRequest($url, $payload, ['Content-Type: application/json']);
+                    if ($response['success']) {
+                        $body = json_decode($response['body'] ?? '', true);
+                        if (isset($body['ok']) && $body['ok'] === true) {
+                            $result['success'] = true;
+                            $result['message'] = __d('settings', 'Test message sent to Telegram successfully!');
+                        } else {
+                            $result['message'] = __d('settings', 'Telegram API error: {0}', $body['description'] ?? 'Unknown error');
+                        }
+                    } else {
+                        $result['message'] = __d('settings', 'Telegram test failed: {0}', $response['error']);
+                    }
+                    break;
+
+                case 'webhook':
+                    $url = $data['channel_webhook_url'] ?? '';
+                    if (empty($url)) {
+                        $result['message'] = __d('settings', 'Webhook URL is required.');
+                        break;
+                    }
+                    $payload = json_encode([
+                        'event' => 'test',
+                        'message' => 'ISP Status Page - Test notification. Your webhook is configured correctly!',
+                        'timestamp' => date('c'),
+                    ]);
+                    $headers = ['Content-Type: application/json'];
+                    $secret = $data['channel_webhook_secret'] ?? '';
+                    if (!empty($secret)) {
+                        $signature = hash_hmac('sha256', $payload, $secret);
+                        $headers[] = 'X-Signature: ' . $signature;
+                    }
+                    $response = $this->sendWebhookRequest($url, $payload, $headers);
+                    if ($response['success']) {
+                        $result['success'] = true;
+                        $result['message'] = __d('settings', 'Test message sent to webhook successfully! (HTTP {0})', $response['http_code'] ?? '200');
+                    } else {
+                        $result['message'] = __d('settings', 'Webhook test failed: {0}', $response['error']);
+                    }
+                    break;
+
+                default:
+                    $result['message'] = __d('settings', 'Unknown channel: {0}', $channel);
+                    break;
+            }
+        } catch (\Exception $e) {
+            $result['message'] = __d('settings', 'Error: {0}', $e->getMessage());
+        }
+
+        return $this->response
+            ->withType('application/json')
+            ->withStringBody(json_encode($result));
+    }
+
+    /**
+     * Send a webhook HTTP request via cURL
+     *
+     * @param string $url Target URL
+     * @param string $payload JSON body
+     * @param array $headers HTTP headers
+     * @return array Result with success, error, http_code, body keys
+     */
+    private function sendWebhookRequest(string $url, string $payload, array $headers = []): array
+    {
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => $payload,
+            CURLOPT_HTTPHEADER => $headers,
+            CURLOPT_TIMEOUT => 10,
+            CURLOPT_CONNECTTIMEOUT => 5,
+            CURLOPT_SSL_VERIFYPEER => true,
+        ]);
+
+        $body = curl_exec($ch);
+        $httpCode = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $error = curl_error($ch);
+        curl_close($ch);
+
+        if ($error) {
+            return ['success' => false, 'error' => $error, 'http_code' => 0, 'body' => ''];
+        }
+
+        if ($httpCode >= 200 && $httpCode < 300) {
+            return ['success' => true, 'error' => '', 'http_code' => $httpCode, 'body' => $body];
+        }
+
+        return ['success' => false, 'error' => "HTTP {$httpCode}", 'http_code' => $httpCode, 'body' => $body];
     }
 
     /**

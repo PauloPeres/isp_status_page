@@ -122,11 +122,12 @@
 - **Complexity:** Medium (many small fixes across many files)
 - **Dependencies:** None
 
-### P2-008: Notification channels — Slack, Discord, Teams (with setup UI)
+### P2-008: Notification channels — Slack, Discord, Teams (with setup UI) -- DONE
 - **Source:** USER_TESTING_POWER_USER.md (Recommendation #3), PROJECT_SUMMARY.md
 - **Description:** Alert channel implementations exist (Slack, Discord, Telegram, Webhook) but there is no admin UI for configuring them. Settings page has SMS/Telegram/WhatsApp toggles but no credential configuration UI. Users need a way to set up Slack webhooks, Discord webhooks, Telegram bot tokens, etc. from the admin panel.
 - **Complexity:** Large
 - **Dependencies:** TASK-1003 (completed)
+- **Resolution:** Added "Channels" tab to Settings page with channel cards for Slack, Discord, Telegram, and Custom Webhook. Each card has input fields, connection status badges, and test buttons. Added saveChannels() and testNotificationChannel() actions to SettingsController. Channel configs stored in settings table with channel_ prefix.
 
 ### P2-009: Add "Quick Setup" wizard for monitors -- DONE
 - **Source:** USER_TESTING_MOM.md (Recommendation #2), USER_TESTING_POWER_USER.md
@@ -149,11 +150,12 @@
 - **Dependencies:** DB-007 (rollup data)
 - **Resolution:** Created uptime_bar element with color-coded 30-day segments (green/yellow/red/grey). Displayed on monitor detail page, monitors index (compact), and public status page. Uses efficient GROUP BY DATE aggregate query.
 
-### P2-012: Monitor groups/tags
+### P2-012: Monitor groups/tags -- DONE
 - **Source:** USER_TESTING_POWER_USER.md (Recommendation #5)
 - **Description:** At 50+ monitors, a flat list becomes unmanageable. Need tags, folders, or grouping. No tagging system exists currently.
 - **Complexity:** Medium
 - **Dependencies:** None
+- **Resolution:** Added tags TEXT (JSON array) column to monitors table via migration. Monitor entity has getTags(), setTags(), hasTag(), getTagColor() methods. Tags shown as colored pills on index page. Tag filter dropdown in monitors list. Tags input (comma-separated) on add/edit forms. Controller parses tags on save and supports ?tag= query param.
 
 ### P2-013: Bulk operations
 - **Source:** USER_TESTING_POWER_USER.md (Recommendation #6)
