@@ -459,10 +459,10 @@ $this->assign('title', __('Logs de Emails'));
             </tbody>
         </table>
     <?php else: ?>
-        <div class="no-emails">
-            <p style="font-size: 18px; margin-bottom: 8px;">📭 <?= __('Nenhum email encontrado') ?></p>
-            <p><?= __('Tente ajustar os filtros ou aguarde o envio de novos emails.') ?></p>
-        </div>
+        <?= $this->element('empty_state', [
+            'icon' => '📧',
+            'title' => __('No email logs yet'),
+        ]) ?>
     <?php endif; ?>
 </div>
 

@@ -18,10 +18,13 @@
 
 <div class="card">
     <?php if (count($statusPages) === 0): ?>
-        <div class="empty-state">
-            <p><?= __('No status pages created yet.') ?></p>
-            <p><?= $this->Html->link(__('Create your first status page'), ['action' => 'add']) ?></p>
-        </div>
+        <?= $this->element('empty_state', [
+            'icon' => '🌐',
+            'title' => __('No status pages created'),
+            'description' => __('Create a public status page for your customers.'),
+            'actionUrl' => $this->Url->build(['action' => 'add']),
+            'actionLabel' => __('Create Status Page'),
+        ]) ?>
     <?php else: ?>
         <div class="table-responsive">
             <table class="table">

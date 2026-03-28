@@ -560,15 +560,13 @@ $this->assign('title', __('Integracoes'));
             </tbody>
         </table>
     <?php else: ?>
-        <div class="empty-state">
-            <p style="font-size: 18px; margin-bottom: 8px;"><?= __('Nenhuma integracao encontrada') ?></p>
-            <p style="margin-bottom: 16px;"><?= __('Configure sua primeira integracao com um sistema externo.') ?></p>
-            <?= $this->Html->link(
-                __('Nova Integracao'),
-                ['action' => 'add'],
-                ['class' => 'btn-add']
-            ) ?>
-        </div>
+        <?= $this->element('empty_state', [
+            'icon' => '🔌',
+            'title' => __('No integrations configured'),
+            'description' => __('Connect to external systems like IXC, Zabbix, or REST APIs.'),
+            'actionUrl' => $this->Url->build(['action' => 'add']),
+            'actionLabel' => __('Add Integration'),
+        ]) ?>
     <?php endif; ?>
 </div>
 

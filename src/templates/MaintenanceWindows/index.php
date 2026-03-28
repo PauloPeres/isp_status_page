@@ -18,10 +18,13 @@
 
 <div class="card">
     <?php if (count($maintenanceWindows) === 0): ?>
-        <div class="empty-state">
-            <p><?= __('No maintenance windows scheduled.') ?></p>
-            <p><?= $this->Html->link(__('Schedule your first maintenance window'), ['action' => 'add']) ?></p>
-        </div>
+        <?= $this->element('empty_state', [
+            'icon' => '🔧',
+            'title' => __('No maintenance windows scheduled'),
+            'description' => __('Plan ahead by scheduling maintenance windows.'),
+            'actionUrl' => $this->Url->build(['action' => 'add']),
+            'actionLabel' => __('Schedule Maintenance'),
+        ]) ?>
     <?php else: ?>
         <div class="table-responsive">
             <table class="table">

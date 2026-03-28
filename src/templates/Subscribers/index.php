@@ -535,10 +535,10 @@ $this->assign('title', __d('subscribers', 'Inscritos de Notificações'));
             </tbody>
         </table>
     <?php else: ?>
-        <div class="no-subscribers">
-            <p style="font-size: 18px; margin-bottom: 8px;"><?= __d('subscribers', 'Nenhum inscrito encontrado') ?></p>
-            <p><?= __d('subscribers', 'Tente ajustar os filtros ou aguarde novas inscrições.') ?></p>
-        </div>
+        <?= $this->element('empty_state', [
+            'icon' => '👥',
+            'title' => __d('subscribers', 'No subscribers yet'),
+        ]) ?>
     <?php endif; ?>
 </div>
 

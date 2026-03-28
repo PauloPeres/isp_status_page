@@ -495,10 +495,10 @@ $this->assign('title', __d('checks', 'Verificações de Monitores'));
             </tbody>
         </table>
     <?php else: ?>
-        <div class="no-checks">
-            <p style="font-size: 18px; margin-bottom: 8px;">📭 <?= __d('checks', 'Nenhuma verificação encontrada') ?></p>
-            <p><?= __d('checks', 'Tente ajustar os filtros ou aguarde as próximas verificações.') ?></p>
-        </div>
+        <?= $this->element('empty_state', [
+            'icon' => '📊',
+            'title' => __d('checks', 'No checks recorded yet'),
+        ]) ?>
     <?php endif; ?>
 </div>
 

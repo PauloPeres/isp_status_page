@@ -621,16 +621,13 @@ $this->assign('title', __d('monitors', 'Monitors'));
             </tbody>
         </table>
     <?php else: ?>
-        <div class="empty-state">
-            <div class="empty-state-icon">📭</div>
-            <p style="font-size: 18px; margin-bottom: 8px;"><?= __d('monitors', 'No monitors found') ?></p>
-            <p style="margin-bottom: 16px;"><?= __d('monitors', 'Try adjusting the filters or create your first monitor.') ?></p>
-            <?= $this->Html->link(
-                __d('monitors', 'Create First Monitor'),
-                ['action' => 'add'],
-                ['class' => 'btn-add']
-            ) ?>
-        </div>
+        <?= $this->element('empty_state', [
+            'icon' => '🖥️',
+            'title' => __d('monitors', 'No monitors yet'),
+            'description' => __d('monitors', 'Create your first monitor to start tracking uptime.'),
+            'actionUrl' => $this->Url->build(['action' => 'add']),
+            'actionLabel' => __d('monitors', 'Add Monitor'),
+        ]) ?>
     <?php endif; ?>
 </div>
 

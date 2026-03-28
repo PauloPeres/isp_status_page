@@ -294,10 +294,13 @@ $this->assign('title', __('API Keys'));
             </tbody>
         </table>
     <?php else: ?>
-        <div class="no-keys">
-            <p style="font-size: 18px; margin-bottom: 8px;"><?= __('No API keys found') ?></p>
-            <p><?= __('Create an API key to access the REST API programmatically.') ?></p>
-        </div>
+        <?= $this->element('empty_state', [
+            'icon' => '🔑',
+            'title' => __('No API keys created'),
+            'description' => __('Create an API key to access the REST API programmatically.'),
+            'actionUrl' => $this->Url->build(['action' => 'add']),
+            'actionLabel' => __('Create API Key'),
+        ]) ?>
     <?php endif; ?>
 </div>
 

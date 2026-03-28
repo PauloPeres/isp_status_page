@@ -599,10 +599,11 @@ $this->assign('title', __d('incidents', 'Incidentes'));
             </tbody>
         </table>
     <?php else: ?>
-        <div class="no-incidents">
-            <p style="font-size: 18px; margin-bottom: 8px;">📭 <?= __d('incidents', 'Nenhum incidente encontrado') ?></p>
-            <p><?= __d('incidents', 'Tente ajustar os filtros ou aguarde novos incidentes.') ?></p>
-        </div>
+        <?= $this->element('empty_state', [
+            'icon' => '✅',
+            'title' => __d('incidents', 'No incidents recorded'),
+            'description' => __d('incidents', 'All systems running smoothly!'),
+        ]) ?>
     <?php endif; ?>
 </div>
 

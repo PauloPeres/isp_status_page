@@ -56,7 +56,11 @@
     </div>
     <div class="card-body">
         <?php if ($invitations->isEmpty()): ?>
-            <p class="text-muted"><?= __('No invitations have been sent yet.') ?></p>
+            <?= $this->element('empty_state', [
+                'icon' => '📨',
+                'title' => __('No invitations sent yet'),
+                'description' => __('Use the form above to invite team members.'),
+            ]) ?>
         <?php else: ?>
             <div class="table-responsive">
                 <table class="table">
