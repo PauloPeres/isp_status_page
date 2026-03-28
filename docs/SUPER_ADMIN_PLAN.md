@@ -41,22 +41,22 @@ Super Admin dashboard for the ISP Status Page SaaS platform operator. Provides c
 - **Result:** SuperAdmin prefix routes added to routes.php (Dashboard, Organizations, Users, Revenue, Health + impersonation). Super Admin link added to admin sidebar (conditional on isSuperAdmin). AppController updated to load and set isSuperAdmin view variable.
 
 ### TASK-SA-006: MetricsService — Revenue KPIs
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Description:** MRR, ARR, revenue by plan, churn rate, ARPU, trial conversion. 5-min Redis cache.
 - **Depends on:** SA-001
-- **Result:** _pending_
+- **Result:** Implemented in `src/src/Service/SuperAdmin/MetricsService.php` — methods: `getRevenueMetrics()`, `getGrowthMetrics()`, `getTrialMetrics()`
 
 ### TASK-SA-007: MetricsService — Customer & Platform KPIs
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Description:** Total orgs, top orgs by usage, platform health (checks/alerts/API), user engagement (DAU/WAU/MAU).
 - **Depends on:** SA-006
-- **Result:** _pending_
+- **Result:** Implemented in `src/src/Service/SuperAdmin/MetricsService.php` — methods: `getCustomerMetrics()`, `getPlatformHealthMetrics()`, `getUserEngagementMetrics()`
 
 ### TASK-SA-008: Super Admin Dashboard Controller & View
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Description:** Main /super-admin page with KPI cards (MRR, Orgs, Monitors, Incidents), charts (plan distribution, signup trends), tables (recent signups, at-risk customers).
 - **Depends on:** SA-006, SA-007, SA-004
-- **Result:** _pending_
+- **Result:** Created `DashboardController.php` with MetricsService integration. Template includes 4 KPI cards (MRR, Active Orgs, Total Monitors, Active Incidents), Plan Distribution doughnut chart, New Signups line chart, Recent Signups and Top Organizations tables, Platform Health cards, and Trial metrics. Chart.js loaded from CDN with data passed via `window.superAdminData`.
 
 ### TASK-SA-009: Organizations List & Detail
 - **Status:** PENDING
@@ -77,10 +77,10 @@ Super Admin dashboard for the ISP Status Page SaaS platform operator. Provides c
 - **Result:** _pending_
 
 ### TASK-SA-012: Revenue Dashboard
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Description:** MRR/ARR cards, revenue by plan chart, plan distribution doughnut, top orgs by revenue, trial metrics.
 - **Depends on:** SA-006, SA-004
-- **Result:** _pending_
+- **Result:** Created `RevenueController.php` with MetricsService integration and Organizations query for paying customers. Template includes MRR/ARR/ARPU/Paid Orgs KPI cards, Revenue by Plan horizontal bar chart, Plan Distribution doughnut chart, Paying Customers table (name, plan, monthly price, since), and Trial metrics section (active trials, conversion rate, total trialed). Shares `super-admin-charts.js` with the dashboard.
 
 ### TASK-SA-013: Platform Health Dashboard
 - **Status:** PENDING
@@ -89,9 +89,9 @@ Super Admin dashboard for the ISP Status Page SaaS platform operator. Provides c
 - **Result:** _pending_
 
 ### TASK-SA-014: Cache Configuration
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Description:** 5-minute Redis cache config for super admin metrics.
-- **Result:** _pending_
+- **Result:** Added `super_admin` cache config to `src/config/app.php` and `src/config/app_local.php` — RedisEngine (db 4) when Redis available, FileEngine fallback, 300s duration, `sa_` prefix
 
 ### TASK-SA-015: Super Admin Link in Regular Sidebar
 - **Status:** PENDING
