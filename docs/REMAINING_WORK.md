@@ -164,17 +164,19 @@
 - **Dependencies:** None
 - **Resolution:** Updated public.css (uptime bar mobile rules), landing.css (nav toggle, mobile nav links, hero, features, pricing, footer touch targets, overflow prevention), Monitors/view.php inline styles (chart overflow, stat cards, details grid, incidents mobile).
 
-### P2-013: Bulk operations
+### P2-013: Bulk operations -- DONE
 - **Source:** USER_TESTING_POWER_USER.md (Recommendation #6)
 - **Description:** Select-all checkbox, bulk pause, bulk delete, bulk tag assignment. Also add CSV/JSON import for migration from other tools (UptimeRobot/Pingdom).
 - **Complexity:** Medium
 - **Dependencies:** None
+- **Resolution:** Added select-all checkbox in table header, per-row checkboxes, bulk action bar (Pause/Resume/Delete Selected) with confirmation dialogs. Added bulkAction() POST endpoint in MonitorsController. Added CSV import feature with import() action, file upload UI, and support for name/type/url/host/port/check_interval/tags columns. Routes added for /monitors/bulk-action and /monitors/import.
 
-### P2-014: Fix Response Time column showing "-" on monitors list
+### P2-014: Fix Response Time column showing "-" on monitors list -- DONE
 - **Source:** USER_TESTING_DETAIL_QA.md (MED-013), USER_TESTING_POWER_USER.md
 - **Description:** All monitors show a dash "-" in the Response Time column on /monitors, even though the dashboard shows response time data for these same monitors. The data exists but is not being displayed in the list view.
 - **Complexity:** Small
 - **Dependencies:** None
+- **Resolution:** Root cause: template accessed $monitor->response_time but the Monitor entity has no such field (response_time lives on MonitorCheck). Fixed by adding a DISTINCT ON query in MonitorsController::index() to fetch the latest check per monitor, passing $latestChecks to the template, and reading response_time from $latestChecks[$monitor->id] instead of the monitor entity.
 
 ### P2-015: Comprehensive browser-based testing (Playwright/Cypress)
 - **Source:** QA_CHECKLIST.md (~298 of ~370 test cases marked NOT TESTED or REQUIRES BROWSER), DEVELOPMENT_PLAN.md (Module 4.5 E2E Tests)

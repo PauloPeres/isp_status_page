@@ -260,6 +260,18 @@ return function (RouteBuilder $routes): void {
         );
 
         /*
+         * Monitor bulk operations routes (P2-013)
+         */
+        $builder->connect(
+            '/monitors/bulk-action',
+            ['controller' => 'Monitors', 'action' => 'bulkAction']
+        );
+        $builder->connect(
+            '/monitors/import',
+            ['controller' => 'Monitors', 'action' => 'import']
+        );
+
+        /*
          * ...and connect the rest of 'Pages' controller's URLs.
          */
         $builder->connect('/pages/*', 'Pages::display');

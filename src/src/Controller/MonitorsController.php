@@ -128,7 +128,23 @@ class MonitorsController extends AppController
         }
         ksort($allTags);
 
-        $this->set(compact('monitors', 'stats', 'monitorsUptimeData', 'allTags'));
+        // P2-014: Get latest check per monitor for response time display
+        $latestChecks = [];
+        if (!empty($monitorIds)) {
+            $orgId = \App\Tenant\TenantContext::getCurrentOrgId();
+            $latestStmt = $conn->execute(
+                "SELECT DISTINCT ON (monitor_id) monitor_id, response_time, status, checked_at
+                 FROM monitor_checks
+                 WHERE monitor_id IN ({$placeholders})" . ($orgId ? ' AND organization_id = ' . (int)$orgId : '') . "
+                 ORDER BY monitor_id, checked_at DESC",
+                $monitorIds
+            );
+            foreach ($latestStmt->fetchAll('assoc') as $row) {
+                $latestChecks[$row['monitor_id']] = $row;
+            }
+        }
+
+        $this->set(compact('monitors', 'stats', 'monitorsUptimeData', 'allTags', 'latestChecks'));
     }
 
     /**
@@ -573,5 +589,242 @@ class MonitorsController extends AppController
             'result' => $result,
             '_serialize' => ['result'],
         ]);
+    }
+
+    /**
+     * Bulk action method (P2-013)
+     *
+     * Performs bulk pause, resume, or delete on selected monitors.
+     *
+     * @return \Cake\Http\Response|null Redirects to index.
+     */
+    public function bulkAction()
+    {
+        $this->request->allowMethod(['post']);
+        $action = $this->request->getData('action');
+        $ids = $this->request->getData('ids', []);
+
+        if (empty($ids)) {
+            $this->Flash->warning(__d('monitors', 'No monitors selected.'));
+
+            return $this->redirect(['action' => 'index']);
+        }
+
+        // Sanitize IDs to integers
+        $ids = array_map('intval', array_filter((array)$ids));
+
+        if (empty($ids)) {
+            $this->Flash->warning(__d('monitors', 'No valid monitors selected.'));
+
+            return $this->redirect(['action' => 'index']);
+        }
+
+        $monitorsTable = $this->fetchTable('Monitors');
+        $count = 0;
+
+        switch ($action) {
+            case 'pause':
+                $count = $monitorsTable->updateAll(
+                    ['active' => false],
+                    ['id IN' => $ids]
+                );
+                $this->Flash->success(__d('monitors', '{0} monitor(s) paused.', $count));
+                break;
+
+            case 'resume':
+                $count = $monitorsTable->updateAll(
+                    ['active' => true],
+                    ['id IN' => $ids]
+                );
+                $this->Flash->success(__d('monitors', '{0} monitor(s) resumed.', $count));
+                break;
+
+            case 'delete':
+                $count = $monitorsTable->deleteAll(['id IN' => $ids]);
+                $this->Flash->success(__d('monitors', '{0} monitor(s) deleted.', $count));
+                break;
+
+            default:
+                $this->Flash->error(__d('monitors', 'Invalid bulk action.'));
+                break;
+        }
+
+        return $this->redirect(['action' => 'index']);
+    }
+
+    /**
+     * Import monitors from CSV (P2-013)
+     *
+     * Accepts a CSV file with columns: name, type, url/host, check_interval
+     * Creates monitors in batch.
+     *
+     * @return \Cake\Http\Response|null|void Redirects on success, renders view otherwise.
+     */
+    public function import()
+    {
+        $this->viewBuilder()->setLayout('admin');
+
+        if ($this->request->is('post')) {
+            $file = $this->request->getUploadedFile('csv_file');
+
+            if (!$file || $file->getError() !== UPLOAD_ERR_OK) {
+                $this->Flash->error(__d('monitors', 'Please upload a valid CSV file.'));
+
+                return $this->redirect(['action' => 'import']);
+            }
+
+            // Validate file type
+            $clientFilename = $file->getClientFilename();
+            $extension = strtolower(pathinfo($clientFilename, PATHINFO_EXTENSION));
+            if ($extension !== 'csv') {
+                $this->Flash->error(__d('monitors', 'Only CSV files are accepted.'));
+
+                return $this->redirect(['action' => 'import']);
+            }
+
+            // Check plan limit
+            if ($this->currentOrganization) {
+                $planService = new PlanService();
+                $orgId = (int)$this->currentOrganization['id'];
+            }
+
+            $stream = $file->getStream();
+            $content = (string)$stream;
+            $lines = array_filter(explode("\n", $content), 'trim');
+
+            if (count($lines) < 2) {
+                $this->Flash->error(__d('monitors', 'CSV file must have a header row and at least one data row.'));
+
+                return $this->redirect(['action' => 'import']);
+            }
+
+            // Parse header
+            $header = str_getcsv(array_shift($lines));
+            $header = array_map(function ($col) {
+                return strtolower(trim($col));
+            }, $header);
+
+            // Required columns
+            $nameIdx = array_search('name', $header);
+            if ($nameIdx === false) {
+                $this->Flash->error(__d('monitors', 'CSV must contain a "name" column.'));
+
+                return $this->redirect(['action' => 'import']);
+            }
+
+            $typeIdx = array_search('type', $header);
+            $urlIdx = array_search('url', $header);
+            $hostIdx = array_search('host', $header);
+            $portIdx = array_search('port', $header);
+            $intervalIdx = array_search('check_interval', $header);
+            $tagsIdx = array_search('tags', $header);
+
+            $monitorsTable = $this->fetchTable('Monitors');
+            $created = 0;
+            $errors = [];
+            $lineNum = 1;
+
+            foreach ($lines as $line) {
+                $lineNum++;
+                $row = str_getcsv(trim($line));
+                if (empty(array_filter($row))) {
+                    continue; // Skip empty rows
+                }
+
+                $name = $row[$nameIdx] ?? '';
+                if (empty(trim($name))) {
+                    $errors[] = __d('monitors', 'Line {0}: Name is required.', $lineNum);
+                    continue;
+                }
+
+                $type = ($typeIdx !== false && !empty($row[$typeIdx])) ? strtolower(trim($row[$typeIdx])) : 'http';
+
+                // Build configuration based on type
+                $configuration = [];
+                switch ($type) {
+                    case 'http':
+                        $url = ($urlIdx !== false) ? trim($row[$urlIdx] ?? '') : '';
+                        if (empty($url)) {
+                            $errors[] = __d('monitors', 'Line {0}: URL is required for HTTP monitors.', $lineNum);
+                            continue 2;
+                        }
+                        $configuration = ['url' => $url, 'method' => 'GET', 'expected_status_code' => 200];
+                        break;
+
+                    case 'ping':
+                        $host = ($hostIdx !== false) ? trim($row[$hostIdx] ?? '') : '';
+                        if (empty($host) && $urlIdx !== false) {
+                            $host = trim($row[$urlIdx] ?? '');
+                        }
+                        if (empty($host)) {
+                            $errors[] = __d('monitors', 'Line {0}: Host is required for Ping monitors.', $lineNum);
+                            continue 2;
+                        }
+                        $configuration = ['host' => $host];
+                        break;
+
+                    case 'port':
+                        $host = ($hostIdx !== false) ? trim($row[$hostIdx] ?? '') : '';
+                        $port = ($portIdx !== false) ? trim($row[$portIdx] ?? '') : '';
+                        if (empty($host)) {
+                            $errors[] = __d('monitors', 'Line {0}: Host is required for Port monitors.', $lineNum);
+                            continue 2;
+                        }
+                        if (empty($port)) {
+                            $errors[] = __d('monitors', 'Line {0}: Port is required for Port monitors.', $lineNum);
+                            continue 2;
+                        }
+                        $configuration = ['host' => $host, 'port' => (int)$port];
+                        break;
+
+                    default:
+                        $errors[] = __d('monitors', 'Line {0}: Invalid type "{1}". Use http, ping, or port.', $lineNum, $type);
+                        continue 2;
+                }
+
+                $data = [
+                    'name' => trim($name),
+                    'type' => $type,
+                    'configuration' => json_encode($configuration),
+                    'check_interval' => ($intervalIdx !== false && !empty($row[$intervalIdx])) ? (int)$row[$intervalIdx] : 300,
+                    'timeout' => 30,
+                    'retry_count' => 3,
+                    'status' => 'unknown',
+                    'active' => true,
+                ];
+
+                // Handle tags
+                if ($tagsIdx !== false && !empty($row[$tagsIdx])) {
+                    $tags = array_values(array_unique(array_filter(array_map('trim', explode(';', $row[$tagsIdx])))));
+                    $data['tags'] = !empty($tags) ? json_encode($tags) : null;
+                }
+
+                $monitor = $monitorsTable->newEntity($data);
+
+                if ($monitorsTable->save($monitor)) {
+                    $created++;
+                } else {
+                    $validationErrors = [];
+                    foreach ($monitor->getErrors() as $field => $fieldErrors) {
+                        foreach ($fieldErrors as $error) {
+                            $validationErrors[] = "{$field}: {$error}";
+                        }
+                    }
+                    $errors[] = __d('monitors', 'Line {0}: {1}', $lineNum, implode(', ', $validationErrors));
+                }
+            }
+
+            if ($created > 0) {
+                $this->Flash->success(__d('monitors', '{0} monitor(s) imported successfully.', $created));
+            }
+
+            if (!empty($errors)) {
+                $this->Flash->error(__d('monitors', 'Import completed with errors:') . "\n" . implode("\n", array_slice($errors, 0, 10)));
+            }
+
+            if ($created > 0) {
+                return $this->redirect(['action' => 'index']);
+            }
+        }
     }
 }

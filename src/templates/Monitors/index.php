@@ -5,6 +5,7 @@
  * @var array $stats
  * @var array $monitorsUptimeData
  * @var array $allTags
+ * @var array $latestChecks
  */
 $this->assign('title', __d('monitors', 'Monitors'));
 ?>
@@ -13,11 +14,18 @@ $this->assign('title', __d('monitors', 'Monitors'));
 
 <div class="monitors-header">
     <h2>🖥️ <?= __d('monitors', 'Monitors') ?></h2>
-    <?= $this->Html->link(
-        '+ ' . __d('monitors', 'New Monitor'),
-        ['action' => 'add'],
-        ['class' => 'btn-add']
-    ) ?>
+    <div style="display: flex; gap: 8px; align-items: center;">
+        <?= $this->Html->link(
+            __d('monitors', 'Import CSV'),
+            ['action' => 'import'],
+            ['class' => 'btn-add', 'style' => 'background: #6c757d;']
+        ) ?>
+        <?= $this->Html->link(
+            '+ ' . __d('monitors', 'New Monitor'),
+            ['action' => 'add'],
+            ['class' => 'btn-add']
+        ) ?>
+    </div>
 </div>
 
 <!-- Statistics Cards -->
@@ -122,12 +130,33 @@ $this->assign('title', __d('monitors', 'Monitors'));
     <?= $this->Form->end() ?>
 </div>
 
+<!-- P2-013: Bulk Action Bar -->
+<div id="bulkActionBar" style="display: none; align-items: center; gap: 12px; padding: 12px 16px; margin-bottom: 16px; background: #e3f2fd; border: 1px solid #90caf9; border-radius: 8px;">
+    <span class="selected-count" style="font-weight: 600; color: #1565c0;">0 selected</span>
+    <div style="display: flex; gap: 8px; margin-left: auto;">
+        <button type="button" onclick="submitBulkAction('pause')" class="btn-action" style="background: #ff9800; color: #fff; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer;">
+            <?= __d('monitors', 'Pause Selected') ?>
+        </button>
+        <button type="button" onclick="submitBulkAction('resume')" class="btn-action" style="background: #4caf50; color: #fff; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer;">
+            <?= __d('monitors', 'Resume Selected') ?>
+        </button>
+        <button type="button" onclick="submitBulkAction('delete')" class="btn-action" style="background: #f44336; color: #fff; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer;">
+            <?= __d('monitors', 'Delete Selected') ?>
+        </button>
+    </div>
+</div>
+
 <!-- Monitors Table -->
 <div class="monitors-table">
     <?php if ($monitors->count() > 0): ?>
+        <?= $this->Form->create(null, ['id' => 'bulkForm', 'url' => ['action' => 'bulkAction']]) ?>
+        <input type="hidden" name="action" id="bulkActionField" value="">
         <table>
             <thead>
                 <tr>
+                    <th style="width: 40px;">
+                        <input type="checkbox" id="selectAll" title="<?= __d('monitors', 'Select all') ?>">
+                    </th>
                     <th><?= $this->Paginator->sort('status', __('Status')) ?></th>
                     <th><?= $this->Paginator->sort('name', __d('monitors', 'Name')) ?></th>
                     <th><?= $this->Paginator->sort('type', __d('monitors', 'Type')) ?></th>
@@ -142,6 +171,9 @@ $this->assign('title', __d('monitors', 'Monitors'));
             <tbody>
                 <?php foreach ($monitors as $monitor): ?>
                     <tr>
+                        <td>
+                            <input type="checkbox" name="ids[]" value="<?= h($monitor->id) ?>" class="monitor-checkbox" onchange="updateBulkBar()">
+                        </td>
                         <td>
                             <span class="status-indicator status-<?= h($monitor->status) ?>"
                                   title="<?= h(ucfirst($monitor->status)) ?>">
@@ -176,9 +208,15 @@ $this->assign('title', __d('monitors', 'Monitors'));
                             <?php endif; ?>
                         </td>
                         <td>
-                            <?php if ($monitor->response_time): ?>
+                            <?php
+                            $responseTime = null;
+                            if (!empty($latestChecks[$monitor->id]['response_time'])) {
+                                $responseTime = (int)$latestChecks[$monitor->id]['response_time'];
+                            }
+                            ?>
+                            <?php if ($responseTime): ?>
                                 <span style="font-family: 'Courier New', monospace; color: #666;">
-                                    <?= number_format($monitor->response_time, 0) ?>ms
+                                    <?= number_format($responseTime, 0) ?>ms
                                 </span>
                             <?php else: ?>
                                 <span style="color: #ccc;">-</span>
@@ -236,6 +274,7 @@ $this->assign('title', __d('monitors', 'Monitors'));
                 <?php endforeach; ?>
             </tbody>
         </table>
+        <?= $this->Form->end() ?>
     <?php else: ?>
         <?= $this->element('empty_state', [
             'icon' => '🖥️',
@@ -260,3 +299,59 @@ $this->assign('title', __d('monitors', 'Monitors'));
         <?= $this->Paginator->counter(__('Page {{page}} of {{pages}}, showing {{current}} record(s) of {{count}} total')) ?>
     </div>
 <?php endif; ?>
+
+<!-- P2-013: Bulk Operations JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Select all toggle
+    var selectAll = document.getElementById('selectAll');
+    if (selectAll) {
+        selectAll.addEventListener('change', function() {
+            document.querySelectorAll('.monitor-checkbox').forEach(function(cb) {
+                cb.checked = selectAll.checked;
+            });
+            updateBulkBar();
+        });
+    }
+});
+
+function updateBulkBar() {
+    var checked = document.querySelectorAll('.monitor-checkbox:checked').length;
+    var bar = document.getElementById('bulkActionBar');
+    if (bar) {
+        bar.style.display = checked > 0 ? 'flex' : 'none';
+        bar.querySelector('.selected-count').textContent = checked + ' <?= __d('monitors', 'selected') ?>';
+    }
+
+    // Update select-all checkbox state
+    var allCheckboxes = document.querySelectorAll('.monitor-checkbox');
+    var selectAll = document.getElementById('selectAll');
+    if (selectAll && allCheckboxes.length > 0) {
+        selectAll.checked = checked === allCheckboxes.length;
+        selectAll.indeterminate = checked > 0 && checked < allCheckboxes.length;
+    }
+}
+
+function submitBulkAction(action) {
+    var checked = document.querySelectorAll('.monitor-checkbox:checked').length;
+    if (checked === 0) return;
+
+    var confirmMsg = '';
+    switch (action) {
+        case 'pause':
+            confirmMsg = '<?= __d('monitors', 'Are you sure you want to pause the selected monitors?') ?>';
+            break;
+        case 'resume':
+            confirmMsg = '<?= __d('monitors', 'Are you sure you want to resume the selected monitors?') ?>';
+            break;
+        case 'delete':
+            confirmMsg = '<?= __d('monitors', 'Are you sure you want to delete the selected monitors? This action cannot be undone.') ?>';
+            break;
+    }
+
+    if (confirm(confirmMsg)) {
+        document.getElementById('bulkActionField').value = action;
+        document.getElementById('bulkForm').submit();
+    }
+}
+</script>
