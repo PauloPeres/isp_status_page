@@ -89,6 +89,19 @@ function isSuperAdminActive($currentController, $targetController, $currentActio
         </div>
 
         <div class="nav-section">
+            <span class="nav-section-title"><?= __('Configuration') ?></span>
+
+            <?= $this->Html->link(
+                '<span class="nav-icon">&#x2699;</span> ' . __('Settings'),
+                ['prefix' => 'SuperAdmin', 'controller' => 'Settings', 'action' => 'index'],
+                [
+                    'escape' => false,
+                    'class' => 'nav-item' . (isSuperAdminActive($controller, 'Settings') ? ' active' : '')
+                ]
+            ) ?>
+        </div>
+
+        <div class="nav-section">
             <span class="nav-section-title"><?= __('Navigation') ?></span>
 
             <?= $this->Html->link(

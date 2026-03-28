@@ -3,110 +3,46 @@
  * @var \App\View\AppView $this
  * @var array $settings
  */
-$this->assign('title', __d('settings', 'System Settings'));
+$this->assign('title', __d('settings', 'Organization Settings'));
 
-// Setting label translations
+// Setting label translations — only org-level settings
 $labels = [
     // General
-    'site_name' => __d('settings', 'Site Name'),
-    'site_url' => __d('settings', 'Site URL'),
+    'site_name' => __d('settings', 'Organization Name'),
     'site_logo_url' => __d('settings', 'Custom Logo URL'),
-    'site_language' => __d('settings', 'System Language'),
+    'site_language' => __d('settings', 'Language'),
+    'site_timezone' => __d('settings', 'Timezone'),
     'status_page_title' => __d('settings', 'Status Page Title'),
-    'status_page_public' => __d('settings', 'Public Status Page'),
-    'status_page_cache_seconds' => __d('settings', 'Page Cache (seconds)'),
     'support_email' => __d('settings', 'Support Email'),
 
-    // Email
-    'smtp_host' => 'SMTP ' . __d('settings', 'Host'),
-    'smtp_port' => 'SMTP ' . __d('settings', 'Port'),
-    'smtp_username' => 'SMTP ' . __d('settings', 'Username'),
-    'smtp_password' => 'SMTP ' . __d('settings', 'Password'),
-    'email_from' => __d('settings', 'Sender Email'),
-    'email_from_name' => __d('settings', 'Sender Name'),
-    'smtp_encryption' => 'SMTP ' . __d('settings', 'Encryption'),
-    'smtp_timeout' => 'SMTP ' . __d('settings', 'Timeout') . ' (' . __d('settings', 'seconds') . ')',
-
-    // Monitoring
-    'monitor_default_interval' => __d('settings', 'Default Interval (seconds)'),
-    'monitor_default_timeout' => __d('settings', 'Default Timeout (seconds)'),
-    'monitor_max_retries' => __d('settings', 'Max Retries'),
-    'monitor_auto_resolve' => __d('settings', 'Auto-resolve Incidents'),
-    'check_interval' => __d('settings', 'Check Interval (minutes)'),
-    'check_timeout' => __d('settings', 'Check Timeout (seconds)'),
-
     // Notifications
+    'enable_email_alerts' => __d('settings', 'Enable Email Alerts'),
     'notification_email_on_incident_created' => __d('settings', 'Email on Incident Created'),
     'notification_email_on_incident_resolved' => __d('settings', 'Email on Incident Resolved'),
     'notification_email_on_down' => __d('settings', 'Email on Monitor Down'),
     'notification_email_on_up' => __d('settings', 'Email on Monitor Up'),
     'alert_throttle_minutes' => __d('settings', 'Alert Throttle (minutes)'),
-    'enable_email_alerts' => __d('settings', 'Enable Email Alerts'),
-    'enable_whatsapp_alerts' => __d('settings', 'Enable WhatsApp Alerts'),
-    'enable_telegram_alerts' => __d('settings', 'Enable Telegram Alerts'),
-    'enable_sms_alerts' => __d('settings', 'Enable SMS Alerts'),
-
-    // Backup
-    'backup_ftp_enabled' => __d('settings', 'Enable FTP/SFTP Upload'),
-    'backup_ftp_type' => __d('settings', 'Protocol Type'),
-    'backup_ftp_host' => __d('settings', 'Server Host'),
-    'backup_ftp_port' => __d('settings', 'Port'),
-    'backup_ftp_username' => __d('settings', 'Username'),
-    'backup_ftp_password' => __d('settings', 'Password'),
-    'backup_ftp_path' => __d('settings', 'Remote Path'),
-    'backup_ftp_passive' => __d('settings', 'Passive Mode (FTP)'),
+    'notification_default_cooldown' => __d('settings', 'Default Cooldown (minutes)'),
 ];
 
 // Description translations (help text)
 $descriptions = [
     // General
-    'site_name' => __d('settings', 'Site name displayed on the status page'),
-    'site_url' => __d('settings', 'Full URL where the system is hosted'),
+    'site_name' => __d('settings', 'Your organization display name shown on the status page'),
     'site_logo_url' => __d('settings', 'Full URL of logo image (PNG, JPG, SVG). Leave empty for default logo.'),
-    'site_language' => __d('settings', 'System interface language'),
-    'status_page_title' => __d('settings', 'Title displayed on the status page'),
-    'status_page_public' => __d('settings', 'Status page is publicly accessible'),
-    'status_page_cache_seconds' => __d('settings', 'Status page cache time in seconds'),
+    'site_language' => __d('settings', 'Preferred language for your organization'),
+    'site_timezone' => __d('settings', 'Timezone for displaying dates and times'),
+    'status_page_title' => __d('settings', 'Title displayed on the public status page'),
     'support_email' => __d('settings', 'Support email shown in public page footer'),
 
-    // Email
-    'smtp_host' => __d('settings', 'SMTP server address'),
-    'smtp_port' => __d('settings', 'SMTP server port (usually 587 or 465)'),
-    'smtp_username' => __d('settings', 'Username for SMTP authentication'),
-    'smtp_password' => __d('settings', 'Password for SMTP authentication'),
-    'smtp_encryption' => __d('settings', 'SMTP encryption type (TLS, SSL or none)'),
-    'email_from' => __d('settings', 'Sender email address'),
-    'email_from_name' => __d('settings', 'Name displayed as email sender'),
-    'smtp_timeout' => __d('settings', 'SMTP connection timeout in seconds'),
-
-    // Monitoring
-    'monitor_default_interval' => __d('settings', 'Default interval between checks in seconds'),
-    'monitor_default_timeout' => __d('settings', 'Default timeout for checks in seconds'),
-    'monitor_max_retries' => __d('settings', 'Maximum retries before marking as failed'),
-    'monitor_auto_resolve' => __d('settings', 'Automatically resolve incidents when monitor comes back online'),
-    'check_interval' => __d('settings', 'Interval between check command runs in minutes'),
-    'check_timeout' => __d('settings', 'Maximum execution time for a check in seconds'),
-
     // Notifications
+    'enable_email_alerts' => __d('settings', 'Enable sending email alerts to subscribers'),
     'notification_email_on_incident_created' => __d('settings', 'Send email when a new incident is created'),
     'notification_email_on_incident_resolved' => __d('settings', 'Send email when an incident is resolved'),
     'notification_email_on_down' => __d('settings', 'Send email when a monitor goes offline'),
     'notification_email_on_up' => __d('settings', 'Send email when a monitor comes back online'),
     'alert_throttle_minutes' => __d('settings', 'Minimum interval in minutes between alerts for the same monitor'),
-    'enable_email_alerts' => __d('settings', 'Enable sending email alerts to subscribers'),
-    'enable_whatsapp_alerts' => __d('settings', 'Enable WhatsApp alerts (future feature)'),
-    'enable_telegram_alerts' => __d('settings', 'Enable Telegram alerts (future feature)'),
-    'enable_sms_alerts' => __d('settings', 'Enable SMS alerts (future feature)'),
-
-    // Backup
-    'backup_ftp_enabled' => __d('settings', 'Enable automatic backup upload via FTP or SFTP'),
-    'backup_ftp_type' => __d('settings', 'Transfer protocol: ftp or sftp'),
-    'backup_ftp_host' => __d('settings', 'FTP/SFTP server address'),
-    'backup_ftp_port' => __d('settings', 'Server port (FTP: 21, SFTP: 22)'),
-    'backup_ftp_username' => __d('settings', 'Username for authentication'),
-    'backup_ftp_password' => __d('settings', 'Password for authentication'),
-    'backup_ftp_path' => __d('settings', 'Remote directory for storing backups'),
-    'backup_ftp_passive' => __d('settings', 'Use passive mode for FTP connections'),
+    'notification_default_cooldown' => __d('settings', 'Default cooldown period in minutes before re-sending notifications'),
 ];
 
 /**
@@ -133,6 +69,12 @@ function getDescription($key, $descriptions, $fallback = '') {
         margin: 0;
         font-size: 24px;
         font-weight: 700;
+    }
+
+    .settings-header p {
+        margin: 8px 0 0;
+        color: #666;
+        font-size: 14px;
     }
 
     .tabs-container {
@@ -207,6 +149,7 @@ function getDescription($key, $descriptions, $fallback = '') {
     .form-group input[type="email"],
     .form-group input[type="number"],
     .form-group input[type="password"],
+    .form-group input[type="url"],
     .form-group select,
     .form-group textarea {
         width: 100%;
@@ -307,6 +250,7 @@ function getDescription($key, $descriptions, $fallback = '') {
         .form-group input[type="email"],
         .form-group input[type="number"],
         .form-group input[type="password"],
+        .form-group input[type="url"],
         .form-group select,
         .form-group textarea {
             font-size: 16px;
@@ -325,17 +269,15 @@ function getDescription($key, $descriptions, $fallback = '') {
 </style>
 
 <div class="settings-header">
-    <h2><?= __d('settings', 'System Settings') ?></h2>
+    <h2><?= __d('settings', 'Organization Settings') ?></h2>
+    <p><?= __d('settings', 'Configure your organization preferences, notification settings, and notification channels.') ?></p>
 </div>
 
 <div class="tabs-container">
     <div class="tabs-nav">
         <button class="tab-button active" data-tab="general"><?= __d('settings', 'General') ?></button>
-        <button class="tab-button" data-tab="email"><?= __d('settings', 'Email') ?></button>
-        <button class="tab-button" data-tab="monitoring"><?= __d('settings', 'Monitoring') ?></button>
         <button class="tab-button" data-tab="notifications"><?= __d('settings', 'Notifications') ?></button>
         <button class="tab-button" data-tab="channels"><?= __d('settings', 'Channels') ?></button>
-        <button class="tab-button" data-tab="backup"><?= __d('settings', 'Backup') ?></button>
     </div>
 
     <!-- General Settings -->
@@ -365,15 +307,14 @@ function getDescription($key, $descriptions, $fallback = '') {
                         ?>
                             <span class="help-text"><?= h($desc) ?></span>
                         <?php endif; ?>
-                    <?php elseif ($setting->key === 'smtp_encryption'): ?>
-                        <?= $this->Form->select("settings.{$setting->key}", [
-                            '' => __d('settings', 'None'),
-                            'tls' => 'TLS',
-                            'ssl' => 'SSL',
-                        ], [
-                            'value' => strtolower($setting->getTypedValue()),
+                    <?php elseif ($setting->key === 'site_timezone'): ?>
+                        <?= $this->Form->select("settings.{$setting->key}",
+                            array_combine(
+                                \DateTimeZone::listIdentifiers(),
+                                \DateTimeZone::listIdentifiers()
+                            ), [
+                            'value' => $setting->getTypedValue() ?: 'America/Sao_Paulo',
                             'class' => 'form-control',
-                            'empty' => false,
                         ]) ?>
                         <?php
                             $desc = getDescription($setting->key, $descriptions);
@@ -438,176 +379,6 @@ function getDescription($key, $descriptions, $fallback = '') {
         <?php else: ?>
             <div class="empty-category">
                 <p><?= __d('settings', 'No general settings available.') ?></p>
-            </div>
-        <?php endif; ?>
-    </div>
-
-    <!-- Email Settings -->
-    <div class="tab-content" id="email">
-        <?php if (count($settings['email']) > 0): ?>
-            <?= $this->Form->create(null, ['url' => ['action' => 'save'], 'class' => 'settings-form']) ?>
-            <?= $this->Form->hidden('category', ['value' => 'email']) ?>
-
-            <?php foreach ($settings['email'] as $setting): ?>
-                <div class="form-group">
-                    <label for="<?= h($setting->key) ?>">
-                        <?= h(getLabel($setting->key, $labels)) ?>
-                    </label>
-
-                    <?php if ($setting->key === 'smtp_encryption'): ?>
-                        <?= $this->Form->select("settings.{$setting->key}", [
-                            '' => __d('settings', 'None'),
-                            'tls' => 'TLS',
-                            'ssl' => 'SSL',
-                        ], [
-                            'value' => strtolower($setting->getTypedValue()),
-                            'class' => 'form-control',
-                            'empty' => false,
-                        ]) ?>
-                    <?php elseif (str_contains($setting->key, 'password')): ?>
-                        <?= $this->Form->password("settings.{$setting->key}", [
-                            'value' => $setting->getTypedValue(),
-                            'class' => 'form-control',
-                            'autocomplete' => 'new-password',
-                        ]) ?>
-                    <?php elseif ($setting->type === 'integer'): ?>
-                        <?= $this->Form->number("settings.{$setting->key}", [
-                            'value' => $setting->getTypedValue(),
-                            'class' => 'form-control',
-                        ]) ?>
-                    <?php else: ?>
-                        <?= $this->Form->text("settings.{$setting->key}", [
-                            'value' => $setting->getTypedValue(),
-                            'class' => 'form-control',
-                        ]) ?>
-                    <?php endif; ?>
-
-                    <?php
-                        $desc = getDescription($setting->key, $descriptions);
-                        if ($desc):
-                    ?>
-                        <span class="help-text"><?= h($desc) ?></span>
-                    <?php endif; ?>
-                </div>
-            <?php endforeach; ?>
-
-            <div class="form-actions">
-                <?= $this->Form->button(__d('settings', 'Save Settings'), [
-                    'type' => 'submit',
-                    'class' => 'btn btn-primary'
-                ]) ?>
-                <?= $this->Form->postLink(
-                    __d('settings', 'Restore Defaults'),
-                    ['action' => 'reset'],
-                    [
-                        'class' => 'btn btn-warning',
-                        'data' => ['category' => 'email'],
-                        'confirm' => __d('settings', 'Are you sure you want to restore settings to default values?')
-                    ]
-                ) ?>
-            </div>
-
-            <?= $this->Form->end() ?>
-
-            <!-- Test Email Form -->
-            <div class="test-email-section" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
-                <h4 style="margin-bottom: 15px;"><?= __d('settings', 'Test Email Settings') ?></h4>
-                <?= $this->Form->create(null, ['url' => ['action' => 'testEmail']]) ?>
-                    <div class="form-group">
-                        <label for="test_email"><?= __d('settings', 'Destination Email') ?></label>
-                        <?= $this->Form->email('test_email', [
-                            'class' => 'form-control',
-                            'placeholder' => __d('settings', 'Enter email to receive the test'),
-                            'required' => true,
-                            'value' => $this->Identity->get('email') ?? ''
-                        ]) ?>
-                        <span class="help-text"><?= __d('settings', 'Enter the email address where you want to receive the test email.') ?></span>
-                    </div>
-                    <div class="form-actions">
-                        <?= $this->Form->button(__d('settings', 'Send Test Email'), [
-                            'type' => 'submit',
-                            'class' => 'btn btn-secondary'
-                        ]) ?>
-                    </div>
-                <?= $this->Form->end() ?>
-            </div>
-        <?php else: ?>
-            <div class="empty-category">
-                <p><?= __d('settings', 'No email settings available.') ?></p>
-                <p style="font-size: 13px; margin-top: 8px;"><?= __d('settings', 'Configure email settings to send notifications.') ?></p>
-            </div>
-        <?php endif; ?>
-    </div>
-
-    <!-- Monitoring Settings -->
-    <div class="tab-content" id="monitoring">
-        <?php if (count($settings['monitoring']) > 0): ?>
-            <?= $this->Form->create(null, ['url' => ['action' => 'save'], 'class' => 'settings-form']) ?>
-            <?= $this->Form->hidden('category', ['value' => 'monitoring']) ?>
-
-            <?php foreach ($settings['monitoring'] as $setting): ?>
-                <div class="form-group">
-                    <label for="<?= h($setting->key) ?>">
-                        <?= h(getLabel($setting->key, $labels)) ?>
-                    </label>
-
-                    <?php if ($setting->type === 'boolean'): ?>
-                        <div class="checkbox-label">
-                            <?= $this->Form->checkbox("settings.{$setting->key}", [
-                                'checked' => $setting->getTypedValue(),
-                                'hiddenField' => true,
-                                'id' => 'setting-' . h($setting->key),
-                            ]) ?>
-                            <label for="setting-<?= h($setting->key) ?>">
-                                <?= h(getDescription($setting->key, $descriptions) ?: __d('settings', 'Enable this option')) ?>
-                            </label>
-                        </div>
-                    <?php elseif ($setting->type === 'integer'): ?>
-                        <?= $this->Form->number("settings.{$setting->key}", [
-                            'value' => $setting->getTypedValue(),
-                            'class' => 'form-control',
-                        ]) ?>
-                        <?php
-                            $desc = getDescription($setting->key, $descriptions);
-                            if ($desc):
-                        ?>
-                            <span class="help-text"><?= h($desc) ?></span>
-                        <?php endif; ?>
-                    <?php else: ?>
-                        <?= $this->Form->text("settings.{$setting->key}", [
-                            'value' => $setting->getTypedValue(),
-                            'class' => 'form-control',
-                        ]) ?>
-                        <?php
-                            $desc = getDescription($setting->key, $descriptions);
-                            if ($desc):
-                        ?>
-                            <span class="help-text"><?= h($desc) ?></span>
-                        <?php endif; ?>
-                    <?php endif; ?>
-                </div>
-            <?php endforeach; ?>
-
-            <div class="form-actions">
-                <?= $this->Form->button(__d('settings', 'Save Settings'), [
-                    'type' => 'submit',
-                    'class' => 'btn btn-primary'
-                ]) ?>
-                <?= $this->Form->postLink(
-                    __d('settings', 'Restore Defaults'),
-                    ['action' => 'reset'],
-                    [
-                        'class' => 'btn btn-warning',
-                        'data' => ['category' => 'monitoring'],
-                        'confirm' => __d('settings', 'Are you sure you want to restore settings to default values?')
-                    ]
-                ) ?>
-            </div>
-
-            <?= $this->Form->end() ?>
-        <?php else: ?>
-            <div class="empty-category">
-                <p><?= __d('settings', 'No monitoring settings available.') ?></p>
             </div>
         <?php endif; ?>
     </div>
@@ -714,11 +485,11 @@ function getDescription($key, $descriptions, $fallback = '') {
                 <div class="channel-header">
                     <span class="channel-icon">&#9993;</span>
                     <h4><?= __d('settings', 'Email') ?></h4>
-                    <span class="badge badge-success"><?= __d('settings', 'Configured via SMTP') ?></span>
+                    <span class="badge badge-success"><?= __d('settings', 'Managed by platform') ?></span>
                 </div>
                 <div class="channel-body">
                     <p style="color: #666; font-size: 13px;">
-                        <?= __d('settings', 'Email notifications are configured through the Email tab. SMTP settings are already available.') ?>
+                        <?= __d('settings', 'Email delivery is managed by the platform. Enable or disable email alerts in the Notifications tab.') ?>
                     </p>
                 </div>
             </div>
@@ -840,103 +611,6 @@ function getDescription($key, $descriptions, $fallback = '') {
 
             <?= $this->Form->end() ?>
         </div>
-    </div>
-
-    <!-- Backup Settings -->
-    <div class="tab-content" id="backup">
-        <?php if (isset($settings['backup']) && count($settings['backup']) > 0): ?>
-            <?= $this->Form->create(null, ['url' => ['action' => 'save'], 'class' => 'settings-form']) ?>
-            <?= $this->Form->hidden('category', ['value' => 'backup']) ?>
-
-            <?php foreach ($settings['backup'] as $setting): ?>
-                <div class="form-group">
-                    <label for="<?= h($setting->key) ?>">
-                        <?= h(getLabel($setting->key, $labels)) ?>
-                    </label>
-
-                    <?php if ($setting->key === 'backup_ftp_type'): ?>
-                        <?= $this->Form->select("settings.{$setting->key}", [
-                            'ftp' => 'FTP',
-                            'sftp' => 'SFTP',
-                        ], [
-                            'value' => $setting->getTypedValue(),
-                            'class' => 'form-control',
-                            'empty' => false,
-                        ]) ?>
-                    <?php elseif (str_contains($setting->key, 'password')): ?>
-                        <?= $this->Form->password("settings.{$setting->key}", [
-                            'value' => $setting->getTypedValue(),
-                            'class' => 'form-control',
-                            'autocomplete' => 'new-password',
-                        ]) ?>
-                    <?php elseif ($setting->type === 'boolean'): ?>
-                        <div class="checkbox-label">
-                            <?= $this->Form->checkbox("settings.{$setting->key}", [
-                                'checked' => $setting->getTypedValue(),
-                                'hiddenField' => true,
-                                'id' => 'setting-' . h($setting->key),
-                            ]) ?>
-                            <label for="setting-<?= h($setting->key) ?>">
-                                <?= h(getDescription($setting->key, $descriptions) ?: __d('settings', 'Enable this option')) ?>
-                            </label>
-                        </div>
-                    <?php elseif ($setting->type === 'integer'): ?>
-                        <?= $this->Form->number("settings.{$setting->key}", [
-                            'value' => $setting->getTypedValue(),
-                            'class' => 'form-control',
-                        ]) ?>
-                    <?php else: ?>
-                        <?= $this->Form->text("settings.{$setting->key}", [
-                            'value' => $setting->getTypedValue(),
-                            'class' => 'form-control',
-                        ]) ?>
-                    <?php endif; ?>
-
-                    <?php
-                        $desc = getDescription($setting->key, $descriptions);
-                        if ($desc && $setting->type !== 'boolean'):
-                    ?>
-                        <span class="help-text"><?= h($desc) ?></span>
-                    <?php endif; ?>
-                </div>
-            <?php endforeach; ?>
-
-            <div class="form-actions">
-                <?= $this->Form->button(__d('settings', 'Save Settings'), [
-                    'type' => 'submit',
-                    'class' => 'btn btn-primary'
-                ]) ?>
-                <?= $this->Form->postLink(
-                    __d('settings', 'Restore Defaults'),
-                    ['action' => 'reset'],
-                    [
-                        'class' => 'btn btn-warning',
-                        'data' => ['category' => 'backup'],
-                        'confirm' => __d('settings', 'Are you sure you want to restore settings to default values?')
-                    ]
-                ) ?>
-            </div>
-
-            <?= $this->Form->end() ?>
-
-            <!-- Test FTP Connection -->
-            <div class="test-ftp-section" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
-                <h4 style="margin-bottom: 15px;"><?= __d('settings', 'Test FTP/SFTP Connection') ?></h4>
-                <?= $this->Form->create(null, ['url' => ['action' => 'testFtpConnection']]) ?>
-                    <div class="form-actions">
-                        <?= $this->Form->button(__d('settings', 'Test Connection'), [
-                            'type' => 'submit',
-                            'class' => 'btn btn-secondary'
-                        ]) ?>
-                    </div>
-                <?= $this->Form->end() ?>
-            </div>
-        <?php else: ?>
-            <div class="empty-category">
-                <p><?= __d('settings', 'No backup settings available.') ?></p>
-                <p style="font-size: 13px; margin-top: 8px;"><?= __d('settings', 'Run migrations to add FTP/SFTP backup settings.') ?></p>
-            </div>
-        <?php endif; ?>
     </div>
 </div>
 

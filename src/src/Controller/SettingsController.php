@@ -4,11 +4,11 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Service\BackupUploaderService;
-use App\Service\SettingService;
 use App\Service\EmailService;
+use App\Service\SettingService;
+use Cake\Cache\Cache;
 use Cake\Http\Exception\BadRequestException;
 use Cake\I18n\I18n;
-use Cake\Cache\Cache;
 
 /**
  * Settings Controller
@@ -38,7 +38,41 @@ class SettingsController extends AppController
     }
 
     /**
+     * Org-level setting keys that customers are allowed to save.
+     * Any key not in this list will be rejected by the save() action.
+     *
+     * @var array<string>
+     */
+    private const ALLOWED_ORG_KEYS = [
+        // General
+        'site_name',
+        'site_logo_url',
+        'site_language',
+        'site_timezone',
+        'status_page_title',
+        'support_email',
+        // Notifications
+        'enable_email_alerts',
+        'notification_email_on_incident_created',
+        'notification_email_on_incident_resolved',
+        'notification_email_on_down',
+        'notification_email_on_up',
+        'alert_throttle_minutes',
+        'notification_default_cooldown',
+        // Channels
+        'channel_slack_webhook_url',
+        'channel_discord_webhook_url',
+        'channel_telegram_bot_token',
+        'channel_telegram_chat_id',
+        'channel_webhook_url',
+        'channel_webhook_secret',
+    ];
+
+    /**
      * Index method - Display settings page
+     *
+     * Simplified for SaaS customers: only General, Notifications, and Channels tabs.
+     * Email, Backup, and Monitoring settings are managed by Super Admin.
      *
      * @return \Cake\Http\Response|null|void Renders view
      */
@@ -51,32 +85,29 @@ class SettingsController extends AppController
             ->orderBy(['key' => 'ASC'])
             ->all();
 
-        // Group settings by category
+        // Group settings by the 3 customer-facing categories only
         $settings = [
             'general' => [],
-            'email' => [],
-            'monitoring' => [],
             'notifications' => [],
-            'backup' => [],
         ];
 
         foreach ($allSettings as $setting) {
-            // Categorize based on key prefix
-            if (str_starts_with($setting->key, 'site_') || str_starts_with($setting->key, 'status_page_') || $setting->key === 'support_email') {
+            // General: org identity & display preferences
+            if (
+                in_array($setting->key, ['site_name', 'site_logo_url', 'site_language', 'site_timezone', 'status_page_title', 'support_email'], true)
+            ) {
                 $settings['general'][] = $setting;
-            } elseif (str_starts_with($setting->key, 'email_') || str_starts_with($setting->key, 'smtp_')) {
-                $settings['email'][] = $setting;
-            } elseif (str_starts_with($setting->key, 'monitor_') || str_starts_with($setting->key, 'check_')) {
-                $settings['monitoring'][] = $setting;
+            // Notifications: alert preferences
             } elseif (
                 str_starts_with($setting->key, 'notification_') ||
                 str_starts_with($setting->key, 'alert_') ||
-                str_starts_with($setting->key, 'enable_') && str_contains($setting->key, '_alerts')
+                $setting->key === 'enable_email_alerts' ||
+                $setting->key === 'notification_default_cooldown'
             ) {
                 $settings['notifications'][] = $setting;
-            } elseif (str_starts_with($setting->key, 'backup_ftp_')) {
-                $settings['backup'][] = $setting;
             }
+            // Email (smtp_*), Backup (backup_ftp_*), Monitoring (monitor_*, check_*)
+            // are intentionally excluded — managed by Super Admin
         }
 
         // Load channel settings as key => value map for the Channels tab
@@ -99,6 +130,9 @@ class SettingsController extends AppController
     /**
      * Save method - Save settings
      *
+     * Only accepts org-level setting keys. System-level keys (SMTP, FTP, monitoring)
+     * are rejected and must be managed via the Super Admin panel.
+     *
      * @return \Cake\Http\Response|null Redirects on success
      */
     public function save()
@@ -115,9 +149,16 @@ class SettingsController extends AppController
 
         $successCount = 0;
         $errorCount = 0;
+        $rejectedCount = 0;
         $languageChanged = false;
 
         foreach ($data as $key => $value) {
+            // Only allow org-level keys
+            if (!in_array($key, self::ALLOWED_ORG_KEYS, true)) {
+                $rejectedCount++;
+                continue;
+            }
+
             try {
                 // Get existing setting to preserve type
                 $existing = $this->Settings->find()
@@ -172,44 +213,11 @@ class SettingsController extends AppController
             $this->Flash->error(__d('settings', "{$errorCount} setting(s) failed to save."));
         }
 
+        if ($rejectedCount > 0) {
+            $this->Flash->warning(__d('settings', "{$rejectedCount} setting(s) were rejected (system-level keys cannot be changed here)."));
+        }
+
         return $this->redirect(['action' => 'index', '#' => $category ?? '']);
-    }
-
-    /**
-     * Test email method - Send test email
-     *
-     * @return \Cake\Http\Response|null Redirects to index
-     */
-    public function testEmail()
-    {
-        $this->request->allowMethod(['post']);
-
-        $toEmail = $this->request->getData('test_email');
-
-        if (empty($toEmail)) {
-            $this->Flash->error(__d('settings', 'Please provide an email address for the test.'));
-            return $this->redirect(['action' => 'index', '#' => 'email']);
-        }
-
-        // Validate email format
-        if (!filter_var($toEmail, FILTER_VALIDATE_EMAIL)) {
-            $this->Flash->error(__d('settings', 'Invalid email address.'));
-            return $this->redirect(['action' => 'index', '#' => 'email']);
-        }
-
-        try {
-            $emailService = new EmailService();
-
-            if ($emailService->sendTestEmail($toEmail)) {
-                $this->Flash->success(__d('settings', 'Test email sent to {0}. Check your inbox.', $toEmail));
-            } else {
-                $this->Flash->error(__d('settings', 'Unable to send test email. Please check email settings and error logs.'));
-            }
-        } catch (\Exception $e) {
-            $this->Flash->error(__d('settings', 'Error sending test email: {0}', $e->getMessage()));
-        }
-
-        return $this->redirect(['action' => 'index', '#' => 'email']);
     }
 
     /**
@@ -245,67 +253,6 @@ class SettingsController extends AppController
         }
 
         return $this->redirect(['action' => 'index', '#' => $category]);
-    }
-
-    /**
-     * Test FTP/SFTP connection
-     *
-     * Tests the FTP/SFTP connection using settings from the request body
-     * (for unsaved form values) or from SettingService (for saved settings).
-     * Returns JSON when called via AJAX, otherwise redirects.
-     *
-     * @return \Cake\Http\Response|null JSON response or redirect
-     */
-    public function testFtpConnection()
-    {
-        $this->request->allowMethod(['post']);
-
-        $isAjax = $this->request->is('ajax')
-            || $this->request->getHeaderLine('Accept') === 'application/json';
-
-        // Read FTP settings from request body (unsaved form) or fall back to SettingService
-        $requestData = $this->request->getData();
-        if (!empty($requestData['backup_ftp_host'])) {
-            // Override SettingService values with request data so users can test before saving
-            foreach ($requestData as $key => $value) {
-                if (str_starts_with($key, 'backup_ftp_')) {
-                    $this->settingService->set($key, $value);
-                }
-            }
-        }
-
-        try {
-            $uploader = new BackupUploaderService($this->settingService);
-            $result = $uploader->testConnection();
-
-            if ($isAjax) {
-                return $this->response
-                    ->withType('application/json')
-                    ->withStringBody(json_encode([
-                        'success' => $result['success'],
-                        'message' => $result['message'],
-                    ]));
-            }
-
-            if ($result['success']) {
-                $this->Flash->success(__d('settings', 'FTP/SFTP connection successful! {0}', $result['message']));
-            } else {
-                $this->Flash->error(__d('settings', 'FTP/SFTP connection failed: {0}', $result['message']));
-            }
-        } catch (\Exception $e) {
-            if ($isAjax) {
-                return $this->response
-                    ->withType('application/json')
-                    ->withStringBody(json_encode([
-                        'success' => false,
-                        'message' => $e->getMessage(),
-                    ]));
-            }
-
-            $this->Flash->error(__d('settings', 'Error testing connection: {0}', $e->getMessage()));
-        }
-
-        return $this->redirect(['action' => 'index', '#' => 'backup']);
     }
 
     /**
@@ -519,6 +466,9 @@ class SettingsController extends AppController
     /**
      * Get default settings for a category
      *
+     * Only includes org-level categories (General, Notifications).
+     * Email, Backup, and Monitoring defaults are managed by Super Admin.
+     *
      * @param string $category Category name
      * @return array
      */
@@ -527,45 +477,22 @@ class SettingsController extends AppController
         $defaults = [
             'general' => [
                 'site_name' => ['value' => 'ISP Status', 'type' => 'string'],
-                'site_url' => ['value' => 'http://localhost:8765', 'type' => 'string'],
+                'site_logo_url' => ['value' => '', 'type' => 'string'],
                 'site_language' => ['value' => 'pt_BR', 'type' => 'string'],
+                'site_timezone' => ['value' => 'America/Sao_Paulo', 'type' => 'string'],
                 'status_page_title' => ['value' => 'System Status', 'type' => 'string'],
-                'status_page_public' => ['value' => true, 'type' => 'boolean'],
-                'status_page_cache_seconds' => ['value' => 30, 'type' => 'integer'],
                 'support_email' => ['value' => 'support@example.com', 'type' => 'string'],
             ],
-            'email' => [
-                'smtp_host' => ['value' => 'localhost', 'type' => 'string'],
-                'smtp_port' => ['value' => 587, 'type' => 'integer'],
-                'smtp_username' => ['value' => '', 'type' => 'string'],
-                'smtp_password' => ['value' => '', 'type' => 'string'],
-                'email_from' => ['value' => 'noreply@example.com', 'type' => 'string'],
-                'email_from_name' => ['value' => 'ISP Status', 'type' => 'string'],
-            ],
-            'monitoring' => [
-                'monitor_default_interval' => ['value' => 60, 'type' => 'integer'],
-                'monitor_default_timeout' => ['value' => 10, 'type' => 'integer'],
-                'monitor_max_retries' => ['value' => 3, 'type' => 'integer'],
-                'monitor_auto_resolve' => ['value' => true, 'type' => 'boolean'],
-            ],
             'notifications' => [
+                'enable_email_alerts' => ['value' => true, 'type' => 'boolean'],
                 'notification_email_on_incident_created' => ['value' => true, 'type' => 'boolean'],
                 'notification_email_on_incident_resolved' => ['value' => true, 'type' => 'boolean'],
                 'notification_email_on_down' => ['value' => true, 'type' => 'boolean'],
                 'notification_email_on_up' => ['value' => false, 'type' => 'boolean'],
+                'alert_throttle_minutes' => ['value' => 15, 'type' => 'integer'],
+                'notification_default_cooldown' => ['value' => 5, 'type' => 'integer'],
             ],
         ];
-
-        $defaults['backup'] = [
-                'backup_ftp_enabled' => ['value' => false, 'type' => 'boolean'],
-                'backup_ftp_type' => ['value' => 'ftp', 'type' => 'string'],
-                'backup_ftp_host' => ['value' => '', 'type' => 'string'],
-                'backup_ftp_port' => ['value' => 21, 'type' => 'integer'],
-                'backup_ftp_username' => ['value' => '', 'type' => 'string'],
-                'backup_ftp_password' => ['value' => '', 'type' => 'string'],
-                'backup_ftp_path' => ['value' => '/backups', 'type' => 'string'],
-                'backup_ftp_passive' => ['value' => true, 'type' => 'boolean'],
-            ];
 
         return $defaults[$category] ?? [];
     }

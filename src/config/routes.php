@@ -327,6 +327,10 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/users/{id}', ['controller' => 'Users', 'action' => 'view'], ['pass' => ['id'], 'id' => '\d+']);
         $builder->connect('/revenue', ['controller' => 'Revenue', 'action' => 'index']);
         $builder->connect('/health', ['controller' => 'Health', 'action' => 'index']);
+        $builder->connect('/settings', ['controller' => 'Settings', 'action' => 'index']);
+        $builder->connect('/settings/save', ['controller' => 'Settings', 'action' => 'save']);
+        $builder->connect('/settings/test-email', ['controller' => 'Settings', 'action' => 'testEmail']);
+        $builder->connect('/settings/test-ftp', ['controller' => 'Settings', 'action' => 'testFtp']);
         $builder->fallbacks();
     });
 
