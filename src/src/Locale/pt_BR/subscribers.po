@@ -248,3 +248,301 @@ msgstr "Não, manter inscrição"
 
 msgid "Você pode se reinscrever a qualquer momento pela página de status."
 msgstr "Você pode se reinscrever a qualquer momento pela página de status."
+
+#: i18n fix: English source keys for Subscribers templates
+msgid "Notification Subscribers"
+msgstr "Inscritos de Notificações"
+
+msgid "Total Subscribers"
+msgstr "Total de Inscritos"
+
+msgid "Verified"
+msgstr "Verificados"
+
+msgid "Unverified"
+msgstr "Não Verificados"
+
+msgid "Active"
+msgstr "Ativos"
+
+msgid "Added (7 days)"
+msgstr "Adicionados (7 dias)"
+
+msgid "Search"
+msgstr "Buscar"
+
+msgid "Email or name..."
+msgstr "Email ou nome..."
+
+msgid "Verification Status"
+msgstr "Status de Verificação"
+
+msgid "All"
+msgstr "Todos"
+
+msgid "Active Status"
+msgstr "Status Ativo"
+
+msgid "Inactive"
+msgstr "Inativos"
+
+msgid "Period"
+msgstr "Período"
+
+msgid "Last 7 days"
+msgstr "Últimos 7 dias"
+
+msgid "Last 30 days"
+msgstr "Últimos 30 dias"
+
+msgid "Last 90 days"
+msgstr "Últimos 90 dias"
+
+msgid "Filter"
+msgstr "Filtrar"
+
+msgid "Clear"
+msgstr "Limpar"
+
+msgid "Email / Name"
+msgstr "Email / Nome"
+
+msgid "Verification"
+msgstr "Verificação"
+
+msgid "Subscription Date"
+msgstr "Data de Inscrição"
+
+msgid "Subscriptions"
+msgstr "Assinaturas"
+
+msgid "Actions"
+msgstr "Ações"
+
+msgid "Pending"
+msgstr "Pendente"
+
+msgid "monitors"
+msgstr "monitores"
+
+msgid "None"
+msgstr "Nenhuma"
+
+msgid "View"
+msgstr "Ver"
+
+msgid "View details"
+msgstr "Ver detalhes"
+
+msgid "Deactivate"
+msgstr "Desativar"
+
+msgid "Activate"
+msgstr "Ativar"
+
+msgid "Deactivate subscriber"
+msgstr "Desativar inscrito"
+
+msgid "Activate subscriber"
+msgstr "Ativar inscrito"
+
+msgid "Are you sure you want to {0} this subscriber?"
+msgstr "Tem certeza que deseja {0} este inscrito?"
+
+msgid "deactivate"
+msgstr "desativar"
+
+msgid "activate"
+msgstr "ativar"
+
+msgid "Delete"
+msgstr "Excluir"
+
+msgid "Delete subscriber"
+msgstr "Excluir inscrito"
+
+msgid "Are you sure you want to delete this subscriber? This action cannot be undone."
+msgstr "Tem certeza que deseja excluir este inscrito? Esta ação não pode ser desfeita."
+
+msgid "« First"
+msgstr "« Primeira"
+
+msgid "‹ Previous"
+msgstr "‹ Anterior"
+
+msgid "Next ›"
+msgstr "Próxima ›"
+
+msgid "Last »"
+msgstr "Última »"
+
+msgid "Page {{page}} of {{pages}}, showing {{current}} record(s) of {{count}} total"
+msgstr "Página {{page}} de {{pages}}, mostrando {{current}} registro(s) de {{count}} no total"
+
+msgid "Subscriber Details"
+msgstr "Detalhes do Inscrito"
+
+msgid "Notification subscriber"
+msgstr "Inscrito de notificações"
+
+msgid "Back"
+msgstr "Voltar"
+
+msgid "Active and Verified"
+msgstr "Ativo e Verificado"
+
+msgid "Inactive or Unverified"
+msgstr "Inativo ou Não Verificado"
+
+msgid "Can receive notifications"
+msgstr "Pode receber notificações"
+
+msgid "Awaiting email verification"
+msgstr "Aguardando verificação de email"
+
+msgid "Subscriber deactivated"
+msgstr "Inscrito desativado"
+
+msgid "Emails Received"
+msgstr "Emails Recebidos"
+
+msgid "Subscribed Monitors"
+msgstr "Monitores Inscritos"
+
+msgid "Yes"
+msgstr "Sim"
+
+msgid "No"
+msgstr "Não"
+
+msgid "Email:"
+msgstr "Email:"
+
+msgid "Name:"
+msgstr "Nome:"
+
+msgid "Verification Status:"
+msgstr "Status de Verificação:"
+
+msgid "Active Status:"
+msgstr "Status Ativo:"
+
+msgid "Verified at:"
+msgstr "Verificado em:"
+
+msgid "Subscription Date:"
+msgstr "Data de Inscrição:"
+
+msgid "Last Updated:"
+msgstr "Última Atualização:"
+
+msgid "Verification Token:"
+msgstr "Token de Verificação:"
+
+msgid "Unsubscribe Token:"
+msgstr "Token de Cancelamento:"
+
+msgid "Service monitor"
+msgstr "Monitor de serviço"
+
+msgid "Subscribed on: {0}"
+msgstr "Inscrito em: {0}"
+
+msgid "View Monitor"
+msgstr "Ver Monitor"
+
+msgid "No subscribed monitors yet."
+msgstr "Nenhum monitor inscrito ainda."
+
+msgid "The subscriber has not subscribed to any specific monitor."
+msgstr "O inscrito não se inscreveu em nenhum monitor específico."
+
+msgid "Resend Verification"
+msgstr "Reenviar Verificação"
+
+msgid "Are you sure you want to resend the verification email?"
+msgstr "Tem certeza que deseja reenviar o email de verificação?"
+
+msgid "Deactivate Subscriber"
+msgstr "Desativar Inscrito"
+
+msgid "Activate Subscriber"
+msgstr "Ativar Inscrito"
+
+msgid "Delete Subscriber"
+msgstr "Excluir Inscrito"
+
+msgid "Are you sure you want to delete this subscriber? This action cannot be undone and all subscriptions will be removed."
+msgstr "Tem certeza que deseja excluir este inscrito? Esta ação não pode ser desfeita e todas as assinaturas serão removidas."
+
+msgid "Email Verified"
+msgstr "Email Verificado"
+
+msgid "Email Verified Successfully!"
+msgstr "Email Verificado com Sucesso!"
+
+msgid "Thank you for verifying your email"
+msgstr "Obrigado por verificar seu email"
+
+msgid "What happens now?"
+msgstr "O que acontece agora?"
+
+msgid "You will start receiving notifications about incidents"
+msgstr "Você começará a receber notificações sobre incidentes"
+
+msgid "Alerts will be sent when services go offline"
+msgstr "Alertas serão enviados quando serviços ficarem offline"
+
+msgid "You will be notified when issues are resolved"
+msgstr "Você será informado quando os problemas forem resolvidos"
+
+msgid "Back to Status"
+msgstr "Voltar para Status"
+
+msgid "No longer want to receive notifications?"
+msgstr "Não quer mais receber notificações?"
+
+msgid "Unsubscribe"
+msgstr "Cancelar Inscrição"
+
+msgid "Subscription Cancelled"
+msgstr "Inscrição Cancelada"
+
+msgid "You have been successfully unsubscribed. You will no longer receive email notifications"
+msgstr "Você foi desinscrito com sucesso. Não receberá mais notificações no email"
+
+msgid "We will miss you!"
+msgstr "Sentiremos sua falta!"
+
+msgid "If you change your mind, you can subscribe again at any time on the status page."
+msgstr "Se você mudar de ideia, pode se inscrever novamente a qualquer momento na página de status."
+
+msgid "Unsubscribe?"
+msgstr "Cancelar Inscrição?"
+
+msgid "Are you sure you want to cancel notifications for"
+msgstr "Tem certeza que deseja cancelar as notificações para"
+
+msgid "You will stop receiving:"
+msgstr "Você deixará de receber:"
+
+msgid "Incident notifications"
+msgstr "Notificações sobre incidentes"
+
+msgid "Offline service alerts"
+msgstr "Alertas de serviços offline"
+
+msgid "Issue resolution updates"
+msgstr "Informações sobre resoluções de problemas"
+
+msgid "Yes, unsubscribe"
+msgstr "Sim, cancelar inscrição"
+
+msgid "No, keep subscription"
+msgstr "Não, manter inscrição"
+
+msgid "You can resubscribe at any time through the status page."
+msgstr "Você pode se reinscrever a qualquer momento pela página de status."
+
+msgid "Status"
+msgstr "Status"

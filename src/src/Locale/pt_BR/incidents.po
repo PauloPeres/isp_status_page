@@ -315,3 +315,172 @@ msgstr "Última »"
 
 msgid "Página {{page}} de {{pages}}, mostrando {{current}} registro(s) de {{count}} no total"
 msgstr "Página {{page}} de {{pages}}, mostrando {{current}} registro(s) de {{count}} no total"
+
+#: i18n fix: English source keys for Incidents templates
+msgid "Incidents"
+msgstr "Incidentes"
+
+msgid "Active"
+msgstr "Ativos"
+
+msgid "Resolved"
+msgstr "Resolvidos"
+
+msgid "Search"
+msgstr "Buscar"
+
+msgid "Title or description..."
+msgstr "Título ou descrição..."
+
+msgid "All"
+msgstr "Todos"
+
+msgid "All Monitors"
+msgstr "Todos os Monitores"
+
+msgid "Filter"
+msgstr "Filtrar"
+
+msgid "Clear"
+msgstr "Limpar"
+
+msgid "Incident"
+msgstr "Incidente"
+
+msgid "Started"
+msgstr "Iniciado"
+
+msgid "Duration"
+msgstr "Duração"
+
+msgid "Actions"
+msgstr "Ações"
+
+msgid "View"
+msgstr "Ver"
+
+msgid "View details"
+msgstr "Ver detalhes"
+
+msgid "Edit"
+msgstr "Editar"
+
+msgid "Resolve"
+msgstr "Resolver"
+
+msgid "Are you sure you want to resolve this incident?"
+msgstr "Tem certeza que deseja resolver este incidente?"
+
+msgid "In progress"
+msgstr "Em andamento"
+
+msgid "« First"
+msgstr "« Primeira"
+
+msgid "‹ Previous"
+msgstr "‹ Anterior"
+
+msgid "Next ›"
+msgstr "Próxima ›"
+
+msgid "Last »"
+msgstr "Última »"
+
+msgid "Page {{page}} of {{pages}}, showing {{current}} record(s) of {{count}} total"
+msgstr "Página {{page}} de {{pages}}, mostrando {{current}} registro(s) de {{count}} no total"
+
+msgid "Incident Details"
+msgstr "Detalhes do Incidente"
+
+msgid "← Back to Incidents"
+msgstr "← Voltar para Incidentes"
+
+msgid "Acknowledge"
+msgstr "Reconhecer"
+
+msgid "Acknowledge this incident?"
+msgstr "Reconhecer este incidente?"
+
+msgid "Incident resolved"
+msgstr "Incidente resolvido"
+
+msgid "Incident active"
+msgstr "Incidente ativo"
+
+msgid "Main Information"
+msgstr "Informações Principais"
+
+msgid "Severity"
+msgstr "Severidade"
+
+msgid "Affected Monitor"
+msgstr "Monitor Afetado"
+
+msgid "Creation"
+msgstr "Criação"
+
+msgid "🤖 Auto-created"
+msgstr "🤖 Auto-criado"
+
+msgid "👤 Manual"
+msgstr "👤 Manual"
+
+msgid "Started at"
+msgstr "Iniciado em"
+
+msgid "Identified at"
+msgstr "Identificado em"
+
+msgid "Resolved at"
+msgstr "Resolvido em"
+
+msgid "seconds"
+msgstr "segundos"
+
+msgid "minutes"
+msgstr "minutos"
+
+msgid "hours"
+msgstr "horas"
+
+msgid "days"
+msgstr "dias"
+
+msgid "⏱️ In progress..."
+msgstr "⏱️ Em andamento..."
+
+msgid "Acknowledgement"
+msgstr "Reconhecimento"
+
+msgid "By: {0}"
+msgstr "Por: {0}"
+
+msgid "Awaiting acknowledgement"
+msgstr "Aguardando reconhecimento"
+
+msgid "Description"
+msgstr "Descrição"
+
+msgid "Event Timeline"
+msgstr "Timeline de Eventos"
+
+msgid "Recent Monitor Checks"
+msgstr "Verificações Recentes do Monitor"
+
+msgid "View Monitor"
+msgstr "Ver Monitor"
+
+msgid "Critical"
+msgstr "Críticos"
+
+msgid "Investigating"
+msgstr "Investigando"
+
+msgid "Identified"
+msgstr "Identificado"
+
+msgid "Monitoring"
+msgstr "Monitorando"
+
+msgid "Maintenance"
+msgstr "Manutenção"

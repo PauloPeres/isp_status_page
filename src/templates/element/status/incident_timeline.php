@@ -12,7 +12,7 @@ if ($incidents->count() === 0) {
 ?>
 
 <div class="incidents-section">
-    <h3 class="section-title">🚨 <?= __('Incidentes Recentes') ?></h3>
+    <h3 class="section-title">🚨 <?= __('Recent Incidents') ?></h3>
 
     <div class="incident-timeline">
         <?php foreach ($incidents as $incident): ?>
@@ -26,11 +26,11 @@ if ($incidents->count() === 0) {
                         <span class="incident-status-badge <?= h($incident->status) ?>">
                             <?php
                             if ($incident->status === 'resolved') {
-                                echo '✅ ' . __('Resolvido');
+                                echo '✅ ' . __('Resolved');
                             } elseif ($incident->status === 'investigating') {
-                                echo '🔍 ' . __('Investigando');
+                                echo '🔍 ' . __('Investigating');
                             } elseif ($incident->status === 'identified') {
-                                echo '⚠️ ' . __('Identificado');
+                                echo '⚠️ ' . __('Identified');
                             } else {
                                 echo '🔄 ' . ucfirst($incident->status);
                             }
@@ -48,7 +48,7 @@ if ($incidents->count() === 0) {
                         <span class="meta-item">
                             <span class="meta-icon">📅</span>
                             <span class="meta-text">
-                                <?= __('Iniciado:') ?> <span class="local-datetime" data-utc="<?= $incident->started_at->format('c') ?>"></span>
+                                <?= __('Started:') ?> <span class="local-datetime" data-utc="<?= $incident->started_at->format('c') ?>"></span>
                             </span>
                         </span>
 
@@ -56,7 +56,7 @@ if ($incidents->count() === 0) {
                             <span class="meta-item resolved">
                                 <span class="meta-icon">✅</span>
                                 <span class="meta-text">
-                                    <?= __('Resolvido:') ?> <span class="local-datetime" data-utc="<?= $incident->resolved_at->format('c') ?>"></span>
+                                    <?= __('Resolved:') ?> <span class="local-datetime" data-utc="<?= $incident->resolved_at->format('c') ?>"></span>
                                 </span>
                             </span>
 
@@ -64,14 +64,14 @@ if ($incidents->count() === 0) {
                                 <span class="meta-item">
                                     <span class="meta-icon">⏱️</span>
                                     <span class="meta-text">
-                                        <?= __('Duração:') ?> <?= gmdate('H\h i\m', $incident->duration) ?>
+                                        <?= __('Duration:') ?> <?= gmdate('H\h i\m', $incident->duration) ?>
                                     </span>
                                 </span>
                             <?php endif; ?>
                         <?php else: ?>
                             <span class="meta-item ongoing">
                                 <span class="meta-icon">🔴</span>
-                                <span class="meta-text"><?= __('Em andamento') ?></span>
+                                <span class="meta-text"><?= __('In progress') ?></span>
                             </span>
                         <?php endif; ?>
                     </div>
@@ -82,7 +82,7 @@ if ($incidents->count() === 0) {
 
     <div class="incidents-footer">
         <?= $this->Html->link(
-            __('Ver Histórico Completo') . ' →',
+            __('View Full History') . ' →',
             ['action' => 'history'],
             ['class' => 'btn-view-history']
         ) ?>

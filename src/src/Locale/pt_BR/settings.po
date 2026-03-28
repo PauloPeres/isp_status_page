@@ -449,3 +449,286 @@ msgstr "URL da Logo Personalizada"
 
 msgid "URL completa da imagem da logo (PNG, JPG, SVG). Deixe vazio para usar o logo padrão."
 msgstr "URL completa da imagem da logo (PNG, JPG, SVG). Deixe vazio para usar o logo padrão."
+
+#: Settings/index.php - i18n fix: English source keys
+msgid "System Settings"
+msgstr "Configurações do Sistema"
+
+msgid "Site Name"
+msgstr "Nome do Site"
+
+msgid "Site URL"
+msgstr "URL do Site"
+
+msgid "Custom Logo URL"
+msgstr "URL da Logo Personalizada"
+
+msgid "System Language"
+msgstr "Idioma do Sistema"
+
+msgid "Status Page Title"
+msgstr "Título da Página de Status"
+
+msgid "Public Status Page"
+msgstr "Página de Status Pública"
+
+msgid "Page Cache (seconds)"
+msgstr "Cache da Página (segundos)"
+
+msgid "Support Email"
+msgstr "Email de Suporte"
+
+msgid "Sender Email"
+msgstr "Email Remetente"
+
+msgid "Sender Name"
+msgstr "Nome do Remetente"
+
+msgid "seconds"
+msgstr "segundos"
+
+msgid "Default Interval (seconds)"
+msgstr "Intervalo Padrão (segundos)"
+
+msgid "Default Timeout (seconds)"
+msgstr "Timeout Padrão (segundos)"
+
+msgid "Max Retries"
+msgstr "Máximo de Tentativas"
+
+msgid "Auto-resolve Incidents"
+msgstr "Auto-resolver Incidentes"
+
+msgid "Check Interval (minutes)"
+msgstr "Intervalo de Verificação (minutos)"
+
+msgid "Check Timeout (seconds)"
+msgstr "Timeout de Verificação (segundos)"
+
+msgid "Email on Incident Created"
+msgstr "Email ao Criar Incidente"
+
+msgid "Email on Incident Resolved"
+msgstr "Email ao Resolver Incidente"
+
+msgid "Email on Monitor Down"
+msgstr "Email ao Ficar Offline"
+
+msgid "Email on Monitor Up"
+msgstr "Email ao Voltar Online"
+
+msgid "Alert Throttle (minutes)"
+msgstr "Intervalo Entre Alertas (minutos)"
+
+msgid "Enable Email Alerts"
+msgstr "Habilitar Alertas por Email"
+
+msgid "Enable WhatsApp Alerts"
+msgstr "Habilitar Alertas por WhatsApp"
+
+msgid "Enable Telegram Alerts"
+msgstr "Habilitar Alertas por Telegram"
+
+msgid "Enable SMS Alerts"
+msgstr "Habilitar Alertas por SMS"
+
+msgid "Enable FTP/SFTP Upload"
+msgstr "Habilitar Upload FTP/SFTP"
+
+msgid "Protocol Type"
+msgstr "Tipo de Protocolo"
+
+msgid "Server Host"
+msgstr "Host do Servidor"
+
+msgid "Remote Path"
+msgstr "Caminho Remoto"
+
+msgid "Passive Mode (FTP)"
+msgstr "Modo Passivo (FTP)"
+
+msgid "General"
+msgstr "Geral"
+
+msgid "Monitoring"
+msgstr "Monitoramento"
+
+msgid "Notifications"
+msgstr "Notificações"
+
+msgid "Portuguese (Brazil)"
+msgstr "Português (Brasil)"
+
+msgid "None"
+msgstr "Nenhuma"
+
+msgid "Enable this option"
+msgstr "Ativar esta opção"
+
+msgid "Save Settings"
+msgstr "Salvar Configurações"
+
+msgid "Restore Defaults"
+msgstr "Restaurar Padrões"
+
+msgid "Are you sure you want to restore settings to default values?"
+msgstr "Tem certeza que deseja restaurar as configurações para os valores padrão?"
+
+msgid "No general settings available."
+msgstr "Nenhuma configuração geral disponível."
+
+msgid "Test Email Settings"
+msgstr "Testar Configurações de Email"
+
+msgid "Destination Email"
+msgstr "Email de Destino"
+
+msgid "Enter email to receive the test"
+msgstr "Digite o email para receber o teste"
+
+msgid "Enter the email address where you want to receive the test email."
+msgstr "Digite o endereço de email onde deseja receber o email de teste."
+
+msgid "Send Test Email"
+msgstr "Enviar Email de Teste"
+
+msgid "No email settings available."
+msgstr "Nenhuma configuração de email disponível."
+
+msgid "Configure email settings to send notifications."
+msgstr "Configure as configurações de email para enviar notificações."
+
+msgid "No monitoring settings available."
+msgstr "Nenhuma configuração de monitoramento disponível."
+
+msgid "No notification settings available."
+msgstr "Nenhuma configuração de notificações disponível."
+
+msgid "Test FTP/SFTP Connection"
+msgstr "Testar Conexão FTP/SFTP"
+
+msgid "Test Connection"
+msgstr "Testar Conexão"
+
+msgid "No backup settings available."
+msgstr "Nenhuma configuração de backup disponível."
+
+msgid "Run migrations to add FTP/SFTP backup settings."
+msgstr "Execute as migrations para adicionar as configurações de backup FTP/SFTP."
+
+msgid "Site name displayed on the status page"
+msgstr "Nome do site exibido na página de status"
+
+msgid "Full URL where the system is hosted"
+msgstr "URL completa onde o sistema está hospedado"
+
+msgid "Full URL of logo image (PNG, JPG, SVG). Leave empty for default logo."
+msgstr "URL completa da imagem da logo (PNG, JPG, SVG). Deixe vazio para usar o logo padrão."
+
+msgid "System interface language"
+msgstr "Idioma da interface do sistema"
+
+msgid "Title displayed on the status page"
+msgstr "Título exibido na página de status"
+
+msgid "Status page is publicly accessible"
+msgstr "A página de status é acessível publicamente"
+
+msgid "Status page cache time in seconds"
+msgstr "Tempo de cache da página de status em segundos"
+
+msgid "Support email shown in public page footer"
+msgstr "Email de suporte exibido no rodapé da página pública"
+
+msgid "SMTP server address"
+msgstr "Endereço do servidor SMTP"
+
+msgid "SMTP server port (usually 587 or 465)"
+msgstr "Porta do servidor SMTP (geralmente 587 ou 465)"
+
+msgid "Username for SMTP authentication"
+msgstr "Nome de usuário para autenticação SMTP"
+
+msgid "Password for SMTP authentication"
+msgstr "Senha para autenticação SMTP"
+
+msgid "SMTP encryption type (TLS, SSL or none)"
+msgstr "Tipo de criptografia SMTP (TLS, SSL ou nenhuma)"
+
+msgid "Sender email address"
+msgstr "Endereço de email do remetente"
+
+msgid "Name displayed as email sender"
+msgstr "Nome exibido como remetente dos emails"
+
+msgid "SMTP connection timeout in seconds"
+msgstr "Tempo limite para conexão SMTP em segundos"
+
+msgid "Default interval between checks in seconds"
+msgstr "Intervalo padrão entre verificações em segundos"
+
+msgid "Default timeout for checks in seconds"
+msgstr "Tempo limite padrão para verificações em segundos"
+
+msgid "Maximum retries before marking as failed"
+msgstr "Número máximo de tentativas antes de marcar como falha"
+
+msgid "Automatically resolve incidents when monitor comes back online"
+msgstr "Resolver automaticamente incidentes quando monitor volta online"
+
+msgid "Interval between check command runs in minutes"
+msgstr "Intervalo entre execuções do comando de verificação em minutos"
+
+msgid "Maximum execution time for a check in seconds"
+msgstr "Tempo máximo de execução de uma verificação em segundos"
+
+msgid "Send email when a new incident is created"
+msgstr "Enviar email quando um novo incidente é criado"
+
+msgid "Send email when an incident is resolved"
+msgstr "Enviar email quando um incidente é resolvido"
+
+msgid "Send email when a monitor goes offline"
+msgstr "Enviar email quando um monitor fica offline"
+
+msgid "Send email when a monitor comes back online"
+msgstr "Enviar email quando um monitor volta online"
+
+msgid "Minimum interval in minutes between alerts for the same monitor"
+msgstr "Intervalo mínimo em minutos entre alertas do mesmo monitor"
+
+msgid "Enable sending email alerts to subscribers"
+msgstr "Ativar envio de alertas por email para assinantes"
+
+msgid "Enable WhatsApp alerts (future feature)"
+msgstr "Ativar envio de alertas via WhatsApp (funcionalidade futura)"
+
+msgid "Enable Telegram alerts (future feature)"
+msgstr "Ativar envio de alertas via Telegram (funcionalidade futura)"
+
+msgid "Enable SMS alerts (future feature)"
+msgstr "Ativar envio de alertas via SMS (funcionalidade futura)"
+
+msgid "Enable automatic backup upload via FTP or SFTP"
+msgstr "Ativar upload automático de backups via FTP ou SFTP"
+
+msgid "Transfer protocol: ftp or sftp"
+msgstr "Protocolo de transferência: ftp ou sftp"
+
+msgid "FTP/SFTP server address"
+msgstr "Endereço do servidor FTP/SFTP"
+
+msgid "Server port (FTP: 21, SFTP: 22)"
+msgstr "Porta do servidor (FTP: 21, SFTP: 22)"
+
+msgid "Username for authentication"
+msgstr "Nome de usuário para autenticação"
+
+msgid "Password for authentication"
+msgstr "Senha para autenticação"
+
+msgid "Remote directory for storing backups"
+msgstr "Diretório remoto para armazenar os backups"
+
+msgid "Use passive mode for FTP connections"
+msgstr "Usar modo passivo para conexões FTP"

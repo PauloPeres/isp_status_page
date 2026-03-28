@@ -6,7 +6,7 @@
 use Cake\Core\Configure;
 
 $siteName = Configure::read('Settings.site_name', 'ISP Status');
-$this->assign('title', __('Histórico de Incidentes'));
+$this->assign('title', __('Incident History'));
 ?>
 
 <style>
@@ -374,22 +374,22 @@ $this->assign('title', __('Histórico de Incidentes'));
 
 <div class="container">
     <?= $this->Html->link(
-        '← ' . __('Voltar para Status'),
+        '← ' . __('Back to Status'),
         ['controller' => 'Status', 'action' => 'index'],
         ['class' => 'back-link']
     ) ?>
 
     <div class="history-header">
-        <h1>📜 <?= __('Histórico de Incidentes') ?></h1>
-        <p><?= __('Últimos 30 dias de incidentes reportados') ?></p>
+        <h1>📜 <?= __('Incident History') ?></h1>
+        <p><?= __('Last 30 days of reported incidents') ?></p>
     </div>
 
     <div class="timeline">
         <?php if (empty($groupedIncidents)): ?>
             <div class="empty-state">
                 <div class="empty-state-icon">🎉</div>
-                <h3><?= __('Nenhum incidente registrado') ?></h3>
-                <p><?= __('Não houve incidentes nos últimos 30 dias. Todos os sistemas estão operando normalmente!') ?></p>
+                <h3><?= __('No incidents recorded') ?></h3>
+                <p><?= __('No incidents in the last 30 days. All systems are operating normally!') ?></p>
             </div>
         <?php else: ?>
             <?php foreach ($groupedIncidents as $date => $incidents): ?>
@@ -407,10 +407,10 @@ $this->assign('title', __('Histórico de Incidentes'));
                             default => 'ongoing'
                         };
                         $statusLabel = match($incident->status) {
-                            'resolved' => '✅ Resolvido',
-                            'investigating' => '🔍 Investigando',
-                            'identified' => '🔍 Identificado',
-                            default => '🚨 Em andamento'
+                            'resolved' => '✅ ' . __('Resolved'),
+                            'investigating' => '🔍 ' . __('Investigating'),
+                            'identified' => '🔍 ' . __('Identified'),
+                            default => '🚨 ' . __('In progress')
                         };
                         $severityClass = match($incident->severity) {
                             'critical' => 'major',
@@ -419,10 +419,10 @@ $this->assign('title', __('Histórico de Incidentes'));
                             default => 'minor'
                         };
                         $severityLabel = match($incident->severity) {
-                            'critical' => 'Crítico',
-                            'major' => 'Importante',
-                            'minor' => 'Menor',
-                            default => 'Manutenção'
+                            'critical' => __('Critical'),
+                            'major' => __('Major'),
+                            'minor' => __('Minor'),
+                            default => __('Maintenance')
                         };
 
                         // Calculate duration
@@ -460,18 +460,18 @@ $this->assign('title', __('Histórico de Incidentes'));
 
                             <div class="incident-meta">
                                 <div class="meta-item">
-                                    <strong><?= __('Início:') ?></strong>
+                                    <strong><?= __('Start:') ?></strong>
                                     <span><?= $incident->created->format('d/m/Y H:i') ?></span>
                                 </div>
 
                                 <?php if ($incident->resolved_at): ?>
                                     <div class="meta-item">
-                                        <strong><?= __('Resolvido:') ?></strong>
+                                        <strong><?= __('Resolved:') ?></strong>
                                         <span><?= $incident->resolved_at->format('d/m/Y H:i') ?></span>
                                     </div>
                                     <?php if ($duration): ?>
                                         <div class="meta-item">
-                                            <strong><?= __('Duração:') ?></strong>
+                                            <strong><?= __('Duration:') ?></strong>
                                             <span><?= $duration ?></span>
                                         </div>
                                     <?php endif; ?>
@@ -479,7 +479,7 @@ $this->assign('title', __('Histórico de Incidentes'));
 
                                 <?php if ($incident->auto_created): ?>
                                     <div class="meta-item">
-                                        <span>🤖 <?= __('Auto-criado') ?></span>
+                                        <span>🤖 <?= __('Auto-created') ?></span>
                                     </div>
                                 <?php endif; ?>
                             </div>

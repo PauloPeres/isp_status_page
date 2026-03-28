@@ -34,19 +34,19 @@ $this->assign('title', $statusPageTitle);
         <div class="status-icon"><?= $systemIcon ?></div>
         <h2 class="status-title"><?= h($systemMessage) ?></h2>
         <p class="status-description">
-            <?= $onlineMonitors ?> <?= __('de') ?> <?= $totalMonitors ?> <?= __('serviços operacionais') ?>
+            <?= $onlineMonitors ?> <?= __('of') ?> <?= $totalMonitors ?> <?= __('services operational') ?>
             <?php if ($offlineMonitors > 0): ?>
                 | <?= $offlineMonitors ?> <?= __('offline') ?>
             <?php endif; ?>
             <?php if ($degradedMonitors > 0): ?>
-                | <?= $degradedMonitors ?> <?= __('degradados') ?>
+                | <?= $degradedMonitors ?> <?= __('degraded') ?>
             <?php endif; ?>
         </p>
     </div>
 
     <!-- Services List -->
     <div class="services-section">
-        <h3 class="section-title">📊 <?= __('Status dos Serviços') ?></h3>
+        <h3 class="section-title">📊 <?= __('Service Status') ?></h3>
 
         <?php if ($monitors->count() > 0): ?>
             <?php foreach ($monitors as $monitor): ?>
@@ -55,7 +55,7 @@ $this->assign('title', $statusPageTitle);
         <?php else: ?>
             <div class="empty-state">
                 <div class="empty-state-icon">📭</div>
-                <p><?= __('Nenhum serviço sendo monitorado no momento.') ?></p>
+                <p><?= __('No services being monitored at this time.') ?></p>
             </div>
         <?php endif; ?>
     </div>
@@ -70,7 +70,7 @@ $this->assign('title', $statusPageTitle);
 
 <!-- Auto-reload Indicator -->
 <div class="auto-reload-indicator">
-    <span id="reload-message"><?= __('Próxima atualização em:') ?> <strong id="countdown">300</strong> <?= __('segundos') ?></span>
+    <span id="reload-message"><?= __('Next update in:') ?> <strong id="countdown">300</strong> <?= __('seconds') ?></span>
 </div>
 
 <style>
@@ -123,8 +123,8 @@ document.addEventListener('DOMContentLoaded', function() {
     countdownInterval = setInterval(updateCountdown, 1000);
 
     // Show last update time in console
-    console.log('<?= __('Última atualização:') ?> ' + new Date().toLocaleString('pt-BR'));
-    console.log('<?= __('Próxima atualização em 5 minutos') ?>');
+    console.log('<?= __('Last update:') ?> ' + new Date().toLocaleString('pt-BR'));
+    console.log('<?= __('Next update in 5 minutes') ?>');
 
     // Smooth scroll to subscribe form
     const subscribeLink = document.querySelector('a[href="#subscribe-form"]');

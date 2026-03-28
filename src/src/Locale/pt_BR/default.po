@@ -796,3 +796,142 @@ msgstr "Não foi possível excluir o usuário. Tente novamente."
 # Status Page Access
 msgid "A página de status não está disponível publicamente. Por favor, faça login."
 msgstr "A página de status não está disponível publicamente. Por favor, faça login."
+
+#: i18n fix: English source keys for public pages
+msgid "Service Status"
+msgstr "Status dos Serviços"
+
+msgid "Home"
+msgstr "Início"
+
+msgid "History"
+msgstr "Histórico"
+
+msgid "About"
+msgstr "Sobre"
+
+msgid "This page shows the real-time status of all our services. We continuously monitor to ensure the best experience."
+msgstr "Esta página mostra o status em tempo real de todos os nossos serviços. Monitoramos continuamente para garantir a melhor experiência."
+
+msgid "Useful Links"
+msgstr "Links Úteis"
+
+msgid "Home Page"
+msgstr "Página Inicial"
+
+msgid "Incident History"
+msgstr "Histórico de Incidentes"
+
+msgid "Automatic updates every 30 seconds"
+msgstr "Atualizações automáticas a cada 30 segundos"
+
+msgid "All rights reserved."
+msgstr "Todos os direitos reservados."
+
+msgid "Recent Incidents"
+msgstr "Incidentes Recentes"
+
+msgid "Resolved"
+msgstr "Resolvido"
+
+msgid "Investigating"
+msgstr "Investigando"
+
+msgid "Identified"
+msgstr "Identificado"
+
+msgid "Started:"
+msgstr "Iniciado:"
+
+msgid "Resolved:"
+msgstr "Resolvido:"
+
+msgid "Duration:"
+msgstr "Duração:"
+
+msgid "In progress"
+msgstr "Em andamento"
+
+msgid "View Full History"
+msgstr "Ver Histórico Completo"
+
+msgid "Last check:"
+msgstr "Última verificação:"
+
+msgid "Awaiting first check"
+msgstr "Aguardando primeira verificação"
+
+msgid "Operational"
+msgstr "Operacional"
+
+msgid "Degraded"
+msgstr "Degradado"
+
+msgid "of"
+msgstr "de"
+
+msgid "services operational"
+msgstr "serviços operacionais"
+
+msgid "degraded"
+msgstr "degradados"
+
+msgid "No services being monitored at this time."
+msgstr "Nenhum serviço sendo monitorado no momento."
+
+msgid "Next update in:"
+msgstr "Próxima atualização em:"
+
+msgid "Last update:"
+msgstr "Última atualização:"
+
+msgid "Next update in 5 minutes"
+msgstr "Próxima atualização em 5 minutos"
+
+msgid "Receive Notifications"
+msgstr "Receba Notificações"
+
+msgid "Subscribe to receive email updates about incidents and scheduled maintenance."
+msgstr "Inscreva-se para receber atualizações por email sobre incidentes e manutenções programadas."
+
+msgid "your@email.com"
+msgstr "seu@email.com"
+
+msgid "Subscribe"
+msgstr "Inscrever-se"
+
+msgid "You will only receive important alerts. You can unsubscribe at any time."
+msgstr "Você receberá apenas alertas importantes. Pode cancelar a qualquer momento."
+
+msgid "Back to Status"
+msgstr "Voltar para Status"
+
+msgid "Last 30 days of reported incidents"
+msgstr "Últimos 30 dias de incidentes reportados"
+
+msgid "No incidents recorded"
+msgstr "Nenhum incidente registrado"
+
+msgid "No incidents in the last 30 days. All systems are operating normally!"
+msgstr "Não houve incidentes nos últimos 30 dias. Todos os sistemas estão operando normalmente!"
+
+msgid "Start:"
+msgstr "Início:"
+
+msgid "Auto-created"
+msgstr "Auto-criado"
+
+msgid "Critical"
+msgstr "Crítico"
+
+msgid "Major"
+msgstr "Importante"
+
+msgid "Minor"
+msgstr "Menor"
+
+msgid "Maintenance"
+msgstr "Manutenção"
+
+msgid "Integrations"
+msgstr "Integrações"

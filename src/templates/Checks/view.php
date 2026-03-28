@@ -6,7 +6,7 @@
  * @var iterable<\App\Model\Entity\MonitorCheck> $nextChecks
  * @var array $monitorStats
  */
-$this->assign('title', __d('checks', 'Detalhes da Verificação'));
+$this->assign('title', __d('checks', 'Check Details'));
 ?>
 
 <style>
@@ -261,9 +261,9 @@ $this->assign('title', __d('checks', 'Detalhes da Verificação'));
 </style>
 
 <div class="check-header">
-    <h2>📊 <?= __d('checks', 'Detalhes da Verificação') ?></h2>
+    <h2>📊 <?= __d('checks', 'Check Details') ?></h2>
     <div>
-        <?= $this->Html->link(__d('checks', '← Voltar'), ['action' => 'index'], ['class' => 'back-link']) ?>
+        <?= $this->Html->link(__d('checks', '← Back'), ['action' => 'index'], ['class' => 'back-link']) ?>
     </div>
 </div>
 
@@ -271,13 +271,13 @@ $this->assign('title', __d('checks', 'Detalhes da Verificação'));
 <div class="status-banner <?= $check->status === 'success' ? 'success' : 'danger' ?>">
     <span style="font-size: 24px;"><?= $check->status === 'success' ? '✅' : '❌' ?></span>
     <span>
-        <?= $check->status === 'success' ? __d('checks', 'Verificação bem-sucedida') : __d('checks', 'Verificação falhou') ?>
+        <?= $check->status === 'success' ? __d('checks', 'Check successful') : __d('checks', 'Check failed') ?>
     </span>
 </div>
 
 <!-- Check Details -->
 <div class="check-details">
-    <h3 style="margin: 0 0 20px 0; font-size: 20px;"><?= __d('checks', 'Informações da Verificação') ?></h3>
+    <h3 style="margin: 0 0 20px 0; font-size: 20px;"><?= __d('checks', 'Check Information') ?></h3>
 
     <div class="details-grid">
         <div class="detail-item">
@@ -291,12 +291,12 @@ $this->assign('title', __d('checks', 'Detalhes da Verificação'));
         </div>
 
         <div class="detail-item">
-            <span class="detail-label"><?= __d('checks', 'Tipo') ?></span>
+            <span class="detail-label"><?= __d('checks', 'Type') ?></span>
             <span class="detail-value"><?= h(strtoupper($check->monitor->type)) ?></span>
         </div>
 
         <div class="detail-item">
-            <span class="detail-label"><?= __d('checks', 'Data/Hora') ?></span>
+            <span class="detail-label"><?= __d('checks', 'Date/Time') ?></span>
             <span class="detail-value">
                 <?= h($check->checked_at->i18nFormat('dd/MM/yyyy HH:mm:ss')) ?>
             </span>
@@ -313,7 +313,7 @@ $this->assign('title', __d('checks', 'Detalhes da Verificação'));
 
         <?php if ($check->response_time !== null): ?>
             <div class="detail-item">
-                <span class="detail-label"><?= __d('checks', 'Tempo de Resposta') ?></span>
+                <span class="detail-label"><?= __d('checks', 'Response Time') ?></span>
                 <span class="detail-value" style="font-family: 'Courier New', monospace;">
                     <?= number_format($check->response_time, 2) ?>ms
                 </span>
@@ -333,7 +333,7 @@ $this->assign('title', __d('checks', 'Detalhes da Verificação'));
     <!-- Message -->
     <?php if ($check->message): ?>
         <div class="message-box <?= $check->status === 'failed' ? 'error' : '' ?>">
-            <h4><?= $check->status === 'failed' ? __d('checks', 'Mensagem de Erro') : __d('checks', 'Mensagem') ?></h4>
+            <h4><?= $check->status === 'failed' ? __d('checks', 'Error Message') : __d('checks', 'Mensagem') ?></h4>
             <pre><?= h($check->message) ?></pre>
         </div>
     <?php endif; ?>
@@ -341,7 +341,7 @@ $this->assign('title', __d('checks', 'Detalhes da Verificação'));
     <!-- Response Details (if available) -->
     <?php if ($check->response_details): ?>
         <div class="message-box">
-            <h4><?= __d('checks', 'Detalhes da Resposta') ?></h4>
+            <h4><?= __d('checks', 'Response Details') ?></h4>
             <pre><?= h(json_encode(json_decode($check->response_details), JSON_PRETTY_PRINT)) ?></pre>
         </div>
     <?php endif; ?>
@@ -349,17 +349,17 @@ $this->assign('title', __d('checks', 'Detalhes da Verificação'));
 
 <!-- Monitor Statistics -->
 <div class="stats-section">
-    <h3>📈 <?= __d('checks', 'Estatísticas do Monitor') ?></h3>
+    <h3>📈 <?= __d('checks', 'Monitor Statistics') ?></h3>
     <div class="stats-row">
         <div class="stat-item">
             <div class="stat-item-value"><?= number_format($monitorStats['totalChecks']) ?></div>
-            <div class="stat-item-label"><?= __d('checks', 'Total de Checks') ?></div>
+            <div class="stat-item-label"><?= __d('checks', 'Total Checks') ?></div>
         </div>
         <div class="stat-item">
             <div class="stat-item-value" style="color: #22c55e;">
                 <?= number_format($monitorStats['successChecks']) ?>
             </div>
-            <div class="stat-item-label"><?= __d('checks', 'Checks Bem-sucedidos') ?></div>
+            <div class="stat-item-label"><?= __d('checks', 'Successful Checks') ?></div>
         </div>
         <div class="stat-item">
             <div class="stat-item-value" style="color: #3b82f6;">
@@ -370,7 +370,7 @@ $this->assign('title', __d('checks', 'Detalhes da Verificação'));
                     echo number_format($successRate, 1);
                 ?>%
             </div>
-            <div class="stat-item-label"><?= __d('checks', 'Taxa de Sucesso') ?></div>
+            <div class="stat-item-label"><?= __d('checks', 'Success Rate') ?></div>
         </div>
         <div class="stat-item">
             <div class="stat-item-value">
@@ -380,14 +380,14 @@ $this->assign('title', __d('checks', 'Detalhes da Verificação'));
                     <span style="font-size: 14px; color: #999;"><?= __d('checks', 'N/A') ?></span>
                 <?php endif; ?>
             </div>
-            <div class="stat-item-label"><?= __d('checks', 'Tempo Médio') ?></div>
+            <div class="stat-item-label"><?= __d('checks', 'Average Time') ?></div>
         </div>
     </div>
 </div>
 
 <!-- Context: Surrounding Checks -->
 <div class="context-section">
-    <h3>🕒 <?= __d('checks', 'Verificações Próximas') ?></h3>
+    <h3>🕒 <?= __d('checks', 'Nearby Checks') ?></h3>
 
     <?php if ($previousChecks->count() > 0 || $nextChecks->count() > 0): ?>
         <div class="checks-timeline">
@@ -417,7 +417,7 @@ $this->assign('title', __d('checks', 'Detalhes da Verificação'));
                 </span>
                 <div class="timeline-content">
                     <span class="timeline-time" style="font-weight: 600;">
-                        <?= h($check->checked_at->i18nFormat('dd/MM/yyyy HH:mm:ss')) ?> <?= __d('checks', '(atual)') ?>
+                        <?= h($check->checked_at->i18nFormat('dd/MM/yyyy HH:mm:ss')) ?> <?= __d('checks', '(current)') ?>
                     </span>
                     <?php if ($check->response_time !== null): ?>
                         <span class="timeline-response" style="font-weight: 600;">
@@ -448,17 +448,17 @@ $this->assign('title', __d('checks', 'Detalhes da Verificação'));
         </div>
     <?php else: ?>
         <div class="no-context">
-            <p><?= __d('checks', 'Não há verificações próximas disponíveis') ?></p>
+            <p><?= __d('checks', 'No nearby checks available') ?></p>
         </div>
     <?php endif; ?>
 </div>
 
 <div style="margin-top: 24px;">
-    <?= $this->Html->link(__d('checks', '← Voltar para Verificações'), ['action' => 'index'], [
+    <?= $this->Html->link(__d('checks', '← Back to Checks'), ['action' => 'index'], [
         'class' => 'btn btn-secondary',
         'style' => 'display: inline-block; padding: 10px 20px; background: #6b7280; color: white; text-decoration: none; border-radius: 6px;'
     ]) ?>
-    <?= $this->Html->link(__d('checks', 'Ver Monitor'), ['controller' => 'Monitors', 'action' => 'view', $check->monitor->id], [
+    <?= $this->Html->link(__d('checks', 'View Monitor'), ['controller' => 'Monitors', 'action' => 'view', $check->monitor->id], [
         'class' => 'btn btn-primary',
         'style' => 'display: inline-block; padding: 10px 20px; background: #3b82f6; color: white; text-decoration: none; border-radius: 6px; margin-left: 8px;'
     ]) ?>

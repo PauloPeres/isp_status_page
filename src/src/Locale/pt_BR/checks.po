@@ -213,3 +213,124 @@ msgstr "← Voltar para Verificações"
 
 msgid "Ver Monitor"
 msgstr "Ver Monitor"
+
+#: i18n fix: English source keys for Checks templates
+msgid "Monitor Checks"
+msgstr "Verificações de Monitores"
+
+msgid "Success"
+msgstr "Sucesso"
+
+msgid "Failures"
+msgstr "Falhas"
+
+msgid "Success Rate"
+msgstr "Taxa de Sucesso"
+
+msgid "Average Time"
+msgstr "Tempo Médio"
+
+msgid "All Monitors"
+msgstr "Todos os Monitores"
+
+msgid "All"
+msgstr "Todos"
+
+msgid "Failed"
+msgstr "Falha"
+
+msgid "Period"
+msgstr "Período"
+
+msgid "Last 24 hours"
+msgstr "Últimas 24 horas"
+
+msgid "Last 7 days"
+msgstr "Últimos 7 dias"
+
+msgid "Last 30 days"
+msgstr "Últimos 30 dias"
+
+msgid "Filter"
+msgstr "Filtrar"
+
+msgid "Clear"
+msgstr "Limpar"
+
+msgid "Date/Time"
+msgstr "Data/Hora"
+
+msgid "Response Time"
+msgstr "Tempo de Resposta"
+
+msgid "Message"
+msgstr "Mensagem"
+
+msgid "Actions"
+msgstr "Ações"
+
+msgid "View"
+msgstr "Ver"
+
+msgid "View details"
+msgstr "Ver detalhes"
+
+msgid "« First"
+msgstr "« Primeira"
+
+msgid "‹ Previous"
+msgstr "‹ Anterior"
+
+msgid "Next ›"
+msgstr "Próxima ›"
+
+msgid "Last »"
+msgstr "Última »"
+
+msgid "Page {{page}} of {{pages}}, showing {{current}} record(s) of {{count}} total"
+msgstr "Página {{page}} de {{pages}}, mostrando {{current}} registro(s) de {{count}} no total"
+
+msgid "Check Details"
+msgstr "Detalhes da Verificação"
+
+msgid "← Back"
+msgstr "← Voltar"
+
+msgid "Check successful"
+msgstr "Verificação bem-sucedida"
+
+msgid "Check failed"
+msgstr "Verificação falhou"
+
+msgid "Check Information"
+msgstr "Informações da Verificação"
+
+msgid "Type"
+msgstr "Tipo"
+
+msgid "Error Message"
+msgstr "Mensagem de Erro"
+
+msgid "Response Details"
+msgstr "Detalhes da Resposta"
+
+msgid "Monitor Statistics"
+msgstr "Estatísticas do Monitor"
+
+msgid "Successful Checks"
+msgstr "Verificações Bem-sucedidas"
+
+msgid "Nearby Checks"
+msgstr "Verificações Próximas"
+
+msgid "(current)"
+msgstr "(atual)"
+
+msgid "No nearby checks available"
+msgstr "Não há verificações próximas disponíveis"
+
+msgid "← Back to Checks"
+msgstr "← Voltar para Verificações"
+
+msgid "View Monitor"
+msgstr "Ver Monitor"

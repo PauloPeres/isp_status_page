@@ -66,7 +66,7 @@ function isActive($currentController, $targetController, $currentAction = null, 
             ) ?>
 
             <?= $this->Html->link(
-                '<span class="nav-icon">🔗</span> ' . __('Integracoes'),
+                '<span class="nav-icon">🔗</span> ' . __('Integrations'),
                 ['controller' => 'Integrations', 'action' => 'index'],
                 [
                     'escape' => false,

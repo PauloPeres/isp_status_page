@@ -4,7 +4,7 @@
  * @var \App\Model\Entity\Subscriber $subscriber
  * @var bool $success
  */
-$this->assign('title', __d('subscribers', 'Cancelar Inscrição'));
+$this->assign('title', __d('subscribers', 'Unsubscribe'));
 ?>
 
 <div class="unsubscribe-page">
@@ -15,20 +15,20 @@ $this->assign('title', __d('subscribers', 'Cancelar Inscrição'));
                 ✅
             </div>
 
-            <h1 class="unsubscribe-title"><?= __d('subscribers', 'Inscrição Cancelada') ?></h1>
+            <h1 class="unsubscribe-title"><?= __d('subscribers', 'Subscription Cancelled') ?></h1>
 
             <p class="unsubscribe-message">
-                <?= __d('subscribers', 'Você foi desinscrito com sucesso. Não receberá mais notificações no email') ?> <strong><?= h($subscriber->email) ?></strong>
+                <?= __d('subscribers', 'You have been successfully unsubscribed. You will no longer receive email notifications') ?> <strong><?= h($subscriber->email) ?></strong>
             </p>
 
             <div class="unsubscribe-info">
-                <p><?= __d('subscribers', 'Sentiremos sua falta! 😢') ?></p>
-                <p><?= __d('subscribers', 'Se você mudar de ideia, pode se inscrever novamente a qualquer momento na página de status.') ?></p>
+                <p><?= __d('subscribers', 'We will miss you!') ?></p>
+                <p><?= __d('subscribers', 'If you change your mind, you can subscribe again at any time on the status page.') ?></p>
             </div>
 
             <div class="unsubscribe-actions">
                 <?= $this->Html->link(
-                    '← ' . __d('subscribers', 'Voltar para Status'),
+                    '← ' . __d('subscribers', 'Back to Status'),
                     ['controller' => 'Status', 'action' => 'index'],
                     ['class' => 'btn btn-primary']
                 ) ?>
@@ -40,28 +40,28 @@ $this->assign('title', __d('subscribers', 'Cancelar Inscrição'));
                 ⚠️
             </div>
 
-            <h1 class="unsubscribe-title"><?= __d('subscribers', 'Cancelar Inscrição?') ?></h1>
+            <h1 class="unsubscribe-title"><?= __d('subscribers', 'Unsubscribe?') ?></h1>
 
             <p class="unsubscribe-message">
-                <?= __d('subscribers', 'Tem certeza que deseja cancelar as notificações para') ?> <strong><?= h($subscriber->email) ?></strong>?
+                <?= __d('subscribers', 'Are you sure you want to cancel notifications for') ?> <strong><?= h($subscriber->email) ?></strong>?
             </p>
 
             <div class="unsubscribe-info">
-                <h3><?= __d('subscribers', 'Você deixará de receber:') ?></h3>
+                <h3><?= __d('subscribers', 'You will stop receiving:') ?></h3>
                 <ul>
-                    <li>✗ <?= __d('subscribers', 'Notificações sobre incidentes') ?></li>
-                    <li>✗ <?= __d('subscribers', 'Alertas de serviços offline') ?></li>
-                    <li>✗ <?= __d('subscribers', 'Informações sobre resoluções de problemas') ?></li>
+                    <li>✗ <?= __d('subscribers', 'Incident notifications') ?></li>
+                    <li>✗ <?= __d('subscribers', 'Offline service alerts') ?></li>
+                    <li>✗ <?= __d('subscribers', 'Issue resolution updates') ?></li>
                 </ul>
             </div>
 
             <div class="unsubscribe-actions">
                 <?= $this->Form->create(null, ['class' => 'unsubscribe-form']) ?>
                     <button type="submit" class="btn btn-danger">
-                        <?= __d('subscribers', 'Sim, cancelar inscrição') ?>
+                        <?= __d('subscribers', 'Yes, unsubscribe') ?>
                     </button>
                     <?= $this->Html->link(
-                        __d('subscribers', 'Não, manter inscrição'),
+                        __d('subscribers', 'No, keep subscription'),
                         ['controller' => 'Status', 'action' => 'index'],
                         ['class' => 'btn btn-secondary']
                     ) ?>
@@ -71,7 +71,7 @@ $this->assign('title', __d('subscribers', 'Cancelar Inscrição'));
             <div class="unsubscribe-footer">
                 <p>
                     <small>
-                        <?= __d('subscribers', 'Você pode se reinscrever a qualquer momento pela página de status.') ?>
+                        <?= __d('subscribers', 'You can resubscribe at any time through the status page.') ?>
                     </small>
                 </p>
             </div>

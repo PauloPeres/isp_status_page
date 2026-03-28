@@ -18,12 +18,12 @@
                 <?php endif; ?>
                 <?php if ($monitor->last_check_at): ?>
                     <p class="service-last-check">
-                        <?= __('Última verificação:') ?> <span class="local-datetime" data-utc="<?= $monitor->last_check_at->format('c') ?>"></span>
+                        <?= __('Last check:') ?> <span class="local-datetime" data-utc="<?= $monitor->last_check_at->format('c') ?>"></span>
                         (<span class="time-ago" data-utc="<?= $monitor->last_check_at->format('c') ?>"></span>)
                     </p>
                 <?php else: ?>
                     <p class="service-last-check">
-                        <?= __('Aguardando primeira verificação') ?>
+                        <?= __('Awaiting first check') ?>
                     </p>
                 <?php endif; ?>
             </div>
@@ -40,11 +40,11 @@
             <span class="service-status-badge <?= $monitor->status === 'up' ? 'operational' : ($monitor->status === 'down' ? 'down' : 'degraded') ?>">
                 <?php
                 if ($monitor->status === 'up') {
-                    echo __('Operacional');
+                    echo __('Operational');
                 } elseif ($monitor->status === 'down') {
                     echo __('Offline');
                 } else {
-                    echo __('Degradado');
+                    echo __('Degraded');
                 }
                 ?>
             </span>

@@ -3,7 +3,7 @@
  * @var \App\View\AppView $this
  * @var \App\Model\Entity\Subscriber $subscriber
  */
-$this->assign('title', __d('subscribers', 'Email Verificado'));
+$this->assign('title', __d('subscribers', 'Email Verified'));
 ?>
 
 <div class="verify-page">
@@ -12,24 +12,24 @@ $this->assign('title', __d('subscribers', 'Email Verificado'));
             ✅
         </div>
 
-        <h1 class="verify-title"><?= __d('subscribers', 'Email Verificado com Sucesso!') ?></h1>
+        <h1 class="verify-title"><?= __d('subscribers', 'Email Verified Successfully!') ?></h1>
 
         <p class="verify-message">
-            <?= __d('subscribers', 'Obrigado por verificar seu email') ?> <strong><?= h($subscriber->email) ?></strong>
+            <?= __d('subscribers', 'Thank you for verifying your email') ?> <strong><?= h($subscriber->email) ?></strong>
         </p>
 
         <div class="verify-info">
-            <h3><?= __d('subscribers', 'O que acontece agora?') ?></h3>
+            <h3><?= __d('subscribers', 'What happens now?') ?></h3>
             <ul>
-                <li>✓ <?= __d('subscribers', 'Você começará a receber notificações sobre incidentes') ?></li>
-                <li>✓ <?= __d('subscribers', 'Alertas serão enviados quando serviços ficarem offline') ?></li>
-                <li>✓ <?= __d('subscribers', 'Você será informado quando os problemas forem resolvidos') ?></li>
+                <li>✓ <?= __d('subscribers', 'You will start receiving notifications about incidents') ?></li>
+                <li>✓ <?= __d('subscribers', 'Alerts will be sent when services go offline') ?></li>
+                <li>✓ <?= __d('subscribers', 'You will be notified when issues are resolved') ?></li>
             </ul>
         </div>
 
         <div class="verify-actions">
             <?= $this->Html->link(
-                '← ' . __d('subscribers', 'Voltar para Status'),
+                '← ' . __d('subscribers', 'Back to Status'),
                 ['controller' => 'Status', 'action' => 'index'],
                 ['class' => 'btn btn-primary']
             ) ?>
@@ -37,9 +37,9 @@ $this->assign('title', __d('subscribers', 'Email Verificado'));
 
         <div class="verify-footer">
             <p>
-                <?= __d('subscribers', 'Não quer mais receber notificações?') ?>
+                <?= __d('subscribers', 'No longer want to receive notifications?') ?>
                 <?= $this->Html->link(
-                    __d('subscribers', 'Cancelar inscrição'),
+                    __d('subscribers', 'Unsubscribe'),
                     ['action' => 'unsubscribe', $subscriber->unsubscribe_token],
                     ['class' => 'unsubscribe-link']
                 ) ?>
