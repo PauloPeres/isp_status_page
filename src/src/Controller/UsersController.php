@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Service\LoginThrottleService;
+
 /**
  * Users Controller
  *
@@ -35,10 +37,38 @@ class UsersController extends AppController
         $this->viewBuilder()->disableAutoLayout();
 
         $this->request->allowMethod(['get', 'post']);
+
+        // TASK-AUTH-005: Brute force protection
+        $throttleService = new LoginThrottleService();
+        $clientIp = $this->request->clientIp();
+
+        // Check if IP is locked out before processing authentication
+        if ($this->request->is('post') && $throttleService->isLocked($clientIp)) {
+            $this->Flash->error(__('Too many failed login attempts. Please try again in 15 minutes.'));
+            $this->set('result', null);
+
+            return;
+        }
+
+        // Also check by username if provided
+        $username = $this->request->getData('username');
+        if ($this->request->is('post') && !empty($username) && $throttleService->isLocked($username)) {
+            $this->Flash->error(__('Too many failed login attempts for this account. Please try again in 15 minutes.'));
+            $this->set('result', null);
+
+            return;
+        }
+
         $result = $this->Authentication->getResult();
 
         // If user is logged in redirect them away
         if ($result && $result->isValid()) {
+            // TASK-AUTH-005: Clear login attempts on successful login
+            $throttleService->clearAttempts($clientIp);
+            if (!empty($username)) {
+                $throttleService->clearAttempts($username);
+            }
+
             // Regenerate session ID to prevent session fixation attacks (TASK-AUTH-006)
             $this->request->getSession()->renew();
 
@@ -67,6 +97,17 @@ class UsersController extends AppController
 
         // Pass result to view only when it's a POST (login attempt)
         if ($this->request->is('post')) {
+            // TASK-AUTH-005: Record failed login attempt
+            $throttleService->recordFailure($clientIp);
+            if (!empty($username)) {
+                $throttleService->recordFailure($username);
+            }
+
+            $remaining = $throttleService->getRemainingAttempts($clientIp);
+            if ($remaining > 0 && $remaining <= 3) {
+                $this->Flash->warning(__('Warning: {0} login attempts remaining before lockout.', $remaining));
+            }
+
             $this->set(compact('result'));
         } else {
             $this->set('result', null);

@@ -59,7 +59,10 @@ class OAuthController extends AppController
         }
 
         try {
-            $authUrl = $this->oauthService->getAuthorizationUrl($provider);
+            // TASK-AUTH-002: Pass session so state parameter can be generated and stored
+            $session = $this->request->getSession();
+            $authUrl = $this->oauthService->getAuthorizationUrl($provider, $session);
+
             return $this->response->withHeader('Location', $authUrl)->withStatus(302);
         } catch (\Exception $e) {
             $this->log("OAuth redirect error for {$provider}: {$e->getMessage()}", 'error');
@@ -89,8 +92,15 @@ class OAuthController extends AppController
             return $this->redirect(['controller' => 'Users', 'action' => 'login']);
         }
 
-        // Handle the callback
+        // TASK-AUTH-002: Verify OAuth state parameter to prevent CSRF
         $queryParams = $this->request->getQueryParams();
+        $session = $this->request->getSession();
+        if (!$this->oauthService->verifyState($queryParams, $session)) {
+            $this->Flash->error(__('Authentication failed: invalid state parameter. Please try again.'));
+            return $this->redirect(['controller' => 'Users', 'action' => 'login']);
+        }
+
+        // Handle the callback
         $user = $this->oauthService->handleCallback($provider, $queryParams);
 
         if (!$user) {

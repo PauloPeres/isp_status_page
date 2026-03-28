@@ -34,6 +34,7 @@ use Cake\Routing\Middleware\RoutingMiddleware;
 use App\Middleware\ApiAuthMiddleware;
 use App\Middleware\ApiRateLimitMiddleware;
 use App\Middleware\PlanLimitMiddleware;
+use App\Middleware\EmailVerificationMiddleware;
 use App\Middleware\SecurityHeadersMiddleware;
 use App\Middleware\SuperAdminMiddleware;
 use App\Middleware\TenantMiddleware;
@@ -108,6 +109,9 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
 
             // Add authentication middleware. It should be after routing.
             ->add(new AuthenticationMiddleware($this))
+
+            // TASK-AUTH-017: Redirect unverified users to email verification page
+            ->add(new EmailVerificationMiddleware())
 
             // Resolve the current tenant (organization) from subdomain, session, header, etc.
             ->add(new TenantMiddleware())

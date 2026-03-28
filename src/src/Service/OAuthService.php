@@ -5,6 +5,7 @@ namespace App\Service;
 
 use App\Model\Entity\User;
 use Cake\Http\Client;
+use Cake\Http\Session;
 use Cake\Log\LogTrait;
 use Cake\ORM\Locator\LocatorAwareTrait;
 
@@ -61,16 +62,53 @@ class OAuthService
      * Get the authorization URL for the given provider.
      *
      * @param string $provider The OAuth provider (google, github).
+     * @param \Cake\Http\Session|null $session The session to store OAuth state in (TASK-AUTH-002).
      * @return string The authorization URL to redirect the user to.
      * @throws \InvalidArgumentException If provider is not supported.
      */
-    public function getAuthorizationUrl(string $provider): string
+    public function getAuthorizationUrl(string $provider, ?Session $session = null): string
     {
         return match ($provider) {
-            self::PROVIDER_GOOGLE => $this->getGoogleAuthUrl(),
-            self::PROVIDER_GITHUB => $this->getGitHubAuthUrl(),
+            self::PROVIDER_GOOGLE => $this->getGoogleAuthUrl($session),
+            self::PROVIDER_GITHUB => $this->getGitHubAuthUrl($session),
             default => throw new \InvalidArgumentException("Unsupported OAuth provider: {$provider}"),
         };
+    }
+
+    /**
+     * Verify the OAuth state parameter to prevent CSRF attacks (TASK-AUTH-002).
+     *
+     * @param array $queryParams The callback query parameters.
+     * @param \Cake\Http\Session|null $session The session containing the stored state.
+     * @return bool True if state is valid, false otherwise.
+     */
+    public function verifyState(array $queryParams, ?Session $session = null): bool
+    {
+        if (!$session) {
+            $this->log('OAuth state verification failed: no session provided', 'warning');
+
+            return false;
+        }
+
+        $queryState = $queryParams['state'] ?? null;
+        $sessionState = $session->read('oauth_state');
+
+        // Always delete the state from session after reading (one-time use)
+        $session->delete('oauth_state');
+
+        if (empty($queryState) || empty($sessionState)) {
+            $this->log('OAuth state verification failed: missing state parameter', 'warning');
+
+            return false;
+        }
+
+        if (!hash_equals($sessionState, $queryState)) {
+            $this->log('OAuth state verification failed: state mismatch', 'warning');
+
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -125,9 +163,10 @@ class OAuthService
     /**
      * Get Google OAuth authorization URL.
      *
+     * @param \Cake\Http\Session|null $session The session to store state in (TASK-AUTH-002).
      * @return string
      */
-    private function getGoogleAuthUrl(): string
+    private function getGoogleAuthUrl(?Session $session = null): string
     {
         $params = [
             'client_id' => env('GOOGLE_CLIENT_ID', ''),
@@ -138,21 +177,36 @@ class OAuthService
             'prompt' => 'select_account',
         ];
 
+        // TASK-AUTH-002: Generate and store state parameter for CSRF protection
+        if ($session) {
+            $state = bin2hex(random_bytes(16));
+            $session->write('oauth_state', $state);
+            $params['state'] = $state;
+        }
+
         return self::GOOGLE_AUTH_URL . '?' . http_build_query($params);
     }
 
     /**
      * Get GitHub OAuth authorization URL.
      *
+     * @param \Cake\Http\Session|null $session The session to store state in (TASK-AUTH-002).
      * @return string
      */
-    private function getGitHubAuthUrl(): string
+    private function getGitHubAuthUrl(?Session $session = null): string
     {
         $params = [
             'client_id' => env('GITHUB_CLIENT_ID', ''),
             'redirect_uri' => $this->getCallbackUrl(self::PROVIDER_GITHUB),
             'scope' => 'user:email read:user',
         ];
+
+        // TASK-AUTH-002: Generate and store state parameter for CSRF protection
+        if ($session) {
+            $state = bin2hex(random_bytes(16));
+            $session->write('oauth_state', $state);
+            $params['state'] = $state;
+        }
 
         return self::GITHUB_AUTH_URL . '?' . http_build_query($params);
     }
