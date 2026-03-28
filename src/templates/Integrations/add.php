@@ -3,7 +3,7 @@
  * @var \App\View\AppView $this
  * @var \App\Model\Entity\Integration $integration
  */
-$this->assign('title', __('Nova Integracao'));
+$this->assign('title', __('New Integration'));
 ?>
 
 <style>
@@ -152,11 +152,11 @@ $this->assign('title', __('Nova Integracao'));
 
 <div class="page-header">
     <div>
-        <h2><?= __('Nova Integracao') ?></h2>
-        <p style="color: #666;"><?= __('Configure uma nova integracao com sistema externo') ?></p>
+        <h2><?= __('New Integration') ?></h2>
+        <p style="color: #666;"><?= __('Configure a new integration with external system') ?></p>
     </div>
     <?= $this->Html->link(
-        __('Voltar'),
+        __('Back'),
         ['action' => 'index'],
         ['class' => 'btn btn-secondary']
     ) ?>
@@ -166,15 +166,15 @@ $this->assign('title', __('Nova Integracao'));
     <?= $this->Form->create($integration) ?>
 
     <div class="form-section">
-        <h3 class="form-section-title"><?= __('Informacoes Basicas') ?></h3>
+        <h3 class="form-section-title"><?= __('Basic Information') ?></h3>
 
         <div class="form-group">
             <label>
-                <?= __('Nome') ?> *
+                <?= __('Name') ?> *
                 <?= $this->element('tooltip', ['text' => __d('monitors', 'tooltip.integration_name')]) ?>
             </label>
             <?= $this->Form->text('name', [
-                'placeholder' => __('Ex: API de Monitoramento'),
+                'placeholder' => __('E.g.: Monitoring API'),
                 'required' => true,
                 'class' => 'form-control',
             ]) ?>
@@ -183,7 +183,7 @@ $this->assign('title', __('Nova Integracao'));
         <div class="form-row">
             <div class="form-group">
                 <label>
-                    <?= __('Tipo') ?> *
+                    <?= __('Type') ?> *
                     <?= $this->element('tooltip', ['text' => __d('monitors', 'tooltip.integration_type')]) ?>
                 </label>
                 <?= $this->Form->select('type', [
@@ -193,7 +193,7 @@ $this->assign('title', __('Nova Integracao'));
                 ], [
                     'required' => true,
                     'class' => 'form-control',
-                    'empty' => __('Selecione...'),
+                    'empty' => __('Select...'),
                     'id' => 'integration-type',
                 ]) ?>
             </div>
@@ -204,8 +204,8 @@ $this->assign('title', __('Nova Integracao'));
                     <?= $this->element('tooltip', ['text' => __d('monitors', 'tooltip.integration_active')]) ?>
                 </label>
                 <?= $this->Form->select('active', [
-                    '1' => __('Ativa'),
-                    '0' => __('Inativa'),
+                    '1' => __('Active'),
+                    '0' => __('Inactive'),
                 ], [
                     'class' => 'form-control',
                     'default' => '1',
@@ -215,12 +215,12 @@ $this->assign('title', __('Nova Integracao'));
     </div>
 
     <div class="form-section">
-        <h3 class="form-section-title"><?= __('Configuracao de Conexao') ?></h3>
+        <h3 class="form-section-title"><?= __('Connection Settings') ?></h3>
 
         <div class="config-section">
             <div class="form-group">
                 <label>
-                    <?= __('URL Base') ?> *
+                    <?= __('Base URL') ?> *
                     <?= $this->element('tooltip', ['text' => __d('monitors', 'tooltip.integration_url')]) ?>
                 </label>
                 <?= $this->Form->text('config_base_url', [
@@ -228,12 +228,12 @@ $this->assign('title', __('Nova Integracao'));
                     'required' => true,
                     'class' => 'form-control',
                 ]) ?>
-                <div class="form-help"><?= __('URL completa da API externa') ?></div>
+                <div class="form-help"><?= __('Full URL of the external API') ?></div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label><?= __('Metodo HTTP') ?></label>
+                    <label><?= __('HTTP Method') ?></label>
                     <?= $this->Form->select('config_method', [
                         'GET' => 'GET',
                         'POST' => 'POST',
@@ -247,7 +247,7 @@ $this->assign('title', __('Nova Integracao'));
 
                 <div class="form-group">
                     <label>
-                        <?= __('Timeout (segundos)') ?>
+                        <?= __('Timeout (seconds)') ?>
                         <?= $this->element('tooltip', ['text' => __d('monitors', 'tooltip.integration_sync_interval')]) ?>
                     </label>
                     <?= $this->Form->number('config_timeout', [
@@ -262,10 +262,10 @@ $this->assign('title', __('Nova Integracao'));
 
             <div class="form-group">
                 <label>
-                    <?= __('Tipo de Autenticacao') ?>
+                    <?= __('Authentication Type') ?>
                 </label>
                 <?= $this->Form->select('config_auth_type', [
-                    'none' => __('Nenhuma'),
+                    'none' => __('None'),
                     'bearer' => 'Bearer Token',
                     'basic' => __('Basic Auth'),
                     'api_key' => 'API Key',
@@ -283,7 +283,7 @@ $this->assign('title', __('Nova Integracao'));
                         <?= $this->element('tooltip', ['text' => __d('monitors', 'tooltip.integration_api_key')]) ?>
                     </label>
                     <?= $this->Form->text('config_api_key', [
-                        'placeholder' => __('Seu token de autenticacao'),
+                        'placeholder' => __('Your authentication token'),
                         'class' => 'form-control',
                         'type' => 'password',
                     ]) ?>
@@ -294,21 +294,21 @@ $this->assign('title', __('Nova Integracao'));
                 <div class="form-row">
                     <div class="form-group">
                         <label>
-                            <?= __('Usuario') ?>
+                            <?= __('Username') ?>
                             <?= $this->element('tooltip', ['text' => __d('monitors', 'tooltip.integration_username')]) ?>
                         </label>
                         <?= $this->Form->text('config_username', [
-                            'placeholder' => __('Usuario'),
+                            'placeholder' => __('Username'),
                             'class' => 'form-control',
                         ]) ?>
                     </div>
                     <div class="form-group">
                         <label>
-                            <?= __('Senha') ?>
+                            <?= __('Password') ?>
                             <?= $this->element('tooltip', ['text' => __d('monitors', 'tooltip.integration_password')]) ?>
                         </label>
                         <?= $this->Form->text('config_password', [
-                            'placeholder' => __('Senha'),
+                            'placeholder' => __('Password'),
                             'class' => 'form-control',
                             'type' => 'password',
                         ]) ?>
@@ -317,20 +317,20 @@ $this->assign('title', __('Nova Integracao'));
             </div>
 
             <div class="form-group">
-                <label><?= __('Headers Customizados (JSON)') ?></label>
+                <label><?= __('Custom Headers (JSON)') ?></label>
                 <?= $this->Form->textarea('config_headers', [
                     'placeholder' => '{"Content-Type": "application/json"}',
                     'class' => 'form-control',
                     'rows' => 3,
                 ]) ?>
-                <div class="form-help"><?= __('Formato JSON. Exemplo: {"Authorization": "Custom value"}') ?></div>
+                <div class="form-help"><?= __('JSON format. Example: {"Authorization": "Custom value"}') ?></div>
             </div>
         </div>
     </div>
 
     <div style="display: flex; gap: 8px; margin-top: 24px;">
-        <?= $this->Form->button(__('Salvar'), ['type' => 'submit', 'class' => 'btn-submit']) ?>
-        <?= $this->Html->link(__('Cancelar'), ['action' => 'index'], ['class' => 'btn btn-secondary']) ?>
+        <?= $this->Form->button(__('Save'), ['type' => 'submit', 'class' => 'btn-submit']) ?>
+        <?= $this->Html->link(__('Cancel'), ['action' => 'index'], ['class' => 'btn btn-secondary']) ?>
     </div>
 
     <?= $this->Form->end() ?>

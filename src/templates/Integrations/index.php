@@ -4,15 +4,15 @@
  * @var \Cake\Collection\CollectionInterface $integrations
  * @var array $stats
  */
-$this->assign('title', __('Integracoes'));
+$this->assign('title', __('Integrations'));
 ?>
 
 <!-- Styles provided by admin.css -->
 
 <div class="integrations-header">
-    <h2><?= __('Integracoes') ?></h2>
+    <h2><?= __('Integrations') ?></h2>
     <?= $this->Html->link(
-        '+ ' . __('Nova Integracao'),
+        '+ ' . __('New Integration'),
         ['action' => 'add'],
         ['class' => 'btn-add']
     ) ?>
@@ -25,7 +25,7 @@ $this->assign('title', __('Integracoes'));
         <div class="stat-value info"><?= number_format($stats['total']) ?></div>
     </div>
     <div class="stat-card-mini">
-        <div class="stat-label"><?= __('Ativas') ?></div>
+        <div class="stat-label"><?= __('Active') ?></div>
         <div class="stat-value success"><?= number_format($stats['active']) ?></div>
     </div>
     <div class="stat-card-mini">
@@ -47,21 +47,21 @@ $this->assign('title', __('Integracoes'));
     <?= $this->Form->create(null, ['type' => 'get']) ?>
     <div class="filters-row">
         <div class="filter-group">
-            <label><?= __('Buscar') ?></label>
+            <label><?= __('Search') ?></label>
             <?= $this->Form->control('search', [
                 'label' => false,
-                'placeholder' => __('Nome da integracao...'),
+                'placeholder' => __('Integration name...'),
                 'value' => $this->request->getQuery('search'),
                 'class' => 'form-control',
             ]) ?>
         </div>
 
         <div class="filter-group">
-            <label><?= __('Tipo') ?></label>
+            <label><?= __('Type') ?></label>
             <?= $this->Form->control('type', [
                 'label' => false,
                 'options' => [
-                    '' => __('Todos'),
+                    '' => __('All'),
                     'ixc' => 'IXC Soft',
                     'zabbix' => 'Zabbix',
                     'rest_api' => 'REST API',
@@ -77,9 +77,9 @@ $this->assign('title', __('Integracoes'));
             <?= $this->Form->control('active', [
                 'label' => false,
                 'options' => [
-                    '' => __('Todos'),
-                    '1' => __('Ativa'),
-                    '0' => __('Inativa'),
+                    '' => __('All'),
+                    '1' => __('Active'),
+                    '0' => __('Inactive'),
                 ],
                 'value' => $this->request->getQuery('active'),
                 'empty' => false,
@@ -89,8 +89,8 @@ $this->assign('title', __('Integracoes'));
     </div>
 
     <div class="filter-buttons">
-        <?= $this->Form->button(__('Filtrar'), ['type' => 'submit', 'class' => 'btn-filter']) ?>
-        <?= $this->Html->link(__('Limpar'), ['action' => 'index'], ['class' => 'btn-clear']) ?>
+        <?= $this->Form->button(__('Filter'), ['type' => 'submit', 'class' => 'btn-filter']) ?>
+        <?= $this->Html->link(__('Clear'), ['action' => 'index'], ['class' => 'btn-clear']) ?>
     </div>
     <?= $this->Form->end() ?>
 </div>
@@ -101,12 +101,12 @@ $this->assign('title', __('Integracoes'));
         <table>
             <thead>
                 <tr>
-                    <th><?= $this->Paginator->sort('name', __('Nome')) ?></th>
-                    <th><?= $this->Paginator->sort('type', __('Tipo')) ?></th>
+                    <th><?= $this->Paginator->sort('name', __('Name')) ?></th>
+                    <th><?= $this->Paginator->sort('type', __('Type')) ?></th>
                     <th><?= $this->Paginator->sort('active', __('Status')) ?></th>
-                    <th><?= $this->Paginator->sort('last_sync_at', __('Ultima Sincronizacao')) ?></th>
-                    <th><?= __('Resultado') ?></th>
-                    <th style="text-align: right;"><?= __('Acoes') ?></th>
+                    <th><?= $this->Paginator->sort('last_sync_at', __('Last Sync')) ?></th>
+                    <th><?= __('Result') ?></th>
+                    <th style="text-align: right;"><?= __('Actions') ?></th>
                 </tr>
             </thead>
             <tbody>
@@ -128,18 +128,18 @@ $this->assign('title', __('Integracoes'));
                         </td>
                         <td>
                             <?php if ($integration->active): ?>
-                                <span class="badge badge-success"><?= __('Ativa') ?></span>
+                                <span class="badge badge-success"><?= __('Active') ?></span>
                             <?php else: ?>
-                                <span class="badge badge-secondary"><?= __('Inativa') ?></span>
+                                <span class="badge badge-secondary"><?= __('Inactive') ?></span>
                             <?php endif; ?>
                         </td>
                         <td>
                             <?php if ($integration->last_sync_at): ?>
                                 <span class="sync-status">
-                                    <?= $integration->last_sync_at->format('d/m/Y H:i') ?>
+                                    <?= $integration->last_sync_at->nice() ?>
                                 </span>
                             <?php else: ?>
-                                <span style="color: #999;"><?= __('Nunca') ?></span>
+                                <span style="color: #999;"><?= __('Never') ?></span>
                             <?php endif; ?>
                         </td>
                         <td>
@@ -147,7 +147,7 @@ $this->assign('title', __('Integracoes'));
                                 <?php if ($integration->last_sync_status === 'success'): ?>
                                     <span class="badge badge-success"><?= __('OK') ?></span>
                                 <?php else: ?>
-                                    <span class="badge badge-danger"><?= __('Erro') ?></span>
+                                    <span class="badge badge-danger"><?= __('Error') ?></span>
                                 <?php endif; ?>
                             <?php else: ?>
                                 <span style="color: #ccc;">-</span>
@@ -156,7 +156,7 @@ $this->assign('title', __('Integracoes'));
                         <td>
                             <div class="action-buttons">
                                 <?= $this->Html->link(
-                                    __('Ver'),
+                                    __('View'),
                                     ['action' => 'view', $integration->id],
                                     ['class' => 'btn-action btn-action-view']
                                 ) ?>
@@ -164,19 +164,19 @@ $this->assign('title', __('Integracoes'));
                                         class="btn-action btn-action-test"
                                         onclick="testConnection(<?= $integration->id ?>)"
                                         id="test-btn-<?= $integration->id ?>">
-                                    <?= __('Testar') ?>
+                                    <?= __('Test') ?>
                                 </button>
                                 <?= $this->Html->link(
-                                    __('Editar'),
+                                    __('Edit'),
                                     ['action' => 'edit', $integration->id],
                                     ['class' => 'btn-action btn-action-edit']
                                 ) ?>
                                 <?= $this->Form->postLink(
-                                    __('Excluir'),
+                                    __('Delete'),
                                     ['action' => 'delete', $integration->id],
                                     [
                                         'class' => 'btn-action btn-action-danger',
-                                        'confirm' => __('Tem certeza que deseja excluir esta integracao? Esta acao nao pode ser desfeita.')
+                                        'confirm' => __('Are you sure you want to delete this integration? This action cannot be undone.')
                                     ]
                                 ) ?>
                             </div>
@@ -200,14 +200,14 @@ $this->assign('title', __('Integracoes'));
 <!-- Pagination -->
 <?php if ($integrations->count() > 0): ?>
     <div class="pagination">
-        <?= $this->Paginator->first('« ' . __('Primeira')) ?>
-        <?= $this->Paginator->prev('< ' . __('Anterior')) ?>
+        <?= $this->Paginator->first('« ' . __('First')) ?>
+        <?= $this->Paginator->prev('< ' . __('Previous')) ?>
         <?= $this->Paginator->numbers() ?>
-        <?= $this->Paginator->next(__('Proxima') . ' >') ?>
-        <?= $this->Paginator->last(__('Ultima') . ' »') ?>
+        <?= $this->Paginator->next(__('Next') . ' >') ?>
+        <?= $this->Paginator->last(__('Last') . ' »') ?>
     </div>
     <div class="pagination-info">
-        <?= $this->Paginator->counter(__('Pagina {{page}} de {{pages}}, mostrando {{current}} de {{count}} integracoes')) ?>
+        <?= $this->Paginator->counter(__('Page {{page}} of {{pages}}, showing {{current}} of {{count}} integrations')) ?>
     </div>
 <?php endif; ?>
 
@@ -217,7 +217,7 @@ function testConnection(integrationId) {
     var resultDiv = document.getElementById('test-result-' + integrationId);
 
     btn.disabled = true;
-    btn.textContent = 'Testando...';
+    btn.textContent = '<?= __('Testing...') ?>';
     resultDiv.style.display = 'none';
 
     fetch('<?= $this->Url->build(['action' => 'test']) ?>/' + integrationId, {
@@ -235,23 +235,23 @@ function testConnection(integrationId) {
 
         if (result.success) {
             resultDiv.className = 'test-result success';
-            resultDiv.textContent = result.message || 'Conexao bem-sucedida';
+            resultDiv.textContent = result.message || '<?= __('Connection successful') ?>';
             if (result.response_time) {
                 resultDiv.textContent += ' (' + Math.round(result.response_time) + 'ms)';
             }
         } else {
             resultDiv.className = 'test-result error';
-            resultDiv.textContent = result.error || result.message || 'Falha na conexao';
+            resultDiv.textContent = result.error || result.message || '<?= __('Connection failed') ?>';
         }
     })
     .catch(function(err) {
         resultDiv.style.display = 'block';
         resultDiv.className = 'test-result error';
-        resultDiv.textContent = 'Erro: ' + err.message;
+        resultDiv.textContent = '<?= __('Error:') ?> ' + err.message;
     })
     .finally(function() {
         btn.disabled = false;
-        btn.textContent = '<?= __('Testar') ?>';
+        btn.textContent = '<?= __('Test') ?>';
     });
 }
 </script>

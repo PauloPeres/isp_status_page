@@ -3,7 +3,7 @@
  * @var \App\View\AppView $this
  * @var \App\Model\Entity\Integration $integration
  */
-$this->assign('title', __('Detalhes da Integracao'));
+$this->assign('title', __('Integration Details'));
 
 $config = $integration->getConfiguration();
 ?>
@@ -239,23 +239,23 @@ $config = $integration->getConfiguration();
             ?>
             <span class="badge <?= $typeBadge ?>"><?= h($integration->getTypeName()) ?></span>
             <?php if ($integration->active): ?>
-                <span class="badge badge-success"><?= __('Ativa') ?></span>
+                <span class="badge badge-success"><?= __('Active') ?></span>
             <?php else: ?>
-                <span class="badge badge-secondary"><?= __('Inativa') ?></span>
+                <span class="badge badge-secondary"><?= __('Inactive') ?></span>
             <?php endif; ?>
         </p>
     </div>
     <div class="header-actions">
         <button type="button" class="btn btn-success" onclick="testConnection(<?= $integration->id ?>)" id="test-btn">
-            <?= __('Testar Conexao') ?>
+            <?= __('Test Connection') ?>
         </button>
         <?= $this->Html->link(
-            __('Editar'),
+            __('Edit'),
             ['action' => 'edit', $integration->id],
             ['class' => 'btn btn-primary']
         ) ?>
         <?= $this->Html->link(
-            __('Voltar'),
+            __('Back'),
             ['action' => 'index'],
             ['class' => 'btn btn-secondary']
         ) ?>
@@ -267,16 +267,16 @@ $config = $integration->getConfiguration();
 
 <!-- Integration Details -->
 <div class="card">
-    <h3 class="card-title"><?= __('Informacoes Gerais') ?></h3>
+    <h3 class="card-title"><?= __('General Information') ?></h3>
 
     <div class="detail-grid">
         <div class="detail-item">
-            <div class="detail-label"><?= __('Nome') ?></div>
+            <div class="detail-label"><?= __('Name') ?></div>
             <div class="detail-value"><?= h($integration->name) ?></div>
         </div>
 
         <div class="detail-item">
-            <div class="detail-label"><?= __('Tipo') ?></div>
+            <div class="detail-label"><?= __('Type') ?></div>
             <div class="detail-value"><?= h($integration->getTypeName()) ?></div>
         </div>
 
@@ -284,36 +284,36 @@ $config = $integration->getConfiguration();
             <div class="detail-label"><?= __('Status') ?></div>
             <div class="detail-value">
                 <?php if ($integration->active): ?>
-                    <span class="badge badge-success"><?= __('Ativa') ?></span>
+                    <span class="badge badge-success"><?= __('Active') ?></span>
                 <?php else: ?>
-                    <span class="badge badge-secondary"><?= __('Inativa') ?></span>
+                    <span class="badge badge-secondary"><?= __('Inactive') ?></span>
                 <?php endif; ?>
             </div>
         </div>
 
         <div class="detail-item">
-            <div class="detail-label"><?= __('Ultima Sincronizacao') ?></div>
+            <div class="detail-label"><?= __('Last Sync') ?></div>
             <div class="detail-value">
                 <?php if ($integration->last_sync_at): ?>
                     <?= $integration->last_sync_at->format('d/m/Y H:i:s') ?>
                     <?php if ($integration->last_sync_status === 'success'): ?>
                         <span class="badge badge-success"><?= __('OK') ?></span>
                     <?php elseif ($integration->last_sync_status === 'error'): ?>
-                        <span class="badge badge-danger"><?= __('Erro') ?></span>
+                        <span class="badge badge-danger"><?= __('Error') ?></span>
                     <?php endif; ?>
                 <?php else: ?>
-                    <span style="color: #999;"><?= __('Nunca sincronizada') ?></span>
+                    <span style="color: #999;"><?= __('Never synced') ?></span>
                 <?php endif; ?>
             </div>
         </div>
 
         <div class="detail-item">
-            <div class="detail-label"><?= __('Criada em') ?></div>
+            <div class="detail-label"><?= __('Created') ?></div>
             <div class="detail-value"><?= $integration->created->format('d/m/Y H:i:s') ?></div>
         </div>
 
         <div class="detail-item">
-            <div class="detail-label"><?= __('Modificada em') ?></div>
+            <div class="detail-label"><?= __('Modified') ?></div>
             <div class="detail-value"><?= $integration->modified->format('d/m/Y H:i:s') ?></div>
         </div>
     </div>
@@ -321,27 +321,27 @@ $config = $integration->getConfiguration();
 
 <!-- Configuration -->
 <div class="card">
-    <h3 class="card-title"><?= __('Configuracao') ?></h3>
+    <h3 class="card-title"><?= __('Configuration') ?></h3>
 
     <?php if (!empty($config)): ?>
         <div class="detail-grid">
             <?php if (!empty($config['base_url'])): ?>
                 <div class="detail-item">
-                    <div class="detail-label"><?= __('URL Base') ?></div>
+                    <div class="detail-label"><?= __('Base URL') ?></div>
                     <div class="detail-value" style="font-family: 'Courier New', monospace;"><?= h($config['base_url']) ?></div>
                 </div>
             <?php endif; ?>
 
             <?php if (!empty($config['method'])): ?>
                 <div class="detail-item">
-                    <div class="detail-label"><?= __('Metodo') ?></div>
+                    <div class="detail-label"><?= __('Method') ?></div>
                     <div class="detail-value"><?= h($config['method']) ?></div>
                 </div>
             <?php endif; ?>
 
             <?php if (!empty($config['auth_type']) && $config['auth_type'] !== 'none'): ?>
                 <div class="detail-item">
-                    <div class="detail-label"><?= __('Autenticacao') ?></div>
+                    <div class="detail-label"><?= __('Authentication') ?></div>
                     <div class="detail-value"><?= h(ucfirst($config['auth_type'])) ?></div>
                 </div>
             <?php endif; ?>
@@ -365,27 +365,27 @@ $config = $integration->getConfiguration();
         }
         ?>
         <div style="margin-top: 16px;">
-            <div class="detail-label"><?= __('Configuracao Completa') ?></div>
+            <div class="detail-label"><?= __('Full Configuration') ?></div>
             <div class="config-display"><?= h(json_encode($safeConfig, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)) ?></div>
         </div>
     <?php else: ?>
-        <p style="color: #999;"><?= __('Nenhuma configuracao definida') ?></p>
+        <p style="color: #999;"><?= __('No configuration defined') ?></p>
     <?php endif; ?>
 </div>
 
 <!-- Integration Logs -->
 <div class="card">
-    <h3 class="card-title"><?= __('Logs Recentes') ?></h3>
+    <h3 class="card-title"><?= __('Recent Logs') ?></h3>
 
     <?php if (!empty($integration->integration_logs)): ?>
         <div class="table-container">
             <table>
                 <thead>
                     <tr>
-                        <th><?= __('Data') ?></th>
-                        <th><?= __('Acao') ?></th>
+                        <th><?= __('Date') ?></th>
+                        <th><?= __('Action') ?></th>
                         <th><?= __('Status') ?></th>
-                        <th><?= __('Mensagem') ?></th>
+                        <th><?= __('Message') ?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -397,7 +397,7 @@ $config = $integration->getConfiguration();
                                 <?php if ($log->status === 'success'): ?>
                                     <span class="badge badge-success"><?= __('OK') ?></span>
                                 <?php elseif ($log->status === 'error'): ?>
-                                    <span class="badge badge-danger"><?= __('Erro') ?></span>
+                                    <span class="badge badge-danger"><?= __('Error') ?></span>
                                 <?php else: ?>
                                     <span class="badge badge-warning"><?= h($log->status) ?></span>
                                 <?php endif; ?>
@@ -410,7 +410,7 @@ $config = $integration->getConfiguration();
         </div>
     <?php else: ?>
         <div class="empty-state">
-            <p><?= __('Nenhum log registrado') ?></p>
+            <p><?= __('No logs recorded') ?></p>
         </div>
     <?php endif; ?>
 </div>
@@ -421,7 +421,7 @@ function testConnection(integrationId) {
     var resultDiv = document.getElementById('test-result');
 
     btn.disabled = true;
-    btn.textContent = 'Testando...';
+    btn.textContent = '<?= __('Testing...') ?>';
     resultDiv.style.display = 'none';
 
     fetch('<?= $this->Url->build(['action' => 'test']) ?>/' + integrationId, {
@@ -439,9 +439,9 @@ function testConnection(integrationId) {
 
         if (result.success) {
             resultDiv.className = 'test-result-card success';
-            var msg = result.message || 'Conexao bem-sucedida';
+            var msg = result.message || '<?= __('Connection successful') ?>';
             if (result.response_time) {
-                msg += ' (Tempo de resposta: ' + Math.round(result.response_time) + 'ms)';
+                msg += ' (<?= __('Response time') ?>: ' + Math.round(result.response_time) + 'ms)';
             }
             if (result.status_code) {
                 msg += ' - HTTP ' + result.status_code;
@@ -449,17 +449,17 @@ function testConnection(integrationId) {
             resultDiv.textContent = msg;
         } else {
             resultDiv.className = 'test-result-card error';
-            resultDiv.textContent = result.error || result.message || 'Falha na conexao';
+            resultDiv.textContent = result.error || result.message || '<?= __('Connection failed') ?>';
         }
     })
     .catch(function(err) {
         resultDiv.style.display = 'block';
         resultDiv.className = 'test-result-card error';
-        resultDiv.textContent = 'Erro: ' + err.message;
+        resultDiv.textContent = '<?= __('Error:') ?> ' + err.message;
     })
     .finally(function() {
         btn.disabled = false;
-        btn.textContent = '<?= __('Testar Conexao') ?>';
+        btn.textContent = '<?= __('Test Connection') ?>';
     });
 }
 </script>

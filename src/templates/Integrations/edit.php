@@ -3,7 +3,7 @@
  * @var \App\View\AppView $this
  * @var \App\Model\Entity\Integration $integration
  */
-$this->assign('title', __('Editar Integracao'));
+$this->assign('title', __('Edit Integration'));
 
 $config = $integration->getConfiguration();
 ?>
@@ -154,11 +154,11 @@ $config = $integration->getConfiguration();
 
 <div class="page-header">
     <div>
-        <h2><?= __('Editar Integracao') ?></h2>
+        <h2><?= __('Edit Integration') ?></h2>
         <p style="color: #666;"><?= h($integration->name) ?></p>
     </div>
     <?= $this->Html->link(
-        __('Voltar'),
+        __('Back'),
         ['action' => 'index'],
         ['class' => 'btn btn-secondary']
     ) ?>
@@ -168,11 +168,11 @@ $config = $integration->getConfiguration();
     <?= $this->Form->create($integration) ?>
 
     <div class="form-section">
-        <h3 class="form-section-title"><?= __('Informacoes Basicas') ?></h3>
+        <h3 class="form-section-title"><?= __('Basic Information') ?></h3>
 
         <div class="form-group">
             <label>
-                <?= __('Nome') ?> *
+                <?= __('Name') ?> *
                 <?= $this->element('tooltip', ['text' => __d('monitors', 'tooltip.integration_name')]) ?>
             </label>
             <?= $this->Form->text('name', [
@@ -184,7 +184,7 @@ $config = $integration->getConfiguration();
         <div class="form-row">
             <div class="form-group">
                 <label>
-                    <?= __('Tipo') ?> *
+                    <?= __('Type') ?> *
                     <?= $this->element('tooltip', ['text' => __d('monitors', 'tooltip.integration_type')]) ?>
                 </label>
                 <?= $this->Form->select('type', [
@@ -204,8 +204,8 @@ $config = $integration->getConfiguration();
                     <?= $this->element('tooltip', ['text' => __d('monitors', 'tooltip.integration_active')]) ?>
                 </label>
                 <?= $this->Form->select('active', [
-                    '1' => __('Ativa'),
-                    '0' => __('Inativa'),
+                    '1' => __('Active'),
+                    '0' => __('Inactive'),
                 ], [
                     'class' => 'form-control',
                 ]) ?>
@@ -214,12 +214,12 @@ $config = $integration->getConfiguration();
     </div>
 
     <div class="form-section">
-        <h3 class="form-section-title"><?= __('Configuracao de Conexao') ?></h3>
+        <h3 class="form-section-title"><?= __('Connection Settings') ?></h3>
 
         <div class="config-section">
             <div class="form-group">
                 <label>
-                    <?= __('URL Base') ?> *
+                    <?= __('Base URL') ?> *
                     <?= $this->element('tooltip', ['text' => __d('monitors', 'tooltip.integration_url')]) ?>
                 </label>
                 <?= $this->Form->text('config_base_url', [
@@ -232,7 +232,7 @@ $config = $integration->getConfiguration();
 
             <div class="form-row">
                 <div class="form-group">
-                    <label><?= __('Metodo HTTP') ?></label>
+                    <label><?= __('HTTP Method') ?></label>
                     <?= $this->Form->select('config_method', [
                         'GET' => 'GET',
                         'POST' => 'POST',
@@ -246,7 +246,7 @@ $config = $integration->getConfiguration();
 
                 <div class="form-group">
                     <label>
-                        <?= __('Timeout (segundos)') ?>
+                        <?= __('Timeout (seconds)') ?>
                         <?= $this->element('tooltip', ['text' => __d('monitors', 'tooltip.integration_sync_interval')]) ?>
                     </label>
                     <?= $this->Form->number('config_timeout', [
@@ -259,9 +259,9 @@ $config = $integration->getConfiguration();
             </div>
 
             <div class="form-group">
-                <label><?= __('Tipo de Autenticacao') ?></label>
+                <label><?= __('Authentication Type') ?></label>
                 <?= $this->Form->select('config_auth_type', [
-                    'none' => __('Nenhuma'),
+                    'none' => __('None'),
                     'bearer' => 'Bearer Token',
                     'basic' => __('Basic Auth'),
                     'api_key' => 'API Key',
@@ -279,7 +279,7 @@ $config = $integration->getConfiguration();
                         <?= $this->element('tooltip', ['text' => __d('monitors', 'tooltip.integration_api_key')]) ?>
                     </label>
                     <?= $this->Form->text('config_api_key', [
-                        'placeholder' => __('Seu token de autenticacao'),
+                        'placeholder' => __('Your authentication token'),
                         'class' => 'form-control',
                         'type' => 'password',
                         'value' => $config['api_key'] ?? '',
@@ -291,7 +291,7 @@ $config = $integration->getConfiguration();
                 <div class="form-row">
                     <div class="form-group">
                         <label>
-                            <?= __('Usuario') ?>
+                            <?= __('Username') ?>
                             <?= $this->element('tooltip', ['text' => __d('monitors', 'tooltip.integration_username')]) ?>
                         </label>
                         <?= $this->Form->text('config_username', [
@@ -301,7 +301,7 @@ $config = $integration->getConfiguration();
                     </div>
                     <div class="form-group">
                         <label>
-                            <?= __('Senha') ?>
+                            <?= __('Password') ?>
                             <?= $this->element('tooltip', ['text' => __d('monitors', 'tooltip.integration_password')]) ?>
                         </label>
                         <?= $this->Form->text('config_password', [
@@ -314,21 +314,21 @@ $config = $integration->getConfiguration();
             </div>
 
             <div class="form-group">
-                <label><?= __('Headers Customizados (JSON)') ?></label>
+                <label><?= __('Custom Headers (JSON)') ?></label>
                 <?= $this->Form->textarea('config_headers', [
                     'placeholder' => '{"Content-Type": "application/json"}',
                     'class' => 'form-control',
                     'rows' => 3,
                     'value' => isset($config['headers']) ? (is_array($config['headers']) ? json_encode($config['headers'], JSON_PRETTY_PRINT) : $config['headers']) : '',
                 ]) ?>
-                <div class="form-help"><?= __('Formato JSON. Exemplo: {"Authorization": "Custom value"}') ?></div>
+                <div class="form-help"><?= __('JSON format. Example: {"Authorization": "Custom value"}') ?></div>
             </div>
         </div>
     </div>
 
     <div style="display: flex; gap: 8px; margin-top: 24px;">
-        <?= $this->Form->button(__('Salvar Alteracoes'), ['type' => 'submit', 'class' => 'btn-submit']) ?>
-        <?= $this->Html->link(__('Cancelar'), ['action' => 'index'], ['class' => 'btn btn-secondary']) ?>
+        <?= $this->Form->button(__('Save Changes'), ['type' => 'submit', 'class' => 'btn-submit']) ?>
+        <?= $this->Html->link(__('Cancel'), ['action' => 'index'], ['class' => 'btn btn-secondary']) ?>
     </div>
 
     <?= $this->Form->end() ?>
