@@ -59,22 +59,22 @@ Super Admin dashboard for the ISP Status Page SaaS platform operator. Provides c
 - **Result:** Created `DashboardController.php` with MetricsService integration. Template includes 4 KPI cards (MRR, Active Orgs, Total Monitors, Active Incidents), Plan Distribution doughnut chart, New Signups line chart, Recent Signups and Top Organizations tables, Platform Health cards, and Trial metrics. Chart.js loaded from CDN with data passed via `window.superAdminData`.
 
 ### TASK-SA-009: Organizations List & Detail
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Description:** Searchable/filterable/sortable table of all orgs. Detail view with monitors, users, billing, activity.
 - **Depends on:** SA-003, SA-004
-- **Result:** _pending_
+- **Result:** Created `SuperAdmin/OrganizationsController.php` with `index()` (search, plan filter, pagination, monitor counts) and `view()` (org details, team members, monitors, recent checks, recent incidents). Templates: `SuperAdmin/Organizations/index.php` and `SuperAdmin/Organizations/view.php` with responsive tables, badges, and pagination.
 
 ### TASK-SA-010: Organization Impersonation
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Description:** "Login as" any org for debugging. Sets TenantContext via session. Red banner in admin UI.
 - **Depends on:** SA-009
-- **Result:** _pending_
+- **Result:** Added `impersonate()` and `stopImpersonation()` actions to OrganizationsController. Modified `TenantMiddleware` with `resolveFromImpersonation()` method that verifies super admin status before honoring impersonation session. Added red impersonation banner to both `admin.php` and `super_admin.php` layouts reading directly from session.
 
 ### TASK-SA-011: Users List & Detail
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Description:** Cross-org user directory. Search, filter, view details, toggle super admin flag.
 - **Depends on:** SA-003, SA-004
-- **Result:** _pending_
+- **Result:** Created `UsersController` (index with search/pagination, view with org memberships and API keys). Templates: `SuperAdmin/Users/index.php` (search bar, users table with org badges, pagination), `SuperAdmin/Users/view.php` (user info cards, organizations table, API keys table). Added `hasMany OrganizationUsers` association to `UsersTable`.
 
 ### TASK-SA-012: Revenue Dashboard
 - **Status:** COMPLETED
@@ -83,10 +83,10 @@ Super Admin dashboard for the ISP Status Page SaaS platform operator. Provides c
 - **Result:** Created `RevenueController.php` with MetricsService integration and Organizations query for paying customers. Template includes MRR/ARR/ARPU/Paid Orgs KPI cards, Revenue by Plan horizontal bar chart, Plan Distribution doughnut chart, Paying Customers table (name, plan, monthly price, since), and Trial metrics section (active trials, conversion rate, total trialed). Shares `super-admin-charts.js` with the dashboard.
 
 ### TASK-SA-013: Platform Health Dashboard
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Description:** Checks per hour, alert dispatches, monitor type distribution, system status.
 - **Depends on:** SA-007, SA-004
-- **Result:** _pending_
+- **Result:** Created `HealthController` with MetricsService integration, monitor type distribution query, failed alerts query, and platform stats. Template includes health KPI cards (Total Monitors, Checks Today, Active Incidents, Alerts Today), horizontal bar chart for monitor type distribution (Chart.js), user engagement grid (DAU/WAU/MAU/API Adoption), platform stats cards (Orgs, Users, API Keys, Webhooks), check volume table, and recent failed alerts table.
 
 ### TASK-SA-014: Cache Configuration
 - **Status:** COMPLETED
