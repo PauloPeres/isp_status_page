@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Controller\SuperAdmin;
 
+use App\Service\AuditLogService;
+
 /**
  * Organizations Controller (Super Admin)
  *
@@ -11,6 +13,24 @@ namespace App\Controller\SuperAdmin;
  */
 class OrganizationsController extends AppController
 {
+    /**
+     * Audit log service instance.
+     *
+     * @var \App\Service\AuditLogService
+     */
+    private AuditLogService $audit;
+
+    /**
+     * Initialize method.
+     *
+     * @return void
+     */
+    public function initialize(): void
+    {
+        parent::initialize();
+        $this->audit = new AuditLogService();
+    }
+
     /**
      * Searchable, filterable, paginated list of all organizations.
      *
@@ -105,6 +125,16 @@ class OrganizationsController extends AppController
         $this->request->getSession()->write('impersonating_org_name', $org->name);
         $this->request->getSession()->write('current_organization_id', $org->id);
 
+        // TASK-AUTH-018: Audit log impersonation start
+        $identity = $this->Authentication->getIdentity();
+        $this->audit->log(
+            'impersonation_start',
+            $identity ? (int)$identity->id : null,
+            $this->request->clientIp(),
+            $this->request->getHeaderLine('User-Agent'),
+            ['organization_id' => $org->id, 'organization_name' => $org->name]
+        );
+
         $this->Flash->success(__('Now impersonating: {0}', $org->name));
 
         return $this->redirect(['prefix' => false, 'controller' => 'Dashboard', 'action' => 'index']);
@@ -117,9 +147,21 @@ class OrganizationsController extends AppController
      */
     public function stopImpersonation()
     {
+        $orgName = $this->request->getSession()->read('impersonating_org_name');
+
         $this->request->getSession()->delete('impersonating_org_id');
         $this->request->getSession()->delete('impersonating_org_name');
         $this->request->getSession()->delete('current_organization_id');
+
+        // TASK-AUTH-018: Audit log impersonation stop
+        $identity = $this->Authentication->getIdentity();
+        $this->audit->log(
+            'impersonation_stop',
+            $identity ? (int)$identity->id : null,
+            $this->request->clientIp(),
+            $this->request->getHeaderLine('User-Agent'),
+            ['organization_name' => $orgName]
+        );
 
         $this->Flash->success(__('Stopped impersonation'));
 

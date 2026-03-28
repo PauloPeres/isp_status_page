@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Service\AuditLogService;
 use App\Service\OAuthService;
 
 /**
@@ -23,6 +24,13 @@ class OAuthController extends AppController
     private OAuthService $oauthService;
 
     /**
+     * Audit log service instance.
+     *
+     * @var \App\Service\AuditLogService
+     */
+    private AuditLogService $audit;
+
+    /**
      * Initialize controller.
      *
      * @return void
@@ -31,6 +39,7 @@ class OAuthController extends AppController
     {
         parent::initialize();
         $this->oauthService = new OAuthService();
+        $this->audit = new AuditLogService();
     }
 
     /**
@@ -111,7 +120,22 @@ class OAuthController extends AppController
         // Log the user in via the Authentication plugin
         $this->Authentication->setIdentity($user);
 
-        $this->Flash->success(__('Successfully signed in with {0}!', ucfirst($provider)));
+        // TASK-AUTH-018: Audit log OAuth login
+        $this->audit->log(
+            'oauth_login',
+            (int)$user->id,
+            $this->request->clientIp(),
+            $this->request->getHeaderLine('User-Agent'),
+            ['provider' => $provider]
+        );
+
+        // TASK-AUTH-019: Show pending-link message if OAuth was not auto-linked
+        $pendingMsg = $this->oauthService->getPendingLinkMessage();
+        if ($pendingMsg) {
+            $this->Flash->info($pendingMsg);
+        } else {
+            $this->Flash->success(__('Successfully signed in with {0}!', ucfirst($provider)));
+        }
 
         return $this->redirect(['controller' => 'Admin', 'action' => 'index']);
     }

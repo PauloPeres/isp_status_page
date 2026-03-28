@@ -1,23 +1,23 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="<?= h(str_replace('_', '-', \Cake\I18n\I18n::getLocale())) ?>">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><?= __('Recuperar Senha') ?> - ISP Status</title>
+    <title><?= __d('users', 'Recover Password') ?> - ISP Status</title>
     <style>
         :root {
-            /* Cores Primárias */
+            /* Primary Colors */
             --color-primary: #1E88E5;
             --color-success: #43A047;
             --color-dark: #263238;
             --color-white: #FFFFFF;
 
-            /* Cores Secundárias */
+            /* Secondary Colors */
             --color-primary-light: #90CAF9;
             --color-warning: #FDD835;
             --color-error: #E53935;
 
-            /* Tons Neutros */
+            /* Neutral Tones */
             --color-gray-light: #ECEFF1;
             --color-gray-medium: #B0BEC5;
 
@@ -25,7 +25,7 @@
             --color-primary-hover: #1976D2;
             --color-error-hover: #D32F2F;
 
-            /* Espaçamento */
+            /* Spacing */
             --space-md: 16px;
             --space-lg: 24px;
             --space-xl: 32px;
@@ -35,7 +35,7 @@
             --radius-lg: 12px;
             --radius-xl: 20px;
 
-            /* Sombras */
+            /* Shadows */
             --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
             --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
@@ -236,9 +236,9 @@
     <div class="login-box">
         <div class="logo-container">
             <img src="/img/icon_isp_status_page.png" alt="ISP Status" class="logo">
-            <h1><?= __('Recuperar Senha') ?></h1>
+            <h1><?= __d('users', 'Recover Password') ?></h1>
             <p class="subtitle">
-                <?= __('Informe seu email e enviaremos um link para redefinir sua senha.') ?>
+                <?= __d('users', 'Enter your email and we will send you a link to reset your password.') ?>
             </p>
         </div>
 
@@ -250,23 +250,23 @@
             <?php endif; ?>
 
             <div class="input-group">
-                <label for="email"><?= __('Email') ?></label>
+                <label for="email"><?= __d('users', 'Email') ?></label>
                 <input
                     type="email"
                     id="email"
                     name="email"
-                    placeholder="<?= __('Digite seu email cadastrado') ?>"
+                    placeholder="<?= __d('users', 'Enter your registered email') ?>"
                     required
                     autofocus
                     autocomplete="email"
                 >
             </div>
 
-            <button type="submit" class="btn"><?= __('Enviar Link de Recuperação') ?></button>
+            <button type="submit" class="btn"><?= __d('users', 'Send Recovery Link') ?></button>
         </form>
 
         <a href="<?= $this->Url->build(['controller' => 'Users', 'action' => 'login']) ?>" class="back-link">
-            ← <?= __('Voltar para o login') ?>
+            &larr; <?= __d('users', 'Back to login') ?>
         </a>
     </div>
 </body>

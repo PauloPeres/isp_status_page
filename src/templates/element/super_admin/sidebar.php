@@ -77,6 +77,15 @@ function isSuperAdminActive($currentController, $targetController, $currentActio
                     'class' => 'nav-item' . (isSuperAdminActive($controller, 'Health') ? ' active' : '')
                 ]
             ) ?>
+
+            <?= $this->Html->link(
+                '<span class="nav-icon">&#x1F6E1;</span> ' . __('Security Logs'),
+                ['prefix' => 'SuperAdmin', 'controller' => 'SecurityLogs', 'action' => 'index'],
+                [
+                    'escape' => false,
+                    'class' => 'nav-item' . (isSuperAdminActive($controller, 'SecurityLogs') ? ' active' : '')
+                ]
+            ) ?>
         </div>
 
         <div class="nav-section">

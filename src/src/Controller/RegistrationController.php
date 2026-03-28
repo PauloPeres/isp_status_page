@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Service\AuditLogService;
 use Cake\Log\Log;
 use Cake\Routing\Router;
 
@@ -14,6 +15,24 @@ use Cake\Routing\Router;
  */
 class RegistrationController extends AppController
 {
+    /**
+     * Audit log service instance.
+     *
+     * @var \App\Service\AuditLogService
+     */
+    private AuditLogService $audit;
+
+    /**
+     * Initialize method.
+     *
+     * @return void
+     */
+    public function initialize(): void
+    {
+        parent::initialize();
+        $this->audit = new AuditLogService();
+    }
+
     /**
      * Before filter callback
      *
@@ -151,6 +170,15 @@ class RegistrationController extends AppController
                 return;
             }
 
+            // TASK-AUTH-018: Audit log registration
+            $this->audit->log(
+                'registration',
+                (int)$user->id,
+                $this->request->clientIp(),
+                $this->request->getHeaderLine('User-Agent'),
+                ['email' => $user->email, 'username' => $user->username]
+            );
+
             // Send verification email
             $this->sendVerificationEmail($user);
 
@@ -203,6 +231,15 @@ class RegistrationController extends AppController
         $user->markEmailVerified();
 
         if ($usersTable->save($user)) {
+            // TASK-AUTH-018: Audit log email verification
+            $this->audit->log(
+                'email_verified',
+                (int)$user->id,
+                $this->request->clientIp(),
+                $this->request->getHeaderLine('User-Agent'),
+                ['email' => $user->email]
+            );
+
             // Auto-login the user
             $this->Authentication->setIdentity($user);
 

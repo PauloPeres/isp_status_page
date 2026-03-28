@@ -1,23 +1,23 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="<?= h(str_replace('_', '-', \Cake\I18n\I18n::getLocale())) ?>">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><?= __('Redefinir Senha') ?> - ISP Status</title>
+    <title><?= __d('users', 'Reset Password') ?> - ISP Status</title>
     <style>
         :root {
-            /* Cores Primárias */
+            /* Primary Colors */
             --color-primary: #1E88E5;
             --color-success: #43A047;
             --color-dark: #263238;
             --color-white: #FFFFFF;
 
-            /* Cores Secundárias */
+            /* Secondary Colors */
             --color-primary-light: #90CAF9;
             --color-warning: #FDD835;
             --color-error: #E53935;
 
-            /* Tons Neutros */
+            /* Neutral Tones */
             --color-gray-light: #ECEFF1;
             --color-gray-medium: #B0BEC5;
 
@@ -25,7 +25,7 @@
             --color-primary-hover: #1976D2;
             --color-error-hover: #D32F2F;
 
-            /* Espaçamento */
+            /* Spacing */
             --space-md: 16px;
             --space-lg: 24px;
             --space-xl: 32px;
@@ -35,7 +35,7 @@
             --radius-lg: 12px;
             --radius-xl: 20px;
 
-            /* Sombras */
+            /* Shadows */
             --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
             --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
@@ -254,9 +254,9 @@
     <div class="login-box">
         <div class="logo-container">
             <img src="/img/icon_isp_status_page.png" alt="ISP Status" class="logo">
-            <h1><?= __('Redefinir Senha') ?></h1>
+            <h1><?= __d('users', 'Reset Password') ?></h1>
             <p class="subtitle">
-                <?= __('Digite sua nova senha abaixo.') ?>
+                <?= __d('users', 'Enter your new password below.') ?>
             </p>
         </div>
 
@@ -268,12 +268,12 @@
             <?php endif; ?>
 
             <div class="input-group">
-                <label for="password"><?= __('Nova Senha') ?></label>
+                <label for="password"><?= __d('users', 'New Password') ?></label>
                 <input
                     type="password"
                     id="password"
                     name="password"
-                    placeholder="<?= __('Digite sua nova senha') ?>"
+                    placeholder="<?= __d('users', 'Enter your new password') ?>"
                     required
                     autofocus
                     autocomplete="new-password"
@@ -282,12 +282,12 @@
             </div>
 
             <div class="input-group">
-                <label for="confirm_password"><?= __('Confirmar Nova Senha') ?></label>
+                <label for="confirm_password"><?= __d('users', 'Confirm New Password') ?></label>
                 <input
                     type="password"
                     id="confirm_password"
                     name="confirm_password"
-                    placeholder="<?= __('Digite novamente sua nova senha') ?>"
+                    placeholder="<?= __d('users', 'Re-enter your new password') ?>"
                     required
                     autocomplete="new-password"
                     minlength="8"
@@ -295,18 +295,18 @@
             </div>
 
             <div class="password-requirements">
-                <strong><?= __('Requisitos da senha:') ?></strong>
+                <strong><?= __d('users', 'Password requirements:') ?></strong>
                 <ul>
-                    <li><?= __('Mínimo de 8 caracteres') ?></li>
-                    <li><?= __('As senhas devem ser idênticas') ?></li>
+                    <li><?= __d('users', 'Minimum 8 characters') ?></li>
+                    <li><?= __d('users', 'Passwords must match') ?></li>
                 </ul>
             </div>
 
-            <button type="submit" class="btn"><?= __('Redefinir Senha') ?></button>
+            <button type="submit" class="btn"><?= __d('users', 'Reset Password') ?></button>
         </form>
 
         <a href="<?= $this->Url->build(['controller' => 'Users', 'action' => 'login']) ?>" class="back-link">
-            ← <?= __('Voltar para o login') ?>
+            &larr; <?= __d('users', 'Back to login') ?>
         </a>
     </div>
 </body>

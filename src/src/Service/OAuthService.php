@@ -21,6 +21,16 @@ class OAuthService
     use LogTrait;
 
     /**
+     * TASK-AUTH-019: Flash message to show after OAuth callback.
+     *
+     * When an existing password-based user is found by email but OAuth
+     * fields are NOT auto-linked, this message explains next steps.
+     *
+     * @var string|null
+     */
+    private ?string $pendingLinkMessage = null;
+
+    /**
      * Supported OAuth providers.
      */
     public const PROVIDER_GOOGLE = 'google';
@@ -158,6 +168,16 @@ class OAuthService
     public function isValidProvider(string $provider): bool
     {
         return in_array($provider, [self::PROVIDER_GOOGLE, self::PROVIDER_GITHUB], true);
+    }
+
+    /**
+     * TASK-AUTH-019: Get any pending-link flash message set during callback.
+     *
+     * @return string|null
+     */
+    public function getPendingLinkMessage(): ?string
+    {
+        return $this->pendingLinkMessage;
     }
 
     /**
@@ -402,17 +422,35 @@ class OAuthService
             return $existingOAuthUser;
         }
 
-        // Check if a user with this email already exists — link OAuth
+        // Check if a user with this email already exists
         $existingEmailUser = $usersTable->find()
             ->where(['email' => $providerUser['email']])
             ->first();
 
         if ($existingEmailUser) {
-            $existingEmailUser->set('oauth_provider', $provider);
-            $existingEmailUser->set('oauth_id', $providerUser['id']);
+            // TASK-AUTH-019: Don't auto-link OAuth if user already has a different provider
+            if (!empty($existingEmailUser->oauth_provider) && $existingEmailUser->oauth_provider !== $provider) {
+                // User already linked to a different OAuth provider -- don't overwrite
+                $this->log(
+                    "OAuth {$provider} login: user {$existingEmailUser->email} already linked to {$existingEmailUser->oauth_provider}, logging in without re-linking",
+                    'info'
+                );
+                return $existingEmailUser;
+            }
 
+            // TASK-AUTH-019: If user has no OAuth provider, don't auto-link;
+            // just log them in and suggest manual linking from their profile.
+            if (empty($existingEmailUser->oauth_provider)) {
+                $providerName = ucfirst($provider);
+                $this->pendingLinkMessage = "We found your existing account. Sign in with your password to link your {$providerName} account from your profile settings.";
+                $this->log("OAuth {$provider} login: existing user {$existingEmailUser->email} found, not auto-linking", 'info');
+                return $existingEmailUser;
+            }
+
+            // Same provider -- update the oauth_id in case it changed
+            $existingEmailUser->set('oauth_id', $providerUser['id']);
             if ($usersTable->save($existingEmailUser)) {
-                $this->log("Linked OAuth {$provider} to existing user: {$existingEmailUser->email}", 'info');
+                $this->log("Updated OAuth {$provider} ID for existing user: {$existingEmailUser->email}", 'info');
                 return $existingEmailUser;
             }
 

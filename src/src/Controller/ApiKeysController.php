@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Service\ApiKeyService;
+use App\Service\AuditLogService;
 use App\Service\PermissionService;
 
 /**
@@ -23,6 +24,13 @@ class ApiKeysController extends AppController
     protected ApiKeyService $apiKeyService;
 
     /**
+     * Audit log service instance.
+     *
+     * @var \App\Service\AuditLogService
+     */
+    private AuditLogService $audit;
+
+    /**
      * Initialize method
      *
      * @return void
@@ -31,6 +39,7 @@ class ApiKeysController extends AppController
     {
         parent::initialize();
         $this->apiKeyService = new ApiKeyService();
+        $this->audit = new AuditLogService();
     }
 
     /**
@@ -101,6 +110,16 @@ class ApiKeysController extends AppController
                 );
 
                 $plainKey = $result['key'];
+
+                // TASK-AUTH-018: Audit log API key creation
+                $this->audit->log(
+                    'api_key_created',
+                    $userId,
+                    $this->request->clientIp(),
+                    $this->request->getHeaderLine('User-Agent'),
+                    ['key_name' => $data['name'] ?? '', 'permissions' => $permissions]
+                );
+
                 $this->Flash->success(__('API key created successfully. Copy the key now - you will not see it again!'));
                 $this->set('newApiKey', $result['entity']);
             } catch (\Exception $e) {
@@ -128,6 +147,16 @@ class ApiKeysController extends AppController
         $apiKey = $this->ApiKeys->get($id);
 
         if ($this->apiKeyService->revoke((int)$apiKey->id)) {
+            // TASK-AUTH-018: Audit log API key revocation
+            $identity = $this->request->getAttribute('identity');
+            $this->audit->log(
+                'api_key_revoked',
+                $identity ? (int)$identity->getIdentifier() : null,
+                $this->request->clientIp(),
+                $this->request->getHeaderLine('User-Agent'),
+                ['key_id' => (int)$apiKey->id, 'key_name' => $apiKey->name]
+            );
+
             $this->Flash->success(__('The API key has been revoked.'));
         } else {
             $this->Flash->error(__('The API key could not be revoked. Please try again.'));

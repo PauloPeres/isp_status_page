@@ -27,7 +27,7 @@
 
 ## Medium Priority
 - TASK-AUTH-017: Enforce email verification before access - COMPLETED
-- TASK-AUTH-018: Security audit logging table
-- TASK-AUTH-019: Fix OAuth account linking (require password)
+- TASK-AUTH-018: Security audit logging table - COMPLETED
+- TASK-AUTH-019: Fix OAuth account linking (require password) - COMPLETED
 - TASK-AUTH-020: Remove sensitive tokens from logs - COMPLETED
-- TASK-AUTH-021: Standardize auth page languages to English with __d()
+- TASK-AUTH-021: Standardize auth page languages to English with __d() - COMPLETED
