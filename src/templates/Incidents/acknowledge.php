@@ -10,7 +10,7 @@
  * @var bool|null $success
  * @var bool|null $alreadyAcknowledged
  */
-$this->assign('title', __d('incidents', 'Reconhecimento de Incidente'));
+$this->assign('title', __d('incidents', 'Incident Acknowledgement'));
 ?>
 
 <style>
@@ -85,47 +85,47 @@ $this->assign('title', __d('incidents', 'Reconhecimento de Incidente'));
 <div class="ack-container">
     <div class="ack-card">
         <?php if (!empty($error)): ?>
-            <div class="ack-header error">Erro</div>
+            <div class="ack-header error"><?= __d('incidents', 'Error') ?></div>
             <div class="ack-body">
                 <p><?= h($error) ?></p>
             </div>
         <?php elseif (!empty($alreadyAcknowledged) && $incident): ?>
-            <div class="ack-header warning">Ja Reconhecido</div>
+            <div class="ack-header warning"><?= __d('incidents', 'Already Acknowledged') ?></div>
             <div class="ack-body">
-                <p><?= __d('incidents', 'Este incidente ja foi reconhecido anteriormente.') ?></p>
+                <p><?= __d('incidents', 'This incident has already been acknowledged.') ?></p>
                 <?php if ($incident->acknowledged_at): ?>
                     <p style="font-size: 14px; color: #888;">
-                        <?= __d('incidents', 'Reconhecido em {0}', h($incident->acknowledged_at->i18nFormat('dd/MM/yyyy HH:mm:ss'))) ?>
+                        <?= __d('incidents', 'Acknowledged at {0}', h($incident->acknowledged_at->i18nFormat('dd/MM/yyyy HH:mm:ss'))) ?>
                     </p>
                 <?php endif; ?>
             </div>
         <?php elseif (!empty($success) && $incident): ?>
-            <div class="ack-header success">Incidente Reconhecido</div>
+            <div class="ack-header success"><?= __d('incidents', 'Incident Acknowledged') ?></div>
             <div class="ack-body">
-                <p><?= __d('incidents', 'O incidente foi reconhecido com sucesso. Obrigado!') ?></p>
+                <p><?= __d('incidents', 'The incident has been successfully acknowledged. Thank you!') ?></p>
                 <div class="ack-incident-info">
                     <dl>
                         <dt><?= __d('incidents', 'Monitor') ?></dt>
                         <dd><?= h($incident->monitor->name) ?></dd>
 
-                        <dt><?= __d('incidents', 'Incidente') ?></dt>
+                        <dt><?= __d('incidents', 'Incident') ?></dt>
                         <dd><?= h($incident->title) ?></dd>
 
-                        <dt><?= __d('incidents', 'Severidade') ?></dt>
+                        <dt><?= __d('incidents', 'Severity') ?></dt>
                         <dd><?= h(ucfirst($incident->severity)) ?></dd>
 
-                        <dt><?= __d('incidents', 'Reconhecido em') ?></dt>
+                        <dt><?= __d('incidents', 'Acknowledged at') ?></dt>
                         <dd><?= $incident->acknowledged_at ? h($incident->acknowledged_at->i18nFormat('dd/MM/yyyy HH:mm:ss')) : '-' ?></dd>
                     </dl>
                 </div>
                 <p style="font-size: 14px; color: #888;">
-                    <?= __d('incidents', 'Os outros membros da equipe foram notificados.') ?>
+                    <?= __d('incidents', 'Other team members have been notified.') ?>
                 </p>
             </div>
         <?php else: ?>
-            <div class="ack-header info">Reconhecimento de Incidente</div>
+            <div class="ack-header info"><?= __d('incidents', 'Incident Acknowledgement') ?></div>
             <div class="ack-body">
-                <p><?= __d('incidents', 'Nenhuma informacao disponivel.') ?></p>
+                <p><?= __d('incidents', 'No information available.') ?></p>
             </div>
         <?php endif; ?>
     </div>

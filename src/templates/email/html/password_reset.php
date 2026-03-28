@@ -6,41 +6,41 @@
  * @var string $resetLink
  * @var object $user
  */
-$this->assign('title', 'Recuperação de Senha');
+$this->assign('title', __d('emails', 'Password Recovery'));
 ?>
 
-<h2>🔐 Recuperação de Senha</h2>
+<h2><?= __d('emails', 'Password Recovery') ?></h2>
 
-<p>Olá!</p>
+<p><?= __d('emails', 'Hello!') ?></p>
 
 <p>
-    Você solicitou a redefinição de senha da sua conta no ISP Status Page.
+    <?= __d('emails', 'You requested a password reset for your ISP Status Page account.') ?>
 </p>
 
 <!-- User Info Box -->
 <div class="info-box" style="margin: 20px 0;">
     <p style="margin: 0;">
-        <strong>👤 Usuário:</strong> <?= h($user->username) ?><br>
-        <strong>📧 Email:</strong> <?= h($user->email) ?>
+        <strong><?= __d('emails', 'Username:') ?></strong> <?= h($user->username) ?><br>
+        <strong><?= __d('emails', 'Email:') ?></strong> <?= h($user->email) ?>
     </p>
 </div>
 
 <p>
-    Para redefinir sua senha, clique no botão abaixo:
+    <?= __d('emails', 'To reset your password, click the button below:') ?>
 </p>
 
 <!-- Reset Button -->
 <p style="text-align: center; margin: 30px 0;">
     <a href="<?= $resetLink ?>" class="button">
-        Redefinir Minha Senha
+        <?= __d('emails', 'Reset My Password') ?>
     </a>
 </p>
 
 <!-- Alternative Link -->
 <div class="info-box">
-    <p><strong>Link alternativo:</strong></p>
+    <p><strong><?= __d('emails', 'Alternative link:') ?></strong></p>
     <p style="margin: 10px 0 0 0;">
-        Se o botão acima não funcionar, copie e cole o link abaixo no seu navegador:
+        <?= __d('emails', 'If the button above does not work, copy and paste the link below into your browser:') ?>
     </p>
     <p style="word-break: break-all; margin: 10px 0 0 0;">
         <a href="<?= $resetLink ?>"><?= $resetLink ?></a>
@@ -50,11 +50,11 @@ $this->assign('title', 'Recuperação de Senha');
 <!-- Warning -->
 <div class="warning-box">
     <p style="margin: 0;">
-        <strong>⏰ Importante:</strong>
-        Este link expira em 1 hora por segurança.
+        <strong><?= __d('emails', 'Important:') ?></strong>
+        <?= __d('emails', 'This link expires in 1 hour for security.') ?>
     </p>
 </div>
 
 <p>
-    Se você não solicitou a redefinição de senha, ignore este email. Sua senha permanecerá inalterada.
+    <?= __d('emails', 'If you did not request a password reset, ignore this email. Your password will remain unchanged.') ?>
 </p>

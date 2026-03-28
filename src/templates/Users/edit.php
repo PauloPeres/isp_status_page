@@ -89,6 +89,19 @@ $this->assign('title', __d('users', 'Edit Profile'));
     margin-bottom: 6px;
 }
 
+.form-group select {
+    padding: 8px 12px;
+    border: 1px solid #d0d0d0;
+    border-radius: 6px;
+    font-size: 14px;
+    background: white;
+}
+
+.form-group select:focus {
+    outline: none;
+    border-color: #3b82f6;
+}
+
 .form-group input[type="text"],
 .form-group input[type="email"],
 .form-group input[type="password"] {
@@ -199,6 +212,58 @@ $this->assign('title', __d('users', 'Edit Profile'));
                         'type' => 'email',
                         'required' => true,
                         'placeholder' => __d('users', 'Enter your email')
+                    ]) ?>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="form-section-title"><?= __d('users', 'Preferences') ?></div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label><?= __d('users', 'Language') ?></label>
+                    <?= $this->Form->control('language', [
+                        'label' => false,
+                        'type' => 'select',
+                        'options' => [
+                            'en' => __d('users', 'English'),
+                            'pt_BR' => __d('users', 'Portuguese (Brazil)'),
+                            'es' => __d('users', 'Spanish'),
+                        ],
+                        'default' => $user->language ?? 'en',
+                    ]) ?>
+                </div>
+
+                <div class="form-group">
+                    <label><?= __d('users', 'Timezone') ?></label>
+                    <?= $this->Form->control('timezone', [
+                        'label' => false,
+                        'type' => 'select',
+                        'options' => [
+                            'America/Sao_Paulo' => __d('users', 'America/Sao Paulo (BRT)'),
+                            'America/New_York' => __d('users', 'America/New York (EST)'),
+                            'America/Chicago' => __d('users', 'America/Chicago (CST)'),
+                            'America/Denver' => __d('users', 'America/Denver (MST)'),
+                            'America/Los_Angeles' => __d('users', 'America/Los Angeles (PST)'),
+                            'America/Argentina/Buenos_Aires' => __d('users', 'America/Buenos Aires (ART)'),
+                            'America/Bogota' => __d('users', 'America/Bogota (COT)'),
+                            'America/Santiago' => __d('users', 'America/Santiago (CLT)'),
+                            'America/Lima' => __d('users', 'America/Lima (PET)'),
+                            'America/Mexico_City' => __d('users', 'America/Mexico City (CST)'),
+                            'Europe/London' => __d('users', 'Europe/London (GMT)'),
+                            'Europe/Paris' => __d('users', 'Europe/Paris (CET)'),
+                            'Europe/Berlin' => __d('users', 'Europe/Berlin (CET)'),
+                            'Europe/Lisbon' => __d('users', 'Europe/Lisbon (WET)'),
+                            'Europe/Madrid' => __d('users', 'Europe/Madrid (CET)'),
+                            'Asia/Tokyo' => __d('users', 'Asia/Tokyo (JST)'),
+                            'Asia/Shanghai' => __d('users', 'Asia/Shanghai (CST)'),
+                            'Asia/Kolkata' => __d('users', 'Asia/Kolkata (IST)'),
+                            'Australia/Sydney' => __d('users', 'Australia/Sydney (AEST)'),
+                            'Pacific/Auckland' => __d('users', 'Pacific/Auckland (NZST)'),
+                            'UTC' => 'UTC',
+                        ],
+                        'default' => $user->timezone ?? 'America/Sao_Paulo',
                     ]) ?>
                 </div>
             </div>

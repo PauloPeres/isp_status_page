@@ -15,39 +15,39 @@
 ?>
 <div style="font-family: Arial, Helvetica, sans-serif; max-width: 600px; margin: 0 auto;">
     <div style="background-color: #1E88E5; color: #ffffff; padding: 20px; text-align: center; border-radius: 4px 4px 0 0;">
-        <h1 style="margin: 0; font-size: 24px;">Incidente Reconhecido</h1>
+        <h1 style="margin: 0; font-size: 24px;"><?= __d('emails', 'Incident Acknowledged') ?></h1>
     </div>
 
     <div style="background-color: #ffffff; padding: 24px; border: 1px solid #e0e0e0; border-top: none; border-radius: 0 0 4px 4px;">
         <p style="font-size: 16px; color: #333333;">
-            O incidente do monitor <strong><?= h($monitor->name) ?></strong> foi reconhecido.
+            <?= __d('emails', 'The incident for monitor {0} has been acknowledged.', '<strong>' . h($monitor->name) . '</strong>') ?>
         </p>
 
         <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
             <tr>
-                <td style="padding: 8px 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555; width: 40%;">Monitor:</td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555; width: 40%;"><?= __d('emails', 'Monitor:') ?></td>
                 <td style="padding: 8px 12px; border-bottom: 1px solid #eee; color: #333;"><?= h($monitor->name) ?></td>
             </tr>
             <tr>
-                <td style="padding: 8px 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Reconhecido por:</td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;"><?= __d('emails', 'Acknowledged by:') ?></td>
                 <td style="padding: 8px 12px; border-bottom: 1px solid #eee; color: #333;"><?= h($acknowledgedBy) ?></td>
             </tr>
             <tr>
-                <td style="padding: 8px 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Data/Hora:</td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;"><?= __d('emails', 'Date/Time:') ?></td>
                 <td style="padding: 8px 12px; border-bottom: 1px solid #eee; color: #333;"><?= h($acknowledgedAt) ?></td>
             </tr>
             <tr>
-                <td style="padding: 8px 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Via:</td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;"><?= __d('emails', 'Via:') ?></td>
                 <td style="padding: 8px 12px; border-bottom: 1px solid #eee; color: #333; text-transform: capitalize;"><?= h($acknowledgedVia) ?></td>
             </tr>
             <tr>
-                <td style="padding: 8px 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Severidade:</td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;"><?= __d('emails', 'Severity:') ?></td>
                 <td style="padding: 8px 12px; border-bottom: 1px solid #eee; text-transform: capitalize;">
                     <?= h($incident->severity) ?>
                 </td>
             </tr>
             <tr>
-                <td style="padding: 8px 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;">Inicio do Incidente:</td>
+                <td style="padding: 8px 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;"><?= __d('emails', 'Incident Started:') ?></td>
                 <td style="padding: 8px 12px; border-bottom: 1px solid #eee;">
                     <?= $incident->started_at->format('d/m/Y H:i:s') ?>
                 </td>
@@ -55,11 +55,11 @@
         </table>
 
         <p style="font-size: 14px; color: #666;">
-            Nenhuma acao adicional e necessaria no momento. A equipe esta ciente e trabalhando na resolucao.
+            <?= __d('emails', 'No additional action is required at this time. The team is aware and working on a resolution.') ?>
         </p>
 
         <p style="font-size: 12px; color: #999; margin-top: 24px; border-top: 1px solid #eee; padding-top: 12px;">
-            Este alerta foi enviado automaticamente por <?= h($siteName) ?>.
+            <?= __d('emails', 'This alert was sent automatically by {0}.', h($siteName)) ?>
         </p>
     </div>
 </div>

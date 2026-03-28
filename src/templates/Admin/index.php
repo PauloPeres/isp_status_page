@@ -5,66 +5,66 @@
  * @var \Cake\Collection\CollectionInterface $recentMonitors
  * @var \Cake\Collection\CollectionInterface $recentIncidents
  */
-$this->assign('title', 'Dashboard');
+$this->assign('title', __d('admin', 'Dashboard'));
 ?>
 
 <div class="admin-dashboard">
     <div class="page-header">
-        <h1>📊 Dashboard</h1>
-        <p>Visão geral do sistema de monitoramento</p>
+        <h1><?= __d('admin', 'Dashboard') ?></h1>
+        <p><?= __d('admin', 'System monitoring overview') ?></p>
     </div>
 
     <!-- Statistics Cards -->
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-icon" style="background: #E3F2FD;">
-                <span style="font-size: 32px;">🖥️</span>
+                <span style="font-size: 32px;">&#128421;</span>
             </div>
             <div class="stat-content">
                 <h3><?= number_format($stats['monitors']['total']) ?></h3>
-                <p>Monitores Total</p>
+                <p><?= __d('admin', 'Total Monitors') ?></p>
                 <div class="stat-details">
-                    <span class="badge badge-success"><?= $stats['monitors']['online'] ?> Online</span>
-                    <span class="badge badge-error"><?= $stats['monitors']['offline'] ?> Offline</span>
+                    <span class="badge badge-success"><?= $stats['monitors']['online'] ?> <?= __d('admin', 'Online') ?></span>
+                    <span class="badge badge-error"><?= $stats['monitors']['offline'] ?> <?= __d('admin', 'Offline') ?></span>
                 </div>
             </div>
         </div>
 
         <div class="stat-card">
             <div class="stat-icon" style="background: #FFEBEE;">
-                <span style="font-size: 32px;">🚨</span>
+                <span style="font-size: 32px;">&#128680;</span>
             </div>
             <div class="stat-content">
                 <h3><?= number_format($stats['incidents']['active']) ?></h3>
-                <p>Incidentes Ativos</p>
+                <p><?= __d('admin', 'Active Incidents') ?></p>
                 <div class="stat-details">
-                    <span class="badge badge-success"><?= $stats['incidents']['resolved_today'] ?> Resolvidos Hoje</span>
+                    <span class="badge badge-success"><?= $stats['incidents']['resolved_today'] ?> <?= __d('admin', 'Resolved Today') ?></span>
                 </div>
             </div>
         </div>
 
         <div class="stat-card">
             <div class="stat-icon" style="background: #E8F5E9;">
-                <span style="font-size: 32px;">📧</span>
+                <span style="font-size: 32px;">&#128231;</span>
             </div>
             <div class="stat-content">
                 <h3><?= number_format($stats['subscribers']['total']) ?></h3>
-                <p>Inscritos Total</p>
+                <p><?= __d('admin', 'Total Subscribers') ?></p>
                 <div class="stat-details">
-                    <span class="badge badge-success"><?= $stats['subscribers']['active'] ?> Ativos</span>
+                    <span class="badge badge-success"><?= $stats['subscribers']['active'] ?> <?= __d('admin', 'Active') ?></span>
                 </div>
             </div>
         </div>
 
         <div class="stat-card">
             <div class="stat-icon" style="background: #FFF3E0;">
-                <span style="font-size: 32px;">📈</span>
+                <span style="font-size: 32px;">&#128200;</span>
             </div>
             <div class="stat-content">
                 <h3><?= number_format($stats['checks']['total_today']) ?></h3>
-                <p>Verificações Hoje</p>
+                <p><?= __d('admin', 'Checks Today') ?></p>
                 <div class="stat-details">
-                    <span class="badge badge-error"><?= $stats['checks']['failed_today'] ?> Falhas</span>
+                    <span class="badge badge-error"><?= $stats['checks']['failed_today'] ?> <?= __d('admin', 'Failures') ?></span>
                 </div>
             </div>
         </div>
@@ -75,8 +75,8 @@ $this->assign('title', 'Dashboard');
         <!-- Recent Monitors -->
         <div class="card">
             <div class="card-header">
-                <span>🖥️ Monitores Recentes</span>
-                <?= $this->Html->link('Ver Todos →', ['controller' => 'Monitors', 'action' => 'index'], ['class' => 'card-link']) ?>
+                <span><?= __d('admin', 'Recent Monitors') ?></span>
+                <?= $this->Html->link(__d('admin', 'View All') . ' &rarr;', ['controller' => 'Monitors', 'action' => 'index'], ['class' => 'card-link', 'escape' => false]) ?>
             </div>
             <div class="card-body">
                 <?php if ($recentMonitors->count() > 0): ?>
@@ -91,13 +91,13 @@ $this->assign('title', 'Dashboard');
                                     </div>
                                 </div>
                                 <span class="badge badge-<?= $monitor->status === 'up' ? 'success' : 'error' ?>">
-                                    <?= $monitor->status === 'up' ? 'Online' : 'Offline' ?>
+                                    <?= $monitor->status === 'up' ? __d('admin', 'Online') : __d('admin', 'Offline') ?>
                                 </span>
                             </div>
                         <?php endforeach; ?>
                     </div>
                 <?php else: ?>
-                    <p class="empty-state">Nenhum monitor cadastrado ainda.</p>
+                    <p class="empty-state"><?= __d('admin', 'No monitors registered yet.') ?></p>
                 <?php endif; ?>
             </div>
         </div>
@@ -105,8 +105,8 @@ $this->assign('title', 'Dashboard');
         <!-- Recent Incidents -->
         <div class="card">
             <div class="card-header">
-                <span>🚨 Incidentes Recentes</span>
-                <?= $this->Html->link('Ver Todos →', ['controller' => 'Incidents', 'action' => 'index'], ['class' => 'card-link']) ?>
+                <span><?= __d('admin', 'Recent Incidents') ?></span>
+                <?= $this->Html->link(__d('admin', 'View All') . ' &rarr;', ['controller' => 'Incidents', 'action' => 'index'], ['class' => 'card-link', 'escape' => false]) ?>
             </div>
             <div class="card-body">
                 <?php if ($recentIncidents->count() > 0): ?>
@@ -124,7 +124,7 @@ $this->assign('title', 'Dashboard');
                         <?php endforeach; ?>
                     </div>
                 <?php else: ?>
-                    <p class="empty-state">Nenhum incidente registrado ainda.</p>
+                    <p class="empty-state"><?= __d('admin', 'No incidents registered yet.') ?></p>
                 <?php endif; ?>
             </div>
         </div>
@@ -132,21 +132,21 @@ $this->assign('title', 'Dashboard');
 
     <!-- Quick Actions -->
     <div class="card">
-        <div class="card-header">⚡ Ações Rápidas</div>
+        <div class="card-header"><?= __d('admin', 'Quick Actions') ?></div>
         <div class="card-body">
             <div class="quick-actions">
                 <?= $this->Html->link(
-                    '➕ Novo Monitor',
+                    __d('admin', 'New Monitor'),
                     ['controller' => 'Monitors', 'action' => 'add'],
                     ['class' => 'btn btn-primary']
                 ) ?>
                 <?= $this->Html->link(
-                    '⚙️ Configurações',
+                    __d('admin', 'Settings'),
                     ['controller' => 'Settings', 'action' => 'index'],
                     ['class' => 'btn btn-secondary']
                 ) ?>
                 <?= $this->Html->link(
-                    '🌐 Ver Página Pública',
+                    __d('admin', 'View Public Page'),
                     ['controller' => 'Status', 'action' => 'index'],
                     ['class' => 'btn btn-secondary', 'target' => '_blank']
                 ) ?>

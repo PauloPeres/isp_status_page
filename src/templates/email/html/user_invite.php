@@ -8,44 +8,43 @@
  * @var string $loginUrl
  * @var string $siteName
  */
-$this->assign('title', 'Convite de Acesso');
+$this->assign('title', __d('emails', 'Access Invitation'));
 ?>
 
-<h2>🎉 Bem-vindo ao <?= h($siteName) ?>!</h2>
+<h2><?= __d('emails', 'Welcome to {0}!', h($siteName)) ?></h2>
 
-<p>Olá <strong><?= h($user->username) ?></strong>!</p>
+<p><?= __d('emails', 'Hello {0}!', '<strong>' . h($user->username) . '</strong>') ?></p>
 
 <p>
-    Uma conta foi criada para você no sistema <strong><?= h($siteName) ?></strong>.
-    Abaixo estão suas credenciais de acesso:
+    <?= __d('emails', 'An account has been created for you in the {0} system. Below are your access credentials:', '<strong>' . h($siteName) . '</strong>') ?>
 </p>
 
 <!-- Credentials Box -->
 <div class="info-box" style="margin: 20px 0; background: #f0f9ff; border-left: 4px solid #1E88E5;">
     <p style="margin: 0;">
-        <strong>👤 Usuário:</strong> <?= h($user->username) ?><br>
-        <strong>📧 Email:</strong> <?= h($user->email) ?><br>
-        <strong>🔑 Senha Temporária:</strong> <code style="background: #e0e0e0; padding: 2px 6px; border-radius: 3px;"><?= h($password) ?></code><br>
-        <strong>🎭 Função:</strong> <?= h(ucfirst($user->role)) ?>
+        <strong><?= __d('emails', 'Username:') ?></strong> <?= h($user->username) ?><br>
+        <strong><?= __d('emails', 'Email:') ?></strong> <?= h($user->email) ?><br>
+        <strong><?= __d('emails', 'Temporary Password:') ?></strong> <code style="background: #e0e0e0; padding: 2px 6px; border-radius: 3px;"><?= h($password) ?></code><br>
+        <strong><?= __d('emails', 'Role:') ?></strong> <?= h(ucfirst($user->role)) ?>
     </p>
 </div>
 
 <p>
-    Para acessar o sistema, clique no botão abaixo:
+    <?= __d('emails', 'To access the system, click the button below:') ?>
 </p>
 
 <!-- Login Button -->
 <p style="text-align: center; margin: 30px 0;">
     <a href="<?= $loginUrl ?>" class="button">
-        Acessar o Sistema
+        <?= __d('emails', 'Access the System') ?>
     </a>
 </p>
 
 <!-- Alternative Link -->
 <div class="info-box">
-    <p><strong>Link alternativo:</strong></p>
+    <p><strong><?= __d('emails', 'Alternative link:') ?></strong></p>
     <p style="margin: 10px 0 0 0;">
-        Se o botão acima não funcionar, copie e cole o link abaixo no seu navegador:
+        <?= __d('emails', 'If the button above does not work, copy and paste the link below into your browser:') ?>
     </p>
     <p style="word-break: break-all; margin: 10px 0 0 0;">
         <a href="<?= $loginUrl ?>"><?= $loginUrl ?></a>
@@ -55,28 +54,27 @@ $this->assign('title', 'Convite de Acesso');
 <!-- Warning Box -->
 <div class="warning-box">
     <p style="margin: 0;">
-        <strong>🔒 Importante - Primeira Vez:</strong>
-        Por segurança, você <strong>será obrigado a alterar sua senha</strong> no primeiro login.
-        Por favor, escolha uma senha segura que apenas você saiba.
+        <strong><?= __d('emails', 'Important - First Login:') ?></strong>
+        <?= __d('emails', 'For security, you will be required to change your password on your first login. Please choose a secure password that only you know.') ?>
     </p>
 </div>
 
 <!-- Security Tips -->
 <div class="info-box">
-    <p style="margin: 0 0 10px 0;"><strong>💡 Dicas de Segurança:</strong></p>
+    <p style="margin: 0 0 10px 0;"><strong><?= __d('emails', 'Security Tips:') ?></strong></p>
     <ul style="margin: 0; padding-left: 20px;">
-        <li>Use uma senha com no mínimo 8 caracteres</li>
-        <li>Combine letras maiúsculas, minúsculas, números e símbolos</li>
-        <li>Não compartilhe sua senha com ninguém</li>
-        <li>Não use a mesma senha de outros serviços</li>
+        <li><?= __d('emails', 'Use a password with at least 8 characters') ?></li>
+        <li><?= __d('emails', 'Combine uppercase, lowercase, numbers and symbols') ?></li>
+        <li><?= __d('emails', 'Do not share your password with anyone') ?></li>
+        <li><?= __d('emails', 'Do not reuse passwords from other services') ?></li>
     </ul>
 </div>
 
 <p>
-    Se você tiver alguma dúvida ou não solicitou esta conta, entre em contato com o administrador do sistema.
+    <?= __d('emails', 'If you have any questions or did not request this account, please contact the system administrator.') ?>
 </p>
 
 <p>
-    Atenciosamente,<br>
-    <strong>Equipe <?= h($siteName) ?></strong>
+    <?= __d('emails', 'Best regards,') ?><br>
+    <strong><?= __d('emails', '{0} Team', h($siteName)) ?></strong>
 </p>
