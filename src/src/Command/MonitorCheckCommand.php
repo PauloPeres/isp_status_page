@@ -386,29 +386,30 @@ class MonitorCheckCommand extends Command
     {
         $monitorChecksTable = $this->fetchTable('MonitorChecks');
 
-        // Get checks from last 24 hours
+        // Get checks from last 24 hours — single aggregate query instead of two COUNT queries
         $cutoffTime = (new DateTime())->modify('-24 hours');
 
-        $query = $monitorChecksTable->find()
+        $result = $monitorChecksTable->find()
+            ->select([
+                'total' => $monitorChecksTable->find()->func()->count('*'),
+                'success' => $monitorChecksTable->find()->func()->sum(
+                    "CASE WHEN status = 'success' THEN 1 ELSE 0 END"
+                ),
+            ])
             ->where([
                 'monitor_id' => $monitorId,
                 'checked_at >=' => $cutoffTime,
-            ]);
+            ])
+            ->disableAutoFields()
+            ->first();
 
-        $totalChecks = $query->count();
+        $totalChecks = (int)($result->total ?? 0);
 
         if ($totalChecks === 0) {
             return null; // Not enough data
         }
 
-        // Count successful checks (success and degraded count as up)
-        $successfulChecks = $monitorChecksTable->find()
-            ->where([
-                'monitor_id' => $monitorId,
-                'checked_at >=' => $cutoffTime,
-                'status IN' => ['success'],
-            ])
-            ->count();
+        $successfulChecks = (int)($result->success ?? 0);
 
         return round(($successfulChecks / $totalChecks) * 100, 2);
     }

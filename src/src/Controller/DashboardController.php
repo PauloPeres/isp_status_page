@@ -62,47 +62,59 @@ class DashboardController extends AppController
             ->orderBy(['name' => 'ASC'])
             ->all();
 
+        // Single aggregate query: uptime stats per monitor (eliminates N+1)
+        $uptimeStats = $checksTable->find()
+            ->select([
+                'monitor_id',
+                'total' => $checksTable->find()->func()->count('*'),
+                'success' => $checksTable->find()->func()->sum(
+                    "CASE WHEN status = 'success' THEN 1 ELSE 0 END"
+                ),
+            ])
+            ->where(['checked_at >=' => $since24h])
+            ->groupBy(['monitor_id'])
+            ->disableAutoFields()
+            ->all()
+            ->combine('monitor_id', function ($row) {
+                return ['total' => $row->total, 'success' => $row->success];
+            })
+            ->toArray();
+
+        // Single aggregate query: avg response time per monitor (eliminates N+1)
+        $responseStats = $checksTable->find()
+            ->select([
+                'monitor_id',
+                'avg_response' => $checksTable->find()->func()->avg('response_time'),
+            ])
+            ->where(['checked_at >=' => $since24h, 'response_time IS NOT' => null])
+            ->groupBy(['monitor_id'])
+            ->disableAutoFields()
+            ->all()
+            ->combine('monitor_id', 'avg_response')
+            ->toArray();
+
+        // Build uptime data from aggregate results
         $uptimeData = [];
         foreach ($monitors as $monitor) {
-            $totalChecks = $checksTable->find()
-                ->where([
-                    'monitor_id' => $monitor->id,
-                    'checked_at >=' => $since24h->toDateTimeString(),
-                ])
-                ->count();
-
-            $successChecks = $checksTable->find()
-                ->where([
-                    'monitor_id' => $monitor->id,
-                    'status' => 'success',
-                    'checked_at >=' => $since24h->toDateTimeString(),
-                ])
-                ->count();
+            $stats = $uptimeStats[$monitor->id] ?? null;
+            $total = $stats ? (int)$stats['total'] : 0;
+            $success = $stats ? (int)$stats['success'] : 0;
 
             $uptimeData[] = [
                 'name' => $monitor->name,
-                'uptime' => $totalChecks > 0 ? round(($successChecks / $totalChecks) * 100, 2) : 0,
+                'uptime' => $total > 0 ? round(($success / $total) * 100, 2) : 0,
             ];
         }
 
-        // Response time chart data: avg response time per monitor
+        // Build response time data from aggregate results
         $responseTimeData = [];
         foreach ($monitors as $monitor) {
-            $avgQuery = $checksTable->find();
-            $avgResult = $avgQuery->select([
-                    'avg_response' => $avgQuery->func()->avg('response_time'),
-                ])
-                ->where([
-                    'monitor_id' => $monitor->id,
-                    'checked_at >=' => $since24h->toDateTimeString(),
-                    'response_time IS NOT' => null,
-                ])
-                ->first();
+            $avgResponse = $responseStats[$monitor->id] ?? null;
 
             $responseTimeData[] = [
                 'name' => $monitor->name,
-                'avg_response_time' => $avgResult && $avgResult->avg_response
-                    ? round((float)$avgResult->avg_response, 0)
+                'avg_response_time' => $avgResponse !== null
+                    ? round((float)$avgResponse, 0)
                     : 0,
             ];
         }

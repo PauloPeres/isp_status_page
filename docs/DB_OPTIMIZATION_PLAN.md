@@ -19,7 +19,7 @@ The monitor_checks table is the highest-volume table in the system. At SaaS scal
 - **Description:** BadgeService queries `created` instead of `checked_at` and `status='up'` instead of `status='success'`. Uptime always shows 100%.
 
 ### TASK-DB-003: Eliminate N+1 Queries
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Priority:** MUST-HAVE
 - **Description:** DashboardController runs 300 queries per load (3 per monitor). Replace with single GROUP BY aggregates. Fix ChecksController stats bug (mutated query builder). Fix MonitorsController memory issue.
 

@@ -66,22 +66,42 @@ class ChecksController extends AppController
             'limit' => 50,
         ]);
 
-        // Calculate statistics
-        $statsQuery = $this->MonitorChecks->find();
+        // Calculate statistics using a single aggregate query
+        // (fixes bug where chained .where() on same query builder caused conditions to stack)
+        $baseConditions = [];
         if ($periodStart) {
-            $statsQuery->where(['checked_at >=' => $periodStart]);
+            $baseConditions['checked_at >='] = $periodStart;
+        }
+        if ($this->request->getQuery('monitor_id')) {
+            $baseConditions['monitor_id'] = $this->request->getQuery('monitor_id');
         }
 
-        $totalChecks = $statsQuery->count();
-        $successChecks = $statsQuery->where(['status' => 'success'])->count();
-        $failedChecks = $statsQuery->where(['status' => 'failed'])->count();
+        $statsResult = $this->MonitorChecks->find()
+            ->select([
+                'total' => $this->MonitorChecks->find()->func()->count('*'),
+                'success' => $this->MonitorChecks->find()->func()->sum(
+                    "CASE WHEN status = 'success' THEN 1 ELSE 0 END"
+                ),
+            ])
+            ->where($baseConditions)
+            ->disableAutoFields()
+            ->first();
+
+        $totalChecks = (int)($statsResult->total ?? 0);
+        $successChecks = (int)($statsResult->success ?? 0);
+        $failedChecks = $totalChecks - $successChecks;
 
         $successRate = $totalChecks > 0 ? round(($successChecks / $totalChecks) * 100, 2) : 0;
 
-        // Calculate average response time (only for successful checks)
-        $avgResponseTime = $statsQuery
-            ->where(['status' => 'success', 'response_time IS NOT' => null])
-            ->select(['avg' => $statsQuery->func()->avg('response_time')])
+        // Calculate average response time in a separate clean query
+        $avgQuery = $this->MonitorChecks->find();
+        $avgResponseTime = $avgQuery
+            ->select(['avg' => $avgQuery->func()->avg('response_time')])
+            ->where(array_merge($baseConditions, [
+                'status' => 'success',
+                'response_time IS NOT' => null,
+            ]))
+            ->disableAutoFields()
             ->first();
 
         $stats = [

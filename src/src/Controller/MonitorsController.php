@@ -85,23 +85,40 @@ class MonitorsController extends AppController
             ],
         ]);
 
-        // Calcular uptime (últimas 24h)
-        $checksLast24h = $this->Monitors->MonitorChecks
-            ->find()
+        // Calculate uptime (last 24h) using aggregate COUNT queries instead of loading all rows into memory
+        $checksTable = $this->Monitors->MonitorChecks;
+        $since24h = date('Y-m-d H:i:s', strtotime('-24 hours'));
+
+        $uptimeResult = $checksTable->find()
+            ->select([
+                'total' => $checksTable->find()->func()->count('*'),
+                'success' => $checksTable->find()->func()->sum(
+                    "CASE WHEN status = 'success' THEN 1 ELSE 0 END"
+                ),
+            ])
             ->where([
                 'monitor_id' => $id,
-                'created >=' => date('Y-m-d H:i:s', strtotime('-24 hours'))
+                'checked_at >=' => $since24h,
             ])
-            ->all();
+            ->disableAutoFields()
+            ->first();
 
-        $totalChecks = $checksLast24h->count();
-        $successfulChecks = $checksLast24h->filter(function ($check) {
-            return $check->status === 'success';
-        })->count();
+        $totalChecks = (int)($uptimeResult->total ?? 0);
+        $successfulChecks = (int)($uptimeResult->success ?? 0);
         $uptime = $totalChecks > 0 ? ($successfulChecks / $totalChecks) * 100 : 0;
 
-        // Calcular tempo médio de resposta
-        $avgResponseTime = $checksLast24h->avg('response_time');
+        // Calculate average response time using aggregate AVG query
+        $avgQuery = $checksTable->find();
+        $avgResult = $avgQuery
+            ->select(['avg' => $avgQuery->func()->avg('response_time')])
+            ->where([
+                'monitor_id' => $id,
+                'checked_at >=' => $since24h,
+                'response_time IS NOT' => null,
+            ])
+            ->disableAutoFields()
+            ->first();
+        $avgResponseTime = $avgResult && $avgResult->avg ? round((float)$avgResult->avg, 2) : null;
 
         $this->set(compact('monitor', 'uptime', 'avgResponseTime', 'totalChecks'));
     }
