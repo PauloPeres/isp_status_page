@@ -2,13 +2,144 @@
  * Monitor Form - Dynamic Field Management
  *
  * Handles showing/hiding monitor type-specific fields based on the selected type.
+ * Also handles the Quick Setup / Advanced mode toggle.
  */
 
+/**
+ * Switch between Quick Setup and Advanced mode
+ */
+function switchMode(mode) {
+    var quickPanel = document.getElementById('quick-setup-panel');
+    var advancedPanel = document.getElementById('advanced-panel');
+    var btnQuick = document.getElementById('btn-quick-setup');
+    var btnAdvanced = document.getElementById('btn-advanced');
+
+    if (!quickPanel || !advancedPanel) {
+        return;
+    }
+
+    if (mode === 'quick') {
+        quickPanel.style.display = 'block';
+        advancedPanel.style.display = 'none';
+        btnQuick.classList.add('mode-btn-active');
+        btnAdvanced.classList.remove('mode-btn-active');
+    } else {
+        quickPanel.style.display = 'none';
+        advancedPanel.style.display = 'block';
+        btnQuick.classList.remove('mode-btn-active');
+        btnAdvanced.classList.add('mode-btn-active');
+    }
+}
+
+/**
+ * Initialize the Quick Setup mode functionality
+ */
+function initQuickSetup() {
+    var urlInput = document.getElementById('quick-url');
+    var nameInput = document.getElementById('quick-name');
+    var typeInput = document.getElementById('quick-type');
+    var targetInput = document.getElementById('quick-target');
+    var typeIndicator = document.getElementById('quick-type-indicator');
+    var typeBadge = document.getElementById('quick-type-badge');
+    var typeLabel = document.getElementById('quick-type-label');
+
+    if (!urlInput) {
+        return;
+    }
+
+    urlInput.addEventListener('input', function() {
+        var url = this.value.trim();
+
+        if (!url) {
+            if (typeIndicator) typeIndicator.style.display = 'none';
+            if (targetInput) targetInput.value = '';
+            return;
+        }
+
+        // Auto-fill name from domain
+        try {
+            var parsedUrl = new URL(url);
+            if (nameInput) nameInput.value = parsedUrl.hostname;
+        } catch(e) {
+            // Not a valid URL — use the raw input as name
+            if (nameInput) {
+                // Strip port if present
+                var cleanName = url.replace(/:\d+$/, '');
+                nameInput.value = cleanName;
+            }
+        }
+
+        // Auto-detect monitor type
+        var detectedType = 'http';
+        var detectedLabel = 'HTTP/HTTPS monitor';
+        var target = url;
+
+        // Check if it looks like an IP address (with optional port)
+        var ipPattern = /^(\d{1,3}\.){3}\d{1,3}(:\d+)?$/;
+
+        if (url.match(/^https?:\/\//i)) {
+            // Starts with http/https -> HTTP monitor
+            detectedType = 'http';
+            detectedLabel = 'HTTP/HTTPS monitor — will check URL response';
+            target = url;
+        } else if (url.match(/:\d+$/)) {
+            // Has a port number -> Port monitor
+            detectedType = 'port';
+            detectedLabel = 'Port monitor — will check TCP connectivity';
+            // Extract host and port
+            var parts = url.split(':');
+            target = parts.slice(0, -1).join(':');
+        } else if (ipPattern.test(url)) {
+            // Looks like a plain IP address -> Ping monitor
+            detectedType = 'ping';
+            detectedLabel = 'Ping monitor — will send ICMP ping';
+            target = url;
+        } else {
+            // Default: assume it is a website, prepend https://
+            detectedType = 'http';
+            detectedLabel = 'HTTP/HTTPS monitor — will check URL response';
+            target = 'https://' + url;
+        }
+
+        // Update hidden fields
+        if (typeInput) typeInput.value = detectedType;
+        if (targetInput) targetInput.value = target;
+
+        // Show type indicator
+        if (typeIndicator) typeIndicator.style.display = 'flex';
+        if (typeBadge) {
+            typeBadge.textContent = detectedType.toUpperCase();
+        }
+        if (typeLabel) typeLabel.textContent = detectedLabel;
+    });
+
+    // Quick setup form submission — populate the target field before submit
+    var quickForm = document.getElementById('quick-setup-form');
+    if (quickForm) {
+        quickForm.addEventListener('submit', function(e) {
+            var url = urlInput.value.trim();
+            if (!url) {
+                e.preventDefault();
+                urlInput.focus();
+                return false;
+            }
+
+            // Ensure target is set
+            if (targetInput && !targetInput.value) {
+                targetInput.value = url.match(/^https?:\/\//) ? url : 'https://' + url;
+            }
+        });
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Quick Setup mode
+    initQuickSetup();
+
     const typeSelect = document.getElementById('monitor-type');
 
     if (!typeSelect) {
-        return; // Not on monitor form page
+        return; // Not on monitor form page or in quick setup mode only
     }
 
     const httpFields = document.getElementById('http-fields');

@@ -128,17 +128,19 @@
 - **Complexity:** Large
 - **Dependencies:** TASK-1003 (completed)
 
-### P2-009: Add "Quick Setup" wizard for monitors
+### P2-009: Add "Quick Setup" wizard for monitors -- DONE
 - **Source:** USER_TESTING_MOM.md (Recommendation #2), USER_TESTING_POWER_USER.md
 - **Description:** For the most common case (website monitoring), just ask for a URL and auto-fill technical defaults. Hide advanced fields (Headers, Body, HTTP methods, SSL verification) behind an "Advanced Options" toggle. The current form scored 1/5 from the non-technical user persona.
 - **Complexity:** Medium
 - **Dependencies:** None
+- **Resolution:** Added Quick Setup / Advanced mode toggle to Monitors/add.php. Quick Setup shows URL input, auto-filled name, interval dropdown, and notification checkboxes. Auto-detects monitor type (HTTP, Ping, Port) from URL pattern. JavaScript in monitor-form.js handles mode switching and auto-detection.
 
-### P2-010: Add landing/welcome page
+### P2-010: Add landing/welcome page -- DONE
 - **Source:** USER_TESTING_MOM.md (Recommendation #3), USER_TESTING_POWER_USER.md
 - **Description:** No landing page exists. Visiting / when unauthenticated redirects straight to login with no context. Need a page explaining what the tool does, with pricing info and a sign-up CTA. Pricing page is currently behind authentication.
 - **Complexity:** Medium
 - **Dependencies:** None
+- **Resolution:** PagesController now renders landing.php for unauthenticated visitors (redirects to /dashboard for authenticated). Landing page includes hero section with blue gradient, features grid (4 cards), pricing section (Free/Pro/Business), and footer. Created landing.css with responsive design. Route unchanged (/ already points to Pages::home).
 
 ### P2-011: Uptime history bars (30/60/90 day visual bars) -- DONE
 - **Source:** USER_TESTING_POWER_USER.md (Recommendation #8)

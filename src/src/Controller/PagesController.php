@@ -36,7 +36,7 @@ class PagesController extends AppController
      *
      * @return \Cake\Http\Response
      */
-    public function home(): Response
+    public function home(): ?Response
     {
         // Check if user is authenticated
         $identity = $this->Authentication->getIdentity();
@@ -46,8 +46,10 @@ class PagesController extends AppController
             return $this->redirect(['controller' => 'Dashboard', 'action' => 'index']);
         }
 
-        // User is not logged in, redirect to login page
-        return $this->redirect(['controller' => 'Users', 'action' => 'login']);
+        // User is not logged in, render the landing page
+        $this->viewBuilder()->disableAutoLayout();
+
+        return $this->render('landing');
     }
 
     /**
