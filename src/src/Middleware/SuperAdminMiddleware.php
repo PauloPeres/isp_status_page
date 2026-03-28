@@ -44,8 +44,38 @@ class SuperAdminMiddleware implements MiddlewareInterface
             return $this->forbidden($request, 'Authentication required.');
         }
 
-        // Check super admin flag
-        $isSuperAdmin = (bool)($identity->get('is_super_admin') ?? false);
+        // Check super admin flag — try multiple access methods
+        $isSuperAdmin = false;
+        if (method_exists($identity, 'get')) {
+            $isSuperAdmin = (bool)($identity->get('is_super_admin') ?? false);
+        } elseif ($identity instanceof \ArrayAccess) {
+            $isSuperAdmin = (bool)($identity['is_super_admin'] ?? false);
+        } elseif (is_object($identity) && isset($identity->is_super_admin)) {
+            $isSuperAdmin = (bool)$identity->is_super_admin;
+        }
+
+        // Fallback: query the database directly
+        if (!$isSuperAdmin) {
+            $userId = null;
+            if (method_exists($identity, 'getIdentifier')) {
+                $userId = $identity->getIdentifier();
+            } elseif (method_exists($identity, 'get')) {
+                $userId = $identity->get('id');
+            } elseif ($identity instanceof \ArrayAccess) {
+                $userId = $identity['id'] ?? null;
+            }
+
+            if ($userId) {
+                $usersTable = \Cake\ORM\TableRegistry::getTableLocator()->get('Users');
+                $user = $usersTable->find()
+                    ->select(['is_super_admin'])
+                    ->where(['id' => $userId])
+                    ->disableHydration()
+                    ->first();
+                $isSuperAdmin = (bool)($user['is_super_admin'] ?? false);
+            }
+        }
+
         if (!$isSuperAdmin) {
             return $this->forbidden($request, 'Super admin access required.');
         }
