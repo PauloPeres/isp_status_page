@@ -302,7 +302,7 @@ class SettingsController extends AppController
                     ]));
             }
 
-            $this->Flash->error(__d('settings', 'Erro ao testar conexao: {0}', $e->getMessage()));
+            $this->Flash->error(__d('settings', 'Error testing connection: {0}', $e->getMessage()));
         }
 
         return $this->redirect(['action' => 'index', '#' => 'backup']);

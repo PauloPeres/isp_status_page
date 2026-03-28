@@ -98,13 +98,13 @@ class IxcAdapter extends AbstractIntegration
             $responseTime = (microtime(true) - $startTime) * 1000;
 
             if ($connected) {
-                return $this->buildSuccessResponse('Conexao estabelecida com sucesso', [
+                return $this->buildSuccessResponse('Connection established successfully', [
                     'response_time' => round($responseTime, 2),
                 ]);
             }
 
             return $this->buildErrorResponse(
-                $this->getLastError() ?? 'Falha ao conectar com o IXC',
+                $this->getLastError() ?? 'Failed to connect to IXC',
                 ['response_time' => round($responseTime, 2)]
             );
         } catch (\Exception $e) {

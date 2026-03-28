@@ -104,17 +104,19 @@
 - **Dependencies:** None
 - **Resolution:** Created AlertRulesController (web) with index/add/edit/delete, templates, and sidebar link under Monitoring section.
 
-### P2-005: Super Admin integration tests
+### P2-005: Super Admin integration tests -- DONE
 - **Source:** SUPER_ADMIN_PLAN.md (TASK-SA-016, PENDING)
 - **Description:** Tests for all super admin controllers: access control (non-super-admin gets 403), page loads, impersonation flow, MetricsService.
 - **Complexity:** Medium
 - **Dependencies:** All Super Admin tasks (completed)
+- **Resolution:** Created integration tests for DashboardController (3 tests), OrganizationsController (5 tests), and UsersController (5 tests). All 13 tests verify: unauthenticated gets 403, non-super-admin gets 403, super admin can access index/view pages.
 
-### P2-006: Complete i18n implementation (locale files and template wrapping)
+### P2-006: Complete i18n implementation (locale files and template wrapping) -- DONE
 - **Source:** I18N_PLAN.md (nearly all items unchecked), USER_TESTING_MOM.md, USER_TESTING_DETAIL_QA.md
 - **Description:** The i18n plan identifies 38+ templates needing translation wrapping, 6 controllers needing Flash message translation, 5 models needing validation message translation, and 4 email templates. Locale .po files exist for some domains (billing, api, onboarding, organizations) but most original templates (Monitors, Incidents, Checks, Subscribers, Users, Settings, EmailLogs, Status, Error pages, layouts) still use hardcoded strings. The checklist from I18N_PLAN.md shows nearly every item unchecked.
 - **Complexity:** Large
 - **Dependencies:** None
+- **Resolution:** Verified zero remaining Portuguese in source code (src/src/, src/templates/, templates/). Fixed 11 hardcoded Portuguese strings across EmailService.php (email subjects, error messages), RestApiAdapter.php (status messages), IxcAdapter.php (connection messages), ZabbixAdapter.php (connection message), SettingsController.php (error message), UsersController.php (comment). Extracted duplicate error message logic into getEmailErrorMessage() helper. Added pt_BR and es translations in .po files for all new English source strings.
 
 ### P2-007: Standardize UI consistency issues
 - **Source:** USER_TESTING_DETAIL_QA.md (MED-001 through MED-017)
@@ -449,7 +451,7 @@
 ### Top 5 Items by Impact
 
 1. **P1-001** (Language consistency) -- Affects every user on every page visit
-2. **P2-006** (Complete i18n) -- Foundation for international adoption
-3. **P2-004** (Alert rules admin UI) -- Critical missing admin feature
-4. **P2-003** (Response time graphs) -- Table-stakes monitoring feature
-5. **P1-003 + P1-004** (Security hardcoding) -- Production security requirement
+2. **P2-007** (UI consistency) -- Multiple formatting/style inconsistencies
+3. **P2-001** (Rollup routing) -- Performance at scale
+4. **P2-002** (Redis caching) -- Dashboard/badge performance
+5. **P1-008 + P1-009** (Navigation + seed data) -- UX and data integrity

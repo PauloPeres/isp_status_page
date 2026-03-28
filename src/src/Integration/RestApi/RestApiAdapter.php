@@ -104,14 +104,14 @@ class RestApiAdapter extends AbstractIntegration
             $statusCode = $response->getStatusCode();
 
             if ($statusCode >= 200 && $statusCode < 400) {
-                return $this->buildSuccessResponse('Conexao estabelecida com sucesso', [
+                return $this->buildSuccessResponse('Connection established successfully', [
                     'status_code' => $statusCode,
                     'response_time' => $responseTime,
                 ]);
             }
 
             return $this->buildErrorResponse(
-                "API retornou status HTTP {$statusCode}",
+                "API returned HTTP status {$statusCode}",
                 [
                     'status_code' => $statusCode,
                     'response_time' => $responseTime,
@@ -119,7 +119,7 @@ class RestApiAdapter extends AbstractIntegration
             );
         } catch (\Exception $e) {
             return $this->buildErrorResponse(
-                'Falha na conexao: ' . $e->getMessage()
+                'Connection failed: ' . $e->getMessage()
             );
         }
     }

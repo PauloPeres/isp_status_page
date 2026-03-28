@@ -515,7 +515,7 @@ class UsersController extends AppController
 
                 $this->log("Generated password for new user: {$data['username']}", 'info');
             } else {
-                // Validar confirmação de senha apenas se não for gerada automaticamente
+                // Validate password confirmation only if not auto-generated
                 if (!empty($data['password']) && !empty($data['confirm_password'])) {
                     if ($data['password'] !== $data['confirm_password']) {
                         $this->Flash->error(__('Passwords do not match.'));

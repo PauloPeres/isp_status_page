@@ -22,6 +22,11 @@ class PartitionMonitorChecks extends AbstractMigration
      */
     public function up(): void
     {
+        // Partitioning is PostgreSQL-only; skip on SQLite
+        if ($this->getAdapter()->getAdapterType() !== 'pgsql') {
+            return;
+        }
+
         // 1. Create the partitioned table with the same columns
         $this->execute("
             CREATE TABLE monitor_checks_partitioned (
@@ -93,6 +98,11 @@ class PartitionMonitorChecks extends AbstractMigration
      */
     public function down(): void
     {
+        // Partitioning is PostgreSQL-only; skip on SQLite
+        if ($this->getAdapter()->getAdapterType() !== 'pgsql') {
+            return;
+        }
+
         // Rename partitioned table away and restore the original
         $this->execute("ALTER SEQUENCE IF EXISTS monitor_checks_id_seq RENAME TO monitor_checks_partitioned_id_seq");
         $this->execute("ALTER TABLE monitor_checks RENAME TO monitor_checks_partitioned");

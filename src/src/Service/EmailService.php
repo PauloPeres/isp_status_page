@@ -118,7 +118,7 @@ class EmailService
                 ->setEmailFormat('html')
                 ->setFrom([$fromEmail => $fromName])
                 ->setTo($subscriber->email)
-                ->setSubject("Verifique seu email - {$siteName}")
+                ->setSubject(__('Verify your email') . " - {$siteName}")
                 ->setViewVars([
                     'subscriber' => $subscriber,
                     'verifyUrl' => $verifyUrl,
@@ -238,7 +238,7 @@ class EmailService
                 ->setEmailFormat('html')
                 ->setFrom([$fromEmail => $fromName])
                 ->setTo($user->email)
-                ->setSubject("Recuperação de Senha - {$siteName}")
+                ->setSubject(__('Password Recovery') . " - {$siteName}")
                 ->setViewVars([
                     'user' => $user,
                     'resetLink' => $resetLink,
@@ -255,7 +255,7 @@ class EmailService
 
             return [
                 'success' => true,
-                'message' => 'Email de recuperação enviado com sucesso.',
+                'message' => __('Password recovery email sent successfully.'),
             ];
         } catch (\Exception $e) {
             $errorMessage = $e->getMessage();
@@ -264,17 +264,7 @@ class EmailService
             error_log("Failed to send password reset email to {$user->email}: {$errorMessage}");
 
             // Determine user-friendly error message based on exception
-            if (stripos($errorMessage, 'connection') !== false || stripos($errorMessage, 'could not connect') !== false) {
-                $userMessage = '❌ Não foi possível conectar ao servidor de email. Verifique as configurações SMTP.';
-            } elseif (stripos($errorMessage, 'authentication') !== false || stripos($errorMessage, 'auth') !== false) {
-                $userMessage = '❌ Falha na autenticação SMTP. Verifique usuário e senha nas configurações.';
-            } elseif (stripos($errorMessage, 'timeout') !== false) {
-                $userMessage = '❌ Timeout ao conectar ao servidor de email. Verifique host e porta nas configurações.';
-            } elseif (stripos($errorMessage, 'tls') !== false || stripos($errorMessage, 'ssl') !== false) {
-                $userMessage = '❌ Erro na criptografia TLS/SSL. Verifique as configurações de segurança.';
-            } else {
-                $userMessage = '❌ Erro ao enviar email. Verifique as configurações ou tente novamente mais tarde.';
-            }
+            $userMessage = $this->getEmailErrorMessage($errorMessage);
 
             return [
                 'success' => false,
@@ -307,7 +297,7 @@ class EmailService
                 ->setEmailFormat('html')
                 ->setFrom([$fromEmail => $fromName])
                 ->setTo($user->email)
-                ->setSubject("🎉 Convite de Acesso - {$siteName}")
+                ->setSubject(__('Access Invitation') . " - {$siteName}")
                 ->setViewVars([
                     'user' => $user,
                     'password' => $password,
@@ -325,7 +315,7 @@ class EmailService
 
             return [
                 'success' => true,
-                'message' => 'Email de convite enviado com sucesso.',
+                'message' => __('Invitation email sent successfully.'),
             ];
         } catch (\Exception $e) {
             $errorMessage = $e->getMessage();
@@ -334,17 +324,7 @@ class EmailService
             error_log("Failed to send user invitation email to {$user->email}: {$errorMessage}");
 
             // Determine user-friendly error message based on exception
-            if (stripos($errorMessage, 'connection') !== false || stripos($errorMessage, 'could not connect') !== false) {
-                $userMessage = '❌ Não foi possível conectar ao servidor de email. Verifique as configurações SMTP.';
-            } elseif (stripos($errorMessage, 'authentication') !== false || stripos($errorMessage, 'auth') !== false) {
-                $userMessage = '❌ Falha na autenticação SMTP. Verifique usuário e senha nas configurações.';
-            } elseif (stripos($errorMessage, 'timeout') !== false) {
-                $userMessage = '❌ Timeout ao conectar ao servidor de email. Verifique host e porta nas configurações.';
-            } elseif (stripos($errorMessage, 'tls') !== false || stripos($errorMessage, 'ssl') !== false) {
-                $userMessage = '❌ Erro na criptografia TLS/SSL. Verifique as configurações de segurança.';
-            } else {
-                $userMessage = '❌ Erro ao enviar email. Verifique as configurações ou tente novamente mais tarde.';
-            }
+            $userMessage = $this->getEmailErrorMessage($errorMessage);
 
             return [
                 'success' => false,
@@ -441,5 +421,26 @@ class EmailService
         $mailer->deliver();
 
         return true;
+    }
+
+    /**
+     * Get a translated user-friendly error message based on the exception message.
+     *
+     * @param string $errorMessage The original exception message
+     * @return string Translated user-friendly error message
+     */
+    private function getEmailErrorMessage(string $errorMessage): string
+    {
+        if (stripos($errorMessage, 'connection') !== false || stripos($errorMessage, 'could not connect') !== false) {
+            return __('Could not connect to the email server. Please check the SMTP settings.');
+        } elseif (stripos($errorMessage, 'authentication') !== false || stripos($errorMessage, 'auth') !== false) {
+            return __('SMTP authentication failed. Please check the username and password in settings.');
+        } elseif (stripos($errorMessage, 'timeout') !== false) {
+            return __('Timeout connecting to the email server. Please check the host and port in settings.');
+        } elseif (stripos($errorMessage, 'tls') !== false || stripos($errorMessage, 'ssl') !== false) {
+            return __('TLS/SSL encryption error. Please check the security settings.');
+        }
+
+        return __('Error sending email. Please check the settings or try again later.');
     }
 }

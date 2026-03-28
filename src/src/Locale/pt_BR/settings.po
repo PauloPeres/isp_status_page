@@ -732,3 +732,6 @@ msgstr "Diretório remoto para armazenar os backups"
 
 msgid "Use passive mode for FTP connections"
 msgstr "Usar modo passivo para conexões FTP"
+
+msgid "Error testing connection: {0}"
+msgstr "Erro ao testar conexão: {0}"

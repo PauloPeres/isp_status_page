@@ -780,3 +780,34 @@ msgstr "Alguns serviços estão degradados"
 
 msgid "All systems operational"
 msgstr "Todos os sistemas operacionais"
+
+# Email service messages
+msgid "Password Recovery"
+msgstr "Recuperação de Senha"
+
+msgid "Password recovery email sent successfully."
+msgstr "Email de recuperação de senha enviado com sucesso."
+
+msgid "Access Invitation"
+msgstr "Convite de Acesso"
+
+msgid "Invitation email sent successfully."
+msgstr "Email de convite enviado com sucesso."
+
+msgid "Verify your email"
+msgstr "Verifique seu email"
+
+msgid "Could not connect to the email server. Please check the SMTP settings."
+msgstr "Não foi possível conectar ao servidor de email. Verifique as configurações SMTP."
+
+msgid "SMTP authentication failed. Please check the username and password in settings."
+msgstr "Falha na autenticação SMTP. Verifique usuário e senha nas configurações."
+
+msgid "Timeout connecting to the email server. Please check the host and port in settings."
+msgstr "Timeout ao conectar ao servidor de email. Verifique host e porta nas configurações."
+
+msgid "TLS/SSL encryption error. Please check the security settings."
+msgstr "Erro na criptografia TLS/SSL. Verifique as configurações de segurança."
+
+msgid "Error sending email. Please check the settings or try again later."
+msgstr "Erro ao enviar email. Verifique as configurações ou tente novamente mais tarde."

@@ -1070,3 +1070,34 @@ msgstr "Ninguna integración configurada"
 
 msgid "Connect to external systems like IXC, Zabbix, or REST APIs."
 msgstr "Conecte con sistemas externos como IXC, Zabbix o REST APIs."
+
+# Email service messages
+msgid "Password Recovery"
+msgstr "Recuperación de Contraseña"
+
+msgid "Password recovery email sent successfully."
+msgstr "Correo de recuperación de contraseña enviado con éxito."
+
+msgid "Access Invitation"
+msgstr "Invitación de Acceso"
+
+msgid "Invitation email sent successfully."
+msgstr "Correo de invitación enviado con éxito."
+
+msgid "Verify your email"
+msgstr "Verifique su correo electrónico"
+
+msgid "Could not connect to the email server. Please check the SMTP settings."
+msgstr "No se pudo conectar al servidor de correo. Verifique la configuración SMTP."
+
+msgid "SMTP authentication failed. Please check the username and password in settings."
+msgstr "Falló la autenticación SMTP. Verifique el usuario y contraseña en la configuración."
+
+msgid "Timeout connecting to the email server. Please check the host and port in settings."
+msgstr "Tiempo de espera agotado al conectar al servidor de correo. Verifique el host y puerto en la configuración."
+
+msgid "TLS/SSL encryption error. Please check the security settings."
+msgstr "Error de cifrado TLS/SSL. Verifique la configuración de seguridad."
+
+msgid "Error sending email. Please check the settings or try again later."
+msgstr "Error al enviar correo. Verifique la configuración o intente de nuevo más tarde."

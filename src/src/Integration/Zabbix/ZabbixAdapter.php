@@ -109,7 +109,7 @@ class ZabbixAdapter extends AbstractIntegration
             // Logout after test
             $this->disconnect();
 
-            return $this->buildSuccessResponse('Conexao com Zabbix estabelecida', [
+            return $this->buildSuccessResponse('Connection to Zabbix established', [
                 'response_time' => round($responseTime, 2),
                 'version' => $apiInfo,
             ]);

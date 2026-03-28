@@ -19,7 +19,11 @@ class ChangeMonitorChecksPkToBigint extends AbstractMigration
      */
     public function up(): void
     {
-        $this->execute("ALTER TABLE monitor_checks ALTER COLUMN id TYPE BIGINT");
+        // SQLite does not support ALTER COLUMN — INTEGER is already 64-bit in SQLite.
+        // Only run on PostgreSQL.
+        if ($this->getAdapter()->getAdapterType() === 'pgsql') {
+            $this->execute("ALTER TABLE monitor_checks ALTER COLUMN id TYPE BIGINT");
+        }
     }
 
     /**
@@ -29,7 +33,9 @@ class ChangeMonitorChecksPkToBigint extends AbstractMigration
      */
     public function down(): void
     {
-        // Reverse to INTEGER — this may fail if any id values exceed 2^31-1
-        $this->execute("ALTER TABLE monitor_checks ALTER COLUMN id TYPE INTEGER");
+        // Only run on PostgreSQL; SQLite does not support ALTER COLUMN.
+        if ($this->getAdapter()->getAdapterType() === 'pgsql') {
+            $this->execute("ALTER TABLE monitor_checks ALTER COLUMN id TYPE INTEGER");
+        }
     }
 }
