@@ -23,8 +23,12 @@ class StatusControllerTest extends TestCase
     protected array $fixtures = [
         'app.Organizations',
         'app.OrganizationUsers',
+        'app.Users',
         'app.Monitors',
+        'app.MonitorChecks',
         'app.Incidents',
+        'app.IncidentUpdates',
+        'app.MaintenanceWindows',
     ];
 
     /**
@@ -183,5 +187,27 @@ class StatusControllerTest extends TestCase
     public function testIndexReturns500ForPartialOutage(): void
     {
         $this->markTestSkipped('Requires specific fixture data with partial outage');
+    }
+
+    /**
+     * Test public status page loads with 200 OK
+     */
+    public function testPublicStatusPageLoads(): void
+    {
+        $this->get('/status');
+
+        $this->assertResponseOk();
+        $this->assertResponseCode(200);
+    }
+
+    /**
+     * Test history page loads with 200 OK
+     */
+    public function testHistoryPageLoads(): void
+    {
+        $this->get('/status/history');
+
+        $this->assertResponseOk();
+        $this->assertResponseCode(200);
     }
 }

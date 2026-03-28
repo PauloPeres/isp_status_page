@@ -28,10 +28,12 @@ class BillingControllerTest extends TestCase
         'app.Monitors',
         'app.Incidents',
         'app.MonitorChecks',
+        'app.NotificationCredits',
+        'app.NotificationCreditTransactions',
     ];
 
     /**
-     * Test plans page loads for authenticated user
+     * Test plans page loads for authenticated user and contains plan names
      */
     public function testPlansAuthenticated(): void
     {
@@ -40,17 +42,31 @@ class BillingControllerTest extends TestCase
                 'id' => 1,
                 'username' => 'admin',
                 'active' => true,
+                'organization_id' => 1,
             ],
+            'current_organization_id' => 1,
         ]);
 
         $this->get('/billing/plans');
 
         $this->assertResponseOk();
-        $this->assertResponseContains('Plans');
+        $this->assertResponseContains('Free');
+        $this->assertResponseContains('Pro');
+        $this->assertResponseContains('Business');
     }
 
     /**
      * Test plans page requires authentication
+     */
+    public function testPlansRequiresAuth(): void
+    {
+        $this->get('/billing/plans');
+
+        $this->assertRedirectContains('/users/login');
+    }
+
+    /**
+     * Test plans page requires authentication (alias for backward compatibility)
      */
     public function testPlansUnauthenticated(): void
     {
