@@ -19,7 +19,7 @@
                 <span class="user-name">
                     <?= h($this->Identity->get('username')) ?>
                 </span>
-                <span class="user-role">Administrador</span>
+                <span class="user-role"><?= __('Administrator') ?></span>
             </div>
 
             <div class="user-dropdown">
@@ -31,18 +31,18 @@
 
                 <div class="dropdown-menu" id="userMenu">
                     <?= $this->Html->link(
-                        '👤 Meu Perfil',
+                        '👤 ' . __('My Profile'),
                         ['controller' => 'Users', 'action' => 'view', $this->Identity->get('id')],
                         ['class' => 'dropdown-item']
                     ) ?>
                     <?= $this->Html->link(
-                        '⚙️ Configurações',
+                        '⚙️ ' . __('Settings'),
                         ['controller' => 'Settings', 'action' => 'index'],
                         ['class' => 'dropdown-item']
                     ) ?>
                     <div class="dropdown-divider"></div>
                     <?= $this->Html->link(
-                        '🚪 Sair',
+                        '🚪 ' . __('Logout'),
                         ['controller' => 'Users', 'action' => 'logout'],
                         ['class' => 'dropdown-item logout']
                     ) ?>

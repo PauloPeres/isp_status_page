@@ -130,7 +130,7 @@ class UsersController extends AppController
 
             // Check if user needs to change password
             if ($user && $user->force_password_change) {
-                $this->Flash->warning(__('Por segurança, você deve alterar sua senha antes de continuar.'));
+                $this->Flash->warning(__('For security, you must change your password before continuing.'));
                 return $this->redirect(['action' => 'changePassword']);
             }
 
@@ -176,7 +176,7 @@ class UsersController extends AppController
 
         if ($result && $result->isValid()) {
             $this->Authentication->logout();
-            $this->Flash->success(__('Você saiu com sucesso.'));
+            $this->Flash->success(__('You have successfully logged out.'));
         }
 
         return $this->redirect(['controller' => 'Users', 'action' => 'login']);
@@ -198,7 +198,7 @@ class UsersController extends AppController
             $email = $this->request->getData('email');
 
             if (empty($email)) {
-                $this->Flash->error(__('Por favor, informe seu email.'));
+                $this->Flash->error(__('Please enter your email.'));
                 return;
             }
 
@@ -248,7 +248,7 @@ class UsersController extends AppController
                         } else {
                             // Generic message for regular users (security)
                             $this->Flash->success(__(
-                                'Se o email informado estiver cadastrado, você receberá as instruções para redefinir sua senha.'
+                                'If the email provided is registered, you will receive instructions to reset your password.'
                             ));
                         }
 
@@ -260,12 +260,12 @@ class UsersController extends AppController
                         $this->log("Password reset link generated for user {$user->email} (email delivery failed)", 'info');
                     }
                 } else {
-                    $this->Flash->error(__('Erro ao processar solicitação. Tente novamente.'));
+                    $this->Flash->error(__('Error processing request. Please try again.'));
                 }
             } else {
                 // Don't reveal if email exists or not (security best practice)
                 $this->Flash->success(__(
-                    'Se o email informado estiver cadastrado, você receberá as instruções para redefinir sua senha.'
+                    'If the email provided is registered, you will receive instructions to reset your password.'
                 ));
             }
 
@@ -287,7 +287,7 @@ class UsersController extends AppController
         $this->request->allowMethod(['get', 'post']);
 
         if (empty($token)) {
-            $this->Flash->error(__('Token de redefinição inválido.'));
+            $this->Flash->error(__('Invalid reset token.'));
             return $this->redirect(['action' => 'login']);
         }
 
@@ -297,13 +297,13 @@ class UsersController extends AppController
             ->first();
 
         if (!$user) {
-            $this->Flash->error(__('Token de redefinição inválido ou expirado.'));
+            $this->Flash->error(__('Invalid or expired reset token.'));
             return $this->redirect(['action' => 'login']);
         }
 
         // Check if token is still valid
         if (!$user->isResetTokenValid()) {
-            $this->Flash->error(__('Token de redefinição expirado. Solicite um novo link.'));
+            $this->Flash->error(__('Reset token expired. Please request a new link.'));
             return $this->redirect(['action' => 'forgotPassword']);
         }
 
@@ -313,19 +313,19 @@ class UsersController extends AppController
 
             // Validate passwords
             if (empty($password) || empty($confirmPassword)) {
-                $this->Flash->error(__('Por favor, preencha todos os campos.'));
+                $this->Flash->error(__('Please fill in all fields.'));
                 $this->set(compact('token'));
                 return;
             }
 
             if ($password !== $confirmPassword) {
-                $this->Flash->error(__('As senhas não coincidem.'));
+                $this->Flash->error(__('Passwords do not match.'));
                 $this->set(compact('token'));
                 return;
             }
 
             if (strlen($password) < 8) {
-                $this->Flash->error(__('A senha deve ter no mínimo 8 caracteres.'));
+                $this->Flash->error(__('Password must be at least 8 characters.'));
                 $this->set(compact('token'));
                 return;
             }
@@ -343,10 +343,10 @@ class UsersController extends AppController
                     $this->request->getHeaderLine('User-Agent')
                 );
 
-                $this->Flash->success(__('Senha redefinida com sucesso! Você já pode fazer login.'));
+                $this->Flash->success(__('Password reset successfully! You can now log in.'));
                 return $this->redirect(['action' => 'login']);
             } else {
-                $this->Flash->error(__('Erro ao redefinir senha. Tente novamente.'));
+                $this->Flash->error(__('Error resetting password. Please try again.'));
             }
         }
 
@@ -369,7 +369,7 @@ class UsersController extends AppController
         $user = $this->Authentication->getIdentity();
 
         if (!$user) {
-            $this->Flash->error(__('Você precisa estar logado para trocar a senha.'));
+            $this->Flash->error(__('You must be logged in to change your password.'));
             return $this->redirect(['action' => 'login']);
         }
 
@@ -384,29 +384,29 @@ class UsersController extends AppController
             // Validate current password
             $hasher = new \Authentication\PasswordHasher\DefaultPasswordHasher();
             if (!$hasher->check($currentPassword, $userEntity->password)) {
-                $this->Flash->error(__('Senha atual incorreta.'));
+                $this->Flash->error(__('Current password is incorrect.'));
                 return;
             }
 
             // Validate new passwords
             if (empty($newPassword) || empty($confirmPassword)) {
-                $this->Flash->error(__('Por favor, preencha todos os campos.'));
+                $this->Flash->error(__('Please fill in all fields.'));
                 return;
             }
 
             if ($newPassword !== $confirmPassword) {
-                $this->Flash->error(__('As senhas não coincidem.'));
+                $this->Flash->error(__('Passwords do not match.'));
                 return;
             }
 
             if (strlen($newPassword) < 8) {
-                $this->Flash->error(__('A senha deve ter no mínimo 8 caracteres.'));
+                $this->Flash->error(__('Password must be at least 8 characters.'));
                 return;
             }
 
             // Check if new password is different from current
             if ($hasher->check($newPassword, $userEntity->password)) {
-                $this->Flash->error(__('A nova senha deve ser diferente da senha atual.'));
+                $this->Flash->error(__('The new password must be different from the current password.'));
                 return;
             }
 
@@ -423,10 +423,10 @@ class UsersController extends AppController
                     $this->request->getHeaderLine('User-Agent')
                 );
 
-                $this->Flash->success(__('Senha alterada com sucesso! Você já pode acessar o sistema.'));
+                $this->Flash->success(__('Password changed successfully! You can now access the system.'));
                 return $this->redirect(['controller' => 'Admin', 'action' => 'index']);
             } else {
-                $this->Flash->error(__('Erro ao alterar senha. Tente novamente.'));
+                $this->Flash->error(__('Error changing password. Please try again.'));
             }
         }
 
@@ -518,12 +518,12 @@ class UsersController extends AppController
                 // Validar confirmação de senha apenas se não for gerada automaticamente
                 if (!empty($data['password']) && !empty($data['confirm_password'])) {
                     if ($data['password'] !== $data['confirm_password']) {
-                        $this->Flash->error(__('As senhas não coincidem.'));
+                        $this->Flash->error(__('Passwords do not match.'));
                         $this->set(compact('user'));
                         return;
                     }
                 } elseif (empty($data['password'])) {
-                    $this->Flash->error(__('A senha é obrigatória.'));
+                    $this->Flash->error(__('Password is required.'));
                     $this->set(compact('user'));
                     return;
                 }
@@ -558,7 +558,7 @@ class UsersController extends AppController
                     ['created_user_id' => $user->id, 'username' => $user->username, 'role' => $role]
                 );
 
-                $successMessage = __('Usuário criado com sucesso.');
+                $successMessage = __('User created successfully.');
 
                 // Send invitation email if requested
                 if ($sendInvite && $generatedPassword) {
@@ -571,11 +571,11 @@ class UsersController extends AppController
                     $result = $emailService->sendUserInvite($user, $generatedPassword, $loginUrl);
 
                     if ($result['success']) {
-                        $successMessage .= ' ' . __('Email de convite enviado com sucesso.');
+                        $successMessage .= ' ' . __('Invitation email sent successfully.');
                         $this->log("Invitation email sent successfully to {$user->email}", 'info');
                     } else {
                         // Show error but don't fail the user creation
-                        $this->Flash->warning(__('Usuário criado, mas houve erro ao enviar o email de convite: ') . $result['message']);
+                        $this->Flash->warning(__('User created, but there was an error sending the invitation email: ') . $result['message']);
                         $this->log("Failed to send invitation email to {$user->email}: " .
                             ($result['technical_error'] ?? $result['message']), 'error');
 
@@ -588,7 +588,7 @@ class UsersController extends AppController
                 return $this->redirect(['action' => 'index']);
             }
 
-            $this->Flash->error(__('Não foi possível criar o usuário. Verifique os erros abaixo.'));
+            $this->Flash->error(__('Unable to create user. Please check the errors below.'));
         }
 
         $this->set(compact('user'));
@@ -610,7 +610,7 @@ class UsersController extends AppController
         // Only allow users to edit their own profile
         $identity = $this->Authentication->getIdentity();
         if (!$identity || $identity->id != $user->id) {
-            $this->Flash->error(__('Você não tem permissão para editar este usuário.'));
+            $this->Flash->error(__('You do not have permission to edit this user.'));
 
             return $this->redirect(['action' => 'view', $identity->id]);
         }
@@ -633,7 +633,7 @@ class UsersController extends AppController
 
                 // Validate password confirmation
                 if ($data['new_password'] !== ($data['confirm_password'] ?? '')) {
-                    $this->Flash->error(__('As senhas não coincidem.'));
+                    $this->Flash->error(__('Passwords do not match.'));
                 } else {
                     // Set the new password
                     $data['password'] = $data['new_password'];
@@ -661,12 +661,12 @@ class UsersController extends AppController
                     );
                 }
 
-                $this->Flash->success(__('Perfil atualizado com sucesso.'));
+                $this->Flash->success(__('Profile updated successfully.'));
 
                 return $this->redirect(['action' => 'view', $user->id]);
             }
 
-            $this->Flash->error(__('Não foi possível atualizar o perfil. Tente novamente.'));
+            $this->Flash->error(__('Unable to update profile. Please try again.'));
         }
 
         $this->set(compact('user'));
@@ -695,9 +695,9 @@ class UsersController extends AppController
                 ['deleted_user_id' => (int)$id, 'username' => $user->username]
             );
 
-            $this->Flash->success(__('Usuário excluído com sucesso.'));
+            $this->Flash->success(__('User deleted successfully.'));
         } else {
-            $this->Flash->error(__('Não foi possível excluir o usuário. Tente novamente.'));
+            $this->Flash->error(__('Unable to delete user. Please try again.'));
         }
 
         return $this->redirect(['action' => 'index']);

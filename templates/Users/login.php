@@ -1,41 +1,28 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Login - ISP Status</title>
     <style>
         :root {
-            /* Cores Primárias */
             --color-primary: #1E88E5;
             --color-success: #43A047;
             --color-dark: #263238;
             --color-white: #FFFFFF;
-
-            /* Cores Secundárias */
             --color-primary-light: #90CAF9;
             --color-warning: #FDD835;
             --color-error: #E53935;
-
-            /* Tons Neutros */
             --color-gray-light: #ECEFF1;
             --color-gray-medium: #B0BEC5;
-
-            /* Hover States */
             --color-primary-hover: #1976D2;
             --color-error-hover: #D32F2F;
-
-            /* Espaçamento */
             --space-md: 16px;
             --space-lg: 24px;
             --space-xl: 32px;
-
-            /* Border Radius */
             --radius-md: 8px;
             --radius-lg: 12px;
             --radius-xl: 20px;
-
-            /* Sombras */
             --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
             --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
@@ -204,12 +191,12 @@
         <div class="logo-container">
             <img src="/img/icon_isp_status_page.png" alt="ISP Status" class="logo">
             <h1>ISP Status</h1>
-            <p class="subtitle">Entre com sua conta</p>
+            <p class="subtitle"><?= __('Sign in to your account') ?></p>
         </div>
 
         <?php if (isset($result) && $result !== null && $this->request->is('post') && !$result->isValid()): ?>
             <div class="alert alert-error">
-                ⚠️ Usuário ou senha inválidos. Tente novamente.
+                <?= __('Invalid username or password. Please try again.') ?>
             </div>
         <?php endif; ?>
 
@@ -219,12 +206,12 @@
             <?php endif; ?>
 
             <div class="input-group">
-                <label for="username">Usuário</label>
+                <label for="username"><?= __('Username') ?></label>
                 <input
                     type="text"
                     id="username"
                     name="username"
-                    placeholder="Digite seu usuário"
+                    placeholder="<?= __('Enter your username') ?>"
                     required
                     autofocus
                     autocomplete="username"
@@ -232,18 +219,18 @@
             </div>
 
             <div class="input-group">
-                <label for="password">Senha</label>
+                <label for="password"><?= __('Password') ?></label>
                 <input
                     type="password"
                     id="password"
                     name="password"
-                    placeholder="Digite sua senha"
+                    placeholder="<?= __('Enter your password') ?>"
                     required
                     autocomplete="current-password"
                 >
             </div>
 
-            <button type="submit" class="btn">Entrar</button>
+            <button type="submit" class="btn"><?= __('Sign In') ?></button>
         </form>
 
         <div class="footer">

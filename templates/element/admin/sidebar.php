@@ -15,16 +15,16 @@ function isActive($currentController, $targetController, $currentAction = null, 
 
 <aside class="admin-sidebar" id="adminSidebar">
     <div class="sidebar-header">
-        <h3>Painel Admin</h3>
+        <h3><?= __('Admin Panel') ?></h3>
         <button class="sidebar-close" id="sidebarClose">&times;</button>
     </div>
 
     <nav class="sidebar-nav">
         <div class="nav-section">
-            <span class="nav-section-title">Principal</span>
+            <span class="nav-section-title"><?= __('Main') ?></span>
 
             <?= $this->Html->link(
-                '<span class="nav-icon">📊</span> Dashboard',
+                '<span class="nav-icon">📊</span> ' . __('Dashboard'),
                 ['controller' => 'Admin', 'action' => 'index'],
                 [
                     'escape' => false,
@@ -34,10 +34,10 @@ function isActive($currentController, $targetController, $currentAction = null, 
         </div>
 
         <div class="nav-section">
-            <span class="nav-section-title">Monitoramento</span>
+            <span class="nav-section-title"><?= __('Monitoring') ?></span>
 
             <?= $this->Html->link(
-                '<span class="nav-icon">🖥️</span> Monitores',
+                '<span class="nav-icon">🖥️</span> ' . __('Monitors'),
                 ['controller' => 'Monitors', 'action' => 'index'],
                 [
                     'escape' => false,
@@ -46,7 +46,7 @@ function isActive($currentController, $targetController, $currentAction = null, 
             ) ?>
 
             <?= $this->Html->link(
-                '<span class="nav-icon">📈</span> Verificações',
+                '<span class="nav-icon">📈</span> ' . __('Checks'),
                 ['controller' => 'Checks', 'action' => 'index'],
                 [
                     'escape' => false,
@@ -55,7 +55,7 @@ function isActive($currentController, $targetController, $currentAction = null, 
             ) ?>
 
             <?= $this->Html->link(
-                '<span class="nav-icon">🚨</span> Incidentes',
+                '<span class="nav-icon">🚨</span> ' . __('Incidents'),
                 ['controller' => 'Incidents', 'action' => 'index'],
                 [
                     'escape' => false,
@@ -65,10 +65,10 @@ function isActive($currentController, $targetController, $currentAction = null, 
         </div>
 
         <div class="nav-section">
-            <span class="nav-section-title">Comunicação</span>
+            <span class="nav-section-title"><?= __('Communication') ?></span>
 
             <?= $this->Html->link(
-                '<span class="nav-icon">📧</span> Inscritos',
+                '<span class="nav-icon">📧</span> ' . __('Subscribers'),
                 ['controller' => 'Subscribers', 'action' => 'index'],
                 [
                     'escape' => false,
@@ -77,7 +77,7 @@ function isActive($currentController, $targetController, $currentAction = null, 
             ) ?>
 
             <?= $this->Html->link(
-                '<span class="nav-icon">✉️</span> Email Logs',
+                '<span class="nav-icon">✉️</span> ' . __('Email Logs'),
                 ['controller' => 'EmailLogs', 'action' => 'index'],
                 [
                     'escape' => false,
@@ -87,10 +87,10 @@ function isActive($currentController, $targetController, $currentAction = null, 
         </div>
 
         <div class="nav-section">
-            <span class="nav-section-title">Sistema</span>
+            <span class="nav-section-title"><?= __('System') ?></span>
 
             <?= $this->Html->link(
-                '<span class="nav-icon">👥</span> Usuários',
+                '<span class="nav-icon">👥</span> ' . __('Users'),
                 ['controller' => 'Users', 'action' => 'index'],
                 [
                     'escape' => false,
@@ -99,7 +99,7 @@ function isActive($currentController, $targetController, $currentAction = null, 
             ) ?>
 
             <?= $this->Html->link(
-                '<span class="nav-icon">⚙️</span> Configurações',
+                '<span class="nav-icon">⚙️</span> ' . __('Settings'),
                 ['controller' => 'Settings', 'action' => 'index'],
                 [
                     'escape' => false,
@@ -109,10 +109,10 @@ function isActive($currentController, $targetController, $currentAction = null, 
         </div>
 
         <div class="nav-section">
-            <span class="nav-section-title">Visualizar</span>
+            <span class="nav-section-title"><?= __('View') ?></span>
 
             <?= $this->Html->link(
-                '<span class="nav-icon">🌐</span> Página Pública',
+                '<span class="nav-icon">🌐</span> ' . __('Public Page'),
                 ['controller' => 'Status', 'action' => 'index'],
                 [
                     'escape' => false,
@@ -126,7 +126,7 @@ function isActive($currentController, $targetController, $currentAction = null, 
     <div class="sidebar-footer">
         <div class="status-indicator">
             <span class="status-dot online"></span>
-            <span class="status-text">Sistema Online</span>
+            <span class="status-text"><?= __('System Online') ?></span>
         </div>
     </div>
 </aside>

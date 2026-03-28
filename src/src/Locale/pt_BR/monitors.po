@@ -118,19 +118,22 @@ msgstr "Verificações (24h)"
 msgid "Average Response"
 msgstr "Resposta Média"
 
-msgid "Não foi possível criar o monitor. Por favor, tente novamente."
+msgid "Unable to create monitor. Please try again."
 msgstr "Não foi possível criar o monitor. Por favor, tente novamente."
 
-msgid "Não foi possível atualizar o monitor. Por favor, tente novamente."
+msgid "Unable to update monitor. Please try again."
 msgstr "Não foi possível atualizar o monitor. Por favor, tente novamente."
 
-msgid "Não foi possível excluir o monitor. Por favor, tente novamente."
+msgid "Unable to delete monitor. Please try again."
 msgstr "Não foi possível excluir o monitor. Por favor, tente novamente."
 
-msgid "Monitor {$status} com sucesso."
-msgstr "Monitor {$status} com sucesso."
+msgid "Monitor enabled successfully."
+msgstr "Monitor ativado com sucesso."
 
-msgid "Não foi possível alterar o status do monitor."
+msgid "Monitor disabled successfully."
+msgstr "Monitor desativado com sucesso."
+
+msgid "Unable to change monitor status."
 msgstr "Não foi possível alterar o status do monitor."
 
 #: Monitors - Form Common

@@ -166,7 +166,7 @@
 
             <div class="email-footer">
                 <p>
-                    Este é um email automático. Por favor, não responda.
+                    <?= __d('emails', 'This is an automatic email. Please do not reply.') ?>
                 </p>
                 <p>
                     &copy; <?= date('Y') ?> <?= isset($siteName) ? h($siteName) : 'ISP Status' ?>

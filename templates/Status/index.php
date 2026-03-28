@@ -11,7 +11,7 @@
  * @var int $degradedMonitors
  * @var \Cake\Collection\CollectionInterface $recentIncidents
  */
-$this->assign('title', 'Status dos Serviços');
+$this->assign('title', __('Service Status'));
 ?>
 
 <div class="container">
@@ -20,19 +20,19 @@ $this->assign('title', 'Status dos Serviços');
         <div class="status-icon"><?= $systemIcon ?></div>
         <h2 class="status-title"><?= h($systemMessage) ?></h2>
         <p class="status-description">
-            <?= $onlineMonitors ?> de <?= $totalMonitors ?> serviços operacionais
+            <?= __("{0} of {1} services operational", $onlineMonitors, $totalMonitors) ?>
             <?php if ($offlineMonitors > 0): ?>
-                | <?= $offlineMonitors ?> offline
+                | <?= __("{0} offline", $offlineMonitors) ?>
             <?php endif; ?>
             <?php if ($degradedMonitors > 0): ?>
-                | <?= $degradedMonitors ?> degradados
+                | <?= __("{0} degraded", $degradedMonitors) ?>
             <?php endif; ?>
         </p>
     </div>
 
     <!-- Services List -->
     <div class="services-section">
-        <h3 class="section-title">📊 Status dos Serviços</h3>
+        <h3 class="section-title">📊 <?= __('Service Status') ?></h3>
 
         <?php if ($monitors->count() > 0): ?>
             <?php foreach ($monitors as $monitor): ?>
@@ -50,11 +50,11 @@ $this->assign('title', 'Status dos Serviços');
                         <span class="service-status-badge <?= $monitor->status === 'up' ? 'operational' : ($monitor->status === 'down' ? 'down' : 'degraded') ?>">
                             <?php
                             if ($monitor->status === 'up') {
-                                echo 'Operacional';
+                                echo __('Operational');
                             } elseif ($monitor->status === 'down') {
-                                echo 'Offline';
+                                echo __('Offline');
                             } else {
-                                echo 'Degradado';
+                                echo __('Degraded');
                             }
                             ?>
                         </span>
@@ -68,7 +68,7 @@ $this->assign('title', 'Status dos Serviços');
                         <?php if ($monitor->last_check): ?>
                             <div class="service-detail-item">
                                 <span>🕐</span>
-                                <span>Última verificação: <?= $monitor->last_check->timeAgoInWords() ?></span>
+                                <span><?= __('Last check') ?>: <?= $monitor->last_check->timeAgoInWords() ?></span>
                             </div>
                         <?php endif; ?>
                         <?php if ($monitor->response_time): ?>
@@ -83,7 +83,7 @@ $this->assign('title', 'Status dos Serviços');
         <?php else: ?>
             <div class="empty-state">
                 <div class="empty-state-icon">📭</div>
-                <p>Nenhum serviço sendo monitorado no momento.</p>
+                <p><?= __('No services are being monitored at the moment.') ?></p>
             </div>
         <?php endif; ?>
     </div>
@@ -91,7 +91,7 @@ $this->assign('title', 'Status dos Serviços');
     <!-- Recent Incidents -->
     <?php if ($recentIncidents->count() > 0): ?>
         <div class="incidents-section">
-            <h3 class="section-title">🚨 Incidentes Recentes</h3>
+            <h3 class="section-title">🚨 <?= __('Recent Incidents') ?></h3>
 
             <?php foreach ($recentIncidents as $incident): ?>
                 <div class="incident-card <?= h($incident->status) ?>">
@@ -107,9 +107,9 @@ $this->assign('title', 'Status dos Serviços');
                     </div>
 
                     <div class="incident-meta">
-                        📅 <?= $incident->created->format('d/m/Y H:i') ?>
+                        📅 <?= $incident->created->format('Y-m-d H:i') ?>
                         <?php if ($incident->resolved_at): ?>
-                            | ✅ Resolvido em <?= $incident->resolved_at->format('d/m/Y H:i') ?>
+                            | ✅ <?= __('Resolved at') ?> <?= $incident->resolved_at->format('Y-m-d H:i') ?>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -117,7 +117,7 @@ $this->assign('title', 'Status dos Serviços');
 
             <div style="text-align: center; margin-top: 24px;">
                 <?= $this->Html->link(
-                    'Ver Histórico Completo →',
+                    __('View Full History') . ' →',
                     ['action' => 'history'],
                     ['class' => 'btn btn-secondary', 'style' => 'display: inline-block; padding: 12px 24px; text-decoration: none; background: var(--color-gray-light); color: var(--color-dark); border-radius: var(--radius-md); transition: all 0.3s ease;']
                 ) ?>
@@ -127,9 +127,9 @@ $this->assign('title', 'Status dos Serviços');
 
     <!-- Subscribe Section -->
     <div class="subscribe-section">
-        <h3 class="subscribe-title">📧 Receba Notificações</h3>
+        <h3 class="subscribe-title">📧 <?= __('Get Notifications') ?></h3>
         <p class="subscribe-description">
-            Inscreva-se para receber atualizações por email sobre incidentes e manutenções programadas.
+            <?= __('Subscribe to receive email updates about incidents and scheduled maintenance.') ?>
         </p>
 
         <?= $this->Form->create(null, [
@@ -138,13 +138,13 @@ $this->assign('title', 'Status dos Serviços');
         ]) ?>
             <?= $this->Form->control('email', [
                 'type' => 'email',
-                'placeholder' => 'seu@email.com',
+                'placeholder' => 'your@email.com',
                 'required' => true,
                 'label' => false,
                 'class' => 'subscribe-input'
             ]) ?>
             <button type="submit" class="subscribe-button">
-                Inscrever-se
+                <?= __('Subscribe') ?>
             </button>
         <?= $this->Form->end() ?>
     </div>
@@ -157,5 +157,5 @@ setTimeout(function() {
 }, 30000);
 
 // Show last update time
-console.log('Última atualização: ' + new Date().toLocaleString('pt-BR'));
+console.log('Last update: ' + new Date().toLocaleString());
 </script>

@@ -9,39 +9,38 @@
  */
 ?>
 
-<h2>Bem-vindo!</h2>
+<h2><?= __d('emails', 'Welcome!') ?></h2>
 
-<p>Olá!</p>
+<p><?= __d('emails', 'Hello!') ?></p>
 
 <p>
-    Obrigado por se inscrever para receber notificações de status em <strong><?= h($siteName) ?></strong>.
+    <?= __d('emails', 'Thank you for subscribing to receive status notifications from {0}.', '<strong>' . h($siteName) . '</strong>') ?>
 </p>
 
 <p>
-    Para confirmar seu email <strong><?= h($subscriber->email) ?></strong> e começar a receber notificações,
-    por favor clique no botão abaixo:
+    <?= __d('emails', 'To confirm your email {0} and start receiving notifications, please click the button below:', '<strong>' . h($subscriber->email) . '</strong>') ?>
 </p>
 
 <div style="text-align: center;">
     <a href="<?= $verifyUrl ?>" class="button">
-        Verificar Meu Email
+        <?= __d('emails', 'Verify My Email') ?>
     </a>
 </div>
 
 <div class="info-box">
-    <p style="margin: 0;"><strong>O que você receberá:</strong></p>
+    <p style="margin: 0;"><strong><?= __d('emails', 'What you will receive:') ?></strong></p>
     <ul style="margin: 8px 0; padding-left: 20px;">
-        <li>Notificações quando serviços ficarem offline</li>
-        <li>Alertas sobre incidentes em andamento</li>
-        <li>Confirmações quando problemas forem resolvidos</li>
+        <li><?= __d('emails', 'Notifications when services go offline') ?></li>
+        <li><?= __d('emails', 'Alerts about ongoing incidents') ?></li>
+        <li><?= __d('emails', 'Confirmations when issues are resolved') ?></li>
     </ul>
 </div>
 
 <p style="font-size: 14px; color: #6c757d;">
-    Se você não se inscreveu para receber notificações, por favor ignore este email.
+    <?= __d('emails', 'If you did not subscribe to receive notifications, please ignore this email.') ?>
 </p>
 
 <p style="font-size: 14px; color: #6c757d;">
-    Link não funciona? Copie e cole este endereço no seu navegador:<br/>
+    <?= __d('emails', 'Link not working? Copy and paste this address into your browser:') ?><br/>
     <span style="word-break: break-all;"><?= h($verifyUrl) ?></span>
 </p>

@@ -126,7 +126,7 @@ class EmailLogsController extends AppController
 
         // Verify it's an email log
         if ($emailLog->channel !== 'email') {
-            $this->Flash->error(__('Este não é um log de email.'));
+            $this->Flash->error(__('This is not an email log.'));
             return $this->redirect(['action' => 'index']);
         }
 

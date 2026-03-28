@@ -484,3 +484,25 @@ msgstr "Monitorando"
 
 msgid "Maintenance"
 msgstr "Manutenção"
+
+#: IncidentsController - Acknowledgement messages
+msgid "Incident not found."
+msgstr "Incidente não encontrado."
+
+msgid "Invalid acknowledgement token."
+msgstr "Token de reconhecimento inválido."
+
+msgid "This incident has already been acknowledged."
+msgstr "Este incidente já foi reconhecido."
+
+msgid "The acknowledgement token has expired (valid for 24h)."
+msgstr "O token de reconhecimento expirou (válido por 24h)."
+
+msgid "The acknowledgement token has expired."
+msgstr "O token de reconhecimento expirou."
+
+msgid "Incident acknowledged successfully."
+msgstr "Incidente reconhecido com sucesso."
+
+msgid "Error acknowledging incident."
+msgstr "Erro ao reconhecer o incidente."

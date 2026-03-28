@@ -17,6 +17,6 @@
 
 <?= str_repeat('-', 70) ?>
 
-<?= __d('emails', 'Este é um email automático. Por favor, não responda.') ?>
+<?= __d('emails', 'This is an automatic email. Please do not reply.') ?>
 
 <?= str_repeat('=', 70) ?>

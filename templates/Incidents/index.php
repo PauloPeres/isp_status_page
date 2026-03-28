@@ -5,7 +5,7 @@
  * @var array $stats
  * @var array $monitors
  */
-$this->assign('title', 'Incidentes');
+$this->assign('title', __('Incidents'));
 ?>
 
 <style>
@@ -342,25 +342,25 @@ $this->assign('title', 'Incidentes');
 </style>
 
 <div class="incidents-header">
-    <h2>🚨 Incidentes</h2>
+    <h2>🚨 <?= __('Incidents') ?></h2>
 </div>
 
 <!-- Statistics Cards -->
 <div class="stats-grid">
     <div class="stat-card-mini">
-        <div class="stat-label">Total</div>
+        <div class="stat-label"><?= __('Total') ?></div>
         <div class="stat-value info"><?= number_format($stats['total']) ?></div>
     </div>
     <div class="stat-card-mini">
-        <div class="stat-label">Ativos</div>
+        <div class="stat-label"><?= __('Active') ?></div>
         <div class="stat-value error"><?= number_format($stats['active']) ?></div>
     </div>
     <div class="stat-card-mini">
-        <div class="stat-label">Resolvidos</div>
+        <div class="stat-label"><?= __('Resolved') ?></div>
         <div class="stat-value success"><?= number_format($stats['resolved']) ?></div>
     </div>
     <div class="stat-card-mini">
-        <div class="stat-label">Críticos</div>
+        <div class="stat-label"><?= __('Critical') ?></div>
         <div class="stat-value warning"><?= number_format($stats['critical']) ?></div>
     </div>
 </div>
@@ -370,26 +370,26 @@ $this->assign('title', 'Incidentes');
     <?= $this->Form->create(null, ['type' => 'get', 'id' => 'filters-form']) ?>
     <div class="filters-row">
         <div class="filter-group">
-            <label>Buscar</label>
+            <label><?= __('Search') ?></label>
             <?= $this->Form->control('search', [
                 'label' => false,
-                'placeholder' => 'Título ou descrição...',
+                'placeholder' => __('Title or description...'),
                 'value' => $this->request->getQuery('search'),
                 'class' => 'form-control',
             ]) ?>
         </div>
 
         <div class="filter-group">
-            <label>Status</label>
+            <label><?= __('Status') ?></label>
             <?= $this->Form->control('status', [
                 'label' => false,
                 'options' => [
-                    '' => 'Todos',
-                    'active' => 'Ativos',
-                    'investigating' => 'Investigando',
-                    'identified' => 'Identificado',
-                    'monitoring' => 'Monitorando',
-                    'resolved' => 'Resolvido',
+                    '' => __('All'),
+                    'active' => __('Active'),
+                    'investigating' => __('Investigating'),
+                    'identified' => __('Identified'),
+                    'monitoring' => __('Monitoring'),
+                    'resolved' => __('Resolved'),
                 ],
                 'value' => $this->request->getQuery('status'),
                 'empty' => false,
@@ -398,15 +398,15 @@ $this->assign('title', 'Incidentes');
         </div>
 
         <div class="filter-group">
-            <label>Severidade</label>
+            <label><?= __('Severity') ?></label>
             <?= $this->Form->control('severity', [
                 'label' => false,
                 'options' => [
-                    '' => 'Todas',
-                    'critical' => 'Crítica',
-                    'major' => 'Major',
-                    'minor' => 'Minor',
-                    'maintenance' => 'Manutenção',
+                    '' => __('All'),
+                    'critical' => __('Critical'),
+                    'major' => __('Major'),
+                    'minor' => __('Minor'),
+                    'maintenance' => __('Maintenance'),
                 ],
                 'value' => $this->request->getQuery('severity'),
                 'empty' => false,
@@ -415,10 +415,10 @@ $this->assign('title', 'Incidentes');
         </div>
 
         <div class="filter-group">
-            <label>Monitor</label>
+            <label><?= __('Monitor') ?></label>
             <?= $this->Form->control('monitor_id', [
                 'label' => false,
-                'options' => ['' => 'Todos os Monitores'] + $monitors,
+                'options' => ['' => __('All Monitors')] + $monitors,
                 'value' => $this->request->getQuery('monitor_id'),
                 'empty' => false,
                 'class' => 'form-control',
@@ -427,8 +427,8 @@ $this->assign('title', 'Incidentes');
     </div>
 
     <div class="filter-buttons">
-        <?= $this->Form->button('Filtrar', ['type' => 'submit', 'class' => 'btn-filter']) ?>
-        <?= $this->Html->link('Limpar', ['action' => 'index'], ['class' => 'btn-clear']) ?>
+        <?= $this->Form->button(__('Filter'), ['type' => 'submit', 'class' => 'btn-filter']) ?>
+        <?= $this->Html->link(__('Clear'), ['action' => 'index'], ['class' => 'btn-clear']) ?>
     </div>
     <?= $this->Form->end() ?>
 </div>
@@ -439,13 +439,13 @@ $this->assign('title', 'Incidentes');
         <table>
             <thead>
                 <tr>
-                    <th>Status</th>
-                    <th>Incidente</th>
-                    <th>Monitor</th>
-                    <th>Severidade</th>
-                    <th>Iniciado</th>
-                    <th>Duração</th>
-                    <th style="text-align: right;">Ações</th>
+                    <th><?= __('Status') ?></th>
+                    <th><?= __('Incident') ?></th>
+                    <th><?= __('Monitor') ?></th>
+                    <th><?= __('Severity') ?></th>
+                    <th><?= __('Started') ?></th>
+                    <th><?= __('Duration') ?></th>
+                    <th style="text-align: right;"><?= __('Actions') ?></th>
                 </tr>
             </thead>
             <tbody>
@@ -461,7 +461,7 @@ $this->assign('title', 'Incidentes');
                             <div class="incident-title">
                                 <?= h($incident->title) ?>
                                 <?php if ($incident->auto_created): ?>
-                                    <span class="badge badge-secondary" title="Auto-criado">🤖</span>
+                                    <span class="badge badge-secondary" title="<?= __('Auto-created') ?>">🤖</span>
                                 <?php endif; ?>
                             </div>
                             <?php if ($incident->description): ?>
@@ -487,7 +487,7 @@ $this->assign('title', 'Incidentes');
                             </span>
                         </td>
                         <td>
-                            <strong><?= h($incident->started_at->i18nFormat('dd/MM/yyyy')) ?></strong><br>
+                            <strong><?= h($incident->started_at->i18nFormat('yyyy-MM-dd')) ?></strong><br>
                             <span style="color: #666; font-size: 13px;">
                                 <?= h($incident->started_at->i18nFormat('HH:mm:ss')) ?>
                             </span>
@@ -511,30 +511,30 @@ $this->assign('title', 'Incidentes');
                                 </span>
                             <?php else: ?>
                                 <span style="color: #999; font-size: 13px;">
-                                    <?= $incident->isResolved() ? 'N/A' : 'Em andamento' ?>
+                                    <?= $incident->isResolved() ? 'N/A' : __('In progress') ?>
                                 </span>
                             <?php endif; ?>
                         </td>
                         <td style="text-align: right;">
                             <div class="action-buttons">
                                 <?= $this->Html->link(
-                                    'Ver',
+                                    __('View'),
                                     ['action' => 'view', $incident->id],
-                                    ['class' => 'btn-action btn-action-view', 'title' => 'Ver detalhes']
+                                    ['class' => 'btn-action btn-action-view', 'title' => __('View details')]
                                 ) ?>
                                 <?php if (!$incident->isResolved()): ?>
                                     <?= $this->Html->link(
-                                        'Editar',
+                                        __('Edit'),
                                         ['action' => 'edit', $incident->id],
-                                        ['class' => 'btn-action btn-action-edit', 'title' => 'Editar']
+                                        ['class' => 'btn-action btn-action-edit', 'title' => __('Edit')]
                                     ) ?>
                                     <?= $this->Form->postLink(
-                                        'Resolver',
+                                        __('Resolve'),
                                         ['action' => 'resolve', $incident->id],
                                         [
                                             'class' => 'btn-action btn-action-resolve',
-                                            'title' => 'Resolver',
-                                            'confirm' => 'Tem certeza que deseja resolver este incidente?'
+                                            'title' => __('Resolve'),
+                                            'confirm' => __('Are you sure you want to resolve this incident?')
                                         ]
                                     ) ?>
                                 <?php endif; ?>
@@ -546,8 +546,8 @@ $this->assign('title', 'Incidentes');
         </table>
     <?php else: ?>
         <div class="no-incidents">
-            <p style="font-size: 18px; margin-bottom: 8px;">📭 Nenhum incidente encontrado</p>
-            <p>Tente ajustar os filtros ou aguarde novos incidentes.</p>
+            <p style="font-size: 18px; margin-bottom: 8px;">📭 <?= __('No incidents found') ?></p>
+            <p><?= __('Try adjusting the filters or wait for new incidents.') ?></p>
         </div>
     <?php endif; ?>
 </div>
@@ -555,13 +555,13 @@ $this->assign('title', 'Incidentes');
 <!-- Pagination -->
 <?php if ($incidents->count() > 0): ?>
     <div class="pagination">
-        <?= $this->Paginator->first('« Primeira') ?>
-        <?= $this->Paginator->prev('‹ Anterior') ?>
+        <?= $this->Paginator->first('« ' . __('First')) ?>
+        <?= $this->Paginator->prev('‹ ' . __('Previous')) ?>
         <?= $this->Paginator->numbers() ?>
-        <?= $this->Paginator->next('Próxima ›') ?>
-        <?= $this->Paginator->last('Última »') ?>
+        <?= $this->Paginator->next(__('Next') . ' ›') ?>
+        <?= $this->Paginator->last(__('Last') . ' »') ?>
     </div>
     <div class="pagination-info">
-        <?= $this->Paginator->counter('Página {{page}} de {{pages}}, mostrando {{current}} registro(s) de {{count}} no total') ?>
+        <?= $this->Paginator->counter(__('Page {{page}} of {{pages}}, showing {{current}} record(s) of {{count}} total')) ?>
     </div>
 <?php endif; ?>

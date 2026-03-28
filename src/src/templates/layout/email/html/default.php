@@ -126,7 +126,7 @@
             <?= $this->fetch('content') ?>
         </div>
         <div class="email-footer">
-            <p><?= __d('emails', 'Este é um email automático. Por favor, não responda.') ?></p>
+            <p><?= __d('emails', 'This is an automatic email. Please do not reply.') ?></p>
         </div>
     </div>
 </body>

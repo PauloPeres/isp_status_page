@@ -97,12 +97,12 @@ class IntegrationsController extends AppController
             $integration = $this->Integrations->patchEntity($integration, $data);
 
             if ($this->Integrations->save($integration)) {
-                $this->Flash->success(__('Integracao criada com sucesso.'));
+                $this->Flash->success(__('Integration created successfully.'));
 
                 return $this->redirect(['action' => 'index']);
             }
 
-            $this->Flash->error(__('Nao foi possivel criar a integracao. Por favor, tente novamente.'));
+            $this->Flash->error(__('Unable to create integration. Please try again.'));
         }
 
         $this->set(compact('integration'));
@@ -130,12 +130,12 @@ class IntegrationsController extends AppController
             $integration = $this->Integrations->patchEntity($integration, $data);
 
             if ($this->Integrations->save($integration)) {
-                $this->Flash->success(__('Integracao atualizada com sucesso.'));
+                $this->Flash->success(__('Integration updated successfully.'));
 
                 return $this->redirect(['action' => 'index']);
             }
 
-            $this->Flash->error(__('Nao foi possivel atualizar a integracao. Por favor, tente novamente.'));
+            $this->Flash->error(__('Unable to update integration. Please try again.'));
         }
 
         $this->set(compact('integration'));
@@ -155,9 +155,9 @@ class IntegrationsController extends AppController
         $integration = $this->Integrations->get($id);
 
         if ($this->Integrations->delete($integration)) {
-            $this->Flash->success(__('Integracao excluida com sucesso.'));
+            $this->Flash->success(__('Integration deleted successfully.'));
         } else {
-            $this->Flash->error(__('Nao foi possivel excluir a integracao. Por favor, tente novamente.'));
+            $this->Flash->error(__('Unable to delete integration. Please try again.'));
         }
 
         return $this->redirect(['action' => 'index']);

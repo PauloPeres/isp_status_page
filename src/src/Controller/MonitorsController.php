@@ -157,12 +157,12 @@ class MonitorsController extends AppController
             $monitor = $this->Monitors->patchEntity($monitor, $data);
 
             if ($this->Monitors->save($monitor)) {
-                $this->Flash->success(__d('monitors', 'Monitor criado com sucesso.'));
+                $this->Flash->success(__d('monitors', 'Monitor created successfully.'));
 
                 return $this->redirect(['action' => 'index']);
             }
 
-            $this->Flash->error(__d('monitors', 'Não foi possível criar o monitor. Por favor, tente novamente.'));
+            $this->Flash->error(__d('monitors', 'Unable to create monitor. Please try again.'));
         }
 
         $this->set(compact('monitor'));
@@ -201,12 +201,12 @@ class MonitorsController extends AppController
 
             if ($this->Monitors->save($monitor)) {
                 \Cake\Log\Log::debug('After save:', ['config' => $monitor->configuration]);
-                $this->Flash->success(__d('monitors', 'Monitor atualizado com sucesso.'));
+                $this->Flash->success(__d('monitors', 'Monitor updated successfully.'));
 
                 return $this->redirect(['action' => 'index']);
             }
 
-            $this->Flash->error(__d('monitors', 'Não foi possível atualizar o monitor. Por favor, tente novamente.'));
+            $this->Flash->error(__d('monitors', 'Unable to update monitor. Please try again.'));
         }
 
         $this->set(compact('monitor'));
@@ -265,9 +265,9 @@ class MonitorsController extends AppController
         $monitor = $this->Monitors->get($id);
 
         if ($this->Monitors->delete($monitor)) {
-            $this->Flash->success(__d('monitors', 'Monitor excluído com sucesso.'));
+            $this->Flash->success(__d('monitors', 'Monitor deleted successfully.'));
         } else {
-            $this->Flash->error(__d('monitors', 'Não foi possível excluir o monitor. Por favor, tente novamente.'));
+            $this->Flash->error(__d('monitors', 'Unable to delete monitor. Please try again.'));
         }
 
         return $this->redirect(['action' => 'index']);
@@ -288,10 +288,10 @@ class MonitorsController extends AppController
         $monitor->active = !$monitor->active;
 
         if ($this->Monitors->save($monitor)) {
-            $status = $monitor->active ? 'ativado' : 'desativado';
-            $this->Flash->success(__d('monitors', "Monitor {$status} com sucesso."));
+            $status = $monitor->active ? 'enabled' : 'disabled';
+            $this->Flash->success(__d('monitors', "Monitor {$status} successfully."));
         } else {
-            $this->Flash->error(__d('monitors', 'Não foi possível alterar o status do monitor.'));
+            $this->Flash->error(__d('monitors', 'Unable to change monitor status.'));
         }
 
         return $this->redirect(['action' => 'index']);

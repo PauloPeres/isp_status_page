@@ -15,23 +15,23 @@ $siteName = Configure::read('Settings.site_name', 'ISP Status');
                 ]) ?>
                 <div class="header-title">
                     <h1><?= h($siteName) ?></h1>
-                    <p class="header-subtitle">Status dos Serviços</p>
+                    <p class="header-subtitle"><?= __('Service Status') ?></p>
                 </div>
             </div>
 
             <nav class="header-nav">
                 <?= $this->Html->link(
-                    '🏠 Início',
+                    '🏠 ' . __('Home'),
                     ['controller' => 'Status', 'action' => 'index'],
                     ['class' => 'nav-link']
                 ) ?>
                 <?= $this->Html->link(
-                    '📜 Histórico',
+                    '📜 ' . __('History'),
                     ['controller' => 'Status', 'action' => 'history'],
                     ['class' => 'nav-link']
                 ) ?>
                 <?= $this->Html->link(
-                    '📧 Notificações',
+                    '📧 ' . __('Notifications'),
                     ['controller' => 'Subscribers', 'action' => 'subscribe'],
                     ['class' => 'nav-link']
                 ) ?>

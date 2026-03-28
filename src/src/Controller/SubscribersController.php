@@ -54,7 +54,7 @@ class SubscribersController extends AppController
         $email = $this->request->getData('email');
 
         if (empty($email)) {
-            $this->Flash->error(__d('subscribers', 'Por favor, informe um email válido.'));
+            $this->Flash->error(__d('subscribers', 'Please provide a valid email.'));
             return $this->redirect(['controller' => 'Status', 'action' => 'index']);
         }
 
@@ -66,7 +66,7 @@ class SubscribersController extends AppController
         if ($subscriber) {
             // Subscriber already exists
             if ($subscriber->verified && $subscriber->active) {
-                $this->Flash->info(__d('subscribers', 'Este email já está inscrito e ativo.'));
+                $this->Flash->info(__d('subscribers', 'This email is already subscribed and active.'));
                 return $this->redirect(['controller' => 'Status', 'action' => 'index']);
             }
 
@@ -80,9 +80,9 @@ class SubscribersController extends AppController
 
                 // Send verification email
                 if ($this->emailService->sendVerificationEmail($subscriber)) {
-                    $this->Flash->success(__d('subscribers', 'Um email de verificação foi enviado para {0}.', $email));
+                    $this->Flash->success(__d('subscribers', 'A verification email has been sent to {0}.', $email));
                 } else {
-                    $this->Flash->warning(__d('subscribers', 'Não foi possível enviar o email de verificação. Por favor, tente novamente mais tarde.'));
+                    $this->Flash->warning(__d('subscribers', 'Unable to send verification email. Please try again later.'));
                 }
                 return $this->redirect(['controller' => 'Status', 'action' => 'index']);
             }
@@ -91,7 +91,7 @@ class SubscribersController extends AppController
                 // Reactivate
                 $subscriber->active = true;
                 $this->Subscribers->save($subscriber);
-                $this->Flash->success(__d('subscribers', 'Sua inscrição foi reativada com sucesso!'));
+                $this->Flash->success(__d('subscribers', 'Your subscription has been reactivated successfully!'));
                 return $this->redirect(['controller' => 'Status', 'action' => 'index']);
             }
         }
@@ -122,16 +122,16 @@ class SubscribersController extends AppController
 
             // Send verification email
             if ($this->emailService->sendVerificationEmail($subscriber)) {
-                $this->Flash->success(__d('subscribers', 'Obrigado por se inscrever! Um email de verificação foi enviado para {0}.', $email));
+                $this->Flash->success(__d('subscribers', 'Thank you for subscribing! A verification email has been sent to {0}.', $email));
             } else {
-                $this->Flash->warning(__d('subscribers', 'Inscrição realizada, mas não foi possível enviar o email de verificação. Por favor, solicite o reenvio.'));
+                $this->Flash->warning(__d('subscribers', 'Subscription completed, but unable to send verification email. Please request a resend.'));
             }
         } else {
             $errors = $subscriber->getErrors();
             if (isset($errors['email']['unique'])) {
-                $this->Flash->error(__d('subscribers', 'Este email já está cadastrado.'));
+                $this->Flash->error(__d('subscribers', 'This email is already registered.'));
             } else {
-                $this->Flash->error(__d('subscribers', 'Não foi possível completar a inscrição. Por favor, tente novamente.'));
+                $this->Flash->error(__d('subscribers', 'Unable to complete subscription. Please try again.'));
             }
         }
 
@@ -149,7 +149,7 @@ class SubscribersController extends AppController
         $this->viewBuilder()->setLayout('public');
 
         if (empty($token)) {
-            $this->Flash->error(__d('subscribers', 'Token de verificação inválido.'));
+            $this->Flash->error(__d('subscribers', 'Invalid verification token.'));
             return $this->redirect(['controller' => 'Status', 'action' => 'index']);
         }
 
@@ -158,12 +158,12 @@ class SubscribersController extends AppController
             ->first();
 
         if (!$subscriber) {
-            $this->Flash->error(__d('subscribers', 'Token de verificação inválido ou expirado.'));
+            $this->Flash->error(__d('subscribers', 'Invalid or expired verification token.'));
             return $this->redirect(['controller' => 'Status', 'action' => 'index']);
         }
 
         if ($subscriber->verified) {
-            $this->Flash->info(__d('subscribers', 'Este email já foi verificado anteriormente.'));
+            $this->Flash->info(__d('subscribers', 'This email has already been verified.'));
             return $this->redirect(['controller' => 'Status', 'action' => 'index']);
         }
 
@@ -174,9 +174,9 @@ class SubscribersController extends AppController
 
         if ($this->Subscribers->save($subscriber)) {
             $this->set('subscriber', $subscriber);
-            $this->Flash->success(__d('subscribers', 'Email verificado com sucesso! Você começará a receber notificações.'));
+            $this->Flash->success(__d('subscribers', 'Email verified successfully! You will start receiving notifications.'));
         } else {
-            $this->Flash->error(__d('subscribers', 'Não foi possível verificar o email. Por favor, tente novamente.'));
+            $this->Flash->error(__d('subscribers', 'Unable to verify email. Please try again.'));
             return $this->redirect(['controller' => 'Status', 'action' => 'index']);
         }
     }
@@ -192,7 +192,7 @@ class SubscribersController extends AppController
         $this->viewBuilder()->setLayout('public');
 
         if (empty($token)) {
-            $this->Flash->error(__d('subscribers', 'Token de cancelamento inválido.'));
+            $this->Flash->error(__d('subscribers', 'Invalid unsubscribe token.'));
             return $this->redirect(['controller' => 'Status', 'action' => 'index']);
         }
 
@@ -201,7 +201,7 @@ class SubscribersController extends AppController
             ->first();
 
         if (!$subscriber) {
-            $this->Flash->error(__d('subscribers', 'Token de cancelamento inválido.'));
+            $this->Flash->error(__d('subscribers', 'Invalid unsubscribe token.'));
             return $this->redirect(['controller' => 'Status', 'action' => 'index']);
         }
 
@@ -211,10 +211,10 @@ class SubscribersController extends AppController
 
             if ($this->Subscribers->save($subscriber)) {
                 $this->set('success', true);
-                $this->Flash->success(__d('subscribers', 'Você foi desinscrito com sucesso. Não receberá mais notificações.'));
+                $this->Flash->success(__d('subscribers', 'You have been unsubscribed successfully. You will no longer receive notifications.'));
             } else {
                 $this->set('success', false);
-                $this->Flash->error(__d('subscribers', 'Não foi possível processar o cancelamento. Por favor, tente novamente.'));
+                $this->Flash->error(__d('subscribers', 'Unable to process unsubscription. Please try again.'));
             }
         }
 
@@ -331,9 +331,9 @@ class SubscribersController extends AppController
         $subscriber = $this->Subscribers->get($id);
 
         if ($this->Subscribers->delete($subscriber)) {
-            $this->Flash->success(__d('subscribers', 'O inscrito foi excluído com sucesso.'));
+            $this->Flash->success(__d('subscribers', 'The subscriber has been deleted successfully.'));
         } else {
-            $this->Flash->error(__d('subscribers', 'Não foi possível excluir o inscrito. Por favor, tente novamente.'));
+            $this->Flash->error(__d('subscribers', 'Unable to delete subscriber. Please try again.'));
         }
 
         return $this->redirect(['action' => 'index']);
@@ -355,9 +355,9 @@ class SubscribersController extends AppController
 
         if ($this->Subscribers->save($subscriber)) {
             $status = $subscriber->active ? 'ativado' : 'desativado';
-            $this->Flash->success(__d('subscribers', "O inscrito foi {$status} com sucesso."));
+            $this->Flash->success(__d('subscribers', "Subscriber has been {$status} successfully."));
         } else {
-            $this->Flash->error(__d('subscribers', 'Não foi possível atualizar o status. Por favor, tente novamente.'));
+            $this->Flash->error(__d('subscribers', 'Unable to update status. Please try again.'));
         }
 
         return $this->redirect($this->referer(['action' => 'index']));
@@ -376,7 +376,7 @@ class SubscribersController extends AppController
         $subscriber = $this->Subscribers->get($id);
 
         if ($subscriber->verified) {
-            $this->Flash->warning(__d('subscribers', 'Este inscrito já está verificado.'));
+            $this->Flash->warning(__d('subscribers', 'This subscriber is already verified.'));
             return $this->redirect($this->referer(['action' => 'view', $id]));
         }
 
@@ -388,9 +388,9 @@ class SubscribersController extends AppController
 
         // Send verification email
         if ($this->emailService->sendVerificationEmail($subscriber)) {
-            $this->Flash->success(__d('subscribers', 'Email de verificação enviado para {0}.', $subscriber->email));
+            $this->Flash->success(__d('subscribers', 'Verification email sent to {0}.', $subscriber->email));
         } else {
-            $this->Flash->error(__d('subscribers', 'Não foi possível enviar o email de verificação. Por favor, tente novamente.'));
+            $this->Flash->error(__d('subscribers', 'Unable to send verification email. Please try again.'));
         }
 
         return $this->redirect($this->referer(['action' => 'view', $id]));

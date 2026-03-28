@@ -57,7 +57,7 @@ class StatusController extends AppController
         if (!$isPublic) {
             $identity = $this->Authentication->getIdentity();
             if (!$identity) {
-                $this->Flash->error(__d('status', 'A página de status não está disponível publicamente. Por favor, faça login.'));
+                $this->Flash->error(__d('status', 'The status page is not publicly available. Please log in.'));
                 return $this->redirect(['controller' => 'Users', 'action' => 'login']);
             }
         }
@@ -97,20 +97,20 @@ class StatusController extends AppController
         if ($offlineMonitors > 0) {
             if ($offlineMonitors >= $totalMonitors / 2) {
                 $systemStatus = 'major-outage';
-                $systemMessage = 'Estamos enfrentando problemas graves';
+                $systemMessage = __('We are experiencing major issues');
                 $systemIcon = '🔴';
             } else {
                 $systemStatus = 'partial-outage';
-                $systemMessage = 'Alguns serviços estão com problemas';
+                $systemMessage = __('Some services are having issues');
                 $systemIcon = '🟡';
             }
         } elseif ($degradedMonitors > 0) {
             $systemStatus = 'partial-outage';
-            $systemMessage = 'Alguns serviços estão degradados';
+            $systemMessage = __('Some services are degraded');
             $systemIcon = '🟡';
         } else {
             $systemStatus = 'all-systems-operational';
-            $systemMessage = 'Todos os sistemas operacionais';
+            $systemMessage = __('All systems operational');
             $systemIcon = '🟢';
         }
 
@@ -126,7 +126,7 @@ class StatusController extends AppController
 
         // Load settings
         $siteName = $this->settingService->get('site_name', 'ISP Status');
-        $statusPageTitle = $this->settingService->get('status_page_title', 'Status dos Serviços');
+        $statusPageTitle = $this->settingService->get('status_page_title', 'Service Status');
         $logoUrl = $this->settingService->get('site_logo_url', null);
         $supportEmail = $this->settingService->get('support_email', 'support@example.com');
 
@@ -168,7 +168,7 @@ class StatusController extends AppController
         if (!$isPublic) {
             $identity = $this->Authentication->getIdentity();
             if (!$identity) {
-                $this->Flash->error(__d('status', 'A página de status não está disponível publicamente. Por favor, faça login.'));
+                $this->Flash->error(__d('status', 'The status page is not publicly available. Please log in.'));
                 return $this->redirect(['controller' => 'Users', 'action' => 'login']);
             }
         }

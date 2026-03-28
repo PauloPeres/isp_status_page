@@ -95,7 +95,7 @@ class SettingsController extends AppController
         $data = $this->request->getData('settings');
 
         if (!$data) {
-            $this->Flash->error(__d('settings', 'Nenhuma configuração foi enviada.'));
+            $this->Flash->error(__d('settings', 'No settings were submitted.'));
             return $this->redirect(['action' => 'index']);
         }
 
@@ -151,11 +151,11 @@ class SettingsController extends AppController
         }
 
         if ($successCount > 0) {
-            $this->Flash->success(__d('settings', "{$successCount} configuração(ões) salva(s) com sucesso."));
+            $this->Flash->success(__d('settings', "{$successCount} setting(s) saved successfully."));
         }
 
         if ($errorCount > 0) {
-            $this->Flash->error(__d('settings', "{$errorCount} configuração(ões) falharam ao salvar."));
+            $this->Flash->error(__d('settings', "{$errorCount} setting(s) failed to save."));
         }
 
         return $this->redirect(['action' => 'index', '#' => $category ?? '']);
@@ -173,13 +173,13 @@ class SettingsController extends AppController
         $toEmail = $this->request->getData('test_email');
 
         if (empty($toEmail)) {
-            $this->Flash->error(__d('settings', 'Por favor, informe um endereço de email para o teste.'));
+            $this->Flash->error(__d('settings', 'Please provide an email address for the test.'));
             return $this->redirect(['action' => 'index', '#' => 'email']);
         }
 
         // Validate email format
         if (!filter_var($toEmail, FILTER_VALIDATE_EMAIL)) {
-            $this->Flash->error(__d('settings', 'Endereço de email inválido.'));
+            $this->Flash->error(__d('settings', 'Invalid email address.'));
             return $this->redirect(['action' => 'index', '#' => 'email']);
         }
 
@@ -187,12 +187,12 @@ class SettingsController extends AppController
             $emailService = new EmailService();
 
             if ($emailService->sendTestEmail($toEmail)) {
-                $this->Flash->success(__d('settings', 'Email de teste enviado para {0}. Verifique sua caixa de entrada.', $toEmail));
+                $this->Flash->success(__d('settings', 'Test email sent to {0}. Check your inbox.', $toEmail));
             } else {
-                $this->Flash->error(__d('settings', 'Não foi possível enviar o email de teste. Verifique as configurações de email e os logs de erro.'));
+                $this->Flash->error(__d('settings', 'Unable to send test email. Please check email settings and error logs.'));
             }
         } catch (\Exception $e) {
-            $this->Flash->error(__d('settings', 'Erro ao enviar email de teste: {0}', $e->getMessage()));
+            $this->Flash->error(__d('settings', 'Error sending test email: {0}', $e->getMessage()));
         }
 
         return $this->redirect(['action' => 'index', '#' => 'email']);
@@ -225,9 +225,9 @@ class SettingsController extends AppController
         }
 
         if ($resetCount > 0) {
-            $this->Flash->success(__d('settings', "{$resetCount} configuração(ões) restaurada(s) para o padrão."));
+            $this->Flash->success(__d('settings', "{$resetCount} setting(s) restored to default."));
         } else {
-            $this->Flash->warning(__d('settings', 'Nenhuma configuração foi restaurada.'));
+            $this->Flash->warning(__d('settings', 'No settings were restored.'));
         }
 
         return $this->redirect(['action' => 'index', '#' => $category]);
@@ -274,9 +274,9 @@ class SettingsController extends AppController
             }
 
             if ($result['success']) {
-                $this->Flash->success(__d('settings', 'Conexao FTP/SFTP realizada com sucesso! {0}', $result['message']));
+                $this->Flash->success(__d('settings', 'FTP/SFTP connection successful! {0}', $result['message']));
             } else {
-                $this->Flash->error(__d('settings', 'Falha na conexao FTP/SFTP: {0}', $result['message']));
+                $this->Flash->error(__d('settings', 'FTP/SFTP connection failed: {0}', $result['message']));
             }
         } catch (\Exception $e) {
             if ($isAjax) {

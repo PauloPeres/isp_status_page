@@ -253,8 +253,8 @@ class IncidentsController extends AppController
                 'contain' => ['Monitors', 'AcknowledgedByUsers'],
             ]);
         } catch (\Cake\Datasource\Exception\RecordNotFoundException $e) {
-            $this->Flash->error(__d('incidents', 'Incidente nao encontrado.'));
-            $this->set('error', __d('incidents', 'Incidente nao encontrado.'));
+            $this->Flash->error(__d('incidents', 'Incident not found.'));
+            $this->set('error', __d('incidents', 'Incident not found.'));
             $this->set('incident', null);
 
             return;
@@ -262,8 +262,8 @@ class IncidentsController extends AppController
 
         // Validate token
         if (empty($token) || $token !== $incident->acknowledgement_token) {
-            $this->Flash->error(__d('incidents', 'Token de reconhecimento invalido.'));
-            $this->set('error', __d('incidents', 'Token de reconhecimento invalido.'));
+            $this->Flash->error(__d('incidents', 'Invalid acknowledgement token.'));
+            $this->set('error', __d('incidents', 'Invalid acknowledgement token.'));
             $this->set('incident', $incident);
 
             return;
@@ -271,7 +271,7 @@ class IncidentsController extends AppController
 
         // Check if already acknowledged
         if ($incident->isAcknowledged()) {
-            $this->Flash->warning(__d('incidents', 'Este incidente ja foi reconhecido.'));
+            $this->Flash->warning(__d('incidents', 'This incident has already been acknowledged.'));
             $this->set('error', null);
             $this->set('incident', $incident);
             $this->set('alreadyAcknowledged', true);
@@ -281,8 +281,8 @@ class IncidentsController extends AppController
 
         // Check token expiry (24h after incident creation)
         if (!$incident->isTokenValid()) {
-            $this->Flash->error(__d('incidents', 'O token de reconhecimento expirou (valido por 24h).'));
-            $this->set('error', __d('incidents', 'O token de reconhecimento expirou.'));
+            $this->Flash->error(__d('incidents', 'The acknowledgement token has expired (valid for 24h).'));
+            $this->set('error', __d('incidents', 'The acknowledgement token has expired.'));
             $this->set('incident', $incident);
 
             return;
@@ -292,7 +292,7 @@ class IncidentsController extends AppController
         $incident->acknowledgeBy(null, \App\Model\Entity\Incident::ACK_VIA_EMAIL);
 
         if ($this->Incidents->save($incident)) {
-            $this->Flash->success(__d('incidents', 'Incidente reconhecido com sucesso.'));
+            $this->Flash->success(__d('incidents', 'Incident acknowledged successfully.'));
 
             // Notify other recipients
             $this->notifyAcknowledgement($incident, 'Email link');
@@ -304,8 +304,8 @@ class IncidentsController extends AppController
             return;
         }
 
-        $this->Flash->error(__d('incidents', 'Erro ao reconhecer o incidente.'));
-        $this->set('error', __d('incidents', 'Erro ao reconhecer o incidente.'));
+        $this->Flash->error(__d('incidents', 'Error acknowledging incident.'));
+        $this->set('error', __d('incidents', 'Error acknowledging incident.'));
         $this->set('incident', $incident);
     }
 
@@ -326,7 +326,7 @@ class IncidentsController extends AppController
         ]);
 
         if ($incident->isAcknowledged()) {
-            $this->Flash->warning(__d('incidents', 'Este incidente ja foi reconhecido.'));
+            $this->Flash->warning(__d('incidents', 'This incident has already been acknowledged.'));
 
             return $this->redirect(['action' => 'view', $id]);
         }
@@ -338,13 +338,13 @@ class IncidentsController extends AppController
         $incident->acknowledgeBy($userId, \App\Model\Entity\Incident::ACK_VIA_WEB);
 
         if ($this->Incidents->save($incident)) {
-            $this->Flash->success(__d('incidents', 'Incidente reconhecido com sucesso.'));
+            $this->Flash->success(__d('incidents', 'Incident acknowledged successfully.'));
 
             // Notify other recipients
             $userName = $user ? ($user->get('username') ?? 'Admin') : 'Admin';
             $this->notifyAcknowledgement($incident, $userName);
         } else {
-            $this->Flash->error(__d('incidents', 'Erro ao reconhecer o incidente.'));
+            $this->Flash->error(__d('incidents', 'Error acknowledging incident.'));
         }
 
         return $this->redirect(['action' => 'view', $id]);

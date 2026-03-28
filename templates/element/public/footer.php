@@ -9,31 +9,30 @@ $supportEmail = Configure::read('Settings.support_email', 'support@example.com')
     <div class="container">
         <div class="footer-grid">
             <div class="footer-section">
-                <h4>Sobre</h4>
+                <h4><?= __('About') ?></h4>
                 <p>
-                    Esta página mostra o status em tempo real de todos os nossos serviços.
-                    Monitoramos continuamente para garantir a melhor experiência.
+                    <?= __('This page shows the real-time status of all our services. We continuously monitor to ensure the best experience.') ?>
                 </p>
             </div>
 
             <div class="footer-section">
-                <h4>Links Úteis</h4>
+                <h4><?= __('Useful Links') ?></h4>
                 <ul class="footer-links">
                     <li>
                         <?= $this->Html->link(
-                            'Página Inicial',
+                            __('Home Page'),
                             ['controller' => 'Status', 'action' => 'index']
                         ) ?>
                     </li>
                     <li>
                         <?= $this->Html->link(
-                            'Histórico de Incidentes',
+                            __('Incident History'),
                             ['controller' => 'Status', 'action' => 'history']
                         ) ?>
                     </li>
                     <li>
                         <?= $this->Html->link(
-                            'Assinar Notificações',
+                            __('Subscribe to Notifications'),
                             ['controller' => 'Subscribers', 'action' => 'subscribe']
                         ) ?>
                     </li>
@@ -41,19 +40,19 @@ $supportEmail = Configure::read('Settings.support_email', 'support@example.com')
             </div>
 
             <div class="footer-section">
-                <h4>Suporte</h4>
+                <h4><?= __('Support') ?></h4>
                 <p>
-                    <strong>Email:</strong><br>
+                    <strong><?= __('Email') ?>:</strong><br>
                     <a href="mailto:<?= h($supportEmail) ?>"><?= h($supportEmail) ?></a>
                 </p>
                 <p class="footer-note">
-                    Atualizações automáticas a cada 30 segundos
+                    <?= __('Automatic updates every 30 seconds') ?>
                 </p>
             </div>
         </div>
 
         <div class="footer-bottom">
-            <p>&copy; <?= date('Y') ?> <?= h($siteName) ?>. Todos os direitos reservados.</p>
+            <p>&copy; <?= date('Y') ?> <?= h($siteName) ?>. <?= __('All rights reserved.') ?></p>
             <p class="footer-powered">
                 Powered by <a href="https://github.com/PauloPeres/isp_status_page" target="_blank">ISP Status Page</a>
             </p>

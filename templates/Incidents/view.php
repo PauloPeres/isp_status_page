@@ -5,7 +5,7 @@
  * @var array $timeline
  * @var \Cake\Collection\CollectionInterface $recentChecks
  */
-$this->assign('title', 'Detalhes do Incidente');
+$this->assign('title', __('Incident Details'));
 ?>
 
 <style>
@@ -400,17 +400,17 @@ $this->assign('title', 'Detalhes do Incidente');
 <div class="incident-header">
     <div>
         <h2>🚨 <?= h($incident->title) ?></h2>
-        <?= $this->Html->link('← Voltar para Incidentes', ['action' => 'index'], ['class' => 'back-link']) ?>
+        <?= $this->Html->link('← ' . __('Back to Incidents'), ['action' => 'index'], ['class' => 'back-link']) ?>
     </div>
     <div class="header-actions">
         <?php if (!$incident->isResolved()): ?>
-            <?= $this->Html->link('Editar', ['action' => 'edit', $incident->id], ['class' => 'btn btn-primary']) ?>
+            <?= $this->Html->link(__('Edit'), ['action' => 'edit', $incident->id], ['class' => 'btn btn-primary']) ?>
             <?= $this->Form->postLink(
-                'Resolver',
+                __('Resolve'),
                 ['action' => 'resolve', $incident->id],
                 [
                     'class' => 'btn btn-success',
-                    'confirm' => 'Tem certeza que deseja resolver este incidente?'
+                    'confirm' => __('Are you sure you want to resolve this incident?')
                 ]
             ) ?>
         <?php endif; ?>
@@ -421,18 +421,18 @@ $this->assign('title', 'Detalhes do Incidente');
 <div class="status-banner <?= $incident->isResolved() ? 'success' : 'danger' ?>">
     <span style="font-size: 24px;"><?= $incident->isResolved() ? '✅' : '⚠️' ?></span>
     <span>
-        <?= $incident->isResolved() ? 'Incidente resolvido' : 'Incidente ativo' ?>
+        <?= $incident->isResolved() ? __('Incident resolved') : __('Incident active') ?>
         - <?= h($incident->getStatusName()) ?>
     </span>
 </div>
 
 <!-- Main Information -->
 <div class="incident-details">
-    <h3>📋 Informações Principais</h3>
+    <h3>📋 <?= __('Main Information') ?></h3>
 
     <div class="details-grid">
         <div class="detail-item">
-            <span class="detail-label">Status</span>
+            <span class="detail-label"><?= __('Status') ?></span>
             <span class="detail-value">
                 <span class="badge badge-<?= $incident->isResolved() ? 'success' : 'danger' ?> badge-lg">
                     <?= $incident->isResolved() ? '✅' : '⚠️' ?>
@@ -442,7 +442,7 @@ $this->assign('title', 'Detalhes do Incidente');
         </div>
 
         <div class="detail-item">
-            <span class="detail-label">Severidade</span>
+            <span class="detail-label"><?= __('Severity') ?></span>
             <span class="detail-value">
                 <span class="badge badge-<?= $incident->getSeverityBadgeClass() ?> badge-lg">
                     <?= h(ucfirst($incident->severity)) ?>
@@ -451,7 +451,7 @@ $this->assign('title', 'Detalhes do Incidente');
         </div>
 
         <div class="detail-item">
-            <span class="detail-label">Monitor Afetado</span>
+            <span class="detail-label"><?= __('Affected Monitor') ?></span>
             <span class="detail-value">
                 <?= $this->Html->link(
                     h($incident->monitor->name),
@@ -462,25 +462,25 @@ $this->assign('title', 'Detalhes do Incidente');
         </div>
 
         <div class="detail-item">
-            <span class="detail-label">Criação</span>
+            <span class="detail-label"><?= __('Creation') ?></span>
             <span class="detail-value">
-                <?= $incident->auto_created ? '🤖 Auto-criado' : '👤 Manual' ?>
+                <?= $incident->auto_created ? '🤖 ' . __('Auto-created') : '👤 ' . __('Manual') ?>
             </span>
         </div>
 
         <div class="detail-item">
-            <span class="detail-label">Iniciado em</span>
+            <span class="detail-label"><?= __('Started at') ?></span>
             <span class="detail-value">
-                <?= h($incident->started_at->i18nFormat('dd/MM/yyyy HH:mm:ss')) ?>
+                <?= h($incident->started_at->i18nFormat('yyyy-MM-dd HH:mm:ss')) ?>
                 <div class="time-ago">(<?= h($incident->started_at->timeAgoInWords()) ?>)</div>
             </span>
         </div>
 
         <?php if ($incident->identified_at): ?>
             <div class="detail-item">
-                <span class="detail-label">Identificado em</span>
+                <span class="detail-label"><?= __('Identified at') ?></span>
                 <span class="detail-value">
-                    <?= h($incident->identified_at->i18nFormat('dd/MM/yyyy HH:mm:ss')) ?>
+                    <?= h($incident->identified_at->i18nFormat('yyyy-MM-dd HH:mm:ss')) ?>
                     <div class="time-ago">(<?= h($incident->identified_at->timeAgoInWords()) ?>)</div>
                 </span>
             </div>
@@ -488,43 +488,43 @@ $this->assign('title', 'Detalhes do Incidente');
 
         <?php if ($incident->resolved_at): ?>
             <div class="detail-item">
-                <span class="detail-label">Resolvido em</span>
+                <span class="detail-label"><?= __('Resolved at') ?></span>
                 <span class="detail-value">
-                    <?= h($incident->resolved_at->i18nFormat('dd/MM/yyyy HH:mm:ss')) ?>
+                    <?= h($incident->resolved_at->i18nFormat('yyyy-MM-dd HH:mm:ss')) ?>
                     <div class="time-ago">(<?= h($incident->resolved_at->timeAgoInWords()) ?>)</div>
                 </span>
             </div>
         <?php endif; ?>
 
         <div class="detail-item">
-            <span class="detail-label">Duração</span>
+            <span class="detail-label"><?= __('Duration') ?></span>
             <span class="detail-value">
                 <?php if ($incident->duration !== null): ?>
                     <strong style="font-family: 'Courier New', monospace; color: #333;">
                         <?php
                         $duration = $incident->duration;
                         if ($duration < 60) {
-                            echo "{$duration} segundos";
+                            echo "{$duration} " . __('seconds');
                         } elseif ($duration < 3600) {
                             $minutes = floor($duration / 60);
                             $seconds = $duration % 60;
-                            echo $seconds > 0 ? "{$minutes}m {$seconds}s" : "{$minutes} minutos";
+                            echo $seconds > 0 ? "{$minutes}m {$seconds}s" : "{$minutes} " . __('minutes');
                         } else {
                             $hours = floor($duration / 3600);
                             $minutes = floor(($duration % 3600) / 60);
                             if ($hours < 24) {
-                                echo $minutes > 0 ? "{$hours}h {$minutes}m" : "{$hours} horas";
+                                echo $minutes > 0 ? "{$hours}h {$minutes}m" : "{$hours} " . __('hours');
                             } else {
                                 $days = floor($hours / 24);
                                 $remainingHours = $hours % 24;
-                                echo $remainingHours > 0 ? "{$days}d {$remainingHours}h" : "{$days} dias";
+                                echo $remainingHours > 0 ? "{$days}d {$remainingHours}h" : "{$days} " . __('days');
                             }
                         }
                         ?>
                     </strong>
                 <?php else: ?>
                     <span style="color: #999;">
-                        <?= $incident->isResolved() ? 'N/A' : '⏱️ Em andamento...' ?>
+                        <?= $incident->isResolved() ? 'N/A' : '⏱️ ' . __('In progress...') ?>
                     </span>
                 <?php endif; ?>
             </span>
@@ -533,7 +533,7 @@ $this->assign('title', 'Detalhes do Incidente');
 
     <?php if ($incident->description): ?>
         <div class="description-section">
-            <div class="detail-label">Descrição</div>
+            <div class="detail-label"><?= __('Description') ?></div>
             <div class="description-box">
                 <?= h($incident->description) ?>
             </div>
@@ -543,7 +543,7 @@ $this->assign('title', 'Detalhes do Incidente');
 
 <!-- Timeline -->
 <div class="timeline-section">
-    <h3>⏱️ Timeline de Eventos</h3>
+    <h3>⏱️ <?= __('Event Timeline') ?></h3>
     <div class="timeline">
         <?php foreach ($timeline as $event): ?>
             <div class="timeline-item timeline-<?= h($event['color']) ?>">
@@ -552,7 +552,7 @@ $this->assign('title', 'Detalhes do Incidente');
                 </div>
                 <div class="timeline-content">
                     <div class="timeline-time">
-                        <?= h($event['timestamp']->i18nFormat('dd/MM/yyyy HH:mm:ss')) ?>
+                        <?= h($event['timestamp']->i18nFormat('yyyy-MM-dd HH:mm:ss')) ?>
                         <span style="color: #999;">(<?= h($event['timestamp']->timeAgoInWords()) ?>)</span>
                     </div>
                     <div class="timeline-title"><?= h($event['title']) ?></div>
@@ -566,7 +566,7 @@ $this->assign('title', 'Detalhes do Incidente');
 <!-- Recent Monitor Checks -->
 <?php if ($recentChecks->count() > 0): ?>
     <div class="checks-section">
-        <h3>📊 Verificações Recentes do Monitor</h3>
+        <h3>📊 <?= __('Recent Monitor Checks') ?></h3>
         <div class="checks-grid">
             <?php foreach ($recentChecks as $check): ?>
                 <div class="check-item check-<?= h($check->status) ?>">
@@ -590,8 +590,8 @@ $this->assign('title', 'Detalhes do Incidente');
 <?php endif; ?>
 
 <div style="margin-top: 24px;">
-    <?= $this->Html->link('← Voltar para Incidentes', ['action' => 'index'], ['class' => 'btn btn-secondary']) ?>
-    <?= $this->Html->link('Ver Monitor', ['controller' => 'Monitors', 'action' => 'view', $incident->monitor->id], [
+    <?= $this->Html->link('← ' . __('Back to Incidents'), ['action' => 'index'], ['class' => 'btn btn-secondary']) ?>
+    <?= $this->Html->link(__('View Monitor'), ['controller' => 'Monitors', 'action' => 'view', $incident->monitor->id], [
         'class' => 'btn',
         'style' => 'background: #3b82f6; color: white; margin-left: 8px;'
     ]) ?>
