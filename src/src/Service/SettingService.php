@@ -7,12 +7,21 @@ use App\Model\Table\SettingsTable;
 use App\Tenant\TenantContext;
 use Cake\Cache\Cache;
 use Cake\ORM\Locator\LocatorAwareTrait;
+use Cake\ORM\TableRegistry;
 
 /**
  * Setting Service
  *
  * Provides cached access to application settings.
  * Settings are stored in the database and cached for performance.
+ *
+ * Supports two levels of settings:
+ * - System-level: stored in the `settings` table, ignores tenant scope.
+ *   Used for SMTP, FTP backup, system defaults.
+ * - Org-level: stored in Organization.settings JSON column.
+ *   Used for org preferences (name, logo, timezone, notifications).
+ *
+ * The `get()` method cascades: org settings -> system settings -> default.
  */
 class SettingService
 {
@@ -32,6 +41,36 @@ class SettingService
      * Cache duration in seconds (1 hour)
      */
     private const CACHE_DURATION = 3600;
+
+    /**
+     * Setting key prefixes that ALWAYS read from system level (bypass org).
+     * These are platform-managed settings that customers cannot override.
+     *
+     * @var array<string>
+     */
+    private const SYSTEM_ONLY_PREFIXES = [
+        'smtp_',
+        'backup_ftp_',
+    ];
+
+    /**
+     * Individual setting keys that ALWAYS read from system level (bypass org).
+     *
+     * @var array<string>
+     */
+    private const SYSTEM_ONLY_KEYS = [
+        'default_language',
+    ];
+
+    /**
+     * Setting keys that are org-level but fall back to system defaults.
+     * Org can override these, but system provides the default.
+     *
+     * @var array<string>
+     */
+    private const ORG_OVERRIDABLE_KEYS = [
+        'site_name',
+    ];
 
     /**
      * Settings table instance
@@ -74,7 +113,73 @@ class SettingService
     }
 
     /**
-     * Get a setting value by key
+     * Get a system-level setting (ignores tenant scope).
+     * Used for: SMTP, FTP, system defaults.
+     *
+     * @param string $key The setting key
+     * @param mixed $default Default value if setting doesn't exist
+     * @return mixed
+     */
+    public function getSystem(string $key, mixed $default = null): mixed
+    {
+        $settingsTable = TableRegistry::getTableLocator()->get('Settings');
+        // Query WITHOUT tenant scope
+        $setting = $settingsTable->find()
+            ->applyOptions(['skipTenantScope' => true])
+            ->where(['key' => $key])
+            ->first();
+
+        return $setting ? $setting->value : $default;
+    }
+
+    /**
+     * Get org-level setting from Organization.settings JSON.
+     *
+     * @param string $key The setting key
+     * @param mixed $default Default value if setting doesn't exist
+     * @return mixed
+     */
+    public function getOrg(string $key, mixed $default = null): mixed
+    {
+        if (TenantContext::isSet()) {
+            $org = TenantContext::getCurrentOrganization();
+            $orgSettings = json_decode($org['settings'] ?? '{}', true);
+            if (isset($orgSettings[$key])) {
+                return $orgSettings[$key];
+            }
+        }
+
+        return $default;
+    }
+
+    /**
+     * Check if a setting key must always be read from system level.
+     *
+     * @param string $key The setting key
+     * @return bool
+     */
+    private function isSystemOnlyKey(string $key): bool
+    {
+        // Check exact key matches
+        if (in_array($key, self::SYSTEM_ONLY_KEYS, true)) {
+            return true;
+        }
+
+        // Check prefix matches
+        foreach (self::SYSTEM_ONLY_PREFIXES as $prefix) {
+            if (str_starts_with($key, $prefix)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Get a setting value by key.
+     *
+     * Cascades: org settings -> system settings -> default.
+     * System-only keys (SMTP, FTP, etc.) bypass org and always read from system.
      *
      * @param string $key The setting key
      * @param mixed $default Default value if setting doesn't exist
@@ -82,6 +187,19 @@ class SettingService
      */
     public function get(string $key, mixed $default = null): mixed
     {
+        // System-only keys always bypass org settings
+        if ($this->isSystemOnlyKey($key)) {
+            $settings = $this->getAll();
+
+            return $settings[$key] ?? $default;
+        }
+
+        // For all other keys, cascade: org -> system -> default
+        $orgValue = $this->getOrg($key);
+        if ($orgValue !== null) {
+            return $orgValue;
+        }
+
         $settings = $this->getAll();
 
         return $settings[$key] ?? $default;
@@ -237,17 +355,10 @@ class SettingService
      * @param string $key The setting key
      * @param mixed $default Default value if neither org nor global setting exists
      * @return mixed
+     * @deprecated Use get() instead, which now cascades org -> system -> default.
      */
     public function getOrgSetting(string $key, mixed $default = null): mixed
     {
-        if (TenantContext::isSet()) {
-            $org = TenantContext::getCurrentOrganization();
-            $orgSettings = json_decode($org['settings'] ?? '{}', true);
-            if (isset($orgSettings[$key])) {
-                return $orgSettings[$key];
-            }
-        }
-
         return $this->get($key, $default);
     }
 
