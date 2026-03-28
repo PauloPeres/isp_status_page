@@ -10,6 +10,7 @@ use App\Model\Entity\Monitor;
 use App\Model\Table\AlertLogsTable;
 use App\Model\Table\AlertRulesTable;
 use App\Service\MaintenanceService;
+use App\Service\NotificationCreditService;
 use Cake\I18n\DateTime;
 use Cake\Log\Log;
 use Cake\ORM\Locator\LocatorAwareTrait;
@@ -157,6 +158,24 @@ class AlertService
                         continue;
                     }
 
+                    // Check notification credits for paid channels (SMS, WhatsApp)
+                    $creditService = new NotificationCreditService();
+                    if ($creditService->getCostForChannel($rule->channel) > 0) {
+                        $orgId = (int)$monitor->organization_id;
+                        if (!$creditService->hasCredits($orgId, $rule->channel)) {
+                            Log::warning("Insufficient credits for org {$orgId}, channel {$rule->channel}, falling back to email");
+                            $this->logAlert($rule, $incident, AlertLog::STATUS_FAILED, "Insufficient credits for {$rule->channel}");
+
+                            // Fall back to email channel
+                            $emailChannel = $this->getChannel('email');
+                            if ($emailChannel !== null) {
+                                $emailChannel->send($rule, $monitor, $incident);
+                            }
+
+                            continue;
+                        }
+                    }
+
                     // Send the alert
                     $result = $channel->send($rule, $monitor, $incident);
 
@@ -175,6 +194,12 @@ class AlertService
 
                     if (!empty($result['success'])) {
                         $dispatched++;
+
+                        // Deduct credits after successful send on paid channels
+                        if ($creditService->getCostForChannel($rule->channel) > 0) {
+                            $orgId = (int)$monitor->organization_id;
+                            $creditService->deduct($orgId, $rule->channel);
+                        }
                     }
 
                     Log::info("Alert dispatched for rule {$rule->id} via {$rule->channel}", [
