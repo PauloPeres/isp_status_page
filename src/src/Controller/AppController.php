@@ -129,11 +129,8 @@ class AppController extends Controller
 
         // Apply locale and timezone
         I18n::setLocale($language);
-        try {
-            DateTime::setDefaultTimezone($timezone);
-        } catch (\Exception $e) {
-            // Invalid timezone; fall back to UTC
-            DateTime::setDefaultTimezone('UTC');
+        if ($timezone && $timezone !== 'UTC') {
+            date_default_timezone_set($timezone);
         }
 
         /*
