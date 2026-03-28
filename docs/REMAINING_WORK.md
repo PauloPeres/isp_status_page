@@ -412,11 +412,12 @@
 - **Complexity:** Medium
 - **Dependencies:** None
 
-### P4-009: Mobile app / PWA
+### P4-009: Mobile app / PWA -- DONE
 - **Source:** USER_TESTING_POWER_USER.md
 - **Description:** No mobile app and no PWA manifest detected. Mobile web works but a dedicated app or PWA would improve the on-the-go experience.
 - **Complexity:** Large
 - **Dependencies:** API (completed)
+- **Resolution:** Full PWA implementation. Created manifest.json with app metadata, icons, shortcuts (Dashboard, Monitors, Status Page), and standalone display mode. Created sw.js service worker with pre-caching of static assets (CSS, JS, icons), network-first fetch strategy with cache fallback, offline page fallback for HTML requests, and push notification support with notification click handling. Created offline.html fallback page with auto-reload on reconnect. Added PWA meta tags (manifest link, apple-mobile-web-app-capable, apple-mobile-web-app-status-bar-style, apple-mobile-web-app-title, apple-touch-icon) and service worker registration script to all layouts (admin, public, super_admin) and standalone auth pages (login, register).
 
 ### P4-010: Scheduled email reports -- DONE
 - **Source:** USER_TESTING_POWER_USER.md

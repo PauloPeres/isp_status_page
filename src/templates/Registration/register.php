@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= __('Register') ?> - ISP Status</title>
     <link rel="stylesheet" href="/css/auth.css">
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#1E88E5">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="ISP Status">
+    <link rel="apple-touch-icon" href="/img/icon_isp_status_page.png">
 </head>
 <body>
     <div class="register-box">
@@ -163,5 +171,10 @@
             <?= __('Already have an account? Sign in') ?>
         </a>
     </div>
+    <script>
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+    }
+    </script>
 </body>
 </html>

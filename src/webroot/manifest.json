@@ -1,0 +1,42 @@
+{
+    "name": "ISP Status Page",
+    "short_name": "ISP Status",
+    "description": "Real-time uptime monitoring, status pages, and instant alerts",
+    "start_url": "/dashboard",
+    "display": "standalone",
+    "background_color": "#1E88E5",
+    "theme_color": "#1E88E5",
+    "orientation": "any",
+    "icons": [
+        {
+            "src": "/img/icon_isp_status_page.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/img/icon_isp_status_page.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "categories": ["business", "productivity", "utilities"],
+    "shortcuts": [
+        {
+            "name": "Dashboard",
+            "url": "/dashboard",
+            "icons": [{"src": "/img/icon_isp_status_page.png", "sizes": "96x96"}]
+        },
+        {
+            "name": "Monitors",
+            "url": "/monitors",
+            "icons": [{"src": "/img/icon_isp_status_page.png", "sizes": "96x96"}]
+        },
+        {
+            "name": "Status Page",
+            "url": "/status",
+            "icons": [{"src": "/img/icon_isp_status_page.png", "sizes": "96x96"}]
+        }
+    ]
+}
