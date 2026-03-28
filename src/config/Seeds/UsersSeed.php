@@ -33,6 +33,8 @@ class UsersSeed extends AbstractSeed
                 'email' => 'admin@example.com',
                 'role' => 'admin',
                 'active' => 1,
+                'email_verified' => true,
+                'is_super_admin' => true,
                 'last_login' => null,
                 'created' => date('Y-m-d H:i:s'),
                 'modified' => date('Y-m-d H:i:s'),
