@@ -130,7 +130,7 @@ $this->assign('title', __d('incidents', 'Incidents'));
                             <div class="incident-title">
                                 <?= h($incident->title) ?>
                                 <?php if ($incident->auto_created): ?>
-                                    <span class="badge badge-secondary" title="Auto-criado">&#x1F916;</span>
+                                    <span class="badge badge-secondary" title="<?= __d('incidents', 'Auto-created') ?>">&#x1F916;</span>
                                 <?php endif; ?>
                                 <?= $this->element('incidents/acknowledge_badge', ['incident' => $incident]) ?>
                             </div>
@@ -223,13 +223,13 @@ $this->assign('title', __d('incidents', 'Incidents'));
 <!-- Pagination -->
 <?php if ($incidents->count() > 0): ?>
     <div class="pagination">
-        <?= $this->Paginator->first(__d('incidents', '« First')) ?>
-        <?= $this->Paginator->prev(__d('incidents', '‹ Previous')) ?>
+        <?= $this->Paginator->first('« ' . __('First')) ?>
+        <?= $this->Paginator->prev('‹ ' . __('Previous')) ?>
         <?= $this->Paginator->numbers() ?>
-        <?= $this->Paginator->next(__d('incidents', 'Next ›')) ?>
-        <?= $this->Paginator->last(__d('incidents', 'Last »')) ?>
+        <?= $this->Paginator->next(__('Next') . ' ›') ?>
+        <?= $this->Paginator->last(__('Last') . ' »') ?>
     </div>
     <div class="pagination-info">
-        <?= $this->Paginator->counter(__d('incidents', 'Page {{page}} of {{pages}}, showing {{current}} record(s) of {{count}} total')) ?>
+        <?= $this->Paginator->counter(__('Page {{page}} of {{pages}}, showing {{current}} record(s) of {{count}} total')) ?>
     </div>
 <?php endif; ?>

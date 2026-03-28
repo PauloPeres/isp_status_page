@@ -47,10 +47,9 @@ $this->assign('title', __('Organizations'));
             ]) ?>
         </div>
 
-        <div class="filter-group filter-actions">
-            <label>&nbsp;</label>
-            <button type="submit" class="btn btn-primary"><?= __('Filter') ?></button>
-            <?= $this->Html->link(__('Clear'), ['action' => 'index'], ['class' => 'btn btn-secondary']) ?>
+        <div class="filter-buttons">
+            <?= $this->Form->button(__('Filter'), ['type' => 'submit', 'class' => 'btn-filter']) ?>
+            <?= $this->Html->link(__('Clear'), ['action' => 'index'], ['class' => 'btn-clear']) ?>
         </div>
     </div>
     <?= $this->Form->end() ?>
@@ -112,24 +111,24 @@ $this->assign('title', __('Organizations'));
                         <?php endif; ?>
                     </td>
                     <td>
-                        <span class="utc-datetime" data-utc="<?= $org->created ? $org->created->format('c') : '' ?>">
-                            <?= $org->created ? $org->created->format('Y-m-d') : '-' ?>
-                        </span>
+                        <?= $org->created ? $org->created->nice() : '-' ?>
                     </td>
                     <td class="actions-cell">
-                        <?= $this->Html->link(
-                            __('View'),
-                            ['action' => 'view', $org->id],
-                            ['class' => 'btn btn-sm btn-secondary']
-                        ) ?>
-                        <?= $this->Form->postLink(
-                            __('Impersonate'),
-                            ['action' => 'impersonate', $org->id],
-                            [
-                                'class' => 'btn btn-sm btn-warning',
-                                'confirm' => __('Impersonate organization "{0}"?', h($org->name)),
-                            ]
-                        ) ?>
+                        <div class="action-buttons">
+                            <?= $this->Html->link(
+                                __('View'),
+                                ['action' => 'view', $org->id],
+                                ['class' => 'btn-action btn-action-view']
+                            ) ?>
+                            <?= $this->Form->postLink(
+                                __('Impersonate'),
+                                ['action' => 'impersonate', $org->id],
+                                [
+                                    'class' => 'btn-action btn-action-toggle',
+                                    'confirm' => __('Impersonate organization "{0}"?', h($org->name)),
+                                ]
+                            ) ?>
+                        </div>
                     </td>
                 </tr>
                 <?php endforeach; ?>
@@ -138,14 +137,14 @@ $this->assign('title', __('Organizations'));
     </div>
 
     <!-- Pagination -->
-    <div class="pagination-wrapper">
-        <?= $this->Paginator->counter(__('Page {{page}} of {{pages}} ({{count}} organizations)')) ?>
-        <ul class="pagination">
-            <?= $this->Paginator->first('<<') ?>
-            <?= $this->Paginator->prev('<') ?>
-            <?= $this->Paginator->numbers() ?>
-            <?= $this->Paginator->next('>') ?>
-            <?= $this->Paginator->last('>>') ?>
-        </ul>
+    <div class="pagination">
+        <?= $this->Paginator->first('« ' . __('First')) ?>
+        <?= $this->Paginator->prev('‹ ' . __('Previous')) ?>
+        <?= $this->Paginator->numbers() ?>
+        <?= $this->Paginator->next(__('Next') . ' ›') ?>
+        <?= $this->Paginator->last(__('Last') . ' »') ?>
+    </div>
+    <div class="pagination-info">
+        <?= $this->Paginator->counter(__('Page {{page}} of {{pages}}, showing {{current}} record(s) of {{count}} total')) ?>
     </div>
 </div>

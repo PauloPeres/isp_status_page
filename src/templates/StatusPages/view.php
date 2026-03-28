@@ -62,11 +62,11 @@ $this->assign('title', __('Status Page: {0}', h($statusPage->name)));
         </div>
         <div class="detail-item">
             <span class="detail-label"><?= __('Created') ?></span>
-            <span class="detail-value"><?= h($statusPage->created->format('Y-m-d H:i:s')) ?></span>
+            <span class="detail-value"><?= $statusPage->created->nice() ?></span>
         </div>
         <div class="detail-item">
             <span class="detail-label"><?= __('Modified') ?></span>
-            <span class="detail-value"><?= h($statusPage->modified->format('Y-m-d H:i:s')) ?></span>
+            <span class="detail-value"><?= $statusPage->modified->nice() ?></span>
         </div>
     </div>
 

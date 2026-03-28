@@ -93,7 +93,7 @@
                                         <span class="badge badge-warning"><?= __('Pending') ?></span>
                                     <?php endif; ?>
                                 </td>
-                                <td><?= h($invitation->created->format('Y-m-d H:i')) ?></td>
+                                <td><?= $invitation->created->nice() ?></td>
                                 <td>
                                     <?php if ($invitation->isPending()): ?>
                                         <?= $this->Form->postLink(

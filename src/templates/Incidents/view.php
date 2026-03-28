@@ -426,8 +426,7 @@ $this->assign('title', __d('incidents', 'Incident Details'));
                     __d('incidents', 'Acknowledge'),
                     ['action' => 'acknowledgeAdmin', $incident->id],
                     [
-                        'class' => 'btn',
-                        'style' => 'background: #1E88E5; color: white;',
+                        'class' => 'btn btn-primary',
                         'confirm' => __d('incidents', 'Acknowledge this incident?')
                     ]
                 ) ?>
@@ -499,7 +498,7 @@ $this->assign('title', __d('incidents', 'Incident Details'));
         <div class="detail-item">
             <span class="detail-label"><?= __d('incidents', 'Started at') ?></span>
             <span class="detail-value">
-                <?= h($incident->started_at->i18nFormat('dd/MM/yyyy HH:mm:ss')) ?>
+                <?= h($incident->started_at->nice()) ?>
                 <div class="time-ago">(<?= h($incident->started_at->timeAgoInWords()) ?>)</div>
             </span>
         </div>
@@ -508,7 +507,7 @@ $this->assign('title', __d('incidents', 'Incident Details'));
             <div class="detail-item">
                 <span class="detail-label"><?= __d('incidents', 'Identified at') ?></span>
                 <span class="detail-value">
-                    <?= h($incident->identified_at->i18nFormat('dd/MM/yyyy HH:mm:ss')) ?>
+                    <?= h($incident->identified_at->nice()) ?>
                     <div class="time-ago">(<?= h($incident->identified_at->timeAgoInWords()) ?>)</div>
                 </span>
             </div>
@@ -518,7 +517,7 @@ $this->assign('title', __d('incidents', 'Incident Details'));
             <div class="detail-item">
                 <span class="detail-label"><?= __d('incidents', 'Resolved at') ?></span>
                 <span class="detail-value">
-                    <?= h($incident->resolved_at->i18nFormat('dd/MM/yyyy HH:mm:ss')) ?>
+                    <?= h($incident->resolved_at->nice()) ?>
                     <div class="time-ago">(<?= h($incident->resolved_at->timeAgoInWords()) ?>)</div>
                 </span>
             </div>
@@ -569,7 +568,7 @@ $this->assign('title', __d('incidents', 'Incident Details'));
                     <?php endif; ?>
                     <?php if ($incident->acknowledged_at): ?>
                         <div class="time-ago">
-                            <?= h($incident->acknowledged_at->i18nFormat('dd/MM/yyyy HH:mm:ss')) ?>
+                            <?= h($incident->acknowledged_at->nice()) ?>
                             (<?= h($incident->acknowledged_at->timeAgoInWords()) ?>)
                         </div>
                     <?php endif; ?>
@@ -605,7 +604,7 @@ $this->assign('title', __d('incidents', 'Incident Details'));
                 </div>
                 <div class="timeline-content">
                     <div class="timeline-time">
-                        <?= h($event['timestamp']->i18nFormat('dd/MM/yyyy HH:mm:ss')) ?>
+                        <?= h($event['timestamp']->nice()) ?>
                         <span style="color: #999;">(<?= h($event['timestamp']->timeAgoInWords()) ?>)</span>
                     </div>
                     <div class="timeline-title"><?= h($event['title']) ?></div>
@@ -645,7 +644,6 @@ $this->assign('title', __d('incidents', 'Incident Details'));
 <div style="margin-top: 24px;">
     <?= $this->Html->link(__d('incidents', '← Back to Incidents'), ['action' => 'index'], ['class' => 'btn btn-secondary']) ?>
     <?= $this->Html->link(__d('incidents', 'View Monitor'), ['controller' => 'Monitors', 'action' => 'view', $incident->monitor->id], [
-        'class' => 'btn',
-        'style' => 'background: #3b82f6; color: white; margin-left: 8px;'
+        'class' => 'btn btn-primary'
     ]) ?>
 </div>

@@ -18,7 +18,7 @@ Monitor:    <?= h($monitor->name) ?>
 Status:     DOWN
 Severity:   <?= h($incident->severity) ?>
 
-Started at: <?= $incident->started_at->format('Y-m-d H:i:s') ?>
+Started at: <?= $incident->started_at->nice() ?>
 
 <?php if (!empty($incident->description)): ?>
 Description: <?= h($incident->description) ?>

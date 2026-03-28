@@ -69,7 +69,7 @@ $badgeColors = [
                 <?php foreach ($logs as $log): ?>
                     <tr>
                         <td style="white-space: nowrap;">
-                            <?= $log->created ? h($log->created->format('Y-m-d H:i:s')) : '-' ?>
+                            <?= $log->created ? $log->created->nice() : '-' ?>
                         </td>
                         <td>
                             <?php

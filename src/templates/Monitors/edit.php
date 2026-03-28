@@ -149,15 +149,15 @@ $this->assign('title', __d('monitors', 'Edit Monitor'));
                 </div>
                 <div class="info-item">
                     <span class="info-label"><?= __d('monitors', 'Last Check') ?>:</span>
-                    <span><?= $monitor->last_check ? $monitor->last_check->format('d/m/Y H:i:s') : __d('monitors', 'Never') ?></span>
+                    <span><?= $monitor->last_check ? $monitor->last_check->nice() : __d('monitors', 'Never') ?></span>
                 </div>
                 <div class="info-item">
                     <span class="info-label"><?= __('Created') ?>:</span>
-                    <span><?= $monitor->created->format('d/m/Y H:i:s') ?></span>
+                    <span><?= $monitor->created->nice() ?></span>
                 </div>
                 <div class="info-item">
                     <span class="info-label"><?= __('Last Updated') ?>:</span>
-                    <span><?= $monitor->modified->format('d/m/Y H:i:s') ?></span>
+                    <span><?= $monitor->modified->nice() ?></span>
                 </div>
             </div>
         </div>

@@ -95,7 +95,7 @@ $this->assign('title', __d('incidents', 'Incident Acknowledgement'));
                 <p><?= __d('incidents', 'This incident has already been acknowledged.') ?></p>
                 <?php if ($incident->acknowledged_at): ?>
                     <p style="font-size: 14px; color: #888;">
-                        <?= __d('incidents', 'Acknowledged at {0}', h($incident->acknowledged_at->i18nFormat('dd/MM/yyyy HH:mm:ss'))) ?>
+                        <?= __d('incidents', 'Acknowledged at {0}', h($incident->acknowledged_at->nice())) ?>
                     </p>
                 <?php endif; ?>
             </div>
@@ -115,7 +115,7 @@ $this->assign('title', __d('incidents', 'Incident Acknowledgement'));
                         <dd><?= h(ucfirst($incident->severity)) ?></dd>
 
                         <dt><?= __d('incidents', 'Acknowledged at') ?></dt>
-                        <dd><?= $incident->acknowledged_at ? h($incident->acknowledged_at->i18nFormat('dd/MM/yyyy HH:mm:ss')) : '-' ?></dd>
+                        <dd><?= $incident->acknowledged_at ? h($incident->acknowledged_at->nice()) : '-' ?></dd>
                     </dl>
                 </div>
                 <p style="font-size: 14px; color: #888;">

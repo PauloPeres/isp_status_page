@@ -162,9 +162,7 @@ $this->assign('title', __('Platform Health'));
                             </td>
                             <td>
                                 <?php if ($alert->created): ?>
-                                    <span class="local-datetime" data-utc="<?= $alert->created->format('c') ?>">
-                                        <?= h($alert->created->format('Y-m-d H:i')) ?>
-                                    </span>
+                                    <?= $alert->created->nice() ?>
                                 <?php else: ?>
                                     -
                                 <?php endif; ?>

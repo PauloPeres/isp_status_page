@@ -70,7 +70,7 @@ $this->assign('title', $statusPageTitle);
 
 <!-- Auto-reload Indicator -->
 <div class="auto-reload-indicator">
-    <span id="reload-message"><?= __('Next update in:') ?> <strong id="countdown">300</strong> <?= __('seconds') ?></span>
+    <span id="reload-message"><?= __('Next update in:') ?> <strong id="countdown">30</strong> <?= __('seconds') ?></span>
 </div>
 
 <style>
@@ -95,8 +95,8 @@ $this->assign('title', $statusPageTitle);
 </style>
 
 <script>
-// Auto-refresh page every 5 minutes (300 seconds)
-const RELOAD_INTERVAL = 300; // seconds
+// Auto-refresh page every 30 seconds
+const RELOAD_INTERVAL = 30; // seconds
 let secondsRemaining = RELOAD_INTERVAL;
 let countdownInterval;
 
@@ -123,8 +123,8 @@ document.addEventListener('DOMContentLoaded', function() {
     countdownInterval = setInterval(updateCountdown, 1000);
 
     // Show last update time in console
-    console.log('<?= __('Last update:') ?> ' + new Date().toLocaleString('pt-BR'));
-    console.log('<?= __('Next update in 5 minutes') ?>');
+    console.log('<?= __('Last update:') ?> ' + new Date().toLocaleString());
+    console.log('<?= __('Next update in 30 seconds') ?>');
 
     // Smooth scroll to subscribe form
     const subscribeLink = document.querySelector('a[href="#subscribe-form"]');

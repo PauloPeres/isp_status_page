@@ -135,7 +135,7 @@ $this->assign('title', __d('subscribers', 'Notification Subscribers'));
                                 <?php if ($subscriber->verified_at): ?>
                                     <br>
                                     <span style="color: #999; font-size: 12px;">
-                                        <?= $subscriber->verified_at->i18nFormat('dd/MM/yyyy HH:mm') ?>
+                                        <?= $subscriber->verified_at->nice() ?>
                                     </span>
                                 <?php endif; ?>
                             <?php else: ?>
@@ -150,11 +150,7 @@ $this->assign('title', __d('subscribers', 'Notification Subscribers'));
                             <?php endif; ?>
                         </td>
                         <td>
-                            <strong><?= h($subscriber->created->i18nFormat('dd/MM/yyyy')) ?></strong>
-                            <br>
-                            <span style="color: #666; font-size: 13px;">
-                                <?= h($subscriber->created->i18nFormat('HH:mm:ss')) ?>
-                            </span>
+                            <?= $subscriber->created->nice() ?>
                         </td>
                         <td>
                             <?php if (isset($subscriber->subscriptions) && count($subscriber->subscriptions) > 0): ?>
@@ -178,7 +174,7 @@ $this->assign('title', __d('subscribers', 'Notification Subscribers'));
                                     [
                                         'class' => 'btn-action btn-action-toggle',
                                         'title' => $subscriber->active ? __d('subscribers', 'Deactivate subscriber') : __d('subscribers', 'Activate subscriber'),
-                                        'confirm' => __d('subscribers', 'Tem certeza que deseja {0} este inscrito?', $subscriber->active ? __d('subscribers', 'deactivate') : __d('subscribers', 'activate'))
+                                        'confirm' => __d('subscribers', 'Are you sure you want to {0} this subscriber?', $subscriber->active ? __d('subscribers', 'deactivate') : __d('subscribers', 'activate'))
                                     ]
                                 ) ?>
                                 <?= $this->Form->postLink(
@@ -207,13 +203,13 @@ $this->assign('title', __d('subscribers', 'Notification Subscribers'));
 <!-- Pagination -->
 <?php if ($subscribers->count() > 0): ?>
     <div class="pagination">
-        <?= $this->Paginator->first(__d('subscribers', '« First')) ?>
-        <?= $this->Paginator->prev(__d('subscribers', '‹ Previous')) ?>
+        <?= $this->Paginator->first('« ' . __('First')) ?>
+        <?= $this->Paginator->prev('‹ ' . __('Previous')) ?>
         <?= $this->Paginator->numbers() ?>
-        <?= $this->Paginator->next(__d('subscribers', 'Next ›')) ?>
-        <?= $this->Paginator->last(__d('subscribers', 'Last »')) ?>
+        <?= $this->Paginator->next(__('Next') . ' ›') ?>
+        <?= $this->Paginator->last(__('Last') . ' »') ?>
     </div>
     <div class="pagination-info">
-        <?= $this->Paginator->counter(__d('subscribers', 'Page {{page}} of {{pages}}, showing {{current}} record(s) of {{count}} total')) ?>
+        <?= $this->Paginator->counter(__('Page {{page}} of {{pages}}, showing {{current}} record(s) of {{count}} total')) ?>
     </div>
 <?php endif; ?>

@@ -98,7 +98,7 @@ $planPrices = [
                                 ?>
                                 $<?= number_format($perOrg, 2) ?>
                             </td>
-                            <td><?= $org->created ? h($org->created->format('Y-m-d')) : '-' ?></td>
+                            <td><?= $org->created ? $org->created->nice() : '-' ?></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>

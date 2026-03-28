@@ -298,7 +298,7 @@ $this->assign('title', __d('checks', 'Check Details'));
         <div class="detail-item">
             <span class="detail-label"><?= __d('checks', 'Date/Time') ?></span>
             <span class="detail-value">
-                <?= h($check->checked_at->i18nFormat('dd/MM/yyyy HH:mm:ss')) ?>
+                <?= h($check->checked_at->nice()) ?>
             </span>
         </div>
 
@@ -333,7 +333,7 @@ $this->assign('title', __d('checks', 'Check Details'));
     <!-- Message -->
     <?php if ($check->message): ?>
         <div class="message-box <?= $check->status === 'failed' ? 'error' : '' ?>">
-            <h4><?= $check->status === 'failed' ? __d('checks', 'Error Message') : __d('checks', 'Mensagem') ?></h4>
+            <h4><?= $check->status === 'failed' ? __d('checks', 'Error Message') : __d('checks', 'Message') ?></h4>
             <pre><?= h($check->message) ?></pre>
         </div>
     <?php endif; ?>
@@ -399,7 +399,7 @@ $this->assign('title', __d('checks', 'Check Details'));
                     </span>
                     <div class="timeline-content">
                         <span class="timeline-time">
-                            <?= h($prevCheck->checked_at->i18nFormat('dd/MM/yyyy HH:mm:ss')) ?>
+                            <?= h($prevCheck->checked_at->nice()) ?>
                         </span>
                         <?php if ($prevCheck->response_time !== null): ?>
                             <span class="timeline-response">
@@ -417,7 +417,7 @@ $this->assign('title', __d('checks', 'Check Details'));
                 </span>
                 <div class="timeline-content">
                     <span class="timeline-time" style="font-weight: 600;">
-                        <?= h($check->checked_at->i18nFormat('dd/MM/yyyy HH:mm:ss')) ?> <?= __d('checks', '(current)') ?>
+                        <?= h($check->checked_at->nice()) ?> <?= __d('checks', '(current)') ?>
                     </span>
                     <?php if ($check->response_time !== null): ?>
                         <span class="timeline-response" style="font-weight: 600;">
@@ -435,7 +435,7 @@ $this->assign('title', __d('checks', 'Check Details'));
                     </span>
                     <div class="timeline-content">
                         <span class="timeline-time">
-                            <?= h($nextCheck->checked_at->i18nFormat('dd/MM/yyyy HH:mm:ss')) ?>
+                            <?= h($nextCheck->checked_at->nice()) ?>
                         </span>
                         <?php if ($nextCheck->response_time !== null): ?>
                             <span class="timeline-response">
@@ -454,12 +454,10 @@ $this->assign('title', __d('checks', 'Check Details'));
 </div>
 
 <div style="margin-top: 24px;">
-    <?= $this->Html->link(__d('checks', '← Back to Checks'), ['action' => 'index'], [
-        'class' => 'btn btn-secondary',
-        'style' => 'display: inline-block; padding: 10px 20px; background: #6b7280; color: white; text-decoration: none; border-radius: 6px;'
+    <?= $this->Html->link('← ' . __d('checks', 'Back to Checks'), ['action' => 'index'], [
+        'class' => 'btn btn-secondary'
     ]) ?>
     <?= $this->Html->link(__d('checks', 'View Monitor'), ['controller' => 'Monitors', 'action' => 'view', $check->monitor->id], [
-        'class' => 'btn btn-primary',
-        'style' => 'display: inline-block; padding: 10px 20px; background: #3b82f6; color: white; text-decoration: none; border-radius: 6px; margin-left: 8px;'
+        'class' => 'btn btn-primary'
     ]) ?>
 </div>

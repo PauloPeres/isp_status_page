@@ -115,9 +115,7 @@ $this->assign('title', h($org->name));
                     <th><?= __('Trial Ends At') ?></th>
                     <td>
                         <?php if ($org->trial_ends_at): ?>
-                            <span class="utc-datetime" data-utc="<?= $org->trial_ends_at->format('c') ?>">
-                                <?= $org->trial_ends_at->format('Y-m-d H:i') ?>
-                            </span>
+                            <?= $org->trial_ends_at->nice() ?>
                             <?php if ($org->is_trial_active): ?>
                                 <span class="badge badge-warning"><?= __('Active') ?></span>
                             <?php else: ?>
@@ -131,17 +129,13 @@ $this->assign('title', h($org->name));
                 <tr>
                     <th><?= __('Created') ?></th>
                     <td>
-                        <span class="utc-datetime" data-utc="<?= $org->created ? $org->created->format('c') : '' ?>">
-                            <?= $org->created ? $org->created->format('Y-m-d H:i:s') : '-' ?>
-                        </span>
+                        <?= $org->created ? $org->created->nice() : '-' ?>
                     </td>
                 </tr>
                 <tr>
                     <th><?= __('Modified') ?></th>
                     <td>
-                        <span class="utc-datetime" data-utc="<?= $org->modified ? $org->modified->format('c') : '' ?>">
-                            <?= $org->modified ? $org->modified->format('Y-m-d H:i:s') : '-' ?>
-                        </span>
+                        <?= $org->modified ? $org->modified->nice() : '-' ?>
                     </td>
                 </tr>
             </tbody>
@@ -231,7 +225,7 @@ $this->assign('title', h($org->name));
                         <td>
                             <?php if (!empty($monitor->last_checked_at)): ?>
                                 <span class="utc-datetime" data-utc="<?= $monitor->last_checked_at->format('c') ?>">
-                                    <?= $monitor->last_checked_at->format('Y-m-d H:i:s') ?>
+                                    <?= $monitor->last_checked_at->nice() ?>
                                 </span>
                             <?php else: ?>
                                 -
@@ -283,7 +277,7 @@ $this->assign('title', h($org->name));
                             <td><?= $check->response_time !== null ? number_format($check->response_time, 0) . ' ms' : '-' ?></td>
                             <td>
                                 <span class="utc-datetime" data-utc="<?= $check->checked_at ? $check->checked_at->format('c') : '' ?>">
-                                    <?= $check->checked_at ? $check->checked_at->format('Y-m-d H:i:s') : '-' ?>
+                                    <?= $check->checked_at ? $check->checked_at->nice() : '-' ?>
                                 </span>
                             </td>
                         </tr>
@@ -330,7 +324,7 @@ $this->assign('title', h($org->name));
                             </td>
                             <td>
                                 <span class="utc-datetime" data-utc="<?= $incident->created ? $incident->created->format('c') : '' ?>">
-                                    <?= $incident->created ? $incident->created->format('Y-m-d H:i:s') : '-' ?>
+                                    <?= $incident->created ? $incident->created->nice() : '-' ?>
                                 </span>
                             </td>
                         </tr>

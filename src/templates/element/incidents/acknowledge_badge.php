@@ -9,13 +9,13 @@
  */
 ?>
 <?php if ($incident->isAcknowledged()): ?>
-    <span class="badge badge-info" title="<?= __d('incidents', 'Reconhecido em {0} via {1}',
-        $incident->acknowledged_at ? h($incident->acknowledged_at->i18nFormat('dd/MM/yyyy HH:mm')) : '',
+    <span class="badge badge-info" title="<?= __d('incidents', 'Acknowledged at {0} via {1}',
+        $incident->acknowledged_at ? h($incident->acknowledged_at->nice()) : '',
         h($incident->acknowledged_via ?? '')) ?>">
-        &#x2714; <?= __d('incidents', 'Reconhecido') ?>
+        &#x2714; <?= __d('incidents', 'Acknowledged') ?>
     </span>
 <?php elseif ($incident->isOngoing()): ?>
-    <span class="badge badge-warning" title="<?= __d('incidents', 'Aguardando reconhecimento') ?>">
-        &#x23F3; <?= __d('incidents', 'Nao reconhecido') ?>
+    <span class="badge badge-warning" title="<?= __d('incidents', 'Awaiting acknowledgement') ?>">
+        &#x23F3; <?= __d('incidents', 'Not acknowledged') ?>
     </span>
 <?php endif; ?>

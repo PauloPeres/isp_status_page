@@ -25,7 +25,7 @@ Via:              <?= h($acknowledgedVia) ?>
 
 Severity:         <?= h($incident->severity) ?>
 
-Incident start:   <?= $incident->started_at->format('Y-m-d H:i:s') ?>
+Incident start:   <?= $incident->started_at->nice() ?>
 
 
 No additional action is required at this time. The team is aware and working on a resolution.

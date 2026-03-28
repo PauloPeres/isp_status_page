@@ -221,6 +221,6 @@ $this->assign('title', __d('monitors', 'Monitors'));
         <?= $this->Paginator->last(__('Last') . ' »') ?>
     </div>
     <div class="pagination-info">
-        <?= $this->Paginator->counter(__d('monitors', 'Page {{page}} of {{pages}}, showing {{current}} of {{count}} monitors')) ?>
+        <?= $this->Paginator->counter(__('Page {{page}} of {{pages}}, showing {{current}} record(s) of {{count}} total')) ?>
     </div>
 <?php endif; ?>

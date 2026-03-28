@@ -40,7 +40,7 @@
             <tr>
                 <td style="padding: 8px 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;"><?= __d('emails', 'Started at:') ?></td>
                 <td style="padding: 8px 12px; border-bottom: 1px solid #eee;">
-                    <?= $incident->started_at->format('d/m/Y H:i:s') ?>
+                    <?= $incident->started_at->nice() ?>
                 </td>
             </tr>
             <?php if (!empty($incident->description)): ?>

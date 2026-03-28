@@ -60,9 +60,9 @@ if ($incident->started_at && $incident->resolved_at) {
                 <td style="padding: 8px 12px; border-bottom: 1px solid #eee; font-weight: bold; color: #555;"><?= __d('emails', 'Resolved at:') ?></td>
                 <td style="padding: 8px 12px; border-bottom: 1px solid #eee;">
                     <?php if ($incident->resolved_at): ?>
-                        <?= $incident->resolved_at->format('d/m/Y H:i:s') ?>
+                        <?= $incident->resolved_at->nice() ?>
                     <?php else: ?>
-                        <?= date('d/m/Y H:i:s') ?>
+                        <?= \Cake\I18n\DateTime::now()->nice() ?>
                     <?php endif; ?>
                 </td>
             </tr>

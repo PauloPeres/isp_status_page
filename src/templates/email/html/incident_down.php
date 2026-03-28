@@ -44,7 +44,7 @@
 
     <p style="margin: 8px 0; font-size: 14px;">
         <strong><?= __d('emails', 'Started at:') ?></strong>
-        <?= $incident->started_at->format('d/m/Y H:i:s') ?>
+        <?= $incident->started_at->nice() ?>
     </p>
 </div>
 

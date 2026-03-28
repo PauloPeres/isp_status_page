@@ -12,7 +12,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="<?= $this->Url->build('/img/icon_isp_status_page.png') ?>">
     <meta name="theme-color" content="#1E88E5">
 
-    <meta name="description" content="<?= __('Página de status em tempo real dos serviços de internet') ?>">
+    <meta name="description" content="<?= __('Real-time status page for internet services') ?>">
     <meta name="robots" content="index, follow">
 
     <?= $this->Html->css(['public']) ?>

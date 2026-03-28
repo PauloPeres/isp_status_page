@@ -65,14 +65,14 @@ $this->assign('title', __d('subscribers', 'Subscriber Details'));
             <div class="stat-icon">✅</div>
             <div class="stat-content">
                 <div class="stat-value"><?= $subscriber->verified ? __d('subscribers', 'Yes') : __d('subscribers', 'No') ?></div>
-                <div class="stat-label"><?= __d('subscribers', 'Verificado') ?></div>
+                <div class="stat-label"><?= __d('subscribers', 'Verified') ?></div>
             </div>
         </div>
 
         <div class="stat-card">
             <div class="stat-icon">⚡</div>
             <div class="stat-content">
-                <div class="stat-value"><?= $subscriber->active ? __d('subscribers', 'Ativo') : __d('subscribers', 'Inativo') ?></div>
+                <div class="stat-value"><?= $subscriber->active ? __d('subscribers', 'Active') : __d('subscribers', 'Inactive') ?></div>
                 <div class="stat-label"><?= __d('subscribers', 'Status') ?></div>
             </div>
         </div>
@@ -95,32 +95,32 @@ $this->assign('title', __d('subscribers', 'Subscriber Details'));
             <div class="detail-item">
                 <span class="detail-label"><?= __d('subscribers', 'Verification Status:') ?></span>
                 <span class="badge badge-<?= $subscriber->verified ? 'success' : 'warning' ?>">
-                    <?= $subscriber->verified ? __d('subscribers', 'Verificado') : __d('subscribers', 'Pendente') ?>
+                    <?= $subscriber->verified ? __d('subscribers', 'Verified') : __d('subscribers', 'Pending') ?>
                 </span>
             </div>
 
             <div class="detail-item">
                 <span class="detail-label"><?= __d('subscribers', 'Active Status:') ?></span>
                 <span class="badge badge-<?= $subscriber->active ? 'success' : 'error' ?>">
-                    <?= $subscriber->active ? __d('subscribers', 'Ativo') : __d('subscribers', 'Inativo') ?>
+                    <?= $subscriber->active ? __d('subscribers', 'Active') : __d('subscribers', 'Inactive') ?>
                 </span>
             </div>
 
             <?php if ($subscriber->verified_at): ?>
                 <div class="detail-item">
                     <span class="detail-label"><?= __d('subscribers', 'Verified at:') ?></span>
-                    <span><?= $subscriber->verified_at->format('d/m/Y H:i:s') ?></span>
+                    <span><?= $subscriber->verified_at->nice() ?></span>
                 </div>
             <?php endif; ?>
 
             <div class="detail-item">
                 <span class="detail-label"><?= __d('subscribers', 'Subscription Date:') ?></span>
-                <span><?= $subscriber->created->format('d/m/Y H:i:s') ?></span>
+                <span><?= $subscriber->created->nice() ?></span>
             </div>
 
             <div class="detail-item">
                 <span class="detail-label"><?= __d('subscribers', 'Last Updated:') ?></span>
-                <span><?= $subscriber->modified->format('d/m/Y H:i:s') ?></span>
+                <span><?= $subscriber->modified->nice() ?></span>
             </div>
 
             <?php if (!empty($subscriber->verification_token)): ?>
@@ -144,7 +144,7 @@ $this->assign('title', __d('subscribers', 'Subscriber Details'));
         <div class="card">
             <div class="card-header">
                 <span><?= __d('subscribers', 'Subscribed Monitors') ?></span>
-                <span class="badge badge-info"><?= count($subscriber->subscriptions) ?> <?= count($subscriber->subscriptions) > 1 ? __d('subscribers', 'monitores') : __d('subscribers', 'monitor') ?></span>
+                <span class="badge badge-info"><?= count($subscriber->subscriptions) ?> <?= count($subscriber->subscriptions) > 1 ? __d('subscribers', 'monitors') : __d('subscribers', 'monitor') ?></span>
             </div>
             <div class="monitors-list">
                 <?php foreach ($subscriber->subscriptions as $subscription): ?>
@@ -158,7 +158,7 @@ $this->assign('title', __d('subscribers', 'Subscriber Details'));
                             </div>
                             <p><?= h($subscription->monitor->description) ?: __d('subscribers', 'Service monitor') ?></p>
                             <div class="monitor-meta">
-                                <span><?= __d('subscribers', 'Inscrito em: {0}', $subscription->created->format('d/m/Y H:i')) ?></span>
+                                <span><?= __d('subscribers', 'Subscribed on: {0}', $subscription->created->nice()) ?></span>
                                 <?= $this->Html->link(
                                     __d('subscribers', 'View Monitor'),
                                     ['controller' => 'Monitors', 'action' => 'view', $subscription->monitor->id],
@@ -200,7 +200,7 @@ $this->assign('title', __d('subscribers', 'Subscriber Details'));
                 ['action' => 'toggle', $subscriber->id],
                 [
                     'class' => 'btn ' . ($subscriber->active ? 'btn-secondary' : 'btn-success'),
-                    'confirm' => __d('subscribers', 'Tem certeza que deseja {0} este inscrito?', $subscriber->active ? __d('subscribers', 'desativar') : __d('subscribers', 'ativar'))
+                    'confirm' => __d('subscribers', 'Are you sure you want to {0} this subscriber?', $subscriber->active ? __d('subscribers', 'deactivate') : __d('subscribers', 'activate'))
                 ]
             ) ?>
 

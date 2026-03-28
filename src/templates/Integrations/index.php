@@ -201,9 +201,9 @@ $this->assign('title', __('Integrations'));
 <?php if ($integrations->count() > 0): ?>
     <div class="pagination">
         <?= $this->Paginator->first('« ' . __('First')) ?>
-        <?= $this->Paginator->prev('< ' . __('Previous')) ?>
+        <?= $this->Paginator->prev('‹ ' . __('Previous')) ?>
         <?= $this->Paginator->numbers() ?>
-        <?= $this->Paginator->next(__('Next') . ' >') ?>
+        <?= $this->Paginator->next(__('Next') . ' ›') ?>
         <?= $this->Paginator->last(__('Last') . ' »') ?>
     </div>
     <div class="pagination-info">

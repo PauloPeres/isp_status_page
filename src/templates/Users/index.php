@@ -131,12 +131,12 @@ $this->assign('title', __d('users', 'Users'));
                             </td>
                             <td>
                                 <?php if ($user->last_login): ?>
-                                    <?= $user->last_login->format('d/m/Y H:i') ?>
+                                    <?= $user->last_login->nice() ?>
                                 <?php else: ?>
                                     <span style="color: #999;"><?= __d('users', 'Never') ?></span>
                                 <?php endif; ?>
                             </td>
-                            <td><?= $user->created->format('d/m/Y') ?></td>
+                            <td><?= $user->created->nice() ?></td>
                             <td>
                                 <div class="action-buttons">
                                     <?= $this->Html->link(__('View'), ['action' => 'view', $user->id], ['class' => 'btn-action btn-action-view']) ?>
@@ -155,15 +155,15 @@ $this->assign('title', __d('users', 'Users'));
 
         <!-- Paginação -->
         <div class="pagination">
-            <?= $this->Paginator->first('«') ?>
-            <?= $this->Paginator->prev('‹') ?>
+            <?= $this->Paginator->first('« ' . __('First')) ?>
+            <?= $this->Paginator->prev('‹ ' . __('Previous')) ?>
             <?= $this->Paginator->numbers() ?>
-            <?= $this->Paginator->next('›') ?>
-            <?= $this->Paginator->last('»') ?>
+            <?= $this->Paginator->next(__('Next') . ' ›') ?>
+            <?= $this->Paginator->last(__('Last') . ' »') ?>
         </div>
 
         <div class="pagination-info">
-            <?= $this->Paginator->counter(__('Showing {{start}} to {{end}} of {{count}} entries')) ?>
+            <?= $this->Paginator->counter(__('Page {{page}} of {{pages}}, showing {{current}} record(s) of {{count}} total')) ?>
         </div>
     <?php else: ?>
         <div class="empty-state">

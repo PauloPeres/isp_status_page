@@ -62,7 +62,7 @@ if ($incident->started_at && $incident->resolved_at) {
 
     <p style="margin: 8px 0; font-size: 14px;">
         <strong><?= __d('emails', 'Resolved at:') ?></strong>
-        <?= $incident->resolved_at->format('d/m/Y H:i:s') ?>
+        <?= $incident->resolved_at->nice() ?>
     </p>
 </div>
 

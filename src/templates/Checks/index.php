@@ -174,13 +174,13 @@ $this->assign('title', __d('checks', 'Monitor Checks'));
 <!-- Pagination -->
 <?php if ($checks->count() > 0): ?>
     <div class="pagination">
-        <?= $this->Paginator->first(__d('checks', '« First')) ?>
-        <?= $this->Paginator->prev(__d('checks', '‹ Previous')) ?>
+        <?= $this->Paginator->first('« ' . __('First')) ?>
+        <?= $this->Paginator->prev('‹ ' . __('Previous')) ?>
         <?= $this->Paginator->numbers() ?>
-        <?= $this->Paginator->next(__d('checks', 'Next ›')) ?>
-        <?= $this->Paginator->last(__d('checks', 'Last »')) ?>
+        <?= $this->Paginator->next(__('Next') . ' ›') ?>
+        <?= $this->Paginator->last(__('Last') . ' »') ?>
     </div>
     <div class="pagination-info">
-        <?= $this->Paginator->counter(__d('checks', 'Page {{page}} of {{pages}}, showing {{current}} record(s) of {{count}} total')) ?>
+        <?= $this->Paginator->counter(__('Page {{page}} of {{pages}}, showing {{current}} record(s) of {{count}} total')) ?>
     </div>
 <?php endif; ?>

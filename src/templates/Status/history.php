@@ -461,13 +461,13 @@ $this->assign('title', __('Incident History'));
                             <div class="incident-meta">
                                 <div class="meta-item">
                                     <strong><?= __('Start:') ?></strong>
-                                    <span><?= $incident->created->format('d/m/Y H:i') ?></span>
+                                    <span><?= $incident->created->nice() ?></span>
                                 </div>
 
                                 <?php if ($incident->resolved_at): ?>
                                     <div class="meta-item">
                                         <strong><?= __('Resolved:') ?></strong>
-                                        <span><?= $incident->resolved_at->format('d/m/Y H:i') ?></span>
+                                        <span><?= $incident->resolved_at->nice() ?></span>
                                     </div>
                                     <?php if ($duration): ?>
                                         <div class="meta-item">

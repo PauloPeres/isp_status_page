@@ -83,7 +83,7 @@ $this->assign('title', __('Super Admin Dashboard'));
                                 ?>
                                 <span class="badge <?= $planBadge ?>"><?= h(ucfirst($org->plan)) ?></span>
                             </td>
-                            <td><?= $org->created ? h($org->created->format('Y-m-d')) : '-' ?></td>
+                            <td><?= $org->created ? $org->created->nice() : '-' ?></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>

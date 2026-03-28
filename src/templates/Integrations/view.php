@@ -295,7 +295,7 @@ $config = $integration->getConfiguration();
             <div class="detail-label"><?= __('Last Sync') ?></div>
             <div class="detail-value">
                 <?php if ($integration->last_sync_at): ?>
-                    <?= $integration->last_sync_at->format('d/m/Y H:i:s') ?>
+                    <?= $integration->last_sync_at->nice() ?>
                     <?php if ($integration->last_sync_status === 'success'): ?>
                         <span class="badge badge-success"><?= __('OK') ?></span>
                     <?php elseif ($integration->last_sync_status === 'error'): ?>
@@ -309,12 +309,12 @@ $config = $integration->getConfiguration();
 
         <div class="detail-item">
             <div class="detail-label"><?= __('Created') ?></div>
-            <div class="detail-value"><?= $integration->created->format('d/m/Y H:i:s') ?></div>
+            <div class="detail-value"><?= $integration->created->nice() ?></div>
         </div>
 
         <div class="detail-item">
             <div class="detail-label"><?= __('Modified') ?></div>
-            <div class="detail-value"><?= $integration->modified->format('d/m/Y H:i:s') ?></div>
+            <div class="detail-value"><?= $integration->modified->nice() ?></div>
         </div>
     </div>
 </div>
@@ -391,7 +391,7 @@ $config = $integration->getConfiguration();
                 <tbody>
                     <?php foreach ($integration->integration_logs as $log): ?>
                         <tr>
-                            <td><?= $log->created->format('d/m/Y H:i:s') ?></td>
+                            <td><?= $log->created->nice() ?></td>
                             <td><?= h($log->action) ?></td>
                             <td>
                                 <?php if ($log->status === 'success'): ?>

@@ -59,14 +59,17 @@
                                 <span class="text-muted"><?= __('Public') ?></span>
                             <?php endif; ?>
                         </td>
-                        <td><?= h($statusPage->created->format('Y-m-d H:i')) ?></td>
+                        <td><?= $statusPage->created->nice() ?></td>
                         <td class="actions">
-                            <?= $this->Html->link(__('Edit'), ['action' => 'edit', $statusPage->id], ['class' => 'btn btn-sm btn-secondary']) ?>
-                            <?= $this->Form->postLink(
-                                __('Delete'),
-                                ['action' => 'delete', $statusPage->id],
-                                ['confirm' => __('Are you sure you want to delete {0}?', $statusPage->name), 'class' => 'btn btn-sm btn-danger']
-                            ) ?>
+                            <div class="action-buttons">
+                                <?= $this->Html->link(__('View'), ['action' => 'view', $statusPage->id], ['class' => 'btn-action btn-action-view']) ?>
+                                <?= $this->Html->link(__('Edit'), ['action' => 'edit', $statusPage->id], ['class' => 'btn-action btn-action-edit']) ?>
+                                <?= $this->Form->postLink(
+                                    __('Delete'),
+                                    ['action' => 'delete', $statusPage->id],
+                                    ['confirm' => __('Are you sure you want to delete {0}?', $statusPage->name), 'class' => 'btn-action btn-action-danger']
+                                ) ?>
+                            </div>
                         </td>
                     </tr>
                     <?php endforeach; ?>
@@ -74,10 +77,15 @@
             </table>
         </div>
 
-        <div class="paginator">
-            <?= $this->Paginator->prev('< ' . __('Previous')) ?>
+        <div class="pagination">
+            <?= $this->Paginator->first('« ' . __('First')) ?>
+            <?= $this->Paginator->prev('‹ ' . __('Previous')) ?>
             <?= $this->Paginator->numbers() ?>
-            <?= $this->Paginator->next(__('Next') . ' >') ?>
+            <?= $this->Paginator->next(__('Next') . ' ›') ?>
+            <?= $this->Paginator->last(__('Last') . ' »') ?>
+        </div>
+        <div class="pagination-info">
+            <?= $this->Paginator->counter(__('Page {{page}} of {{pages}}, showing {{current}} record(s) of {{count}} total')) ?>
         </div>
     <?php endif; ?>
 </div>

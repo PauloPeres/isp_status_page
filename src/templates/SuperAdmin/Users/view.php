@@ -50,18 +50,14 @@ $this->assign('title', __('User: {0}', $user->username));
     <div class="summary-card">
         <div class="card-label"><?= __('Created') ?></div>
         <div class="card-value" style="font-size: 16px;">
-            <span class="local-datetime" data-utc="<?= $user->created->format('c') ?>">
-                <?= h($user->created->format('Y-m-d H:i')) ?>
-            </span>
+            <?= $user->created->nice() ?>
         </div>
     </div>
     <div class="summary-card">
         <div class="card-label"><?= __('Last Login') ?></div>
         <div class="card-value" style="font-size: 16px;">
             <?php if ($user->last_login): ?>
-                <span class="local-datetime" data-utc="<?= $user->last_login->format('c') ?>">
-                    <?= h($user->last_login->format('Y-m-d H:i')) ?>
-                </span>
+                <?= $user->last_login->nice() ?>
             <?php else: ?>
                 <span style="color: #666;"><?= __('Never') ?></span>
             <?php endif; ?>
@@ -110,11 +106,11 @@ $this->assign('title', __('User: {0}', $user->username));
                             <td>
                                 <?php if (!empty($ou->accepted_at)): ?>
                                     <span class="local-datetime" data-utc="<?= $ou->accepted_at->format('c') ?>">
-                                        <?= h($ou->accepted_at->format('Y-m-d')) ?>
+                                        <?= $ou->accepted_at->nice() ?>
                                     </span>
                                 <?php elseif (!empty($ou->created)): ?>
                                     <span class="local-datetime" data-utc="<?= $ou->created->format('c') ?>">
-                                        <?= h($ou->created->format('Y-m-d')) ?>
+                                        <?= $ou->created->nice() ?>
                                     </span>
                                 <?php else: ?>
                                     <span style="color: #666;">-</span>
@@ -178,7 +174,7 @@ $this->assign('title', __('User: {0}', $user->username));
                             <td>
                                 <?php if (!empty($key->last_used_at)): ?>
                                     <span class="local-datetime" data-utc="<?= $key->last_used_at->format('c') ?>">
-                                        <?= h($key->last_used_at->format('Y-m-d H:i')) ?>
+                                        <?= $key->last_used_at->nice() ?>
                                     </span>
                                 <?php else: ?>
                                     <span style="color: #666;"><?= __('Never') ?></span>

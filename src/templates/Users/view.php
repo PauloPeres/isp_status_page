@@ -190,7 +190,7 @@ $this->assign('title', __d('users', 'My Profile'));
                 <span class="detail-label"><?= __d('users', 'Last Login') ?></span>
                 <span class="detail-value">
                     <?php if ($user->last_login): ?>
-                        <?= $user->last_login->format('d/m/Y H:i:s') ?>
+                        <?= $user->last_login->nice() ?>
                     <?php else: ?>
                         <span class="text-muted"><?= __d('users', 'Never') ?></span>
                     <?php endif; ?>
@@ -199,12 +199,12 @@ $this->assign('title', __d('users', 'My Profile'));
 
             <div class="detail-item">
                 <span class="detail-label"><?= __d('users', 'Account Created') ?></span>
-                <span class="detail-value"><?= $user->created->format('d/m/Y H:i:s') ?></span>
+                <span class="detail-value"><?= $user->created->nice() ?></span>
             </div>
 
             <div class="detail-item">
                 <span class="detail-label"><?= __('Last Modified') ?></span>
-                <span class="detail-value"><?= $user->modified->format('d/m/Y H:i:s') ?></span>
+                <span class="detail-value"><?= $user->modified->nice() ?></span>
             </div>
         </div>
     </div>

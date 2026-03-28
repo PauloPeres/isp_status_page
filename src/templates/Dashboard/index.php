@@ -112,7 +112,7 @@ $this->assign('title', __d('dashboard', 'Dashboard'));
                                 <span class="badge <?= $badgeClass ?>"><?= h($check->status) ?></span>
                             </td>
                             <td><?= $check->response_time !== null ? number_format($check->response_time) : '-' ?></td>
-                            <td><?= $check->checked_at ? h($check->checked_at->format('d/m H:i:s')) : '-' ?></td>
+                            <td><?= $check->checked_at ? $check->checked_at->nice() : '-' ?></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -151,7 +151,7 @@ $this->assign('title', __d('dashboard', 'Dashboard'));
                                 ?>
                                 <span class="badge <?= $alertBadge ?>"><?= h($alert->status) ?></span>
                             </td>
-                            <td><?= $alert->created ? h($alert->created->format('d/m H:i:s')) : '-' ?></td>
+                            <td><?= $alert->created ? $alert->created->nice() : '-' ?></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>

@@ -38,7 +38,7 @@ Status:    UP
 Downtime:  <?= h($duration) ?>
 
 <?php endif; ?>
-Resolved:  <?php if ($incident->resolved_at): ?><?= $incident->resolved_at->format('Y-m-d H:i:s') ?><?php else: ?><?= date('Y-m-d H:i:s') ?><?php endif; ?>
+Resolved:  <?php if ($incident->resolved_at): ?><?= $incident->resolved_at->nice() ?><?php else: ?><?= \Cake\I18n\DateTime::now()->nice() ?><?php endif; ?>
 
 
 The service is operating normally. Thank you for your patience!

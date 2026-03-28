@@ -72,17 +72,13 @@ $this->assign('title', __('Users'));
                             </td>
                             <td>
                                 <?php if ($user->last_login): ?>
-                                    <span class="local-datetime" data-utc="<?= $user->last_login->format('c') ?>">
-                                        <?= h($user->last_login->format('Y-m-d H:i')) ?>
-                                    </span>
+                                    <?= $user->last_login->nice() ?>
                                 <?php else: ?>
                                     <span style="color: #666;"><?= __('Never') ?></span>
                                 <?php endif; ?>
                             </td>
                             <td>
-                                <span class="local-datetime" data-utc="<?= $user->created->format('c') ?>">
-                                    <?= h($user->created->format('Y-m-d')) ?>
-                                </span>
+                                <?= $user->created->nice() ?>
                             </td>
                             <td>
                                 <?php if ($user->is_super_admin): ?>
