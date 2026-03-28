@@ -157,6 +157,13 @@
 - **Dependencies:** None
 - **Resolution:** Added tags TEXT (JSON array) column to monitors table via migration. Monitor entity has getTags(), setTags(), hasTag(), getTagColor() methods. Tags shown as colored pills on index page. Tag filter dropdown in monitors list. Tags input (comma-separated) on add/edit forms. Controller parses tags on save and supports ?tag= query param.
 
+### P2-NEW: Fix mobile status page and landing page responsive issues -- DONE
+- **Source:** Manual mobile audit
+- **Description:** Fixed mobile responsive issues across public status page, landing page, monitor detail page, and auth pages. Improvements include: uptime bar overflow on narrow screens (height/min-width adjustments at 768px and 480px), landing page nav hamburger touch target (min 44px), landing page nav links touch-friendly sizing, hero/CTA buttons full-width on mobile, feature/pricing cards disable hover transform on mobile, footer links touch targets, landing page overflow-x prevention, monitor detail page chart overflow fix, stat cards/details grid mobile sizing, incident list mobile stacking.
+- **Complexity:** Medium (multiple CSS files)
+- **Dependencies:** None
+- **Resolution:** Updated public.css (uptime bar mobile rules), landing.css (nav toggle, mobile nav links, hero, features, pricing, footer touch targets, overflow prevention), Monitors/view.php inline styles (chart overflow, stat cards, details grid, incidents mobile).
+
 ### P2-013: Bulk operations
 - **Source:** USER_TESTING_POWER_USER.md (Recommendation #6)
 - **Description:** Select-all checkbox, bulk pause, bulk delete, bulk tag assignment. Also add CSV/JSON import for migration from other tools (UptimeRobot/Pingdom).

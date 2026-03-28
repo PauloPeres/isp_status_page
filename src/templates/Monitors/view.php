@@ -446,18 +446,46 @@ $this->assign('title', __d('monitors', 'Monitor Details'));
     .status-card {
         flex-direction: column;
         text-align: center;
+        padding: 16px;
+    }
+
+    .status-icon {
+        font-size: 48px;
+    }
+
+    .status-content h2 {
+        font-size: 24px;
     }
 
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
     }
 
+    .stat-icon {
+        font-size: 28px;
+    }
+
+    .stat-value {
+        font-size: 22px;
+    }
+
+    .stat-card {
+        padding: 14px;
+        gap: 10px;
+    }
+
     .details-grid {
         grid-template-columns: 1fr;
+        padding: 16px;
+    }
+
+    .detail-item code {
+        word-break: break-all;
     }
 
     .actions-grid {
         flex-direction: column;
+        padding: 16px;
     }
 
     .actions-grid .btn {
@@ -469,6 +497,43 @@ $this->assign('title', __d('monitors', 'Monitor Details'));
         flex-direction: column;
         align-items: flex-start;
         gap: 12px;
+    }
+
+    /* Prevent chart canvas overflow */
+    .card canvas {
+        max-width: 100%;
+    }
+
+    .chart-range-buttons {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .btn-range {
+        min-height: 36px;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .incidents-list {
+        padding: 16px;
+    }
+
+    .incident-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .incident-meta {
+        flex-direction: column;
+        gap: 6px;
+        font-size: 12px;
+    }
+
+    .table-responsive {
+        margin: 0 -16px;
+        padding: 0 16px;
     }
 }
 

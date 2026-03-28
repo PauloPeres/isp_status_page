@@ -1342,3 +1342,41 @@ body {
 .uptime-bar-percentage { font-weight: 600; color: #333; }
 .uptime-bar-compact { height: 16px; border-radius: 3px; }
 .uptime-bar-compact .uptime-bar-segment { min-width: 1px; }
+
+/* --- Uptime Bar Mobile (768px) --- */
+@media (max-width: 768px) {
+    .uptime-bar {
+        height: 20px;
+    }
+
+    .uptime-bar-segment {
+        min-width: 1px;
+    }
+
+    .uptime-bar-labels {
+        font-size: 10px;
+    }
+
+    .uptime-bar-compact {
+        height: 12px;
+    }
+
+    .service-uptime-bar {
+        padding: 6px 12px 4px !important;
+    }
+}
+
+/* --- Uptime Bar Small Mobile (480px) --- */
+@media (max-width: 480px) {
+    .uptime-bar {
+        height: 16px;
+    }
+
+    .uptime-bar-labels {
+        font-size: 9px;
+    }
+
+    .service-uptime-bar {
+        padding: 4px 8px 2px !important;
+    }
+}
