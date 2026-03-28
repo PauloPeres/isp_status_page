@@ -167,6 +167,15 @@ return function (RouteBuilder $routes): void {
         );
 
         /*
+         * Public status page route
+         */
+        $builder->connect(
+            '/s/{slug}',
+            ['controller' => 'StatusPages', 'action' => 'show'],
+            ['pass' => ['slug'], 'slug' => '[a-z0-9][a-z0-9\-]*[a-z0-9]']
+        );
+
+        /*
          * Heartbeat ping route (TASK-1000)
          */
         $builder->connect(

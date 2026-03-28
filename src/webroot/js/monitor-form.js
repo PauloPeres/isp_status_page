@@ -14,6 +14,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const httpFields = document.getElementById('http-fields');
     const pingFields = document.getElementById('ping-fields');
     const portFields = document.getElementById('port-fields');
+    const heartbeatFields = document.getElementById('heartbeat-fields');
+    const sslFields = document.getElementById('ssl-fields');
 
     /**
      * Update visible fields based on selected monitor type
@@ -33,6 +35,14 @@ document.addEventListener('DOMContentLoaded', function() {
         if (portFields) {
             portFields.style.display = 'none';
             disableFieldInputs(portFields);
+        }
+        if (heartbeatFields) {
+            heartbeatFields.style.display = 'none';
+            disableFieldInputs(heartbeatFields);
+        }
+        if (sslFields) {
+            sslFields.style.display = 'none';
+            disableFieldInputs(sslFields);
         }
 
         // Show relevant fields based on type and enable their inputs
@@ -62,6 +72,33 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 updateTargetPlaceholder('example.com or 192.168.1.1');
                 updateTargetHelp('Hostname or IP address for TCP/UDP port check');
+                break;
+
+            case 'heartbeat':
+                if (heartbeatFields) {
+                    heartbeatFields.style.display = 'block';
+                    enableFieldInputs(heartbeatFields);
+                }
+                updateTargetPlaceholder('');
+                updateTargetHelp('Target is not needed for heartbeat monitors — a ping URL will be generated.');
+                break;
+
+            case 'keyword':
+                if (httpFields) {
+                    httpFields.style.display = 'block';
+                    enableFieldInputs(httpFields);
+                }
+                updateTargetPlaceholder('https://example.com');
+                updateTargetHelp('URL to check for keyword presence');
+                break;
+
+            case 'ssl':
+                if (sslFields) {
+                    sslFields.style.display = 'block';
+                    enableFieldInputs(sslFields);
+                }
+                updateTargetPlaceholder('example.com');
+                updateTargetHelp('Domain name to check SSL certificate');
                 break;
 
             default:

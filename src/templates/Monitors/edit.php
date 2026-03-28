@@ -61,6 +61,9 @@ $this->assign('title', __d('monitors', 'Edit Monitor'));
                         'http' => 'HTTP/HTTPS',
                         'ping' => 'Ping (ICMP)',
                         'port' => __d('monitors', 'Port (TCP/UDP)'),
+                        'heartbeat' => __d('monitors', 'Heartbeat'),
+                        'keyword' => __d('monitors', 'Keyword'),
+                        'ssl' => __d('monitors', 'SSL Certificate'),
                     ], [
                         'required' => true,
                         'class' => 'form-control',
@@ -91,6 +94,12 @@ $this->assign('title', __d('monitors', 'Edit Monitor'));
 
             <!-- Port/TCP/UDP Fields -->
             <?= $this->element('monitor/form_port', ['monitor' => $monitor]) ?>
+
+            <!-- Heartbeat Fields -->
+            <?= $this->element('monitor/form_heartbeat', ['monitor' => $monitor]) ?>
+
+            <!-- SSL Certificate Fields -->
+            <?= $this->element('monitor/form_ssl', ['monitor' => $monitor]) ?>
         </div>
 
         <div class="form-section">

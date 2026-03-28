@@ -49,6 +49,7 @@ class TenantMiddleware implements MiddlewareInterface
         '/organizations/select',
         '/organizations/switch',
         '/onboarding/',
+        '/s/',
     ];
 
     /**

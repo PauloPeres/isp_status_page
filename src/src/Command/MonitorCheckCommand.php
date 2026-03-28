@@ -10,9 +10,12 @@ use App\Service\Alert\SlackAlertChannel;
 use App\Service\Alert\TelegramAlertChannel;
 use App\Service\Alert\WebhookAlertChannel;
 use App\Service\Check\CheckService;
+use App\Service\Check\HeartbeatChecker;
 use App\Service\Check\HttpChecker;
+use App\Service\Check\KeywordChecker;
 use App\Service\Check\PingChecker;
 use App\Service\Check\PortChecker;
+use App\Service\Check\SslCertChecker;
 use App\Service\IncidentService;
 use Cake\Command\Command;
 use Cake\Console\Arguments;
@@ -67,6 +70,9 @@ class MonitorCheckCommand extends Command
         $this->checkService->registerChecker(new HttpChecker());
         $this->checkService->registerChecker(new PingChecker());
         $this->checkService->registerChecker(new PortChecker());
+        $this->checkService->registerChecker(new HeartbeatChecker());
+        $this->checkService->registerChecker(new KeywordChecker());
+        $this->checkService->registerChecker(new SslCertChecker());
 
         // Initialize alert service and register channels
         $this->alertService = new AlertService();
