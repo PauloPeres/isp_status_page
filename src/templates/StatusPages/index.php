@@ -67,7 +67,7 @@
                                 <?= $this->Form->postLink(
                                     __('Delete'),
                                     ['action' => 'delete', $statusPage->id],
-                                    ['confirm' => __('Are you sure you want to delete {0}?', $statusPage->name), 'class' => 'btn-action btn-action-danger']
+                                    ['confirm' => __('Are you sure? This action cannot be undone.'), 'class' => 'btn-action btn-action-danger']
                                 ) ?>
                             </div>
                         </td>

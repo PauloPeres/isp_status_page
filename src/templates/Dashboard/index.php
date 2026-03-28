@@ -33,12 +33,12 @@ $this->assign('title', __d('dashboard', 'Dashboard'));
         <div class="card-label"><?= __d('dashboard', 'Offline') ?></div>
         <div class="card-value down"><?= number_format($summary['down']) ?></div>
     </div>
-    <div class="summary-card">
-        <div class="card-label"><?= __d('dashboard', 'Degraded') ?></div>
+    <div class="summary-card" title="<?= __d('dashboard', 'Services responding but slower than normal') ?>">
+        <div class="card-label"><?= __d('dashboard', 'Degraded') ?> <span style="cursor:help;color:#999;font-size:12px;">&#9432;</span></div>
         <div class="card-value degraded"><?= number_format($summary['degraded']) ?></div>
     </div>
-    <div class="summary-card">
-        <div class="card-label"><?= __d('dashboard', 'Unknown') ?></div>
+    <div class="summary-card" title="<?= __d('dashboard', 'No check data available yet') ?>">
+        <div class="card-label"><?= __d('dashboard', 'Unknown') ?> <span style="cursor:help;color:#999;font-size:12px;">&#9432;</span></div>
         <div class="card-value unknown"><?= number_format($summary['unknown']) ?></div>
     </div>
 </div>
@@ -68,13 +68,13 @@ $this->assign('title', __d('dashboard', 'Dashboard'));
 <!-- Charts -->
 <div class="charts-grid">
     <div class="chart-card">
-        <h3><?= __d('dashboard', 'Uptime (Last 24h)') ?></h3>
+        <h3 title="<?= __d('dashboard', 'Percentage of successful checks in the last 24 hours') ?>"><?= __d('dashboard', 'Uptime (Last 24h)') ?> <span style="cursor:help;color:#999;font-size:12px;">&#9432;</span></h3>
         <div class="chart-wrapper">
             <canvas id="uptimeChart"></canvas>
         </div>
     </div>
     <div class="chart-card">
-        <h3><?= __d('dashboard', 'Average Response Time (ms)') ?></h3>
+        <h3 title="<?= __d('dashboard', 'How fast your service responds — lower is better') ?>"><?= __d('dashboard', 'Average Response Time (ms)') ?> <span style="cursor:help;color:#999;font-size:12px;">&#9432;</span></h3>
         <div class="chart-wrapper">
             <canvas id="responseTimeChart"></canvas>
         </div>

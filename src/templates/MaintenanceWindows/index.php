@@ -74,7 +74,7 @@
                                 <?= $this->Form->postLink(
                                     __('Delete'),
                                     ['action' => 'delete', $window->id],
-                                    ['confirm' => __('Are you sure you want to delete this maintenance window?'), 'class' => 'btn-action btn-action-danger']
+                                    ['confirm' => __('Are you sure? This action cannot be undone.'), 'class' => 'btn-action btn-action-danger']
                                 ) ?>
                             </div>
                         </td>

@@ -125,7 +125,7 @@ $this->assign('title', __('Alert Rules'));
                                 __('Delete'),
                                 ['action' => 'delete', $alertRule->id],
                                 [
-                                    'confirm' => __('Are you sure you want to delete this alert rule? This action cannot be undone.'),
+                                    'confirm' => __('Are you sure? This action cannot be undone.'),
                                     'class' => 'btn btn-sm btn-danger',
                                 ]
                             ) ?>

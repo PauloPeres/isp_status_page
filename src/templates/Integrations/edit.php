@@ -152,6 +152,11 @@ $config = $integration->getConfiguration();
     }
 </style>
 
+<?= $this->element('admin/breadcrumb', ['breadcrumbs' => [
+    ['title' => __('Integrations'), 'url' => $this->Url->build(['controller' => 'Integrations', 'action' => 'index'])],
+    ['title' => __('Edit'), 'url' => null],
+]]) ?>
+
 <div class="page-header">
     <div>
         <h2><?= __('Edit Integration') ?></h2>

@@ -102,7 +102,7 @@ if (!empty($maintenanceWindow->monitor_ids)) {
         <?= $this->Form->postLink(
             __('Delete'),
             ['action' => 'delete', $maintenanceWindow->id],
-            ['confirm' => __('Are you sure you want to delete this maintenance window?'), 'class' => 'btn btn-danger']
+            ['confirm' => __('Are you sure? This action cannot be undone.'), 'class' => 'btn btn-danger']
         ) ?>
     </div>
 

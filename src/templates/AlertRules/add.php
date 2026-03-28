@@ -9,6 +9,11 @@
 $this->assign('title', __('New Alert Rule'));
 ?>
 
+<?= $this->element('admin/breadcrumb', ['breadcrumbs' => [
+    ['title' => __('Alert Rules'), 'url' => $this->Url->build(['controller' => 'AlertRules', 'action' => 'index'])],
+    ['title' => __('New Rule'), 'url' => null],
+]]) ?>
+
 <div class="monitors-header">
     <h2><?= __('New Alert Rule') ?></h2>
     <?= $this->Html->link(__('Back to List'), ['action' => 'index'], ['class' => 'btn btn-secondary']) ?>

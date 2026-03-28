@@ -128,6 +128,29 @@ class IncidentsController extends AppController
     }
 
     /**
+     * Add method
+     *
+     * Create a new incident manually.
+     *
+     * @return \Cake\Http\Response|null|void Redirects on successful add, renders view otherwise.
+     */
+    public function add()
+    {
+        $this->viewBuilder()->setLayout('admin');
+        $incident = $this->Incidents->newEmptyEntity();
+        if ($this->request->is('post')) {
+            $incident = $this->Incidents->patchEntity($incident, $this->request->getData());
+            if ($this->Incidents->save($incident)) {
+                $this->Flash->success(__('Incident created'));
+                return $this->redirect(['action' => 'index']);
+            }
+            $this->Flash->error(__('Could not create incident'));
+        }
+        $monitors = $this->fetchTable('Monitors')->find('list')->toArray();
+        $this->set(compact('incident', 'monitors'));
+    }
+
+    /**
      * View method
      *
      * Displays incident details including timeline of status changes

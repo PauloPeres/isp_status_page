@@ -6,6 +6,11 @@
 $this->assign('title', __d('monitors', 'Edit Monitor'));
 ?>
 
+<?= $this->element('admin/breadcrumb', ['breadcrumbs' => [
+    ['title' => __('Monitors'), 'url' => $this->Url->build(['controller' => 'Monitors', 'action' => 'index'])],
+    ['title' => __d('monitors', 'Edit {0}', h($monitor->name)), 'url' => null],
+]]) ?>
+
 <div class="monitors-form">
     <div class="page-header">
         <div>

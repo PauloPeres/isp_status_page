@@ -150,6 +150,11 @@ $this->assign('title', __('New Integration'));
     }
 </style>
 
+<?= $this->element('admin/breadcrumb', ['breadcrumbs' => [
+    ['title' => __('Integrations'), 'url' => $this->Url->build(['controller' => 'Integrations', 'action' => 'index'])],
+    ['title' => __('New Integration'), 'url' => null],
+]]) ?>
+
 <div class="page-header">
     <div>
         <h2><?= __('New Integration') ?></h2>

@@ -176,7 +176,7 @@ $this->assign('title', __('Integrations'));
                                     ['action' => 'delete', $integration->id],
                                     [
                                         'class' => 'btn-action btn-action-danger',
-                                        'confirm' => __('Are you sure you want to delete this integration? This action cannot be undone.')
+                                        'confirm' => __('Are you sure? This action cannot be undone.')
                                     ]
                                 ) ?>
                             </div>

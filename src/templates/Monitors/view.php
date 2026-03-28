@@ -12,6 +12,11 @@
 $this->assign('title', __d('monitors', 'Monitor Details'));
 ?>
 
+<?= $this->element('admin/breadcrumb', ['breadcrumbs' => [
+    ['title' => __('Monitors'), 'url' => $this->Url->build(['controller' => 'Monitors', 'action' => 'index'])],
+    ['title' => h($monitor->name), 'url' => null],
+]]) ?>
+
 <div class="monitors-view">
     <div class="page-header">
         <div>
@@ -257,7 +262,16 @@ $this->assign('title', __d('monitors', 'Monitor Details'));
                             <span>📅 <?= __d('monitors', 'Started') ?>: <span class="local-datetime" data-utc="<?= $incident->started_at->format('c') ?>"></span></span>
                             <?php if ($incident->resolved_at): ?>
                                 <span>✅ <?= __d('monitors', 'Resolved') ?>: <span class="local-datetime" data-utc="<?= $incident->resolved_at->format('c') ?>"></span></span>
-                                <span>⏱️ <?= __d('monitors', 'Duration') ?>: <?= gmdate('H:i:s', $incident->duration ?? 0) ?></span>
+                                <span>⏱️ <?= __d('monitors', 'Duration') ?>: <?php
+                                    $d = $incident->duration ?? 0;
+                                    if ($d < 60) {
+                                        echo "{$d}s";
+                                    } elseif ($d < 3600) {
+                                        echo floor($d / 60) . 'm ' . ($d % 60) . 's';
+                                    } else {
+                                        echo floor($d / 3600) . 'h ' . floor(($d % 3600) / 60) . 'm';
+                                    }
+                                ?></span>
                             <?php endif; ?>
                         </div>
                     </div>

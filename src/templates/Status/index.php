@@ -60,6 +60,34 @@ $this->assign('title', $statusPageTitle);
         <?php endif; ?>
     </div>
 
+    <!-- Scheduled Maintenance (P3-014) -->
+    <?php if (isset($maintenanceWindows) && $maintenanceWindows->count() > 0): ?>
+        <div class="services-section">
+            <h3 class="section-title"><?= __('Scheduled Maintenance') ?></h3>
+            <?php foreach ($maintenanceWindows as $mw): ?>
+                <div style="background: #fff; border: 1px solid #e0e0e0; border-left: 4px solid #FDD835; border-radius: 8px; padding: 16px; margin-bottom: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                        <div>
+                            <strong><?= h($mw->title) ?></strong>
+                            <?php if ($mw->description): ?>
+                                <p style="color: #666; font-size: 14px; margin: 4px 0 0;"><?= h($mw->description) ?></p>
+                            <?php endif; ?>
+                        </div>
+                        <span style="display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; text-transform: uppercase; background: <?= $mw->status === 'in_progress' ? '#FEF3C7' : '#DBEAFE' ?>; color: <?= $mw->status === 'in_progress' ? '#92400E' : '#1D4ED8' ?>;">
+                            <?= h(ucfirst(str_replace('_', ' ', $mw->status))) ?>
+                        </span>
+                    </div>
+                    <div style="margin-top: 8px; font-size: 13px; color: #999;">
+                        <?= h($mw->starts_at->nice()) ?>
+                        <?php if ($mw->ends_at): ?>
+                            &mdash; <?= h($mw->ends_at->nice()) ?>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+
     <!-- Recent Incidents -->
     <?= $this->element('status/incident_timeline', ['incidents' => $recentIncidents]) ?>
 

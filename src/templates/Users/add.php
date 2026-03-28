@@ -182,6 +182,11 @@ $this->assign('title', __d('users', 'New User'));
 </style>
 
 <div class="users-add">
+    <?= $this->element('admin/breadcrumb', ['breadcrumbs' => [
+        ['title' => __('Users'), 'url' => $this->Url->build(['controller' => 'Users', 'action' => 'index'])],
+        ['title' => __d('users', 'Add User'), 'url' => null],
+    ]]) ?>
+
     <div class="users-header">
         <h1><?= __d('users', 'New User') ?></h1>
         <div style="display: flex; gap: 8px;">

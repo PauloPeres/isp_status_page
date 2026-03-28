@@ -142,7 +142,7 @@ $this->assign('title', __d('users', 'Users'));
                                     <?= $this->Html->link(__('View'), ['action' => 'view', $user->id], ['class' => 'btn-action btn-action-view']) ?>
                                     <?= $this->Html->link(__('Edit'), ['action' => 'edit', $user->id], ['class' => 'btn-action btn-action-edit']) ?>
                                     <?= $this->Form->postLink(__('Delete'), ['action' => 'delete', $user->id], [
-                                        'confirm' => __('Are you sure you want to delete this user?'),
+                                        'confirm' => __('Are you sure? This action cannot be undone.'),
                                         'class' => 'btn-action btn-action-danger'
                                     ]) ?>
                                 </div>

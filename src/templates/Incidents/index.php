@@ -12,6 +12,7 @@ $this->assign('title', __d('incidents', 'Incidents'));
 
 <div class="incidents-header">
     <h2>🚨 <?= __d('incidents', 'Incidents') ?></h2>
+    <?= $this->Html->link('+ ' . __d('incidents', 'New Incident'), ['action' => 'add'], ['class' => 'btn-add']) ?>
 </div>
 
 <!-- Statistics Cards -->

@@ -180,6 +180,11 @@ $this->assign('title', __d('users', 'Edit Profile'));
 </style>
 
 <div class="users-edit">
+    <?= $this->element('admin/breadcrumb', ['breadcrumbs' => [
+        ['title' => __('Users'), 'url' => $this->Url->build(['controller' => 'Users', 'action' => 'index'])],
+        ['title' => __d('users', 'Edit Profile'), 'url' => null],
+    ]]) ?>
+
     <div class="users-header">
         <h1><?= __d('users', 'Edit Profile') ?></h1>
         <div style="display: flex; gap: 8px;">

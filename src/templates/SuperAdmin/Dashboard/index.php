@@ -76,7 +76,7 @@ $this->assign('title', __('Super Admin Dashboard'));
                             <td>
                                 <?php
                                     $planBadge = match($org->plan) {
-                                        'business' => 'badge-danger',
+                                        'business' => 'badge-gold',
                                         'pro' => 'badge-warning',
                                         default => 'badge-secondary',
                                     };
@@ -112,7 +112,7 @@ $this->assign('title', __('Super Admin Dashboard'));
                             <td>
                                 <?php
                                     $planBadge = match($org->plan) {
-                                        'business' => 'badge-danger',
+                                        'business' => 'badge-gold',
                                         'pro' => 'badge-warning',
                                         default => 'badge-secondary',
                                     };

@@ -414,6 +414,11 @@ $this->assign('title', __d('incidents', 'Incident Details'));
     }
 </style>
 
+<?= $this->element('admin/breadcrumb', ['breadcrumbs' => [
+    ['title' => __('Incidents'), 'url' => $this->Url->build(['controller' => 'Incidents', 'action' => 'index'])],
+    ['title' => h($incident->title), 'url' => null],
+]]) ?>
+
 <div class="incident-header">
     <div>
         <h2>🚨 <?= h($incident->title) ?></h2>

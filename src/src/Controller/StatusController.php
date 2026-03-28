@@ -183,6 +183,16 @@ class StatusController extends AppController
             }
         }
 
+        // P3-014: Active/upcoming maintenance windows
+        $maintenanceWindows = $this->fetchTable('MaintenanceWindows')->find()
+            ->where(['OR' => [
+                ['MaintenanceWindows.status' => 'scheduled', 'MaintenanceWindows.starts_at >=' => DateTime::now()],
+                ['MaintenanceWindows.status' => 'in_progress'],
+            ]])
+            ->orderBy(['MaintenanceWindows.starts_at' => 'ASC'])
+            ->limit(5)
+            ->all();
+
         $this->set(compact(
             'monitors',
             'systemStatus',
@@ -197,7 +207,8 @@ class StatusController extends AppController
             'statusPageTitle',
             'logoUrl',
             'supportEmail',
-            'monitorsUptimeData'
+            'monitorsUptimeData',
+            'maintenanceWindows'
         ));
     }
 
