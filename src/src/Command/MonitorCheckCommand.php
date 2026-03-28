@@ -8,7 +8,9 @@ use App\Service\Alert\DiscordAlertChannel;
 use App\Service\Alert\EmailAlertChannel;
 use App\Service\Alert\SlackAlertChannel;
 use App\Service\Alert\TelegramAlertChannel;
+use App\Service\Alert\SmsAlertChannel;
 use App\Service\Alert\WebhookAlertChannel;
+use App\Service\Alert\WhatsAppAlertChannel;
 use App\Service\Check\CheckService;
 use App\Service\Check\HeartbeatChecker;
 use App\Service\Check\HttpChecker;
@@ -89,6 +91,8 @@ class MonitorCheckCommand extends Command
         $this->alertService->registerChannel(new DiscordAlertChannel());
         $this->alertService->registerChannel(new TelegramAlertChannel());
         $this->alertService->registerChannel(new WebhookAlertChannel());
+        $this->alertService->registerChannel(new SmsAlertChannel());
+        $this->alertService->registerChannel(new WhatsAppAlertChannel());
 
         // Initialize incident service
         $this->incidentService = new IncidentService();

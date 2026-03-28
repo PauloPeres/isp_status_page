@@ -31,6 +31,7 @@ class EscalationStep extends Entity
     public const CHANNEL_TELEGRAM = 'telegram';
     public const CHANNEL_WEBHOOK = 'webhook';
     public const CHANNEL_SMS = 'sms';
+    public const CHANNEL_WHATSAPP = 'whatsapp';
 
     /**
      * All valid channels
@@ -42,6 +43,7 @@ class EscalationStep extends Entity
         self::CHANNEL_TELEGRAM,
         self::CHANNEL_WEBHOOK,
         self::CHANNEL_SMS,
+        self::CHANNEL_WHATSAPP,
     ];
 
     /**
@@ -95,6 +97,7 @@ class EscalationStep extends Entity
             self::CHANNEL_TELEGRAM => 'Telegram',
             self::CHANNEL_WEBHOOK => 'Webhook',
             self::CHANNEL_SMS => 'SMS',
+            self::CHANNEL_WHATSAPP => 'WhatsApp',
             default => ucfirst($this->channel),
         };
     }
