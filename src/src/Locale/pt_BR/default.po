@@ -935,3 +935,274 @@ msgstr "Manutenção"
 
 msgid "Integrations"
 msgstr "Integrações"
+
+#: Auth pages - login.php (English source keys)
+msgid "Sign in to your account"
+msgstr "Entre com sua conta"
+
+msgid "Username or Email"
+msgstr "Usuário ou Email"
+
+msgid "Enter your username or email"
+msgstr "Digite seu usuário ou email"
+
+msgid "Password"
+msgstr "Senha"
+
+msgid "Enter your password"
+msgstr "Digite sua senha"
+
+msgid "Sign In"
+msgstr "Entrar"
+
+msgid "Forgot my password"
+msgstr "Esqueci minha senha"
+
+msgid "Remember me"
+msgstr "Lembrar-me"
+
+msgid "Or sign in with"
+msgstr "Ou entre com"
+
+msgid "Don't have an account? Register"
+msgstr "Não tem uma conta? Cadastre-se"
+
+msgid "Please wait..."
+msgstr "Aguarde..."
+
+#: Auth pages - register.php
+msgid "Register"
+msgstr "Cadastro"
+
+msgid "Create your account"
+msgstr "Crie sua conta"
+
+msgid "Choose a username"
+msgstr "Escolha um nome de usuário"
+
+msgid "Enter your email address"
+msgstr "Digite seu endereço de email"
+
+msgid "At least 8 characters"
+msgstr "Pelo menos 8 caracteres"
+
+msgid "Password must be at least 8 characters"
+msgstr "A senha deve ter pelo menos 8 caracteres"
+
+msgid "Confirm Password"
+msgstr "Confirmar Senha"
+
+msgid "Repeat your password"
+msgstr "Repita sua senha"
+
+msgid "I agree to the"
+msgstr "Eu concordo com os"
+
+msgid "Terms of Service"
+msgstr "Termos de Serviço"
+
+msgid "and"
+msgstr "e"
+
+msgid "Privacy Policy"
+msgstr "Política de Privacidade"
+
+msgid "Create Account"
+msgstr "Criar Conta"
+
+msgid "Or sign up with"
+msgstr "Ou cadastre-se com"
+
+msgid "Already have an account? Sign in"
+msgstr "Já tem uma conta? Entre"
+
+msgid "Weak"
+msgstr "Fraca"
+
+msgid "Fair"
+msgstr "Razoável"
+
+msgid "Good"
+msgstr "Boa"
+
+msgid "Strong"
+msgstr "Forte"
+
+msgid "Very Strong"
+msgstr "Muito Forte"
+
+#: Auth pages - verify_email.php
+msgid "Check Your Email"
+msgstr "Verifique seu Email"
+
+msgid "We have sent a verification link to your email address. Please check your inbox and click the link to activate your account."
+msgstr "Enviamos um link de verificação para seu endereço de email. Por favor, verifique sua caixa de entrada e clique no link para ativar sua conta."
+
+msgid "The verification link will expire in 24 hours. If you do not see the email, please check your spam/junk folder."
+msgstr "O link de verificação expira em 24 horas. Se você não encontrar o email, verifique sua pasta de spam/lixo eletrônico."
+
+msgid "Didn't receive the email?"
+msgstr "Não recebeu o email?"
+
+msgid "Resend Verification Email"
+msgstr "Reenviar Email de Verificação"
+
+msgid "Back to Login"
+msgstr "Voltar para o Login"
+
+#: Integration pages (English source keys)
+msgid "New Integration"
+msgstr "Nova Integração"
+
+msgid "Integration name..."
+msgstr "Nome da integração..."
+
+msgid "Name"
+msgstr "Nome"
+
+msgid "Type"
+msgstr "Tipo"
+
+msgid "Last Sync"
+msgstr "Última Sincronização"
+
+msgid "Result"
+msgstr "Resultado"
+
+msgid "Test"
+msgstr "Testar"
+
+msgid "Are you sure you want to delete this integration? This action cannot be undone."
+msgstr "Tem certeza que deseja excluir esta integração? Esta ação não pode ser desfeita."
+
+msgid "Page {{page}} of {{pages}}, showing {{current}} of {{count}} integrations"
+msgstr "Página {{page}} de {{pages}}, mostrando {{current}} de {{count}} integrações"
+
+msgid "Testing..."
+msgstr "Testando..."
+
+msgid "Connection successful"
+msgstr "Conexão bem-sucedida"
+
+msgid "Connection failed"
+msgstr "Falha na conexão"
+
+msgid "Error:"
+msgstr "Erro:"
+
+msgid "Configure a new integration with external system"
+msgstr "Configure uma nova integração com sistema externo"
+
+msgid "Basic Information"
+msgstr "Informações Básicas"
+
+msgid "E.g.: Monitoring API"
+msgstr "Ex: API de Monitoramento"
+
+msgid "Select..."
+msgstr "Selecione..."
+
+msgid "Connection Settings"
+msgstr "Configuração de Conexão"
+
+msgid "Base URL"
+msgstr "URL Base"
+
+msgid "Full URL of the external API"
+msgstr "URL completa da API externa"
+
+msgid "HTTP Method"
+msgstr "Método HTTP"
+
+msgid "Timeout (seconds)"
+msgstr "Timeout (segundos)"
+
+msgid "Authentication Type"
+msgstr "Tipo de Autenticação"
+
+msgid "None"
+msgstr "Nenhuma"
+
+msgid "Token / API Key"
+msgstr "Token / API Key"
+
+msgid "Your authentication token"
+msgstr "Seu token de autenticação"
+
+msgid "Username"
+msgstr "Usuário"
+
+msgid "Custom Headers (JSON)"
+msgstr "Headers Customizados (JSON)"
+
+msgid "JSON format. Example: {\"Authorization\": \"Custom value\"}"
+msgstr "Formato JSON. Exemplo: {\"Authorization\": \"Custom value\"}"
+
+msgid "Save"
+msgstr "Salvar"
+
+msgid "Edit Integration"
+msgstr "Editar Integração"
+
+msgid "Integration Details"
+msgstr "Detalhes da Integração"
+
+msgid "Test Connection"
+msgstr "Testar Conexão"
+
+msgid "General Information"
+msgstr "Informações Gerais"
+
+msgid "Never synced"
+msgstr "Nunca sincronizada"
+
+msgid "Modified"
+msgstr "Modificado"
+
+msgid "Configuration"
+msgstr "Configuração"
+
+msgid "Method"
+msgstr "Método"
+
+msgid "Authentication"
+msgstr "Autenticação"
+
+msgid "Full Configuration"
+msgstr "Configuração Completa"
+
+msgid "No configuration defined"
+msgstr "Nenhuma configuração definida"
+
+msgid "Recent Logs"
+msgstr "Logs Recentes"
+
+msgid "Date"
+msgstr "Data"
+
+msgid "Action"
+msgstr "Ação"
+
+msgid "Message"
+msgstr "Mensagem"
+
+msgid "Error"
+msgstr "Erro"
+
+msgid "No logs recorded"
+msgstr "Nenhum log registrado"
+
+msgid "Response time"
+msgstr "Tempo de resposta"
+
+msgid "Never"
+msgstr "Nunca"
+
+msgid "Add Integration"
+msgstr "Adicionar Integração"
+
+msgid "No integrations configured"
+msgstr "Nenhuma integração configurada"
+
+msgid "Connect to external systems like IXC, Zabbix, or REST APIs."
+msgstr "Conecte-se a sistemas externos como IXC, Zabbix ou REST APIs."

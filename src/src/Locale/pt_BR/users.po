@@ -314,3 +314,7 @@ msgstr "Digite sua senha atual"
 
 msgid "Must be different from current password"
 msgstr "Deve ser diferente da senha atual"
+
+#: Users - Auth Pages - Remember me (lowercase)
+msgid "Remember me"
+msgstr "Lembrar-me"

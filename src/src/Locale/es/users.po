@@ -259,3 +259,61 @@ msgstr "Usuario creado, pero hubo un error al enviar el email de invitación: "
 
 msgid "A senha é obrigatória."
 msgstr "La contraseña es obligatoria."
+
+#: Users - Auth Pages (TASK-AUTH-021)
+msgid "Recover Password"
+msgstr "Recuperar Contraseña"
+
+msgid "Enter your email and we will send you a link to reset your password."
+msgstr "Ingrese su email y le enviaremos un enlace para restablecer su contraseña."
+
+msgid "Email"
+msgstr "Email"
+
+msgid "Enter your registered email"
+msgstr "Ingrese su email registrado"
+
+msgid "Send Recovery Link"
+msgstr "Enviar Enlace de Recuperación"
+
+msgid "Back to login"
+msgstr "Volver al login"
+
+msgid "Reset Password"
+msgstr "Restablecer Contraseña"
+
+msgid "Enter your new password below."
+msgstr "Ingrese su nueva contraseña a continuación."
+
+msgid "Enter your new password"
+msgstr "Ingrese su nueva contraseña"
+
+msgid "Re-enter your new password"
+msgstr "Ingrese nuevamente su nueva contraseña"
+
+msgid "Password requirements:"
+msgstr "Requisitos de la contraseña:"
+
+msgid "Passwords must match"
+msgstr "Las contraseñas deben coincidir"
+
+msgid "For security, you must change your password before continuing."
+msgstr "Por seguridad, debe cambiar su contraseña antes de continuar."
+
+msgid "Mandatory Password Change:"
+msgstr "Cambio Obligatorio de Contraseña:"
+
+msgid "This is your first time accessing the system or you are using a temporary password. Please set a new secure password."
+msgstr "Es su primera vez accediendo al sistema o está usando una contraseña temporal. Por favor, establezca una nueva contraseña segura."
+
+msgid "Current Password"
+msgstr "Contraseña Actual"
+
+msgid "Enter your current password"
+msgstr "Ingrese su contraseña actual"
+
+msgid "Must be different from current password"
+msgstr "Debe ser diferente de la contraseña actual"
+
+msgid "Remember me"
+msgstr "Recordarme"
