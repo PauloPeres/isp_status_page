@@ -16,6 +16,7 @@ services:
       - ./src/logs:/var/www/html/logs
     environment:
       - APP_NAME=ISP Status Page
+      - APP_URL=${APP_URL:-http://localhost:8765}
       - APP_DEBUG=${APP_DEBUG:-false}
       - SECURITY_SALT=${SECURITY_SALT:-change-me-in-production}
       - DATABASE_URL=postgres://isp:${POSTGRES_PASSWORD:-isp_secret}@postgres:5432/isp_status

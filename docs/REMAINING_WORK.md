@@ -359,23 +359,26 @@
 ## Priority 4: Future Roadmap
 > Long-term vision items
 
-### P4-001: WhatsApp Business API alert channel
+### P4-001: WhatsApp Business API alert channel -- DONE (acknowledgement)
 - **Source:** PROJECT_SUMMARY.md (2026 Q1-Q2 planned), CLAUDE.md
 - **Description:** WhatsApp Business API integration for alert notifications.
 - **Complexity:** Large
 - **Dependencies:** Alert channel infrastructure (completed)
+- **Partial Resolution:** WhatsApp alert messages now include clickable acknowledge links for down alerts, allowing users to acknowledge incidents directly from the message without opening the web app.
 
-### P4-002: Telegram Bot alert channel (dedicated)
+### P4-002: Telegram Bot alert channel (dedicated) -- DONE (acknowledgement)
 - **Source:** PROJECT_SUMMARY.md (2026 Q1-Q2 planned)
 - **Description:** Dedicated Telegram Bot with interactive features (acknowledge incidents, check status). Basic Telegram alert channel exists but a full bot with interactive commands is planned.
 - **Complexity:** Large
 - **Dependencies:** TASK-1003 (completed)
+- **Partial Resolution:** Telegram alert messages now include inline keyboard buttons with "Acknowledge" URL for down alerts. Users can tap the button to acknowledge the incident directly from the Telegram message. Full interactive bot commands remain as future work.
 
-### P4-003: SMS Gateway alert channel
+### P4-003: SMS Gateway alert channel -- DONE (acknowledgement)
 - **Source:** PROJECT_SUMMARY.md (2026 Q1-Q2 planned)
 - **Description:** SMS gateway integration (Twilio, Vonage, etc.) for alert notifications.
 - **Complexity:** Medium
 - **Dependencies:** Alert channel infrastructure (completed)
+- **Partial Resolution:** SMS alert messages now include a token-based acknowledge URL for down alerts, allowing users to acknowledge incidents by clicking the link directly from the SMS message.
 
 ### P4-004: SLA tracking -- DONE
 - **Source:** PROJECT_SUMMARY.md (2026 Q1-Q2 planned)

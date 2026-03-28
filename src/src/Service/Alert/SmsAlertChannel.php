@@ -18,6 +18,7 @@ use Cake\Log\Log;
  */
 class SmsAlertChannel implements ChannelInterface
 {
+    use AcknowledgeUrlTrait;
     /**
      * Twilio Account SID
      *
@@ -199,8 +200,13 @@ class SmsAlertChannel implements ChannelInterface
 
         if ($isDown) {
             $time = $incident->started_at ? $incident->started_at->format('H:i') : 'now';
+            $ackUrl = $this->getAcknowledgeUrl($incident);
+            $message = "[ALERT] {$name} is DOWN. Started: {$time}";
+            if ($ackUrl) {
+                $message .= "\nACK: {$ackUrl}";
+            }
 
-            return "[ALERT] {$name} is DOWN. Started: {$time}";
+            return $message;
         }
 
         return "[RESOLVED] {$name} is back UP.";

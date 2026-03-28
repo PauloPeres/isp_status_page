@@ -360,6 +360,64 @@ class SmsAlertChannelTest extends TestCase
     }
 
     /**
+     * Test formatMessage for down incident includes acknowledge URL when token exists
+     *
+     * @return void
+     */
+    public function testFormatMessageDownIncludesAcknowledgeUrl(): void
+    {
+        $_SERVER['APP_URL'] = 'https://status.example.com';
+        $_ENV['APP_URL'] = 'https://status.example.com';
+
+        $channel = $this->createUnconfiguredChannel();
+        $monitor = $this->createMonitor();
+        $incident = $this->createIncident(true);
+        $incident->acknowledgement_token = 'abc123token';
+
+        $message = $channel->formatMessage($monitor, $incident);
+
+        $this->assertStringContainsString('ACK:', $message);
+        $this->assertStringContainsString('https://status.example.com/incidents/acknowledge/10/abc123token', $message);
+    }
+
+    /**
+     * Test formatMessage for down incident without token does not include acknowledge URL
+     *
+     * @return void
+     */
+    public function testFormatMessageDownWithoutTokenNoAcknowledgeUrl(): void
+    {
+        $channel = $this->createUnconfiguredChannel();
+        $monitor = $this->createMonitor();
+        $incident = $this->createIncident(true);
+
+        $message = $channel->formatMessage($monitor, $incident);
+
+        $this->assertStringNotContainsString('ACK:', $message);
+    }
+
+    /**
+     * Test formatMessage for resolved incident does not include acknowledge URL
+     *
+     * @return void
+     */
+    public function testFormatMessageResolvedNoAcknowledgeUrl(): void
+    {
+        $_SERVER['APP_URL'] = 'https://status.example.com';
+        $_ENV['APP_URL'] = 'https://status.example.com';
+
+        $channel = $this->createUnconfiguredChannel();
+        $monitor = $this->createMonitor();
+        $incident = $this->createIncident(false);
+        $incident->acknowledgement_token = 'abc123token';
+
+        $message = $channel->formatMessage($monitor, $incident);
+
+        $this->assertStringNotContainsString('ACK:', $message);
+        $this->assertStringNotContainsString('acknowledge', $message);
+    }
+
+    /**
      * Clean up environment variables after each test
      *
      * @return void
@@ -369,7 +427,8 @@ class SmsAlertChannelTest extends TestCase
         unset(
             $_SERVER['TWILIO_SID'], $_ENV['TWILIO_SID'],
             $_SERVER['TWILIO_AUTH_TOKEN'], $_ENV['TWILIO_AUTH_TOKEN'],
-            $_SERVER['TWILIO_FROM_NUMBER'], $_ENV['TWILIO_FROM_NUMBER']
+            $_SERVER['TWILIO_FROM_NUMBER'], $_ENV['TWILIO_FROM_NUMBER'],
+            $_SERVER['APP_URL'], $_ENV['APP_URL']
         );
         parent::tearDown();
     }

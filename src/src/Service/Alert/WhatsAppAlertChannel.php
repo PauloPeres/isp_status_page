@@ -21,6 +21,7 @@ use Cake\Log\Log;
  */
 class WhatsAppAlertChannel implements ChannelInterface
 {
+    use AcknowledgeUrlTrait;
     /**
      * Twilio Account SID
      *
@@ -202,7 +203,15 @@ class WhatsAppAlertChannel implements ChannelInterface
         $time = $incident->started_at ? $incident->started_at->format('H:i') : date('H:i');
 
         if ($isDown) {
-            return "\xF0\x9F\x94\xB4 DOWN\n\nMonitor: {$name}\nTime: {$time}\n\nCheck your status page for details.";
+            $ackUrl = $this->getAcknowledgeUrl($incident);
+            $message = "\xF0\x9F\x94\xB4 DOWN\n\nMonitor: {$name}\nTime: {$time}";
+            if ($ackUrl) {
+                $message .= "\n\n\xF0\x9F\x91\x89 Acknowledge: {$ackUrl}";
+            } else {
+                $message .= "\n\nCheck your status page for details.";
+            }
+
+            return $message;
         }
 
         return "\xE2\x9C\x85 RESOLVED\n\nMonitor: {$name}\nTime: {$time}\n\nCheck your status page for details.";

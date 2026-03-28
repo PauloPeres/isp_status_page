@@ -43,6 +43,7 @@ class TelegramAlertChannelTest extends TestCase
     protected function tearDown(): void
     {
         unset($this->channel, $this->mockClient);
+        unset($_SERVER['APP_URL'], $_ENV['APP_URL']);
         parent::tearDown();
     }
 
@@ -258,6 +259,129 @@ class TelegramAlertChannelTest extends TestCase
         $this->assertFalse($result['success']);
         $this->assertEquals('failed', $result['results'][0]['status']);
         $this->assertEquals('Network error', $result['results'][0]['error']);
+    }
+
+    /**
+     * Test send includes inline keyboard button for down alerts with token
+     */
+    public function testSendIncludesInlineKeyboardForDownAlert(): void
+    {
+        $_SERVER['APP_URL'] = 'https://status.example.com';
+        $_ENV['APP_URL'] = 'https://status.example.com';
+
+        $botToken = '123456:ABC-DEF';
+        $chatId = '-100123456';
+
+        $mockResponse = $this->createMock(Response::class);
+        $mockResponse->method('isOk')->willReturn(true);
+
+        $capturedBody = null;
+        $this->mockClient->expects($this->once())
+            ->method('post')
+            ->willReturnCallback(function ($url, $body, $options) use ($mockResponse, &$capturedBody) {
+                $capturedBody = $body;
+
+                return $mockResponse;
+            });
+
+        $rule = $this->createAlertRule([
+            ['bot_token' => $botToken, 'chat_id' => $chatId],
+        ]);
+        $monitor = $this->createMonitor();
+        $incident = $this->createIncident(true);
+        $incident->acknowledgement_token = 'testtoken123';
+
+        $result = $this->channel->send($rule, $monitor, $incident);
+
+        $this->assertTrue($result['success']);
+        $this->assertNotNull($capturedBody);
+
+        $data = json_decode($capturedBody, true);
+        $this->assertArrayHasKey('reply_markup', $data);
+
+        $replyMarkup = $data['reply_markup'];
+        $this->assertStringContainsString('inline_keyboard', $replyMarkup);
+        $this->assertStringContainsString('Acknowledge', $replyMarkup);
+
+        // Decode the nested JSON to verify the URL (avoids JSON escape issues)
+        $keyboard = json_decode($replyMarkup, true);
+        $this->assertNotNull($keyboard);
+        $this->assertArrayHasKey('inline_keyboard', $keyboard);
+        $this->assertSame(
+            'https://status.example.com/incidents/acknowledge/1/testtoken123',
+            $keyboard['inline_keyboard'][0][0]['url']
+        );
+    }
+
+    /**
+     * Test send does not include inline keyboard for resolved alerts
+     */
+    public function testSendNoInlineKeyboardForResolvedAlert(): void
+    {
+        $_SERVER['APP_URL'] = 'https://status.example.com';
+        $_ENV['APP_URL'] = 'https://status.example.com';
+
+        $botToken = '123456:ABC-DEF';
+        $chatId = '-100123456';
+
+        $mockResponse = $this->createMock(Response::class);
+        $mockResponse->method('isOk')->willReturn(true);
+
+        $capturedBody = null;
+        $this->mockClient->expects($this->once())
+            ->method('post')
+            ->willReturnCallback(function ($url, $body, $options) use ($mockResponse, &$capturedBody) {
+                $capturedBody = $body;
+
+                return $mockResponse;
+            });
+
+        $rule = $this->createAlertRule([
+            ['bot_token' => $botToken, 'chat_id' => $chatId],
+        ]);
+        $monitor = $this->createMonitor();
+        $incident = $this->createIncident(false);
+        $incident->acknowledgement_token = 'testtoken123';
+
+        $result = $this->channel->send($rule, $monitor, $incident);
+
+        $this->assertTrue($result['success']);
+        $data = json_decode($capturedBody, true);
+        $this->assertArrayNotHasKey('reply_markup', $data);
+    }
+
+    /**
+     * Test send does not include inline keyboard when no token
+     */
+    public function testSendNoInlineKeyboardWhenNoToken(): void
+    {
+        $botToken = '123456:ABC-DEF';
+        $chatId = '-100123456';
+
+        $mockResponse = $this->createMock(Response::class);
+        $mockResponse->method('isOk')->willReturn(true);
+
+        $capturedBody = null;
+        $this->mockClient->expects($this->once())
+            ->method('post')
+            ->willReturnCallback(function ($url, $body, $options) use ($mockResponse, &$capturedBody) {
+                $capturedBody = $body;
+
+                return $mockResponse;
+            });
+
+        $rule = $this->createAlertRule([
+            ['bot_token' => $botToken, 'chat_id' => $chatId],
+        ]);
+        $monitor = $this->createMonitor();
+        $incident = $this->createIncident(true);
+        // No acknowledgement_token set
+
+        $result = $this->channel->send($rule, $monitor, $incident);
+
+        $this->assertTrue($result['success']);
+        $data = json_decode($capturedBody, true);
+        $this->assertArrayNotHasKey('reply_markup', $data);
     }
 
     /**

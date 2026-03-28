@@ -17,6 +17,7 @@ use Cake\Log\Log;
  */
 class TelegramAlertChannel implements ChannelInterface
 {
+    use AcknowledgeUrlTrait;
     /**
      * Telegram Bot API base URL
      *
@@ -66,6 +67,19 @@ class TelegramAlertChannel implements ChannelInterface
 
         $message = $this->buildMessage($monitor, $incident);
 
+        // Build inline keyboard with acknowledge button for down alerts
+        $ackUrl = $this->getAcknowledgeUrl($incident);
+        $replyMarkup = null;
+        if ($incident->isOngoing() && $ackUrl) {
+            $replyMarkup = json_encode([
+                'inline_keyboard' => [
+                    [
+                        ['text' => "\xE2\x9C\x85 Acknowledge", 'url' => $ackUrl],
+                    ],
+                ],
+            ]);
+        }
+
         $results = [];
         $allSuccess = true;
 
@@ -91,14 +105,19 @@ class TelegramAlertChannel implements ChannelInterface
             try {
                 $url = static::API_BASE_URL . $recipientData['bot_token'] . '/sendMessage';
 
+                $data = [
+                    'chat_id' => $recipientData['chat_id'],
+                    'text' => $message,
+                    'parse_mode' => 'HTML',
+                    'disable_web_page_preview' => true,
+                ];
+                if ($replyMarkup) {
+                    $data['reply_markup'] = $replyMarkup;
+                }
+
                 $response = $this->httpClient->post(
                     $url,
-                    json_encode([
-                        'chat_id' => $recipientData['chat_id'],
-                        'text' => $message,
-                        'parse_mode' => 'HTML',
-                        'disable_web_page_preview' => true,
-                    ]),
+                    json_encode($data),
                     ['type' => 'application/json']
                 );
 

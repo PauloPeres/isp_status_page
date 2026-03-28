@@ -79,6 +79,7 @@ class IncidentService
             'severity' => $this->determineSeverity($monitor),
             'started_at' => DateTime::now(),
             'auto_created' => true,
+            'acknowledgement_token' => bin2hex(random_bytes(32)),
         ]);
 
         $savedIncident = $this->Incidents->save($incident);
