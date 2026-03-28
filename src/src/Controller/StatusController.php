@@ -134,7 +134,7 @@ class StatusController extends AppController
         if ($systemStatus === 'major-outage') {
             $this->response = $this->response->withStatus(503); // Service Unavailable
         } elseif ($systemStatus === 'partial-outage') {
-            $this->response = $this->response->withStatus(500); // Internal Server Error
+            $this->response = $this->response->withStatus(200); // Degraded but page renders OK
         }
 
         $this->set(compact(
