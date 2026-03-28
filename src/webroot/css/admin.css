@@ -1801,3 +1801,66 @@ body {
 .uptime-bar-percentage { font-weight: 600; color: #333; }
 .uptime-bar-compact { height: 16px; border-radius: 3px; }
 .uptime-bar-compact .uptime-bar-segment { min-width: 1px; }
+
+/* Dark Mode (P3-009) */
+[data-theme="dark"] {
+    --color-dark: #e0e0e0;
+    --color-white: #1e1e2e;
+    --color-gray-light: #2a2a3e;
+    --color-gray-medium: #555;
+    --color-primary: #60a5fa;
+    --color-primary-hover: #3b82f6;
+    --color-success: #4ade80;
+    --color-error: #f87171;
+    --color-warning: #fbbf24;
+}
+[data-theme="dark"] body { background: #1a1a2e; color: #e0e0e0; }
+[data-theme="dark"] .admin-content { background: #1a1a2e; }
+[data-theme="dark"] .content-wrapper { background: transparent; }
+[data-theme="dark"] .card, [data-theme="dark"] .stat-card-mini { background: #2a2a3e; border-color: #333; }
+[data-theme="dark"] .data-table th { background: #2a2a3e; color: #ccc; }
+[data-theme="dark"] .data-table td { border-color: #333; }
+[data-theme="dark"] .data-table tr:hover td { background: #333; }
+[data-theme="dark"] input, [data-theme="dark"] select, [data-theme="dark"] textarea {
+    background: #2a2a3e; color: #e0e0e0; border-color: #444;
+}
+[data-theme="dark"] .page-header h1 { color: #e0e0e0; }
+[data-theme="dark"] .admin-sidebar { background: #151525; }
+[data-theme="dark"] .flash-message { background: #2a2a3e; }
+
+/* Theme toggle button */
+.theme-toggle {
+    background: none;
+    border: 1px solid var(--color-gray-medium, #B0BEC5);
+    border-radius: var(--radius-sm, 4px);
+    padding: 4px 10px;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, border-color 0.2s;
+}
+.theme-toggle:hover {
+    background: var(--color-gray-light, #ECEFF1);
+    border-color: var(--color-primary, #1E88E5);
+}
+[data-theme="dark"] .theme-toggle {
+    border-color: #555;
+    color: #e0e0e0;
+}
+[data-theme="dark"] .theme-toggle:hover {
+    background: #333;
+    border-color: #60a5fa;
+}
+
+/* Breadcrumb Navigation (P3-004) */
+.breadcrumbs { font-size: 13px; margin-bottom: 16px; color: #999; }
+.breadcrumb-link { color: var(--color-primary); text-decoration: none; }
+.breadcrumb-link:hover { text-decoration: underline; }
+.breadcrumb-separator { margin: 0 6px; color: #ccc; }
+.breadcrumb-current { color: #666; font-weight: 500; }
+
+/* Business plan badge (P3-018) */
+.badge-gold { background: #fef3c7; color: #92400e; }

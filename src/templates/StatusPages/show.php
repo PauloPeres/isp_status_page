@@ -11,8 +11,36 @@
 $this->assign('title', h($statusPage->name));
 ?>
 
+<?php
+// Apply custom branding from theme JSON (P3-011)
+$themeConfig = $statusPage->getThemeConfig();
+$brandPrimaryColor = $themeConfig['primary_color'] ?? null;
+$brandLogoUrl = $themeConfig['logo_url'] ?? null;
+$brandCustomCss = $themeConfig['custom_css'] ?? null;
+?>
+
+<?php if ($brandPrimaryColor): ?>
+<style>
+.public-status-page .status-page-header h1 { color: <?= h($brandPrimaryColor) ?>; }
+.public-status-page .btn-primary { background: <?= h($brandPrimaryColor) ?>; border-color: <?= h($brandPrimaryColor) ?>; }
+.public-status-page .monitors-list h2,
+.public-status-page .incidents-section h2 { color: <?= h($brandPrimaryColor) ?>; }
+</style>
+<?php endif; ?>
+
+<?php if ($brandCustomCss): ?>
+<style><?= $brandCustomCss ?></style>
+<?php endif; ?>
+
 <div class="public-status-page">
-    <?php if (!empty($statusPage->header_text)): ?>
+    <?php if ($brandLogoUrl): ?>
+        <div class="status-page-header" style="text-align: center;">
+            <img src="<?= h($brandLogoUrl) ?>" alt="<?= h($statusPage->name) ?>" style="max-height: 60px; margin-bottom: 12px;">
+            <?php if (!empty($statusPage->header_text)): ?>
+                <div><?= $statusPage->header_text ?></div>
+            <?php endif; ?>
+        </div>
+    <?php elseif (!empty($statusPage->header_text)): ?>
         <div class="status-page-header">
             <?= $statusPage->header_text ?>
         </div>

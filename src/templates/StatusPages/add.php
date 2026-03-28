@@ -76,6 +76,36 @@
         <?php endif; ?>
     </div>
 
+    <h3 style="margin-top: 24px; margin-bottom: 12px; padding-top: 16px; border-top: 1px solid #eee;"><?= __('Branding') ?></h3>
+
+    <div class="form-group">
+        <label for="theme-primary-color"><?= __('Primary Color') ?></label>
+        <input type="color" name="theme_primary_color" id="theme-primary-color" value="#1E88E5" class="form-control" style="height: 40px; width: 80px; padding: 2px;">
+    </div>
+
+    <div class="form-group">
+        <?= $this->Form->control('theme_logo_url', [
+            'label' => __('Logo URL'),
+            'type' => 'text',
+            'class' => 'form-control',
+            'placeholder' => __('https://example.com/logo.png'),
+            'value' => '',
+        ]) ?>
+    </div>
+
+    <div class="form-group">
+        <?= $this->Form->control('theme_custom_css', [
+            'label' => __('Custom CSS'),
+            'type' => 'textarea',
+            'class' => 'form-control',
+            'rows' => 5,
+            'placeholder' => __('/* Add custom CSS rules here */'),
+            'value' => '',
+        ]) ?>
+    </div>
+
+    <h3 style="margin-top: 24px; margin-bottom: 12px; padding-top: 16px; border-top: 1px solid #eee;"><?= __('Display Options') ?></h3>
+
     <div class="form-group">
         <?= $this->Form->control('show_uptime_chart', [
             'label' => __('Show Uptime Chart'),

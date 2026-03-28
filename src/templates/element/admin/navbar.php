@@ -15,6 +15,10 @@
         </button>
 
         <div class="navbar-user">
+            <button id="themeToggle" class="theme-toggle" title="Toggle dark mode">
+                <span class="theme-icon">&#127769;</span>
+            </button>
+
             <?= $this->element('admin/org_switcher') ?>
 
             <div class="user-info">
@@ -82,4 +86,21 @@ document.addEventListener('click', function(e) {
         userMenu.classList.remove('show');
     }
 });
+
+// Dark mode toggle (P3-009)
+(function() {
+    const toggle = document.getElementById('themeToggle');
+    const stored = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', stored);
+    if (toggle) {
+        toggle.querySelector('.theme-icon').textContent = stored === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF19';
+    }
+    toggle?.addEventListener('click', function() {
+        const current = document.documentElement.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+        toggle.querySelector('.theme-icon').textContent = next === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF19';
+    });
+})();
 </script>

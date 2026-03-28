@@ -100,6 +100,15 @@ function isActive($currentController, $targetController, $currentAction = null, 
                     'class' => 'nav-item' . (isActive($controller, 'MaintenanceWindows') ? ' active' : '')
                 ]
             ) ?>
+
+            <?= $this->Html->link(
+                '<span class="nav-icon">&#x1F4CA;</span> ' . __('Reports'),
+                ['controller' => 'Reports', 'action' => 'index'],
+                [
+                    'escape' => false,
+                    'class' => 'nav-item' . (isActive($controller, 'Reports') ? ' active' : '')
+                ]
+            ) ?>
         </div>
 
         <div class="nav-section">

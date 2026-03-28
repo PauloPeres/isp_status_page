@@ -209,23 +209,26 @@
 - **Complexity:** Large
 - **Dependencies:** None
 
-### P3-004: Add breadcrumb navigation
+### P3-004: Add breadcrumb navigation -- DONE
 - **Source:** USER_TESTING_DETAIL_QA.md (LOW-001)
 - **Description:** No pages include breadcrumb navigation. Sub-pages like /monitors/add, /monitors/view/1, /monitors/edit/1 have no breadcrumb trail.
 - **Complexity:** Medium
 - **Dependencies:** None
+- **Resolution:** Created `element/admin/breadcrumb.php` with accessible nav markup and CSS in admin.css. Added breadcrumbs to Monitors (add/edit/view), Incidents (view), Integrations (add/edit/view), Users (add/edit), AlertRules (add/edit).
 
-### P3-005: Manual incident creation button
+### P3-005: Manual incident creation button -- DONE
 - **Source:** USER_TESTING_DETAIL_QA.md (LOW-002)
 - **Description:** The incidents list page has no "Create Incident" button, unlike Monitors which has "+ New Monitor". Manual incident creation requires editing the URL.
 - **Complexity:** Small
 - **Dependencies:** None
+- **Resolution:** Added `add()` action to IncidentsController with form for monitor, title, description, severity, and status. Created `Incidents/add.php` template with breadcrumbs. Added "+ New Incident" button to incidents index.
 
-### P3-006: Dashboard contextual help and plain-language explanations
+### P3-006: Dashboard contextual help and plain-language explanations -- DONE
 - **Source:** USER_TESTING_MOM.md (Recommendations #4 and #5)
 - **Description:** Add tooltips/help text explaining: what "Degraded" and "Unknown" mean, what response time means ("How fast your website responds -- lower is better"), what the numbers in Recent Checks mean, severity levels in plain language.
 - **Complexity:** Small
 - **Dependencies:** None
+- **Resolution:** Added title attributes with info icons to Degraded ("Services responding but slower than normal"), Unknown ("No check data available yet"), Uptime ("Percentage of successful checks in the last 24 hours"), and Response Time ("How fast your service responds -- lower is better") on the dashboard.
 
 ### P3-007: Image upload for site logo (instead of URL-only)
 - **Source:** USER_TESTING_MOM.md
@@ -239,65 +242,75 @@
 - **Complexity:** Large
 - **Dependencies:** None
 
-### P3-009: Dark mode
+### P3-009: Dark mode -- DONE
 - **Source:** USER_TESTING_POWER_USER.md
 - **Description:** No dark mode available for the admin panel.
 - **Complexity:** Medium
 - **Dependencies:** None
+- **Resolution:** Added [data-theme="dark"] CSS custom properties overriding all color variables in admin.css. Theme toggle button in admin navbar with sun/moon icon. JavaScript persists theme choice in localStorage. Dark mode styles cover body, cards, tables, inputs, sidebar, flash messages, and page headers.
 
-### P3-010: Report export (PDF/CSV)
+### P3-010: Report export (PDF/CSV) -- DONE
 - **Source:** USER_TESTING_POWER_USER.md (Recommendation #9), DEVELOPMENT_PLAN.md (Module 4.2)
 - **Description:** PDF and CSV export of uptime reports, incident history, and response time data. Enterprise customers require this for SLAs and compliance.
 - **Complexity:** Medium
 - **Dependencies:** None
+- **Resolution:** Created ReportsController with index (report selection page), uptimeReport (CSV of per-monitor uptime by day), incidentReport (CSV of incidents with duration), responseTimeReport (CSV of avg/min/max response times). Reports index page has date range selectors (7/30/60/90/180/365 days) and download buttons. Added "Reports" link to admin sidebar under Monitoring section.
 
-### P3-011: Status page custom branding (themes, colors, custom CSS)
+### P3-011: Status page custom branding (themes, colors, custom CSS) -- DONE
 - **Source:** USER_TESTING_POWER_USER.md
 - **Description:** No custom branding beyond header/footer text. Need color themes, custom CSS injection, and per-status-page logo support.
 - **Complexity:** Medium
 - **Dependencies:** None
+- **Resolution:** Added branding fields (primary color picker, logo URL, custom CSS textarea) to StatusPages add/edit forms. Branding stored in existing theme JSON field as {"primary_color", "logo_url", "custom_css"}. Public show.php applies primary color to headers/buttons, renders logo image, and injects custom CSS. StatusPagesController merges theme data on save.
 
-### P3-012: Embeddable status widget/badge for external sites
+### P3-012: Embeddable status widget/badge for external sites -- DONE
 - **Source:** USER_TESTING_POWER_USER.md
 - **Description:** No embedded status widget for external sites. Need an embeddable JS snippet or iframe widget showing current status.
 - **Complexity:** Medium
 - **Dependencies:** None
+- **Resolution:** Created WidgetController with status() (HTML widget page for iframe embed) and statusJs() (JavaScript snippet that auto-creates iframe). Widget shows colored status dot and label ("All Systems Operational" / "Some Systems Are Down" / etc.) with link to full status page. Routes: /widget/status/{slug} (HTML), /widget/status/{slug}.js (JS embed). No auth required. Template is a minimal standalone HTML page.
 
-### P3-013: RSS/Atom feed for incidents
+### P3-013: RSS/Atom feed for incidents -- DONE
 - **Source:** USER_TESTING_POWER_USER.md
 - **Description:** No RSS/Atom feed exists for incident updates.
 - **Complexity:** Small
 - **Dependencies:** None
+- **Resolution:** Created FeedController with `incidents()` action returning RSS 2.0 XML. Template at `Feed/incidents.php` outputs last 20 incidents with title, status, severity, monitor, and description. Route: `/feed/incidents.rss`.
 
-### P3-014: Scheduled maintenance display on public status page
+### P3-014: Scheduled maintenance display on public status page -- DONE
 - **Source:** USER_TESTING_POWER_USER.md
 - **Description:** Active maintenance windows are not shown on the public status page.
 - **Complexity:** Small
 - **Dependencies:** None
+- **Resolution:** Added query for scheduled/in-progress maintenance windows in StatusController::index(). Added "Scheduled Maintenance" section to Status/index.php that only appears when there are upcoming windows, showing title, description, status badge, and time range.
 
-### P3-015: Users page search/filter
+### P3-015: Users page search/filter -- DONE
 - **Source:** USER_TESTING_DETAIL_QA.md (LOW-006)
 - **Description:** The Users page has no search or filter form, unlike other list pages.
 - **Complexity:** Small
 - **Dependencies:** None
+- **Resolution:** Already implemented. Users index page has Role, Status, and Search filter fields with Filter/Clear buttons.
 
-### P3-016: Consistent confirmation dialog messages
+### P3-016: Consistent confirmation dialog messages -- DONE
 - **Source:** USER_TESTING_DETAIL_QA.md (LOW-021)
 - **Description:** Delete confirmations inconsistently mention "This action cannot be undone". Should be standardized.
 - **Complexity:** Small
 - **Dependencies:** None
+- **Resolution:** Standardized all delete confirmations across MaintenanceWindows (index, edit), StatusPages (index), Users (index), Integrations (index), AlertRules (index) to use: "Are you sure? This action cannot be undone."
 
-### P3-017: Fix "Duration: 00h 00m" for short incidents
+### P3-017: Fix "Duration: 00h 00m" for short incidents -- DONE
 - **Source:** USER_TESTING_DETAIL_QA.md (LOW-019)
 - **Description:** Resolved incidents shorter than 1 minute show "Duration: 00h 00m" instead of the actual seconds.
 - **Complexity:** Small
 - **Dependencies:** None
+- **Resolution:** Replaced `gmdate('H:i:s', ...)` in Monitors/view.php with proper conditional formatting: <60s shows seconds, <3600s shows minutes+seconds, else hours+minutes.
 
-### P3-018: Fix "Business" plan badge color (red/danger implies negative)
+### P3-018: Fix "Business" plan badge color (red/danger implies negative) -- DONE
 - **Source:** USER_TESTING_DETAIL_QA.md (LOW-023)
 - **Description:** Business plan uses `badge-danger` (red) in super admin, implying something negative when it is the highest tier.
 - **Complexity:** Small
 - **Dependencies:** None
+- **Resolution:** Changed `badge-danger` to `badge-gold` for Business plan in SuperAdmin Dashboard and Revenue templates. Added `.badge-gold` CSS class (gold/amber styling) to admin.css.
 
 ### P3-019: Bundle Chart.js locally instead of CDN
 - **Source:** USER_TESTING_POWER_USER.md, USER_TESTING_DETAIL_QA.md (LOW-008)

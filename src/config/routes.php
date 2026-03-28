@@ -191,6 +191,20 @@ return function (RouteBuilder $routes): void {
         );
 
         /*
+         * Embeddable status widget routes (P3-012)
+         */
+        $builder->connect(
+            '/widget/status/{slug}',
+            ['controller' => 'Widget', 'action' => 'status'],
+            ['pass' => ['slug'], 'slug' => '[a-z0-9][a-z0-9\-]*[a-z0-9]']
+        );
+        $builder->connect(
+            '/widget/status/{slug}.js',
+            ['controller' => 'Widget', 'action' => 'statusJs'],
+            ['pass' => ['slug'], 'slug' => '[a-z0-9][a-z0-9\-]*[a-z0-9]']
+        );
+
+        /*
          * Public status page route
          */
         $builder->connect(
@@ -257,6 +271,14 @@ return function (RouteBuilder $routes): void {
             '/organizations/switch/{orgId}',
             ['controller' => 'OrganizationSwitcher', 'action' => 'switch'],
             ['pass' => ['orgId'], 'orgId' => '\d+']
+        );
+
+        /*
+         * RSS Feed route (P3-013)
+         */
+        $builder->connect(
+            '/feed/incidents.rss',
+            ['controller' => 'Feed', 'action' => 'incidents']
         );
 
         /*

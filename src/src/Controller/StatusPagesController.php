@@ -68,6 +68,9 @@ class StatusPagesController extends AppController
                 $data['monitors'] = json_encode(array_map('intval', $data['monitor_ids']));
             }
 
+            // Handle theme/branding fields (P3-011)
+            $data = $this->_mergeThemeData($data, []);
+
             $statusPage = $this->StatusPages->patchEntity($statusPage, $data);
 
             if ($this->StatusPages->save($statusPage)) {
@@ -109,6 +112,9 @@ class StatusPagesController extends AppController
             if (isset($data['monitor_ids']) && is_array($data['monitor_ids'])) {
                 $data['monitors'] = json_encode(array_map('intval', $data['monitor_ids']));
             }
+
+            // Handle theme/branding fields (P3-011)
+            $data = $this->_mergeThemeData($data, $statusPage->getThemeConfig());
 
             $statusPage = $this->StatusPages->patchEntity($statusPage, $data);
 
@@ -229,6 +235,35 @@ class StatusPagesController extends AppController
 
         $this->set(compact('statusPage', 'monitors', 'incidents'));
         $this->set('requirePassword', false);
+    }
+
+    /**
+     * Merge theme branding fields from form data into the theme JSON (P3-011).
+     *
+     * @param array $data The form data.
+     * @param array $existingTheme The existing theme config array.
+     * @return array The modified form data with theme JSON set.
+     */
+    private function _mergeThemeData(array $data, array $existingTheme): array
+    {
+        $theme = $existingTheme;
+
+        if (isset($data['theme_primary_color'])) {
+            $theme['primary_color'] = $data['theme_primary_color'];
+            unset($data['theme_primary_color']);
+        }
+        if (isset($data['theme_logo_url'])) {
+            $theme['logo_url'] = $data['theme_logo_url'];
+            unset($data['theme_logo_url']);
+        }
+        if (isset($data['theme_custom_css'])) {
+            $theme['custom_css'] = $data['theme_custom_css'];
+            unset($data['theme_custom_css']);
+        }
+
+        $data['theme'] = json_encode($theme);
+
+        return $data;
     }
 
     /**
