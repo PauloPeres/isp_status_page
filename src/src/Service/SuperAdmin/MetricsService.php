@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Service\SuperAdmin;
 
+use App\Service\UptimeCalculationService;
 use Cake\Cache\Cache;
 use Cake\I18n\DateTime;
 use Cake\ORM\Locator\LocatorAwareTrait;
@@ -10,6 +11,19 @@ use Cake\ORM\Locator\LocatorAwareTrait;
 class MetricsService
 {
     use LocatorAwareTrait;
+
+    /**
+     * @var \App\Service\UptimeCalculationService
+     */
+    private UptimeCalculationService $uptimeService;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->uptimeService = new UptimeCalculationService();
+    }
 
     // === REVENUE KPIs (SA-006) ===
 
@@ -197,20 +211,17 @@ class MetricsService
     {
         return Cache::remember('sa_platform_health', function () {
             $monitorsTable = $this->fetchTable('Monitors');
-            $checksTable = $this->fetchTable('MonitorChecks');
             $alertLogsTable = $this->fetchTable('AlertLogs');
             $incidentsTable = $this->fetchTable('Incidents');
 
             $today = DateTime::now()->startOfDay();
-            $weekAgo = DateTime::now()->subDays(7);
-            $monthAgo = DateTime::now()->subDays(30);
 
             return [
                 'total_monitors' => $monitorsTable->find()->applyOptions(['skipTenantScope' => true])->count(),
                 'active_monitors' => $monitorsTable->find()->applyOptions(['skipTenantScope' => true])->where(['active' => true])->count(),
-                'checks_today' => $checksTable->find()->applyOptions(['skipTenantScope' => true])->where(['checked_at >=' => $today])->count(),
-                'checks_this_week' => $checksTable->find()->applyOptions(['skipTenantScope' => true])->where(['checked_at >=' => $weekAgo])->count(),
-                'checks_this_month' => $checksTable->find()->applyOptions(['skipTenantScope' => true])->where(['checked_at >=' => $monthAgo])->count(),
+                'checks_today' => $this->uptimeService->getCheckCounts('today'),
+                'checks_this_week' => $this->uptimeService->getCheckCounts('week'),
+                'checks_this_month' => $this->uptimeService->getCheckCounts('month'),
                 'active_incidents' => $incidentsTable->find()->applyOptions(['skipTenantScope' => true])->where(['status !=' => 'resolved'])->count(),
                 'alerts_today' => $alertLogsTable->find()->applyOptions(['skipTenantScope' => true])->where(['created >=' => $today])->count(),
             ];

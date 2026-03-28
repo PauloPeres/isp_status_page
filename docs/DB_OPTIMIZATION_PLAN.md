@@ -40,21 +40,21 @@ The monitor_checks table is the highest-volume table in the system. At SaaS scal
 - **Description:** Weekly range partitions on checked_at. ManagePartitionsCommand for creating future/dropping expired partitions. BIGSERIAL PK.
 
 ### TASK-DB-007: Optimize Queries to Use Rollup Data
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Priority:** MUST-HAVE
 - **Description:** UptimeCalculationService that routes queries to raw (last 24h) vs rollup (historical). Update Dashboard, Badges, SuperAdmin metrics.
 - **Depends on:** DB-004
 
 ### TASK-DB-008: Redis Caching Layer
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Priority:** HIGH
 - **Description:** Cache uptime (60s TTL), dashboard summary (30s TTL), badge SVGs (5min TTL). MonitorCacheService for key management.
 - **Depends on:** DB-003, DB-007
 
 ### TASK-DB-009: Batch Insert for Check Results
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Priority:** NICE-TO-HAVE
-- **Description:** Batch all check results into single INSERT. Reduces 10K inserts/cycle to 1.
+- **Description:** Batch all check results into single INSERT. Reduces 10K inserts/cycle to 1. Implemented via `batchSaveCheckResults()` using CakePHP `saveMany()` in MonitorCheckCommand.
 
 ### TASK-DB-010: PK Migration to BIGINT
 - **Status:** COMPLETED
@@ -62,14 +62,14 @@ The monitor_checks table is the highest-volume table in the system. At SaaS scal
 - **Description:** Change id from SERIAL (32-bit, max 2.1B) to BIGSERIAL (64-bit). Current PK exhausts in ~149 days at target scale.
 
 ### TASK-DB-011: Separate Error Details Table
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Priority:** NICE-TO-HAVE
-- **Description:** Move error_message and details TEXT columns to companion table. Reduces main table heap by ~30%.
+- **Description:** Move error_message and details TEXT columns to companion table. Reduces main table heap by ~30%. Created `monitor_check_details` table, Table/Entity classes, and dual-write in MonitorCheckCommand. ChecksController view() now contains MonitorCheckDetails.
 
 ### TASK-DB-012: TimescaleDB Evaluation
-- **Status:** PENDING
+- **Status:** COMPLETED
 - **Priority:** NICE-TO-HAVE (future)
-- **Description:** Evaluate TimescaleDB for automatic partitioning, continuous aggregates, and compression.
+- **Description:** Evaluate TimescaleDB for automatic partitioning, continuous aggregates, and compression. Full evaluation document at `src/docs/TIMESCALEDB_EVALUATION.md`. Recommendation: adopt after 1M+ rows/day.
 
 ## Impact Summary
 

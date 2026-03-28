@@ -3,13 +3,16 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Service\MonitorCacheService;
+use App\Service\UptimeCalculationService;
 use Cake\I18n\DateTime;
 
 /**
  * Dashboard Controller
  *
  * Enhanced admin dashboard with Chart.js charts, summary cards,
- * and real-time monitoring data.
+ * and real-time monitoring data. Uses UptimeCalculationService
+ * for rollup-aware queries and MonitorCacheService for caching.
  */
 class DashboardController extends AppController
 {
@@ -27,14 +30,26 @@ class DashboardController extends AppController
         $checksTable = $this->fetchTable('MonitorChecks');
         $alertLogsTable = $this->fetchTable('AlertLogs');
 
-        // Summary cards
-        $summary = [
-            'total' => $monitorsTable->find()->count(),
-            'up' => $monitorsTable->find()->where(['status' => 'up'])->count(),
-            'down' => $monitorsTable->find()->where(['status' => 'down'])->count(),
-            'degraded' => $monitorsTable->find()->where(['status' => 'degraded'])->count(),
-            'unknown' => $monitorsTable->find()->where(['status' => 'unknown'])->count(),
-        ];
+        $cacheService = new MonitorCacheService();
+        $uptimeService = new UptimeCalculationService();
+
+        // Determine current org ID for cache key (0 for non-tenant context)
+        $orgId = 0;
+        $identity = $this->request->getAttribute('identity');
+        if ($identity && $identity->get('organization_id')) {
+            $orgId = (int)$identity->get('organization_id');
+        }
+
+        // Cache the summary computation
+        $summary = $cacheService->getDashboardSummary($orgId, function () use ($monitorsTable) {
+            return [
+                'total' => $monitorsTable->find()->count(),
+                'up' => $monitorsTable->find()->where(['status' => 'up'])->count(),
+                'down' => $monitorsTable->find()->where(['status' => 'down'])->count(),
+                'degraded' => $monitorsTable->find()->where(['status' => 'degraded'])->count(),
+                'unknown' => $monitorsTable->find()->where(['status' => 'unknown'])->count(),
+            ];
+        });
 
         // Active incidents with severity
         $activeIncidents = $incidentsTable->find()
@@ -55,61 +70,34 @@ class DashboardController extends AppController
             }
         }
 
-        // Uptime chart data: last 24h uptime % per monitor
-        $since24h = DateTime::now()->subHours(24);
+        // Get active monitors
         $monitors = $monitorsTable->find()
             ->where(['active' => true])
             ->orderBy(['name' => 'ASC'])
             ->all();
 
-        // Single aggregate query: uptime stats per monitor (eliminates N+1)
-        $uptimeStats = $checksTable->find()
-            ->select([
-                'monitor_id',
-                'total' => $checksTable->find()->func()->count('*'),
-                'success' => $checksTable->find()->func()->sum(
-                    "CASE WHEN status = 'success' THEN 1 ELSE 0 END"
-                ),
-            ])
-            ->where(['checked_at >=' => $since24h])
-            ->groupBy(['monitor_id'])
-            ->disableAutoFields()
-            ->all()
-            ->combine('monitor_id', function ($row) {
-                return ['total' => $row->total, 'success' => $row->success];
-            })
-            ->toArray();
+        $monitorIds = [];
+        foreach ($monitors as $monitor) {
+            $monitorIds[] = $monitor->id;
+        }
 
-        // Single aggregate query: avg response time per monitor (eliminates N+1)
-        $responseStats = $checksTable->find()
-            ->select([
-                'monitor_id',
-                'avg_response' => $checksTable->find()->func()->avg('response_time'),
-            ])
-            ->where(['checked_at >=' => $since24h, 'response_time IS NOT' => null])
-            ->groupBy(['monitor_id'])
-            ->disableAutoFields()
-            ->all()
-            ->combine('monitor_id', 'avg_response')
-            ->toArray();
+        // Bulk uptime and response time via UptimeCalculationService (single query each)
+        $bulkUptime = $uptimeService->getBulkUptime($monitorIds, 1);
+        $bulkResponseTimes = $uptimeService->getBulkResponseTimes($monitorIds, 1);
 
-        // Build uptime data from aggregate results
+        // Build uptime data from bulk results
         $uptimeData = [];
         foreach ($monitors as $monitor) {
-            $stats = $uptimeStats[$monitor->id] ?? null;
-            $total = $stats ? (int)$stats['total'] : 0;
-            $success = $stats ? (int)$stats['success'] : 0;
-
             $uptimeData[] = [
                 'name' => $monitor->name,
-                'uptime' => $total > 0 ? round(($success / $total) * 100, 2) : 0,
+                'uptime' => $bulkUptime[$monitor->id] ?? 0,
             ];
         }
 
-        // Build response time data from aggregate results
+        // Build response time data from bulk results
         $responseTimeData = [];
         foreach ($monitors as $monitor) {
-            $avgResponse = $responseStats[$monitor->id] ?? null;
+            $avgResponse = $bulkResponseTimes[$monitor->id] ?? null;
 
             $responseTimeData[] = [
                 'name' => $monitor->name,

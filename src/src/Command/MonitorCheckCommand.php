@@ -17,6 +17,7 @@ use App\Service\Check\PingChecker;
 use App\Service\Check\PortChecker;
 use App\Service\Check\SslCertChecker;
 use App\Service\IncidentService;
+use App\Service\MonitorCacheService;
 use Cake\Command\Command;
 use Cake\Console\Arguments;
 use Cake\Console\ConsoleIo;
@@ -59,6 +60,13 @@ class MonitorCheckCommand extends Command
     protected IncidentService $incidentService;
 
     /**
+     * Monitor cache service instance
+     *
+     * @var \App\Service\MonitorCacheService
+     */
+    protected MonitorCacheService $cacheService;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -84,6 +92,9 @@ class MonitorCheckCommand extends Command
 
         // Initialize incident service
         $this->incidentService = new IncidentService();
+
+        // Initialize cache service
+        $this->cacheService = new MonitorCacheService();
     }
 
     /**
@@ -216,13 +227,33 @@ class MonitorCheckCommand extends Command
             'total' => count($monitors),
         ];
 
+        // Collect batch results for a single INSERT at end of cycle (TASK-DB-009)
+        $batchResults = [];
+
         foreach ($monitors as $monitor) {
             try {
                 // Execute check
                 $checkResult = $this->checkService->executeCheck($monitor);
 
-                // Save check result
-                $this->saveCheckResult($monitor, $checkResult);
+                // Collect check result for batch insert instead of saving individually
+                $status = $this->mapStatusToCheckStatus($checkResult['status']);
+                $batchResults[] = [
+                    'organization_id' => $monitor->organization_id,
+                    'monitor_id' => $monitor->id,
+                    'status' => $status,
+                    'response_time' => $checkResult['response_time'] ?? null,
+                    'status_code' => $checkResult['status_code'] ?? null,
+                    'error_message' => $checkResult['error_message'] ?? null,
+                    'details' => json_encode($checkResult['metadata'] ?? []),
+                    'checked_at' => $checkResult['checked_at'] ?? date('Y-m-d H:i:s'),
+                    'created' => date('Y-m-d H:i:s'),
+                ];
+
+                // Invalidate cached data for this monitor after check
+                $this->cacheService->invalidateMonitor($monitor->id);
+                if ($monitor->organization_id) {
+                    $this->cacheService->invalidateDashboard((int)$monitor->organization_id);
+                }
 
                 // Track old status before updating
                 $oldStatus = $monitor->getOriginal('status') ?? $monitor->status;
@@ -234,16 +265,16 @@ class MonitorCheckCommand extends Command
                 $this->handleIncidentsAndAlerts($monitor, $checkResult, $oldStatus);
 
                 // Count results
-                $status = $checkResult['status'];
-                if (isset($results[$status])) {
-                    $results[$status]++;
+                $checkStatus = $checkResult['status'];
+                if (isset($results[$checkStatus])) {
+                    $results[$checkStatus]++;
                 }
 
                 // Display progress
                 if ($verbose) {
                     $this->displayCheckResult($io, $monitor, $checkResult);
                 } else {
-                    $icon = $this->getStatusIcon($status);
+                    $icon = $this->getStatusIcon($checkStatus);
                     $io->out("{$icon} [{$monitor->id}] {$monitor->name}", 0);
                 }
             } catch (\Exception $e) {
@@ -258,6 +289,9 @@ class MonitorCheckCommand extends Command
                 ]);
             }
         }
+
+        // Batch insert all check results at once (TASK-DB-009)
+        $this->batchSaveCheckResults($batchResults);
 
         return $results;
     }
@@ -316,34 +350,86 @@ class MonitorCheckCommand extends Command
     }
 
     /**
-     * Save check result to database
+     * Batch save all check results at end of check cycle (TASK-DB-009)
      *
-     * @param \App\Model\Entity\Monitor $monitor Monitor entity
-     * @param array $checkResult Check result
+     * Instead of one INSERT per monitor, all results are collected and
+     * inserted in a single batch operation for better performance.
+     *
+     * After saving, writes error details to the companion table (TASK-DB-011).
+     *
+     * @param array $batchResults Array of check result data
      * @return void
      */
-    protected function saveCheckResult($monitor, array $checkResult): void
+    protected function batchSaveCheckResults(array $batchResults): void
     {
-        $monitorChecksTable = $this->fetchTable('MonitorChecks');
+        if (empty($batchResults)) {
+            return;
+        }
 
-        // Map checker status to check status
-        $status = $this->mapStatusToCheckStatus($checkResult['status']);
+        $checksTable = $this->fetchTable('MonitorChecks');
+        $entities = $checksTable->newEntities($batchResults);
+        $savedEntities = $checksTable->saveMany($entities);
 
-        $checkEntity = $monitorChecksTable->newEntity([
-            'monitor_id' => $monitor->id,
-            'status' => $status,
-            'response_time' => $checkResult['response_time'] ?? null,
-            'status_code' => $checkResult['status_code'] ?? null,
-            'error_message' => $checkResult['error_message'] ?? null,
-            'details' => json_encode($checkResult['metadata'] ?? []),
-            'checked_at' => $checkResult['checked_at'] ?? date('Y-m-d H:i:s'),
-        ]);
-
-        if (!$monitorChecksTable->save($checkEntity)) {
-            Log::error("Failed to save check result for monitor {$monitor->id}", [
-                'monitor_id' => $monitor->id,
-                'errors' => $checkEntity->getErrors(),
+        if ($savedEntities === false) {
+            Log::error('Failed to batch save check results', [
+                'count' => count($batchResults),
+                'errors' => array_map(fn($e) => $e->getErrors(), $entities),
             ]);
+
+            return;
+        }
+
+        // Save error details to companion table (TASK-DB-011)
+        $this->saveErrorDetails($savedEntities, $batchResults);
+    }
+
+    /**
+     * Save error details to the monitor_check_details companion table (TASK-DB-011)
+     *
+     * Only saves rows where error_message or details are non-null,
+     * keeping the companion table sparse and storage-efficient.
+     *
+     * @param iterable $savedEntities Saved MonitorCheck entities with IDs
+     * @param array $batchResults Original batch data for error_message/details
+     * @return void
+     */
+    protected function saveErrorDetails(iterable $savedEntities, array $batchResults): void
+    {
+        $detailsTable = $this->fetchTable('MonitorCheckDetails');
+        $detailRows = [];
+
+        $index = 0;
+        foreach ($savedEntities as $entity) {
+            $original = $batchResults[$index] ?? null;
+            $index++;
+
+            if ($original === null) {
+                continue;
+            }
+
+            $errorMessage = $original['error_message'] ?? null;
+            $details = $original['details'] ?? null;
+
+            // Only save if there is error info to store
+            if ($errorMessage !== null || ($details !== null && $details !== 'null' && $details !== '[]')) {
+                $detailRows[] = [
+                    'check_id' => $entity->id,
+                    'error_message' => $errorMessage,
+                    'details' => $details,
+                    'created' => date('Y-m-d H:i:s'),
+                ];
+            }
+        }
+
+        if (!empty($detailRows)) {
+            $detailEntities = $detailsTable->newEntities($detailRows);
+            $saved = $detailsTable->saveMany($detailEntities);
+
+            if ($saved === false) {
+                Log::error('Failed to save error details to monitor_check_details', [
+                    'count' => count($detailRows),
+                ]);
+            }
         }
     }
 

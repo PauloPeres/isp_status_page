@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use Cake\I18n\DateTime;
 use Cake\Log\Log;
 use Cake\ORM\Locator\LocatorAwareTrait;
 
@@ -11,10 +10,30 @@ use Cake\ORM\Locator\LocatorAwareTrait;
  * Badge Service
  *
  * Generates shields.io-style SVG badges for monitor uptime, status, and response time.
+ * Uses MonitorCacheService for SVG caching and UptimeCalculationService for data.
  */
 class BadgeService
 {
     use LocatorAwareTrait;
+
+    /**
+     * @var \App\Service\UptimeCalculationService
+     */
+    private UptimeCalculationService $uptimeService;
+
+    /**
+     * @var \App\Service\MonitorCacheService
+     */
+    private MonitorCacheService $cacheService;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->uptimeService = new UptimeCalculationService();
+        $this->cacheService = new MonitorCacheService();
+    }
 
     /**
      * Generate uptime badge SVG
@@ -25,28 +44,30 @@ class BadgeService
      */
     public function generateUptime(int $monitorId, int $days = 30): string
     {
-        try {
-            $monitorsTable = $this->fetchTable('Monitors');
-            $monitor = $monitorsTable->get($monitorId);
+        return $this->cacheService->getBadgeSvg('uptime', $monitorId, function () use ($monitorId, $days) {
+            try {
+                $monitorsTable = $this->fetchTable('Monitors');
+                $monitor = $monitorsTable->get($monitorId);
 
-            $uptime = $this->calculateUptime($monitorId, $days);
-            $uptimeStr = number_format($uptime, 1) . '%';
+                $uptime = $this->uptimeService->getUptime($monitorId, $days);
+                $uptimeStr = number_format($uptime, 1) . '%';
 
-            // Color based on uptime
-            if ($uptime >= 99.5) {
-                $color = '#43A047'; // green
-            } elseif ($uptime >= 95.0) {
-                $color = '#FDD835'; // yellow
-            } else {
-                $color = '#E53935'; // red
+                // Color based on uptime
+                if ($uptime >= 99.5) {
+                    $color = '#43A047'; // green
+                } elseif ($uptime >= 95.0) {
+                    $color = '#FDD835'; // yellow
+                } else {
+                    $color = '#E53935'; // red
+                }
+
+                return $this->generateBadgeSvg('uptime', $uptimeStr, $color);
+            } catch (\Exception $e) {
+                Log::error("BadgeService::generateUptime failed: " . $e->getMessage());
+
+                return $this->generateErrorBadge('error');
             }
-
-            return $this->generateBadgeSvg('uptime', $uptimeStr, $color);
-        } catch (\Exception $e) {
-            Log::error("BadgeService::generateUptime failed: " . $e->getMessage());
-
-            return $this->generateErrorBadge('error');
-        }
+        });
     }
 
     /**
@@ -57,24 +78,26 @@ class BadgeService
      */
     public function generateStatus(int $monitorId): string
     {
-        try {
-            $monitorsTable = $this->fetchTable('Monitors');
-            $monitor = $monitorsTable->get($monitorId);
+        return $this->cacheService->getBadgeSvg('status', $monitorId, function () use ($monitorId) {
+            try {
+                $monitorsTable = $this->fetchTable('Monitors');
+                $monitor = $monitorsTable->get($monitorId);
 
-            $statusText = strtolower($monitor->status);
-            $color = match ($monitor->status) {
-                'up' => '#43A047',
-                'down' => '#E53935',
-                'degraded' => '#FDD835',
-                default => '#9E9E9E',
-            };
+                $statusText = strtolower($monitor->status);
+                $color = match ($monitor->status) {
+                    'up' => '#43A047',
+                    'down' => '#E53935',
+                    'degraded' => '#FDD835',
+                    default => '#9E9E9E',
+                };
 
-            return $this->generateBadgeSvg('status', $statusText, $color);
-        } catch (\Exception $e) {
-            Log::error("BadgeService::generateStatus failed: " . $e->getMessage());
+                return $this->generateBadgeSvg('status', $statusText, $color);
+            } catch (\Exception $e) {
+                Log::error("BadgeService::generateStatus failed: " . $e->getMessage());
 
-            return $this->generateErrorBadge('error');
-        }
+                return $this->generateErrorBadge('error');
+            }
+        });
     }
 
     /**
@@ -85,25 +108,28 @@ class BadgeService
      */
     public function generateResponseTime(int $monitorId): string
     {
-        try {
-            $avgResponseTime = $this->calculateAvgResponseTime($monitorId);
-            $responseStr = $avgResponseTime . 'ms';
+        return $this->cacheService->getBadgeSvg('response', $monitorId, function () use ($monitorId) {
+            try {
+                $avgResponseTime = $this->uptimeService->getAvgResponseTime($monitorId, 1);
+                $avgMs = (int)round((float)($avgResponseTime ?? 0));
+                $responseStr = $avgMs . 'ms';
 
-            // Color based on response time
-            if ($avgResponseTime < 200) {
-                $color = '#43A047'; // green
-            } elseif ($avgResponseTime < 500) {
-                $color = '#FDD835'; // yellow
-            } else {
-                $color = '#E53935'; // red
+                // Color based on response time
+                if ($avgMs < 200) {
+                    $color = '#43A047'; // green
+                } elseif ($avgMs < 500) {
+                    $color = '#FDD835'; // yellow
+                } else {
+                    $color = '#E53935'; // red
+                }
+
+                return $this->generateBadgeSvg('response time', $responseStr, $color);
+            } catch (\Exception $e) {
+                Log::error("BadgeService::generateResponseTime failed: " . $e->getMessage());
+
+                return $this->generateErrorBadge('error');
             }
-
-            return $this->generateBadgeSvg('response time', $responseStr, $color);
-        } catch (\Exception $e) {
-            Log::error("BadgeService::generateResponseTime failed: " . $e->getMessage());
-
-            return $this->generateErrorBadge('error');
-        }
+        });
     }
 
     /**
@@ -115,66 +141,6 @@ class BadgeService
     public function generateErrorBadge(string $message): string
     {
         return $this->generateBadgeSvg('monitor', $message, '#9E9E9E');
-    }
-
-    /**
-     * Calculate uptime percentage for a monitor over a given number of days
-     *
-     * @param int $monitorId Monitor ID
-     * @param int $days Number of days
-     * @return float Uptime percentage
-     */
-    private function calculateUptime(int $monitorId, int $days): float
-    {
-        $checksTable = $this->fetchTable('MonitorChecks');
-        $since = DateTime::now()->modify("-{$days} days");
-
-        $totalChecks = $checksTable->find()
-            ->where([
-                'monitor_id' => $monitorId,
-                'checked_at >=' => $since,
-            ])
-            ->count();
-
-        if ($totalChecks === 0) {
-            return 100.0;
-        }
-
-        $successChecks = $checksTable->find()
-            ->where([
-                'monitor_id' => $monitorId,
-                'status' => 'success',
-                'checked_at >=' => $since,
-            ])
-            ->count();
-
-        return round(($successChecks / $totalChecks) * 100, 2);
-    }
-
-    /**
-     * Calculate average response time for a monitor (last 24h)
-     *
-     * @param int $monitorId Monitor ID
-     * @return int Average response time in milliseconds
-     */
-    private function calculateAvgResponseTime(int $monitorId): int
-    {
-        $checksTable = $this->fetchTable('MonitorChecks');
-        $since = DateTime::now()->modify('-24 hours');
-
-        $result = $checksTable->find()
-            ->where([
-                'monitor_id' => $monitorId,
-                'checked_at >=' => $since,
-                'response_time IS NOT' => null,
-            ])
-            ->select(['avg_time' => $checksTable->find()->func()->avg('response_time')])
-            ->disableHydration()
-            ->first();
-
-        $avg = $result['avg_time'] ?? 0;
-
-        return (int)round((float)$avg);
     }
 
     /**
