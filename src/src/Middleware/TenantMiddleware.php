@@ -43,6 +43,7 @@ class TenantMiddleware implements MiddlewareInterface
         '/heartbeat/',
         '/webhooks/',
         '/api/v1/',
+        '/api/v2/',
         '/api/docs',
         '/incidents/acknowledge/',
         '/auth/',
