@@ -504,6 +504,7 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/monitors/import', ['controller' => 'Monitors', 'action' => 'import', 'prefix' => 'Api/V2', '_method' => 'POST']);
         $builder->connect('/monitors/{id}', ['controller' => 'Monitors', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
         $builder->connect('/monitors/{id}', ['controller' => 'Monitors', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/monitors/{id}', ['controller' => 'Monitors', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '\d+']);
         $builder->connect('/monitors/{id}', ['controller' => 'Monitors', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
         $builder->connect('/monitors/{id}/checks', ['controller' => 'Monitors', 'action' => 'checks', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
         $builder->connect('/monitors/{id}/pause', ['controller' => 'Monitors', 'action' => 'pause', 'prefix' => 'Api/V2', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
@@ -514,6 +515,8 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/incidents', ['controller' => 'Incidents', 'action' => 'add', 'prefix' => 'Api/V2', '_method' => 'POST']);
         $builder->connect('/incidents/{id}', ['controller' => 'Incidents', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
         $builder->connect('/incidents/{id}', ['controller' => 'Incidents', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/incidents/{id}', ['controller' => 'Incidents', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/incidents/{id}', ['controller' => 'Incidents', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
         $builder->connect('/incidents/{id}/acknowledge', ['controller' => 'Incidents', 'action' => 'acknowledge', 'prefix' => 'Api/V2', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
         $builder->connect('/incidents/{id}/updates', ['controller' => 'Incidents', 'action' => 'addUpdate', 'prefix' => 'Api/V2', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
 
@@ -526,6 +529,7 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/integrations', ['controller' => 'Integrations', 'action' => 'add', 'prefix' => 'Api/V2', '_method' => 'POST']);
         $builder->connect('/integrations/{id}', ['controller' => 'Integrations', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
         $builder->connect('/integrations/{id}', ['controller' => 'Integrations', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/integrations/{id}', ['controller' => 'Integrations', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '\d+']);
         $builder->connect('/integrations/{id}', ['controller' => 'Integrations', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
         $builder->connect('/integrations/{id}/test', ['controller' => 'Integrations', 'action' => 'test', 'prefix' => 'Api/V2', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
 
@@ -534,6 +538,7 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/alert-rules', ['controller' => 'AlertRules', 'action' => 'add', 'prefix' => 'Api/V2', '_method' => 'POST']);
         $builder->connect('/alert-rules/{id}', ['controller' => 'AlertRules', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
         $builder->connect('/alert-rules/{id}', ['controller' => 'AlertRules', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/alert-rules/{id}', ['controller' => 'AlertRules', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '\d+']);
         $builder->connect('/alert-rules/{id}', ['controller' => 'AlertRules', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
 
         // Escalation Policies
@@ -541,6 +546,7 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/escalation-policies', ['controller' => 'EscalationPolicies', 'action' => 'add', 'prefix' => 'Api/V2', '_method' => 'POST']);
         $builder->connect('/escalation-policies/{id}', ['controller' => 'EscalationPolicies', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
         $builder->connect('/escalation-policies/{id}', ['controller' => 'EscalationPolicies', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/escalation-policies/{id}', ['controller' => 'EscalationPolicies', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '\d+']);
         $builder->connect('/escalation-policies/{id}', ['controller' => 'EscalationPolicies', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
 
         // SLA
@@ -548,6 +554,7 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/sla', ['controller' => 'Sla', 'action' => 'add', 'prefix' => 'Api/V2', '_method' => 'POST']);
         $builder->connect('/sla/{id}', ['controller' => 'Sla', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
         $builder->connect('/sla/{id}', ['controller' => 'Sla', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/sla/{id}', ['controller' => 'Sla', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '\d+']);
         $builder->connect('/sla/{id}', ['controller' => 'Sla', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
         $builder->connect('/sla/{id}/report', ['controller' => 'Sla', 'action' => 'report', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
         $builder->connect('/sla/{id}/export', ['controller' => 'Sla', 'action' => 'export', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
@@ -555,6 +562,7 @@ return function (RouteBuilder $routes): void {
         // Settings
         $builder->connect('/settings', ['controller' => 'Settings', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
         $builder->connect('/settings', ['controller' => 'Settings', 'action' => 'save', 'prefix' => 'Api/V2', '_method' => 'PUT']);
+        $builder->connect('/settings', ['controller' => 'Settings', 'action' => 'save', 'prefix' => 'Api/V2', '_method' => 'PATCH']);
 
         // Billing
         $builder->connect('/billing/plans', ['controller' => 'Billing', 'action' => 'plans', 'prefix' => 'Api/V2', '_method' => 'GET']);
@@ -589,6 +597,7 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/scheduled-reports', ['controller' => 'ScheduledReports', 'action' => 'add', 'prefix' => 'Api/V2', '_method' => 'POST']);
         $builder->connect('/scheduled-reports/{id}', ['controller' => 'ScheduledReports', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
         $builder->connect('/scheduled-reports/{id}', ['controller' => 'ScheduledReports', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/scheduled-reports/{id}', ['controller' => 'ScheduledReports', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '\d+']);
         $builder->connect('/scheduled-reports/{id}', ['controller' => 'ScheduledReports', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
         $builder->connect('/scheduled-reports/{id}/send-now', ['controller' => 'ScheduledReports', 'action' => 'sendNow', 'prefix' => 'Api/V2', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
         $builder->connect('/scheduled-reports/{id}/preview', ['controller' => 'ScheduledReports', 'action' => 'preview', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
@@ -598,6 +607,7 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/maintenance-windows', ['controller' => 'MaintenanceWindows', 'action' => 'add', 'prefix' => 'Api/V2', '_method' => 'POST']);
         $builder->connect('/maintenance-windows/{id}', ['controller' => 'MaintenanceWindows', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
         $builder->connect('/maintenance-windows/{id}', ['controller' => 'MaintenanceWindows', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/maintenance-windows/{id}', ['controller' => 'MaintenanceWindows', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '\d+']);
         $builder->connect('/maintenance-windows/{id}', ['controller' => 'MaintenanceWindows', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
 
         // Status Pages
@@ -605,6 +615,7 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/status-pages', ['controller' => 'StatusPages', 'action' => 'add', 'prefix' => 'Api/V2', '_method' => 'POST']);
         $builder->connect('/status-pages/{id}', ['controller' => 'StatusPages', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
         $builder->connect('/status-pages/{id}', ['controller' => 'StatusPages', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/status-pages/{id}', ['controller' => 'StatusPages', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '\d+']);
         $builder->connect('/status-pages/{id}', ['controller' => 'StatusPages', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
 
         // Two-Factor Auth

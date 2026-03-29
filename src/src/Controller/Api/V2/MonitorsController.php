@@ -721,7 +721,7 @@ class MonitorsController extends AppController
                 $filtered[$key] = $data['configuration'][$key];
             }
         }
-        $data['configuration'] = $filtered;
+        $data['configuration'] = !empty($filtered) ? json_encode($filtered) : null;
 
         return $data;
     }

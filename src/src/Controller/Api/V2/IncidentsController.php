@@ -235,6 +235,39 @@ class IncidentsController extends AppController
     }
 
     /**
+     * DELETE /api/v2/incidents/{id}
+     *
+     * Delete an incident.
+     *
+     * @param string $id Incident ID.
+     * @return void
+     */
+    public function delete(string $id): void
+    {
+        $this->request->allowMethod(['delete']);
+
+        if (!$this->requireRole(['owner', 'admin'])) {
+            return;
+        }
+
+        $incidentsTable = $this->fetchTable('Incidents');
+
+        try {
+            $incident = $incidentsTable->get($id);
+        } catch (\Cake\Datasource\Exception\RecordNotFoundException $e) {
+            $this->error('Incident not found', 404);
+
+            return;
+        }
+
+        if ($incidentsTable->delete($incident)) {
+            $this->success(['message' => 'Incident deleted']);
+        } else {
+            $this->error('Unable to delete incident', 500);
+        }
+    }
+
+    /**
      * POST /api/v2/incidents/{id}/acknowledge
      *
      * Acknowledge an incident from the authenticated user.
