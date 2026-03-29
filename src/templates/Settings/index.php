@@ -469,6 +469,81 @@ function getDescription($key, $descriptions, $fallback = '') {
                 <p><?= __d('settings', 'No notification settings available.') ?></p>
             </div>
         <?php endif; ?>
+
+        <!-- Quiet Hours Settings (P4-008) -->
+        <div class="settings-form" style="margin-top: 32px; padding-top: 24px; border-top: 2px solid #e0e0e0;">
+            <h3 style="margin: 0 0 8px; font-size: 18px; font-weight: 600;"><?= __d('settings', 'Quiet Hours') ?></h3>
+            <p style="margin: 0 0 20px; color: #666; font-size: 14px;">
+                <?= __d('settings', 'During quiet hours, non-critical alert notifications will be suppressed. Critical alerts (e.g., complete outages) will still be delivered unless you choose to suppress all alerts. This helps reduce noise during off-hours without missing important events.') ?>
+            </p>
+
+            <?= $this->Form->create(null, ['url' => ['action' => 'saveQuietHours'], 'class' => 'settings-form']) ?>
+
+            <div class="form-group">
+                <div class="checkbox-label">
+                    <?= $this->Form->checkbox('quiet_hours_enabled', [
+                        'checked' => !empty($quietHours['enabled']),
+                        'hiddenField' => true,
+                        'id' => 'quiet-hours-enabled',
+                    ]) ?>
+                    <label for="quiet-hours-enabled">
+                        <?= __d('settings', 'Enable quiet hours for this organization') ?>
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group" style="display: flex; gap: 16px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 150px;">
+                    <label for="quiet-hours-start"><?= __d('settings', 'Start Time') ?></label>
+                    <input type="time" id="quiet-hours-start" name="quiet_hours_start"
+                           value="<?= h($quietHours['start'] ?? '22:00') ?>"
+                           class="form-control" style="width: 100%; padding: 10px 12px; border: 1px solid #d0d0d0; border-radius: 6px; font-size: 14px;">
+                </div>
+                <div style="flex: 1; min-width: 150px;">
+                    <label for="quiet-hours-end"><?= __d('settings', 'End Time') ?></label>
+                    <input type="time" id="quiet-hours-end" name="quiet_hours_end"
+                           value="<?= h($quietHours['end'] ?? '08:00') ?>"
+                           class="form-control" style="width: 100%; padding: 10px 12px; border: 1px solid #d0d0d0; border-radius: 6px; font-size: 14px;">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="quiet-hours-timezone"><?= __d('settings', 'Timezone') ?></label>
+                <?= $this->Form->select('quiet_hours_timezone',
+                    array_combine(
+                        \DateTimeZone::listIdentifiers(),
+                        \DateTimeZone::listIdentifiers()
+                    ), [
+                    'value' => $quietHours['timezone'] ?? 'UTC',
+                    'class' => 'form-control',
+                    'id' => 'quiet-hours-timezone',
+                ]) ?>
+                <span class="help-text"><?= __d('settings', 'The timezone used to determine when quiet hours are active.') ?></span>
+            </div>
+
+            <div class="form-group">
+                <label for="quiet-hours-suppress-level"><?= __d('settings', 'Suppress Level') ?></label>
+                <?= $this->Form->select('quiet_hours_suppress_level', [
+                    'non_critical' => __d('settings', 'Non-critical only — critical alerts still delivered'),
+                    'all' => __d('settings', 'All alerts — suppress everything during quiet hours'),
+                    'none' => __d('settings', 'None — quiet hours enabled but no suppression'),
+                ], [
+                    'value' => $quietHours['suppress_level'] ?? 'non_critical',
+                    'class' => 'form-control',
+                    'id' => 'quiet-hours-suppress-level',
+                ]) ?>
+                <span class="help-text"><?= __d('settings', 'Choose which alerts to suppress during quiet hours. "Non-critical only" is recommended for most teams.') ?></span>
+            </div>
+
+            <div class="form-actions">
+                <?= $this->Form->button(__d('settings', 'Save Quiet Hours'), [
+                    'type' => 'submit',
+                    'class' => 'btn btn-primary'
+                ]) ?>
+            </div>
+
+            <?= $this->Form->end() ?>
+        </div>
     </div>
 
     <!-- Notification Channels -->

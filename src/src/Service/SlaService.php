@@ -76,6 +76,10 @@ class SlaService
         // Determine status
         $status = $this->determineStatus($actualUptime, $targetUptime, $warningThreshold);
 
+        // Clamp values to valid range (0-100%)
+        $actualUptime = round(min(100, max(0, $actualUptime)), 3);
+        $targetUptime = round(min(100, max(0, $targetUptime)), 3);
+
         return [
             'target_uptime' => $targetUptime,
             'actual_uptime' => $actualUptime,

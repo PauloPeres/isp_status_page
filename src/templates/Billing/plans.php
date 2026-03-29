@@ -12,13 +12,14 @@
 
 $this->assign('title', __('Plans & Pricing'));
 
-$planOrder = ['free' => 0, 'pro' => 1, 'business' => 2];
+$planOrder = ['free' => 0, 'pro' => 1, 'business' => 2, 'enterprise' => 3];
 $currentPlanOrder = $planOrder[$currentPlan] ?? 0;
 
 $planColors = [
     'free' => 'var(--color-secondary, #6c757d)',
     'pro' => 'var(--color-primary, #1E88E5)',
     'business' => 'var(--color-success, #43A047)',
+    'enterprise' => '#1a1a2e',
 ];
 
 $planFeatures = [
@@ -50,6 +51,17 @@ $planFeatures = [
         '90 days data retention',
         'SSL monitoring',
         'Priority support',
+    ],
+    'enterprise' => [
+        'Everything in Business, plus:',
+        '15-second check intervals',
+        'Unlimited status pages',
+        'API access (50,000 req/hr)',
+        '365-day data retention',
+        'SSO / SAML authentication',
+        'SLA tracking',
+        'Dedicated support manager',
+        'Custom domain support',
     ],
 ];
 ?>
@@ -83,8 +95,9 @@ $planFeatures = [
             $color = $planColors[$slug] ?? 'var(--color-primary, #1E88E5)';
             $features = $planFeatures[$slug] ?? [];
             $isPopular = ($slug === 'pro');
+            $isEnterprise = ($slug === 'enterprise');
             ?>
-            <div class="plan-card <?= $isCurrent ? 'plan-current' : '' ?> <?= $isPopular ? 'plan-popular' : '' ?>" style="--plan-color: <?= $color ?>">
+            <div class="plan-card <?= $isCurrent ? 'plan-current' : '' ?> <?= $isPopular ? 'plan-popular' : '' ?> <?= $isEnterprise ? 'plan-enterprise' : '' ?>" style="--plan-color: <?= $color ?>">
                 <?php if ($isPopular): ?>
                     <div class="plan-popular-badge"><?= __('Most Popular') ?></div>
                 <?php endif; ?>
@@ -96,11 +109,16 @@ $planFeatures = [
                 <div class="plan-header">
                     <h2 class="plan-name"><?= h($plan->name) ?></h2>
                     <div class="plan-price">
-                        <span class="price-amount" data-monthly="<?= h($plan->getMonthlyPriceFormatted()) ?>" data-yearly="<?= h($plan->getYearlyPriceFormatted()) ?>">
-                            <?= $plan->price_monthly === 0 ? __('Free') : h($plan->getMonthlyPriceFormatted()) ?>
-                        </span>
-                        <?php if ($plan->price_monthly > 0): ?>
-                            <span class="price-period" data-monthly="<?= __('/month') ?>" data-yearly="<?= __('/year') ?>"><?= __('/month') ?></span>
+                        <?php if ($isEnterprise): ?>
+                            <span class="price-amount"><?= __('Custom') ?></span>
+                            <span class="price-period"><?= __('pricing') ?></span>
+                        <?php else: ?>
+                            <span class="price-amount" data-monthly="<?= h($plan->getMonthlyPriceFormatted()) ?>" data-yearly="<?= h($plan->getYearlyPriceFormatted()) ?>">
+                                <?= $plan->price_monthly === 0 ? __('Free') : h($plan->getMonthlyPriceFormatted()) ?>
+                            </span>
+                            <?php if ($plan->price_monthly > 0): ?>
+                                <span class="price-period" data-monthly="<?= __('/month') ?>" data-yearly="<?= __('/year') ?>"><?= __('/month') ?></span>
+                            <?php endif; ?>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -115,7 +133,11 @@ $planFeatures = [
                 </ul>
 
                 <div class="plan-actions">
-                    <?php if ($isCurrent): ?>
+                    <?php if ($isEnterprise): ?>
+                        <a href="/contact/sales" class="btn btn-enterprise plan-btn">
+                            <?= __('Contact Sales') ?>
+                        </a>
+                    <?php elseif ($isCurrent): ?>
                         <?php if ($slug !== 'free'): ?>
                             <?= $this->Form->create(null, [
                                 'url' => ['action' => 'portal'],

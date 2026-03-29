@@ -11,6 +11,7 @@ use App\Model\Table\AlertLogsTable;
 use App\Model\Table\AlertRulesTable;
 use App\Service\MaintenanceService;
 use App\Service\NotificationCreditService;
+use App\Service\QuietHoursService;
 use Cake\I18n\DateTime;
 use Cake\Log\Log;
 use Cake\ORM\Locator\LocatorAwareTrait;
@@ -55,6 +56,13 @@ class AlertService
     protected MaintenanceService $maintenanceService;
 
     /**
+     * Quiet hours service for checking notification suppression
+     *
+     * @var \App\Service\QuietHoursService
+     */
+    protected QuietHoursService $quietHoursService;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -62,6 +70,7 @@ class AlertService
         $this->AlertRules = $this->fetchTable('AlertRules');
         $this->AlertLogs = $this->fetchTable('AlertLogs');
         $this->maintenanceService = new MaintenanceService();
+        $this->quietHoursService = new QuietHoursService();
     }
 
     /**
@@ -121,6 +130,15 @@ class AlertService
             // Check if monitor is in a maintenance window with alert suppression
             if ($this->maintenanceService->shouldSuppressAlert((int)$monitor->id)) {
                 Log::debug("Monitor {$monitor->id} is in maintenance window, suppressing alert dispatch");
+
+                return 0;
+            }
+
+            // Check quiet hours — suppress alerts based on org settings and severity
+            $orgId = (int)$monitor->organization_id;
+            $severity = $incident->severity ?? 'warning';
+            if ($this->quietHoursService->shouldSuppressAlert($orgId, $severity)) {
+                Log::info("Alert suppressed by quiet hours for org {$orgId}, monitor {$monitor->id}, severity {$severity}");
 
                 return 0;
             }

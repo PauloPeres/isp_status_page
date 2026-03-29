@@ -6,6 +6,7 @@ namespace App\Controller;
 use App\Service\BackupUploaderService;
 use App\Service\EmailService;
 use App\Service\SettingService;
+use App\Tenant\TenantContext;
 use Cake\Cache\Cache;
 use Cake\Http\Exception\BadRequestException;
 use Cake\I18n\I18n;
@@ -124,7 +125,45 @@ class SettingsController extends AppController
             $settings['channels'][$key] = $this->settingService->getString($key, '');
         }
 
-        $this->set(compact('settings'));
+        // Load quiet hours settings from organization
+        $quietHours = [
+            'enabled' => false,
+            'start' => '22:00',
+            'end' => '08:00',
+            'timezone' => 'UTC',
+            'suppress_level' => 'non_critical',
+        ];
+
+        $orgId = TenantContext::getCurrentOrgId();
+        if ($orgId) {
+            try {
+                $orgsTable = $this->fetchTable('Organizations');
+                $org = $orgsTable->find()
+                    ->select([
+                        'quiet_hours_enabled',
+                        'quiet_hours_start',
+                        'quiet_hours_end',
+                        'quiet_hours_timezone',
+                        'quiet_hours_suppress_level',
+                    ])
+                    ->where(['id' => $orgId])
+                    ->first();
+
+                if ($org) {
+                    $quietHours = [
+                        'enabled' => !empty($org->quiet_hours_enabled),
+                        'start' => $org->quiet_hours_start ?? '22:00',
+                        'end' => $org->quiet_hours_end ?? '08:00',
+                        'timezone' => $org->quiet_hours_timezone ?? 'UTC',
+                        'suppress_level' => $org->quiet_hours_suppress_level ?? 'non_critical',
+                    ];
+                }
+            } catch (\Exception $e) {
+                // Quiet hours columns may not exist yet (pre-migration)
+            }
+        }
+
+        $this->set(compact('settings', 'quietHours'));
     }
 
     /**
