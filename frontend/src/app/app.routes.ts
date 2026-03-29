@@ -234,6 +234,59 @@ export const routes: Routes = [
             (m) => m.ActivityLogComponent,
           ),
       },
+      {
+        path: 'two-factor',
+        loadComponent: () =>
+          import('./features/two-factor/two-factor.component').then(
+            (m) => m.TwoFactorComponent,
+          ),
+      },
+    ],
+  },
+
+  {
+    path: 'super-admin',
+    loadComponent: () =>
+      import('./layout/app-layout.component').then(
+        (m) => m.AppLayoutComponent,
+      ),
+    canActivate: [superAdminGuard],
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./features/super-admin/super-admin-dashboard.component').then(
+            (m) => m.SuperAdminDashboardComponent,
+          ),
+      },
+      {
+        path: 'organizations',
+        loadComponent: () =>
+          import('./features/super-admin/super-admin-orgs.component').then(
+            (m) => m.SuperAdminOrgsComponent,
+          ),
+      },
+      {
+        path: 'users',
+        loadComponent: () =>
+          import('./features/super-admin/super-admin-users.component').then(
+            (m) => m.SuperAdminUsersComponent,
+          ),
+      },
+      {
+        path: 'revenue',
+        loadComponent: () =>
+          import('./features/super-admin/super-admin-revenue.component').then(
+            (m) => m.SuperAdminRevenueComponent,
+          ),
+      },
+      {
+        path: 'health',
+        loadComponent: () =>
+          import('./features/super-admin/super-admin-health.component').then(
+            (m) => m.SuperAdminHealthComponent,
+          ),
+      },
     ],
   },
 

@@ -81,13 +81,13 @@ ALL admin functionality (~20 feature areas, ~110 API endpoints)
 - TASK-NG-039: Billing + Credits -- COMPLETED (2026-03-29)
 - TASK-NG-040: Team (Users + Invitations) -- COMPLETED (2026-03-29)
 - TASK-NG-041: API Keys -- COMPLETED (2026-03-29)
-- TASK-NG-042: Reports
-- TASK-NG-043: Scheduled Reports
-- TASK-NG-044: Maintenance Windows
-- TASK-NG-045: Status Pages Management
-- TASK-NG-046: Two-Factor Auth
-- TASK-NG-047: Activity Log
-- TASK-NG-048: Super Admin (largest — 9 sub-pages)
+- TASK-NG-042: Reports -- COMPLETED (2026-03-29)
+- TASK-NG-043: Scheduled Reports -- COMPLETED (2026-03-29)
+- TASK-NG-044: Maintenance Windows -- COMPLETED (2026-03-29)
+- TASK-NG-045: Status Pages Management -- COMPLETED (2026-03-29)
+- TASK-NG-046: Two-Factor Auth -- COMPLETED (2026-03-29)
+- TASK-NG-047: Activity Log -- COMPLETED (2026-03-29)
+- TASK-NG-048: Super Admin (largest — 9 sub-pages) -- COMPLETED (2026-03-29)
 
 ### Phase 4: Integration + Cutover (5 tasks)
 - TASK-NG-050: CakePHP catch-all route for /app/*

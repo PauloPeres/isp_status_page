@@ -1,30 +1,118 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import {
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonContent,
-  IonMenuButton,
-  IonButtons,
+  IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons,
+  IonList, IonItem, IonLabel, IonBadge, IonNote, IonIcon, IonSelect, IonSelectOption,
+  IonRefresher, IonRefresherContent,
 } from '@ionic/angular/standalone';
+import { ActivityLogService, ActivityLogEntry } from './activity-log.service';
+import { addIcons } from 'ionicons';
+import { listOutline } from 'ionicons/icons';
+
+addIcons({ listOutline });
 
 @Component({
   selector: 'app-activity-log',
   standalone: true,
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons],
+  imports: [
+    CommonModule, FormsModule,
+    IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons,
+    IonList, IonItem, IonLabel, IonBadge, IonNote, IonIcon, IonSelect, IonSelectOption,
+    IonRefresher, IonRefresherContent,
+  ],
   template: `
     <ion-header>
       <ion-toolbar>
-        <ion-buttons slot="start">
-          <ion-menu-button></ion-menu-button>
-        </ion-buttons>
+        <ion-buttons slot="start"><ion-menu-button></ion-menu-button></ion-buttons>
         <ion-title>Activity Log</ion-title>
       </ion-toolbar>
     </ion-header>
-    <ion-content class="ion-padding">
-      <h2>Activity Log</h2>
-      <p>Coming soon...</p>
+
+    <ion-content>
+      <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+        <ion-refresher-content></ion-refresher-content>
+      </ion-refresher>
+
+      <ion-item>
+        <ion-label>Filter by event</ion-label>
+        <ion-select [(ngModel)]="eventFilter" (ionChange)="load()" interface="popover" placeholder="All events">
+          <ion-select-option value="">All</ion-select-option>
+          <ion-select-option value="login">Login</ion-select-option>
+          <ion-select-option value="logout">Logout</ion-select-option>
+          <ion-select-option value="create">Create</ion-select-option>
+          <ion-select-option value="update">Update</ion-select-option>
+          <ion-select-option value="delete">Delete</ion-select-option>
+          <ion-select-option value="settings_change">Settings Change</ion-select-option>
+          <ion-select-option value="2fa">2FA</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-list>
+        @for (entry of items(); track entry.id) {
+          <ion-item>
+            <ion-label>
+              <h2>{{ entry.description }}</h2>
+              <p>
+                <ion-badge [color]="getEventColor(entry.event_type)" style="margin-right: 6px; font-size: 0.65rem">
+                  {{ entry.event_type }}
+                </ion-badge>
+                @if (entry.user_name) {
+                  <span>{{ entry.user_name }}</span>
+                }
+                <span style="margin-left: 8px; color: var(--ion-color-medium); font-size: 0.75rem">{{ entry.ip_address }}</span>
+              </p>
+            </ion-label>
+            <ion-note slot="end" style="font-size: 0.7rem">{{ entry.created_at | date:'short' }}</ion-note>
+          </ion-item>
+        } @empty {
+          <div class="empty-state">
+            <ion-icon name="list-outline" style="font-size: 48px; color: var(--ion-color-medium)"></ion-icon>
+            <h3>No activity logged</h3>
+            <p>Activity will appear here as actions are performed.</p>
+          </div>
+        }
+      </ion-list>
     </ion-content>
   `,
+  styles: [`
+    .empty-state { text-align: center; padding: 3rem 1rem; color: var(--ion-color-medium); }
+    .empty-state h3 { margin: 1rem 0 0.5rem; color: var(--ion-text-color); }
+  `],
 })
-export class ActivityLogComponent {}
+export class ActivityLogComponent implements OnInit {
+  items = signal<ActivityLogEntry[]>([]);
+  eventFilter = '';
+
+  constructor(private service: ActivityLogService) {}
+
+  ngOnInit(): void { this.load(); }
+
+  load(): void {
+    const params: any = {};
+    if (this.eventFilter) params.event_type = this.eventFilter;
+    this.service.getAll(params).subscribe((data) => this.items.set(data.items));
+  }
+
+  onRefresh(event: any): void {
+    const params: any = {};
+    if (this.eventFilter) params.event_type = this.eventFilter;
+    this.service.getAll(params).subscribe({
+      next: (data) => { this.items.set(data.items); event.target.complete(); },
+      error: () => event.target.complete(),
+    });
+  }
+
+  getEventColor(type: string): string {
+    switch (type) {
+      case 'login': return 'success';
+      case 'logout': return 'medium';
+      case 'create': return 'primary';
+      case 'update': return 'secondary';
+      case 'delete': return 'danger';
+      case 'settings_change': return 'warning';
+      case '2fa': return 'tertiary';
+      default: return 'medium';
+    }
+  }
+}
