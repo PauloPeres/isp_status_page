@@ -1,0 +1,42 @@
+import { Injectable } from '@angular/core';
+import { ApiService, PaginatedResponse } from '../../core/services/api.service';
+import { Observable } from 'rxjs';
+
+export interface AlertRule {
+  id: number;
+  name: string;
+  monitor_id: number;
+  monitor_name?: string;
+  trigger_type: string;
+  channel: string;
+  recipients: string[];
+  cooldown_minutes: number;
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+@Injectable({ providedIn: 'root' })
+export class AlertRuleService {
+  constructor(private api: ApiService) {}
+
+  getAll(params?: any): Observable<PaginatedResponse<AlertRule>> {
+    return this.api.get<PaginatedResponse<AlertRule>>('/alert-rules', params);
+  }
+
+  get(id: number): Observable<AlertRule> {
+    return this.api.get<AlertRule>(`/alert-rules/${id}`);
+  }
+
+  create(data: Partial<AlertRule>): Observable<AlertRule> {
+    return this.api.post<AlertRule>('/alert-rules', data);
+  }
+
+  update(id: number, data: Partial<AlertRule>): Observable<AlertRule> {
+    return this.api.put<AlertRule>(`/alert-rules/${id}`, data);
+  }
+
+  delete(id: number): Observable<void> {
+    return this.api.delete<void>(`/alert-rules/${id}`);
+  }
+}

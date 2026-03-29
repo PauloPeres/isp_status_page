@@ -1,0 +1,44 @@
+import { Injectable } from '@angular/core';
+import { ApiService, PaginatedResponse } from '../../core/services/api.service';
+import { Observable } from 'rxjs';
+
+export interface Integration {
+  id: number;
+  name: string;
+  type: string;
+  configuration: any;
+  active: boolean;
+  last_test_at: string | null;
+  last_test_status: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+@Injectable({ providedIn: 'root' })
+export class IntegrationService {
+  constructor(private api: ApiService) {}
+
+  getAll(params?: any): Observable<PaginatedResponse<Integration>> {
+    return this.api.get<PaginatedResponse<Integration>>('/integrations', params);
+  }
+
+  get(id: number): Observable<Integration> {
+    return this.api.get<Integration>(`/integrations/${id}`);
+  }
+
+  create(data: Partial<Integration>): Observable<Integration> {
+    return this.api.post<Integration>('/integrations', data);
+  }
+
+  update(id: number, data: Partial<Integration>): Observable<Integration> {
+    return this.api.put<Integration>(`/integrations/${id}`, data);
+  }
+
+  delete(id: number): Observable<void> {
+    return this.api.delete<void>(`/integrations/${id}`);
+  }
+
+  testConnection(id: number): Observable<{ success: boolean; message: string }> {
+    return this.api.post<{ success: boolean; message: string }>(`/integrations/${id}/test`);
+  }
+}

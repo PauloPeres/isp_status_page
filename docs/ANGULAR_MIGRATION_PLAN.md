@@ -73,14 +73,14 @@ ALL admin functionality (~20 feature areas, ~110 API endpoints)
 - TASK-NG-031: Monitors (largest — dynamic forms for 9 monitor types) -- COMPLETED (2026-03-29)
 - TASK-NG-032: Incidents + Timeline -- COMPLETED (2026-03-29)
 - TASK-NG-033: Checks -- COMPLETED (2026-03-29)
-- TASK-NG-034: Integrations
-- TASK-NG-035: Alert Rules
-- TASK-NG-036: Escalation Policies
-- TASK-NG-037: SLA
-- TASK-NG-038: Settings
-- TASK-NG-039: Billing + Credits
-- TASK-NG-040: Team (Users + Invitations)
-- TASK-NG-041: API Keys
+- TASK-NG-034: Integrations -- COMPLETED (2026-03-29)
+- TASK-NG-035: Alert Rules -- COMPLETED (2026-03-29)
+- TASK-NG-036: Escalation Policies -- COMPLETED (2026-03-29)
+- TASK-NG-037: SLA -- COMPLETED (2026-03-29)
+- TASK-NG-038: Settings -- COMPLETED (2026-03-29)
+- TASK-NG-039: Billing + Credits -- COMPLETED (2026-03-29)
+- TASK-NG-040: Team (Users + Invitations) -- COMPLETED (2026-03-29)
+- TASK-NG-041: API Keys -- COMPLETED (2026-03-29)
 - TASK-NG-042: Reports
 - TASK-NG-043: Scheduled Reports
 - TASK-NG-044: Maintenance Windows

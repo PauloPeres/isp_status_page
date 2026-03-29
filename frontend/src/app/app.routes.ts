@@ -88,11 +88,39 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'alert-rules/new',
+        loadComponent: () =>
+          import('./features/alert-rules/alert-rule-form.component').then(
+            (m) => m.AlertRuleFormComponent,
+          ),
+      },
+      {
+        path: 'alert-rules/:id/edit',
+        loadComponent: () =>
+          import('./features/alert-rules/alert-rule-form.component').then(
+            (m) => m.AlertRuleFormComponent,
+          ),
+      },
+      {
         path: 'escalation',
         loadComponent: () =>
           import(
             './features/escalation/escalation-policy-list.component'
           ).then((m) => m.EscalationPolicyListComponent),
+      },
+      {
+        path: 'escalation/new',
+        loadComponent: () =>
+          import('./features/escalation/escalation-form.component').then(
+            (m) => m.EscalationFormComponent,
+          ),
+      },
+      {
+        path: 'escalation/:id/edit',
+        loadComponent: () =>
+          import('./features/escalation/escalation-form.component').then(
+            (m) => m.EscalationFormComponent,
+          ),
       },
       {
         path: 'integrations',
@@ -134,6 +162,20 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/sla/sla-list.component').then(
             (m) => m.SlaListComponent,
+          ),
+      },
+      {
+        path: 'sla/new',
+        loadComponent: () =>
+          import('./features/sla/sla-form.component').then(
+            (m) => m.SlaFormComponent,
+          ),
+      },
+      {
+        path: 'sla/:id',
+        loadComponent: () =>
+          import('./features/sla/sla-form.component').then(
+            (m) => m.SlaFormComponent,
           ),
       },
       {
