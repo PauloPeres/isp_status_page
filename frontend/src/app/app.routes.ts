@@ -130,6 +130,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'integrations/new',
+        loadComponent: () =>
+          import('./features/integrations/integration-form.component').then(
+            (m) => m.IntegrationFormComponent,
+          ),
+      },
+      {
         path: 'status-pages',
         loadComponent: () =>
           import('./features/status-pages/status-page-list.component').then(
@@ -137,10 +144,24 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'status-pages/new',
+        loadComponent: () =>
+          import('./features/status-pages/status-page-form.component').then(
+            (m) => m.StatusPageFormComponent,
+          ),
+      },
+      {
         path: 'maintenance',
         loadComponent: () =>
           import('./features/maintenance/maintenance-list.component').then(
             (m) => m.MaintenanceListComponent,
+          ),
+      },
+      {
+        path: 'maintenance/new',
+        loadComponent: () =>
+          import('./features/maintenance/maintenance-form.component').then(
+            (m) => m.MaintenanceFormComponent,
           ),
       },
       {
@@ -156,6 +177,13 @@ export const routes: Routes = [
           import(
             './features/scheduled-reports/scheduled-report-list.component'
           ).then((m) => m.ScheduledReportListComponent),
+      },
+      {
+        path: 'scheduled-reports/new',
+        loadComponent: () =>
+          import(
+            './features/scheduled-reports/scheduled-report-form.component'
+          ).then((m) => m.ScheduledReportFormComponent),
       },
       {
         path: 'sla',

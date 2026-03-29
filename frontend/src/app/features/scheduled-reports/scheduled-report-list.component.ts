@@ -1,5 +1,6 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonButton,
   IonList, IonItem, IonItemSliding, IonItemOptions, IonItemOption,
@@ -17,7 +18,7 @@ addIcons({ calendarOutline, sendOutline });
   selector: 'app-scheduled-report-list',
   standalone: true,
   imports: [
-    CommonModule,
+    CommonModule, RouterLink,
     IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonButton,
     IonList, IonItem, IonItemSliding, IonItemOptions, IonItemOption,
     IonLabel, IonBadge, IonNote, IonIcon, IonSpinner,
@@ -28,6 +29,9 @@ addIcons({ calendarOutline, sendOutline });
       <ion-toolbar>
         <ion-buttons slot="start"><ion-menu-button></ion-menu-button></ion-buttons>
         <ion-title>Scheduled Reports</ion-title>
+        <ion-buttons slot="end">
+          <ion-button routerLink="/scheduled-reports/new" fill="solid" color="primary" size="small">+ New Report</ion-button>
+        </ion-buttons>
       </ion-toolbar>
     </ion-header>
 

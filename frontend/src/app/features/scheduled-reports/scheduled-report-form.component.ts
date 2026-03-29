@@ -1,0 +1,97 @@
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import {
+  IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonBackButton, IonButton,
+  IonList, IonItem, IonInput, IonSelect, IonSelectOption, IonToggle, IonSpinner,
+  ToastController,
+} from '@ionic/angular/standalone';
+import { ScheduledReportService } from './scheduled-report.service';
+
+@Component({
+  selector: 'app-scheduled-report-form',
+  standalone: true,
+  imports: [
+    CommonModule, FormsModule, RouterLink,
+    IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonBackButton, IonButton,
+    IonList, IonItem, IonInput, IonSelect, IonSelectOption, IonToggle, IonSpinner,
+  ],
+  template: `
+    <ion-header>
+      <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-back-button defaultHref="/scheduled-reports"></ion-back-button>
+        </ion-buttons>
+        <ion-title>New Scheduled Report</ion-title>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="ion-padding">
+      <ion-list>
+        <ion-item>
+          <ion-input label="Name" labelPlacement="floating" [(ngModel)]="form.name" name="name" required></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-select label="Report Type" labelPlacement="floating" [(ngModel)]="form.report_type" name="report_type">
+            <ion-select-option value="uptime">Uptime</ion-select-option>
+            <ion-select-option value="incidents">Incidents</ion-select-option>
+            <ion-select-option value="performance">Performance</ion-select-option>
+            <ion-select-option value="sla">SLA</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-select label="Frequency" labelPlacement="floating" [(ngModel)]="form.frequency" name="frequency">
+            <ion-select-option value="daily">Daily</ion-select-option>
+            <ion-select-option value="weekly">Weekly</ion-select-option>
+            <ion-select-option value="monthly">Monthly</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-input label="Recipients (comma-separated)" labelPlacement="floating" [(ngModel)]="form.recipients_text" name="recipients"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-toggle [(ngModel)]="form.active" name="active">Active</ion-toggle>
+        </ion-item>
+      </ion-list>
+      <ion-button expand="block" (click)="onSave()" [disabled]="saving">
+        @if (saving) { <ion-spinner name="crescent"></ion-spinner> }
+        @else { Save Report }
+      </ion-button>
+    </ion-content>
+  `,
+})
+export class ScheduledReportFormComponent {
+  form: any = { name: '', report_type: 'uptime', frequency: 'weekly', recipients_text: '', active: true };
+  saving = false;
+
+  constructor(
+    private service: ScheduledReportService,
+    private router: Router,
+    private toastCtrl: ToastController,
+  ) {}
+
+  onSave(): void {
+    if (!this.form.name) return;
+    this.saving = true;
+    const payload = {
+      name: this.form.name,
+      report_type: this.form.report_type,
+      frequency: this.form.frequency,
+      recipients: this.form.recipients_text.split(',').map((e: string) => e.trim()).filter((e: string) => e),
+      active: this.form.active,
+    };
+    this.service.create(payload).subscribe({
+      next: async () => {
+        this.saving = false;
+        const toast = await this.toastCtrl.create({ message: 'Report scheduled', color: 'success', duration: 2000, position: 'bottom' });
+        await toast.present();
+        this.router.navigate(['/scheduled-reports']);
+      },
+      error: async () => {
+        this.saving = false;
+        const toast = await this.toastCtrl.create({ message: 'Failed to create report', color: 'danger', duration: 3000, position: 'bottom' });
+        await toast.present();
+      },
+    });
+  }
+}

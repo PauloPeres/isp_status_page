@@ -30,6 +30,9 @@ addIcons({ extensionPuzzleOutline });
       <ion-toolbar>
         <ion-buttons slot="start"><ion-menu-button></ion-menu-button></ion-buttons>
         <ion-title>Integrations</ion-title>
+        <ion-buttons slot="end">
+          <ion-button routerLink="/integrations/new" fill="solid" color="primary" size="small">+ New Integration</ion-button>
+        </ion-buttons>
       </ion-toolbar>
     </ion-header>
 

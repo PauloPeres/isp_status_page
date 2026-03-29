@@ -1,5 +1,6 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonButton,
   IonList, IonItem, IonItemSliding, IonItemOptions, IonItemOption,
@@ -17,7 +18,7 @@ addIcons({ globeOutline });
   selector: 'app-status-page-list',
   standalone: true,
   imports: [
-    CommonModule,
+    CommonModule, RouterLink,
     IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonButton,
     IonList, IonItem, IonItemSliding, IonItemOptions, IonItemOption,
     IonLabel, IonBadge, IonNote, IonIcon, IonChip,
@@ -28,6 +29,9 @@ addIcons({ globeOutline });
       <ion-toolbar>
         <ion-buttons slot="start"><ion-menu-button></ion-menu-button></ion-buttons>
         <ion-title>Status Pages</ion-title>
+        <ion-buttons slot="end">
+          <ion-button routerLink="/status-pages/new" fill="solid" color="primary" size="small">+ New Page</ion-button>
+        </ion-buttons>
       </ion-toolbar>
     </ion-header>
 
