@@ -466,4 +466,24 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/alert-rules/{id}', ['controller' => 'AlertRules', 'action' => 'edit', 'prefix' => 'Api/V1', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
         $builder->connect('/alert-rules/{id}', ['controller' => 'AlertRules', 'action' => 'delete', 'prefix' => 'Api/V1', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
     });
+
+    /*
+     * REST API v2 routes (TASK-NG-001 / TASK-NG-002)
+     *
+     * JWT authentication handled by JwtAuthMiddleware; CSRF skipped for /api/* in Application.php.
+     * Auth endpoints (login, refresh) do not require JWT.
+     */
+    $routes->scope('/api/v2', function (RouteBuilder $builder): void {
+        $builder->setExtensions(['json']);
+
+        // --- Auth (no JWT required for login/refresh) ---
+        $builder->connect('/auth/login', ['controller' => 'Auth', 'action' => 'login', 'prefix' => 'Api/V2', '_method' => 'POST']);
+        $builder->connect('/auth/refresh', ['controller' => 'Auth', 'action' => 'refresh', 'prefix' => 'Api/V2', '_method' => 'POST']);
+        $builder->connect('/auth/logout', ['controller' => 'Auth', 'action' => 'logout', 'prefix' => 'Api/V2', '_method' => 'POST']);
+        $builder->connect('/auth/me', ['controller' => 'Auth', 'action' => 'me', 'prefix' => 'Api/V2', '_method' => 'GET']);
+        $builder->connect('/auth/switch-org', ['controller' => 'Auth', 'action' => 'switchOrg', 'prefix' => 'Api/V2', '_method' => 'POST']);
+
+        // Fallback for other v2 routes (will be added by subsequent tasks)
+        $builder->fallbacks();
+    });
 };

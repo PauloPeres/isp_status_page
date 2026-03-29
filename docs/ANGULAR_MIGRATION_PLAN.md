@@ -38,8 +38,8 @@ ALL admin functionality (~20 feature areas, ~110 API endpoints)
 ## Task Breakdown — 54 Tasks
 
 ### Phase 1: Backend API Foundation (6 tasks)
-- TASK-NG-001: JWT Authentication Service + Middleware
-- TASK-NG-002: API v2 Base Controller + Auth Endpoints (login, refresh, logout, me, switch-org)
+- TASK-NG-001: JWT Authentication Service + Middleware -- COMPLETED (2026-03-29)
+- TASK-NG-002: API v2 Base Controller + Auth Endpoints (login, refresh, logout, me, switch-org) -- COMPLETED (2026-03-29)
 - TASK-NG-003: Dashboard API (summary, uptime, response-times, recent)
 - TASK-NG-004: Monitors API v2 (CRUD + bulk + import)
 - TASK-NG-005: Incidents API v2 (CRUD + acknowledge + timeline)
@@ -60,7 +60,7 @@ ALL admin functionality (~20 feature areas, ~110 API endpoints)
 - TASK-NG-016: OpenAPI v2 Specification
 
 ### Phase 2: Angular Project Setup (7 tasks)
-- TASK-NG-020: Angular + Ionic + Capacitor initialization
+- TASK-NG-020: Angular + Ionic + Capacitor initialization -- COMPLETED
 - TASK-NG-021: Core Module (auth service, JWT interceptor, guards)
 - TASK-NG-022: API Service + TypeScript models
 - TASK-NG-023: Design System / Ionic Theme (Indigo palette, fonts)

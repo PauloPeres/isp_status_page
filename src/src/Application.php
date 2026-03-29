@@ -33,6 +33,8 @@ use Cake\Routing\Middleware\AssetMiddleware;
 use Cake\Routing\Middleware\RoutingMiddleware;
 use App\Middleware\ApiAuthMiddleware;
 use App\Middleware\ApiRateLimitMiddleware;
+use App\Middleware\CorsMiddleware;
+use App\Middleware\JwtAuthMiddleware;
 use App\Middleware\PlanLimitMiddleware;
 use App\Middleware\EmailVerificationMiddleware;
 use App\Middleware\SecurityHeadersMiddleware;
@@ -89,6 +91,9 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
     public function middleware(MiddlewareQueue $middlewareQueue): MiddlewareQueue
     {
         $middlewareQueue
+            // CORS headers for Angular SPA (TASK-NG-001)
+            ->add(new CorsMiddleware())
+
             // Security headers on all responses (TASK-AUTH-008)
             ->add(new SecurityHeadersMiddleware())
 
@@ -121,6 +126,9 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
 
             // API authentication via Bearer token (API key) — only activates on /api/v1/* paths
             ->add(new ApiAuthMiddleware())
+
+            // JWT authentication for API v2 — only activates on /api/v2/* paths (TASK-NG-001)
+            ->add(new JwtAuthMiddleware())
 
             // API rate limiting per API key — only activates on /api/v1/* paths
             ->add(new ApiRateLimitMiddleware())
