@@ -1,0 +1,692 @@
+import { Component, OnInit, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import {
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonContent,
+  IonButtons,
+  IonBackButton,
+  IonButton,
+  IonList,
+  IonItem,
+  IonInput,
+  IonTextarea,
+  IonSelect,
+  IonSelectOption,
+  IonToggle,
+  IonNote,
+  IonSpinner,
+  ToastController,
+} from '@ionic/angular/standalone';
+import { MonitorService } from './monitor.service';
+import { MonitorType } from '../../core/models/monitor.model';
+
+@Component({
+  selector: 'app-monitor-form',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonContent,
+    IonButtons,
+    IonBackButton,
+    IonButton,
+    IonList,
+    IonItem,
+    IonInput,
+    IonTextarea,
+    IonSelect,
+    IonSelectOption,
+    IonToggle,
+    IonNote,
+    IonSpinner,
+  ],
+  template: `
+    <ion-header>
+      <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-back-button defaultHref="/monitors"></ion-back-button>
+        </ion-buttons>
+        <ion-title>{{ isEdit() ? 'Edit Monitor' : 'New Monitor' }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button
+            (click)="onSave()"
+            fill="solid"
+            color="primary"
+            [disabled]="saving()"
+          >
+            @if (saving()) {
+              <ion-spinner name="crescent" style="width: 20px; height: 20px"></ion-spinner>
+            } @else {
+              Save
+            }
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="ion-padding">
+      @if (loading()) {
+        <div style="text-align: center; padding: 2rem">
+          <ion-spinner name="crescent"></ion-spinner>
+        </div>
+      } @else {
+        <!-- Quick Setup -->
+        @if (!isEdit() && !advancedMode()) {
+          <div class="quick-setup">
+            <h3>Quick Setup</h3>
+            <p>Enter a URL to get started quickly, or switch to advanced mode.</p>
+            <ion-list>
+              <ion-item>
+                <ion-input
+                  label="URL"
+                  labelPlacement="stacked"
+                  placeholder="https://example.com"
+                  [value]="quickUrl"
+                  (ionInput)="quickUrl = $any($event).detail.value || ''"
+                  type="url"
+                ></ion-input>
+              </ion-item>
+            </ion-list>
+            <div class="quick-actions">
+              <ion-button (click)="onQuickCreate()" fill="solid" color="primary" [disabled]="!quickUrl">
+                Create HTTP Monitor
+              </ion-button>
+              <ion-button (click)="advancedMode.set(true)" fill="outline" color="medium">
+                Advanced Mode
+              </ion-button>
+            </div>
+          </div>
+        }
+
+        <!-- Advanced / Edit Form -->
+        @if (isEdit() || advancedMode()) {
+          <form [formGroup]="form">
+            <!-- Basic Info -->
+            <ion-list>
+              <ion-item>
+                <ion-input
+                  label="Name"
+                  labelPlacement="stacked"
+                  placeholder="My Monitor"
+                  formControlName="name"
+                  required
+                ></ion-input>
+              </ion-item>
+              @if (form.get('name')?.touched && form.get('name')?.hasError('required')) {
+                <ion-note color="danger" class="field-error">Name is required</ion-note>
+              }
+
+              <ion-item>
+                <ion-textarea
+                  label="Description"
+                  labelPlacement="stacked"
+                  placeholder="Optional description"
+                  formControlName="description"
+                  [autoGrow]="true"
+                  [rows]="2"
+                ></ion-textarea>
+              </ion-item>
+
+              <ion-item>
+                <ion-select
+                  label="Type"
+                  labelPlacement="stacked"
+                  formControlName="type"
+                  interface="popover"
+                >
+                  @for (t of monitorTypes; track t.value) {
+                    <ion-select-option [value]="t.value">{{ t.label }}</ion-select-option>
+                  }
+                </ion-select>
+              </ion-item>
+            </ion-list>
+
+            <!-- Type-specific Configuration -->
+            <div formGroupName="configuration">
+              @switch (form.get('type')?.value) {
+                @case ('http') {
+                  <ion-list>
+                    <ion-item>
+                      <ion-input
+                        label="URL"
+                        labelPlacement="stacked"
+                        placeholder="https://example.com"
+                        formControlName="url"
+                        type="url"
+                      ></ion-input>
+                    </ion-item>
+                    <ion-item>
+                      <ion-select
+                        label="Method"
+                        labelPlacement="stacked"
+                        formControlName="method"
+                        interface="popover"
+                      >
+                        <ion-select-option value="GET">GET</ion-select-option>
+                        <ion-select-option value="POST">POST</ion-select-option>
+                        <ion-select-option value="HEAD">HEAD</ion-select-option>
+                        <ion-select-option value="PUT">PUT</ion-select-option>
+                      </ion-select>
+                    </ion-item>
+                    <ion-item>
+                      <ion-input
+                        label="Expected Status Code"
+                        labelPlacement="stacked"
+                        formControlName="expected_status_code"
+                        type="number"
+                        placeholder="200"
+                      ></ion-input>
+                    </ion-item>
+                    <ion-item>
+                      <ion-input
+                        label="Expected Content"
+                        labelPlacement="stacked"
+                        formControlName="expected_content"
+                        placeholder="Optional string to find in response"
+                      ></ion-input>
+                    </ion-item>
+                    <ion-item>
+                      <ion-toggle formControlName="verify_ssl">Verify SSL</ion-toggle>
+                    </ion-item>
+                    <ion-item>
+                      <ion-toggle formControlName="follow_redirects">Follow Redirects</ion-toggle>
+                    </ion-item>
+                  </ion-list>
+                }
+                @case ('ping') {
+                  <ion-list>
+                    <ion-item>
+                      <ion-input
+                        label="Host"
+                        labelPlacement="stacked"
+                        placeholder="192.168.1.1 or hostname"
+                        formControlName="host"
+                      ></ion-input>
+                    </ion-item>
+                    <ion-item>
+                      <ion-input
+                        label="Packet Count"
+                        labelPlacement="stacked"
+                        formControlName="packet_count"
+                        type="number"
+                        placeholder="4"
+                      ></ion-input>
+                    </ion-item>
+                    <ion-item>
+                      <ion-input
+                        label="Max Packet Loss (%)"
+                        labelPlacement="stacked"
+                        formControlName="max_packet_loss"
+                        type="number"
+                        placeholder="0"
+                      ></ion-input>
+                    </ion-item>
+                    <ion-item>
+                      <ion-input
+                        label="Max Latency (ms)"
+                        labelPlacement="stacked"
+                        formControlName="max_latency"
+                        type="number"
+                        placeholder="1000"
+                      ></ion-input>
+                    </ion-item>
+                  </ion-list>
+                }
+                @case ('port') {
+                  <ion-list>
+                    <ion-item>
+                      <ion-input
+                        label="Host"
+                        labelPlacement="stacked"
+                        placeholder="192.168.1.1 or hostname"
+                        formControlName="host"
+                      ></ion-input>
+                    </ion-item>
+                    <ion-item>
+                      <ion-input
+                        label="Port"
+                        labelPlacement="stacked"
+                        formControlName="port"
+                        type="number"
+                        placeholder="443"
+                      ></ion-input>
+                    </ion-item>
+                    <ion-item>
+                      <ion-select
+                        label="Protocol"
+                        labelPlacement="stacked"
+                        formControlName="protocol"
+                        interface="popover"
+                      >
+                        <ion-select-option value="tcp">TCP</ion-select-option>
+                        <ion-select-option value="udp">UDP</ion-select-option>
+                      </ion-select>
+                    </ion-item>
+                  </ion-list>
+                }
+                @case ('api') {
+                  <ion-list>
+                    <ion-item>
+                      <ion-input
+                        label="URL"
+                        labelPlacement="stacked"
+                        placeholder="https://api.example.com/health"
+                        formControlName="url"
+                        type="url"
+                      ></ion-input>
+                    </ion-item>
+                    <ion-item>
+                      <ion-select
+                        label="Method"
+                        labelPlacement="stacked"
+                        formControlName="method"
+                        interface="popover"
+                      >
+                        <ion-select-option value="GET">GET</ion-select-option>
+                        <ion-select-option value="POST">POST</ion-select-option>
+                      </ion-select>
+                    </ion-item>
+                    <ion-item>
+                      <ion-input
+                        label="Expected Status Code"
+                        labelPlacement="stacked"
+                        formControlName="expected_status_code"
+                        type="number"
+                        placeholder="200"
+                      ></ion-input>
+                    </ion-item>
+                    <ion-item>
+                      <ion-input
+                        label="JSON Path"
+                        labelPlacement="stacked"
+                        formControlName="json_path"
+                        placeholder="status.health"
+                      ></ion-input>
+                    </ion-item>
+                    <ion-item>
+                      <ion-input
+                        label="Expected Value"
+                        labelPlacement="stacked"
+                        formControlName="expected_value"
+                        placeholder="ok"
+                      ></ion-input>
+                    </ion-item>
+                  </ion-list>
+                }
+                @default {
+                  <!-- Generic host-based types (ixc_service, ixc_equipment, zabbix_host, etc.) -->
+                  <ion-list>
+                    <ion-item>
+                      <ion-input
+                        label="Host / Resource ID"
+                        labelPlacement="stacked"
+                        placeholder="Enter the resource identifier"
+                        formControlName="host"
+                      ></ion-input>
+                    </ion-item>
+                  </ion-list>
+                }
+              }
+            </div>
+
+            <!-- Monitoring Settings -->
+            <ion-list>
+              <ion-item>
+                <ion-input
+                  label="Check Interval (seconds)"
+                  labelPlacement="stacked"
+                  formControlName="check_interval"
+                  type="number"
+                  placeholder="300"
+                ></ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-input
+                  label="Timeout (seconds)"
+                  labelPlacement="stacked"
+                  formControlName="timeout"
+                  type="number"
+                  placeholder="30"
+                ></ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-input
+                  label="Tags"
+                  labelPlacement="stacked"
+                  formControlName="tags"
+                  placeholder="production, web, critical (comma-separated)"
+                ></ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-toggle formControlName="active">Active</ion-toggle>
+              </ion-item>
+            </ion-list>
+
+            <div class="form-actions">
+              <ion-button expand="block" (click)="onSave()" [disabled]="saving() || form.invalid">
+                @if (saving()) {
+                  <ion-spinner name="crescent" style="width: 20px; height: 20px"></ion-spinner>
+                } @else {
+                  {{ isEdit() ? 'Update Monitor' : 'Create Monitor' }}
+                }
+              </ion-button>
+            </div>
+          </form>
+        }
+      }
+    </ion-content>
+  `,
+  styles: [
+    `
+      .quick-setup {
+        text-align: center;
+        padding: 1rem;
+      }
+      .quick-setup h3 {
+        margin-bottom: 0.5rem;
+      }
+      .quick-setup p {
+        color: var(--ion-color-medium);
+        margin-bottom: 1rem;
+      }
+      .quick-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 1rem;
+      }
+      .field-error {
+        display: block;
+        padding: 4px 16px;
+        font-size: 0.75rem;
+      }
+      .form-actions {
+        padding: 1rem 0 2rem;
+      }
+    `,
+  ],
+})
+export class MonitorFormComponent implements OnInit {
+  isEdit = signal(false);
+  loading = signal(false);
+  saving = signal(false);
+  advancedMode = signal(false);
+  quickUrl = '';
+
+  monitorTypes: { value: MonitorType; label: string }[] = [
+    { value: 'http', label: 'HTTP(S)' },
+    { value: 'ping', label: 'Ping (ICMP)' },
+    { value: 'port', label: 'Port (TCP/UDP)' },
+    { value: 'api', label: 'REST API' },
+    { value: 'keyword', label: 'Keyword' },
+    { value: 'ssl', label: 'SSL Certificate' },
+    { value: 'heartbeat', label: 'Heartbeat' },
+    { value: 'ixc_service', label: 'IXC Service' },
+    { value: 'ixc_equipment', label: 'IXC Equipment' },
+    { value: 'zabbix_host', label: 'Zabbix Host' },
+    { value: 'zabbix_trigger', label: 'Zabbix Trigger' },
+  ];
+
+  form: FormGroup;
+
+  private monitorId: number | null = null;
+
+  constructor(
+    private fb: FormBuilder,
+    private route: ActivatedRoute,
+    private router: Router,
+    private monitorService: MonitorService,
+    private toastCtrl: ToastController,
+  ) {
+    this.form = this.fb.group({
+      name: ['', Validators.required],
+      description: [''],
+      type: ['http', Validators.required],
+      check_interval: [300, [Validators.required, Validators.min(30)]],
+      timeout: [30, [Validators.required, Validators.min(1)]],
+      tags: [''],
+      active: [true],
+      configuration: this.fb.group({
+        // HTTP / API fields
+        url: [''],
+        method: ['GET'],
+        expected_status_code: [200],
+        expected_content: [''],
+        verify_ssl: [true],
+        follow_redirects: [true],
+        // Ping fields
+        host: [''],
+        packet_count: [4],
+        max_packet_loss: [0],
+        max_latency: [1000],
+        // Port fields
+        port: [null as number | null],
+        protocol: ['tcp'],
+        // API fields
+        json_path: [''],
+        expected_value: [''],
+      }),
+    });
+  }
+
+  ngOnInit(): void {
+    const idParam = this.route.snapshot.paramMap.get('id');
+    if (idParam) {
+      this.monitorId = Number(idParam);
+      this.isEdit.set(true);
+      this.advancedMode.set(true);
+      this.loadMonitor();
+    }
+  }
+
+  private loadMonitor(): void {
+    if (!this.monitorId) return;
+    this.loading.set(true);
+    this.monitorService.getMonitor(this.monitorId).subscribe({
+      next: (data: any) => {
+        const monitor = data.monitor;
+        this.form.patchValue({
+          name: monitor.name,
+          description: monitor.description || '',
+          type: monitor.type,
+          check_interval: monitor.check_interval,
+          timeout: monitor.timeout,
+          tags: Array.isArray(monitor.tags) ? monitor.tags.join(', ') : '',
+          active: monitor.active,
+        });
+
+        // Patch configuration
+        if (monitor.configuration) {
+          const config =
+            typeof monitor.configuration === 'string'
+              ? JSON.parse(monitor.configuration)
+              : monitor.configuration;
+          this.form.get('configuration')?.patchValue(config);
+        }
+
+        this.loading.set(false);
+      },
+      error: () => {
+        this.loading.set(false);
+        this.showToast('Failed to load monitor', 'danger');
+      },
+    });
+  }
+
+  onQuickCreate(): void {
+    if (!this.quickUrl) return;
+
+    // Try to extract a name from the URL
+    let name = '';
+    try {
+      const url = new URL(this.quickUrl);
+      name = url.hostname;
+    } catch {
+      name = this.quickUrl;
+    }
+
+    this.saving.set(true);
+    this.monitorService
+      .createMonitor({
+        name,
+        type: 'http',
+        configuration: {
+          url: this.quickUrl,
+          method: 'GET',
+          expected_status_code: 200,
+          verify_ssl: true,
+          follow_redirects: true,
+        },
+        check_interval: 300,
+        timeout: 30,
+        active: true,
+      })
+      .subscribe({
+        next: () => {
+          this.saving.set(false);
+          this.showToast('Monitor created successfully', 'success');
+          this.router.navigate(['/monitors']);
+        },
+        error: () => {
+          this.saving.set(false);
+          this.showToast('Failed to create monitor', 'danger');
+        },
+      });
+  }
+
+  onSave(): void {
+    if (this.form.invalid) return;
+
+    const formValue = this.form.getRawValue();
+
+    // Process tags from comma-separated string to array
+    const tagsStr = formValue.tags as string;
+    const tags = tagsStr
+      ? tagsStr
+          .split(',')
+          .map((t: string) => t.trim())
+          .filter((t: string) => t.length > 0)
+      : [];
+
+    // Filter configuration to only include relevant fields for the type
+    const config = this.filterConfigByType(
+      formValue.type,
+      formValue.configuration,
+    );
+
+    const payload: any = {
+      name: formValue.name,
+      description: formValue.description || null,
+      type: formValue.type,
+      check_interval: formValue.check_interval,
+      timeout: formValue.timeout,
+      active: formValue.active,
+      configuration: config,
+      tags,
+    };
+
+    this.saving.set(true);
+
+    const request$ = this.isEdit()
+      ? this.monitorService.updateMonitor(this.monitorId!, payload)
+      : this.monitorService.createMonitor(payload);
+
+    request$.subscribe({
+      next: () => {
+        this.saving.set(false);
+        this.showToast(
+          this.isEdit()
+            ? 'Monitor updated successfully'
+            : 'Monitor created successfully',
+          'success',
+        );
+        this.router.navigate(['/monitors']);
+      },
+      error: () => {
+        this.saving.set(false);
+        this.showToast(
+          this.isEdit()
+            ? 'Failed to update monitor'
+            : 'Failed to create monitor',
+          'danger',
+        );
+      },
+    });
+  }
+
+  private filterConfigByType(type: string, config: any): any {
+    const filtered: any = {};
+
+    switch (type) {
+      case 'http':
+        if (config.url) filtered.url = config.url;
+        if (config.method) filtered.method = config.method;
+        if (config.expected_status_code)
+          filtered.expected_status_code = config.expected_status_code;
+        if (config.expected_content)
+          filtered.expected_content = config.expected_content;
+        filtered.verify_ssl = config.verify_ssl ?? true;
+        filtered.follow_redirects = config.follow_redirects ?? true;
+        break;
+
+      case 'ping':
+        if (config.host) filtered.host = config.host;
+        if (config.packet_count) filtered.packet_count = config.packet_count;
+        if (config.max_packet_loss != null)
+          filtered.max_packet_loss = config.max_packet_loss;
+        if (config.max_latency) filtered.max_latency = config.max_latency;
+        break;
+
+      case 'port':
+        if (config.host) filtered.host = config.host;
+        if (config.port) filtered.port = config.port;
+        if (config.protocol) filtered.protocol = config.protocol;
+        break;
+
+      case 'api':
+        if (config.url) filtered.url = config.url;
+        if (config.method) filtered.method = config.method;
+        if (config.expected_status_code)
+          filtered.expected_status_code = config.expected_status_code;
+        if (config.json_path) filtered.json_path = config.json_path;
+        if (config.expected_value)
+          filtered.expected_value = config.expected_value;
+        break;
+
+      default:
+        // For integration-based types, just pass host/resource
+        if (config.host) filtered.host = config.host;
+        break;
+    }
+
+    return filtered;
+  }
+
+  private async showToast(
+    message: string,
+    color: 'success' | 'danger',
+  ): Promise<void> {
+    const toast = await this.toastCtrl.create({
+      message,
+      duration: 3000,
+      color,
+      position: 'bottom',
+    });
+    await toast.present();
+  }
+}

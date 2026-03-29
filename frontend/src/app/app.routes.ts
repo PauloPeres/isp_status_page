@@ -32,6 +32,20 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'monitors/new',
+        loadComponent: () =>
+          import('./features/monitors/monitor-form.component').then(
+            (m) => m.MonitorFormComponent,
+          ),
+      },
+      {
+        path: 'monitors/:id/edit',
+        loadComponent: () =>
+          import('./features/monitors/monitor-form.component').then(
+            (m) => m.MonitorFormComponent,
+          ),
+      },
+      {
         path: 'monitors/:id',
         loadComponent: () =>
           import('./features/monitors/monitor-detail.component').then(
