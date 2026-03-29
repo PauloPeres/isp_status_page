@@ -71,8 +71,8 @@ ALL admin functionality (~20 feature areas, ~110 API endpoints)
 ### Phase 3: Feature Modules (19 tasks)
 - TASK-NG-030: Dashboard -- COMPLETED (2026-03-29)
 - TASK-NG-031: Monitors (largest — dynamic forms for 9 monitor types) -- COMPLETED (2026-03-29)
-- TASK-NG-032: Incidents + Timeline
-- TASK-NG-033: Checks
+- TASK-NG-032: Incidents + Timeline -- COMPLETED (2026-03-29)
+- TASK-NG-033: Checks -- COMPLETED (2026-03-29)
 - TASK-NG-034: Integrations
 - TASK-NG-035: Alert Rules
 - TASK-NG-036: Escalation Policies

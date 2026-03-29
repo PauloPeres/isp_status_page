@@ -16,13 +16,18 @@ export interface Incident {
   organization_id: number;
   created: string;
   modified: string;
+  monitor?: { id: number; name: string };
+  timeline?: IncidentTimelineEntry[];
 }
 
 export interface IncidentTimelineEntry {
   id: number;
   incident_id: number;
   type: string;
+  status?: IncidentStatus;
   message: string;
+  is_public?: boolean;
   user_id?: number;
+  user?: { id: number; name: string };
   created: string;
 }

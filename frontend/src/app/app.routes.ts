@@ -67,6 +67,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'incidents/new',
+        loadComponent: () =>
+          import('./features/incidents/incident-form.component').then(
+            (m) => m.IncidentFormComponent,
+          ),
+      },
+      {
         path: 'incidents/:id',
         loadComponent: () =>
           import('./features/incidents/incident-detail.component').then(
