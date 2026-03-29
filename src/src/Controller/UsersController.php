@@ -52,7 +52,12 @@ class UsersController extends AppController
      */
     public function login()
     {
-        // Disable layout - use standalone HTML
+        // Redirect GET requests to Angular app login
+        if ($this->request->is('get')) {
+            return $this->redirect('/app/login');
+        }
+
+        // Disable layout - use standalone HTML (fallback for POST)
         $this->viewBuilder()->disableAutoLayout();
 
         $this->request->allowMethod(['get', 'post']);
