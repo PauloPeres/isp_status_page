@@ -1,0 +1,61 @@
+<?php
+declare(strict_types=1);
+
+namespace App\Controller\Api\V2;
+
+use App\Service\SettingService;
+
+/**
+ * SettingsController (TASK-NG-009)
+ *
+ * Read and update organization settings.
+ */
+class SettingsController extends AppController
+{
+    /**
+     * GET /api/v2/settings
+     *
+     * Return all settings for the current organization.
+     *
+     * @return void
+     */
+    public function index(): void
+    {
+        $this->request->allowMethod(['get']);
+
+        if (!$this->requireRole(['owner', 'admin'])) {
+            return;
+        }
+
+        $service = new SettingService();
+        $settings = $service->getAllForOrganization($this->currentOrgId);
+
+        $this->success(['settings' => $settings]);
+    }
+
+    /**
+     * PUT /api/v2/settings
+     *
+     * Save/update settings for the current organization.
+     *
+     * @return void
+     */
+    public function save(): void
+    {
+        $this->request->allowMethod(['put']);
+
+        if (!$this->requireRole(['owner', 'admin'])) {
+            return;
+        }
+
+        try {
+            $service = new SettingService();
+            $data = $this->request->getData();
+            $service->saveMultiple($data, $this->currentOrgId);
+
+            $this->success(['message' => 'Settings saved']);
+        } catch (\Exception $e) {
+            $this->error('Failed to save settings: ' . $e->getMessage(), 422);
+        }
+    }
+}

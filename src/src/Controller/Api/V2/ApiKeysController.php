@@ -1,0 +1,105 @@
+<?php
+declare(strict_types=1);
+
+namespace App\Controller\Api\V2;
+
+/**
+ * ApiKeysController (TASK-NG-010)
+ *
+ * Manage API keys for the current organization.
+ */
+class ApiKeysController extends AppController
+{
+    /**
+     * GET /api/v2/api-keys
+     *
+     * List all API keys for the current organization.
+     *
+     * @return void
+     */
+    public function index(): void
+    {
+        $this->request->allowMethod(['get']);
+
+        if (!$this->requireRole(['owner', 'admin'])) {
+            return;
+        }
+
+        $table = $this->fetchTable('ApiKeys');
+        $keys = $table->find()
+            ->where(['ApiKeys.organization_id' => $this->currentOrgId])
+            ->orderBy(['ApiKeys.created' => 'DESC'])
+            ->all();
+
+        $this->success(['api_keys' => $keys->toArray()]);
+    }
+
+    /**
+     * POST /api/v2/api-keys
+     *
+     * Create a new API key.
+     *
+     * @return void
+     */
+    public function add(): void
+    {
+        $this->request->allowMethod(['post']);
+
+        if (!$this->requireRole(['owner', 'admin'])) {
+            return;
+        }
+
+        $table = $this->fetchTable('ApiKeys');
+        $key = $table->newEntity($this->request->getData());
+        $key->set('organization_id', $this->currentOrgId);
+        $key->set('user_id', $this->currentUserId);
+        $key->set('key', bin2hex(random_bytes(32)));
+
+        if (!$table->save($key)) {
+            $this->error('Validation failed', 422, $key->getErrors());
+
+            return;
+        }
+
+        $this->success(['api_key' => $key], 201);
+    }
+
+    /**
+     * DELETE /api/v2/api-keys/{id}
+     *
+     * Delete an API key.
+     *
+     * @param string $id API key ID.
+     * @return void
+     */
+    public function delete(string $id): void
+    {
+        $this->request->allowMethod(['delete']);
+
+        if (!$this->requireRole(['owner', 'admin'])) {
+            return;
+        }
+
+        $table = $this->fetchTable('ApiKeys');
+        $key = $table->find()
+            ->where([
+                'ApiKeys.id' => $id,
+                'ApiKeys.organization_id' => $this->currentOrgId,
+            ])
+            ->first();
+
+        if (!$key) {
+            $this->error('API key not found', 404);
+
+            return;
+        }
+
+        if (!$table->delete($key)) {
+            $this->error('Failed to delete API key', 500);
+
+            return;
+        }
+
+        $this->success(['message' => 'API key deleted']);
+    }
+}

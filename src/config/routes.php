@@ -483,7 +483,150 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/auth/me', ['controller' => 'Auth', 'action' => 'me', 'prefix' => 'Api/V2', '_method' => 'GET']);
         $builder->connect('/auth/switch-org', ['controller' => 'Auth', 'action' => 'switchOrg', 'prefix' => 'Api/V2', '_method' => 'POST']);
 
-        // Fallback for other v2 routes (will be added by subsequent tasks)
+        // --- Dashboard (TASK-NG-003) ---
+        $builder->connect('/dashboard/summary', ['controller' => 'Dashboard', 'action' => 'summary', 'prefix' => 'Api/V2', '_method' => 'GET']);
+        $builder->connect('/dashboard/uptime', ['controller' => 'Dashboard', 'action' => 'uptime', 'prefix' => 'Api/V2', '_method' => 'GET']);
+        $builder->connect('/dashboard/response-times', ['controller' => 'Dashboard', 'action' => 'responseTimes', 'prefix' => 'Api/V2', '_method' => 'GET']);
+        $builder->connect('/dashboard/recent-checks', ['controller' => 'Dashboard', 'action' => 'recentChecks', 'prefix' => 'Api/V2', '_method' => 'GET']);
+        $builder->connect('/dashboard/recent-alerts', ['controller' => 'Dashboard', 'action' => 'recentAlerts', 'prefix' => 'Api/V2', '_method' => 'GET']);
+
+        // --- Monitors (TASK-NG-004) ---
+        $builder->connect('/monitors', ['controller' => 'Monitors', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
+        $builder->connect('/monitors', ['controller' => 'Monitors', 'action' => 'add', 'prefix' => 'Api/V2', '_method' => 'POST']);
+        $builder->connect('/monitors/bulk-action', ['controller' => 'Monitors', 'action' => 'bulkAction', 'prefix' => 'Api/V2', '_method' => 'POST']);
+        $builder->connect('/monitors/import', ['controller' => 'Monitors', 'action' => 'import', 'prefix' => 'Api/V2', '_method' => 'POST']);
+        $builder->connect('/monitors/{id}', ['controller' => 'Monitors', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/monitors/{id}', ['controller' => 'Monitors', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/monitors/{id}', ['controller' => 'Monitors', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/monitors/{id}/checks', ['controller' => 'Monitors', 'action' => 'checks', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/monitors/{id}/pause', ['controller' => 'Monitors', 'action' => 'pause', 'prefix' => 'Api/V2', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/monitors/{id}/resume', ['controller' => 'Monitors', 'action' => 'resume', 'prefix' => 'Api/V2', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
+
+        // --- Incidents (TASK-NG-005) ---
+        $builder->connect('/incidents', ['controller' => 'Incidents', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
+        $builder->connect('/incidents', ['controller' => 'Incidents', 'action' => 'add', 'prefix' => 'Api/V2', '_method' => 'POST']);
+        $builder->connect('/incidents/{id}', ['controller' => 'Incidents', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/incidents/{id}', ['controller' => 'Incidents', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/incidents/{id}/acknowledge', ['controller' => 'Incidents', 'action' => 'acknowledge', 'prefix' => 'Api/V2', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/incidents/{id}/updates', ['controller' => 'Incidents', 'action' => 'addUpdate', 'prefix' => 'Api/V2', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
+
+        // Integrations
+        $builder->connect('/integrations', ['controller' => 'Integrations', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
+        $builder->connect('/integrations', ['controller' => 'Integrations', 'action' => 'add', 'prefix' => 'Api/V2', '_method' => 'POST']);
+        $builder->connect('/integrations/{id}', ['controller' => 'Integrations', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/integrations/{id}', ['controller' => 'Integrations', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/integrations/{id}', ['controller' => 'Integrations', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/integrations/{id}/test', ['controller' => 'Integrations', 'action' => 'test', 'prefix' => 'Api/V2', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
+
+        // Alert Rules
+        $builder->connect('/alert-rules', ['controller' => 'AlertRules', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
+        $builder->connect('/alert-rules', ['controller' => 'AlertRules', 'action' => 'add', 'prefix' => 'Api/V2', '_method' => 'POST']);
+        $builder->connect('/alert-rules/{id}', ['controller' => 'AlertRules', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/alert-rules/{id}', ['controller' => 'AlertRules', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/alert-rules/{id}', ['controller' => 'AlertRules', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
+
+        // Escalation Policies
+        $builder->connect('/escalation-policies', ['controller' => 'EscalationPolicies', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
+        $builder->connect('/escalation-policies', ['controller' => 'EscalationPolicies', 'action' => 'add', 'prefix' => 'Api/V2', '_method' => 'POST']);
+        $builder->connect('/escalation-policies/{id}', ['controller' => 'EscalationPolicies', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/escalation-policies/{id}', ['controller' => 'EscalationPolicies', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/escalation-policies/{id}', ['controller' => 'EscalationPolicies', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
+
+        // SLA
+        $builder->connect('/sla', ['controller' => 'Sla', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
+        $builder->connect('/sla', ['controller' => 'Sla', 'action' => 'add', 'prefix' => 'Api/V2', '_method' => 'POST']);
+        $builder->connect('/sla/{id}', ['controller' => 'Sla', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/sla/{id}', ['controller' => 'Sla', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/sla/{id}', ['controller' => 'Sla', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/sla/{id}/report', ['controller' => 'Sla', 'action' => 'report', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/sla/{id}/export', ['controller' => 'Sla', 'action' => 'export', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
+
+        // Settings
+        $builder->connect('/settings', ['controller' => 'Settings', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
+        $builder->connect('/settings', ['controller' => 'Settings', 'action' => 'save', 'prefix' => 'Api/V2', '_method' => 'PUT']);
+
+        // Billing
+        $builder->connect('/billing/plans', ['controller' => 'Billing', 'action' => 'plans', 'prefix' => 'Api/V2', '_method' => 'GET']);
+        $builder->connect('/billing/checkout', ['controller' => 'Billing', 'action' => 'checkout', 'prefix' => 'Api/V2', '_method' => 'POST']);
+        $builder->connect('/billing/portal', ['controller' => 'Billing', 'action' => 'portal', 'prefix' => 'Api/V2', '_method' => 'POST']);
+        $builder->connect('/billing/usage', ['controller' => 'Billing', 'action' => 'usage', 'prefix' => 'Api/V2', '_method' => 'GET']);
+        $builder->connect('/billing/credits', ['controller' => 'Billing', 'action' => 'credits', 'prefix' => 'Api/V2', '_method' => 'GET']);
+
+        // Users (Team)
+        $builder->connect('/users', ['controller' => 'Users', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
+        $builder->connect('/users/{id}', ['controller' => 'Users', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/users/{id}/role', ['controller' => 'Users', 'action' => 'updateRole', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/users/{id}', ['controller' => 'Users', 'action' => 'remove', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
+
+        // Invitations
+        $builder->connect('/invitations', ['controller' => 'Invitations', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
+        $builder->connect('/invitations', ['controller' => 'Invitations', 'action' => 'send', 'prefix' => 'Api/V2', '_method' => 'POST']);
+        $builder->connect('/invitations/{id}', ['controller' => 'Invitations', 'action' => 'revoke', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
+
+        // API Keys
+        $builder->connect('/api-keys', ['controller' => 'ApiKeys', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
+        $builder->connect('/api-keys', ['controller' => 'ApiKeys', 'action' => 'add', 'prefix' => 'Api/V2', '_method' => 'POST']);
+        $builder->connect('/api-keys/{id}', ['controller' => 'ApiKeys', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
+
+        // Reports
+        $builder->connect('/reports/uptime', ['controller' => 'Reports', 'action' => 'uptime', 'prefix' => 'Api/V2', '_method' => 'GET']);
+        $builder->connect('/reports/incidents', ['controller' => 'Reports', 'action' => 'incidents', 'prefix' => 'Api/V2', '_method' => 'GET']);
+        $builder->connect('/reports/response-times', ['controller' => 'Reports', 'action' => 'responseTimes', 'prefix' => 'Api/V2', '_method' => 'GET']);
+
+        // Scheduled Reports
+        $builder->connect('/scheduled-reports', ['controller' => 'ScheduledReports', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
+        $builder->connect('/scheduled-reports', ['controller' => 'ScheduledReports', 'action' => 'add', 'prefix' => 'Api/V2', '_method' => 'POST']);
+        $builder->connect('/scheduled-reports/{id}', ['controller' => 'ScheduledReports', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/scheduled-reports/{id}', ['controller' => 'ScheduledReports', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/scheduled-reports/{id}', ['controller' => 'ScheduledReports', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/scheduled-reports/{id}/send-now', ['controller' => 'ScheduledReports', 'action' => 'sendNow', 'prefix' => 'Api/V2', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/scheduled-reports/{id}/preview', ['controller' => 'ScheduledReports', 'action' => 'preview', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
+
+        // Maintenance Windows
+        $builder->connect('/maintenance-windows', ['controller' => 'MaintenanceWindows', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
+        $builder->connect('/maintenance-windows', ['controller' => 'MaintenanceWindows', 'action' => 'add', 'prefix' => 'Api/V2', '_method' => 'POST']);
+        $builder->connect('/maintenance-windows/{id}', ['controller' => 'MaintenanceWindows', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/maintenance-windows/{id}', ['controller' => 'MaintenanceWindows', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/maintenance-windows/{id}', ['controller' => 'MaintenanceWindows', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
+
+        // Status Pages
+        $builder->connect('/status-pages', ['controller' => 'StatusPages', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
+        $builder->connect('/status-pages', ['controller' => 'StatusPages', 'action' => 'add', 'prefix' => 'Api/V2', '_method' => 'POST']);
+        $builder->connect('/status-pages/{id}', ['controller' => 'StatusPages', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/status-pages/{id}', ['controller' => 'StatusPages', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/status-pages/{id}', ['controller' => 'StatusPages', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
+
+        // Two-Factor Auth
+        $builder->connect('/2fa/setup', ['controller' => 'TwoFactor', 'action' => 'setup', 'prefix' => 'Api/V2', '_method' => ['GET', 'POST']]);
+        $builder->connect('/2fa/verify', ['controller' => 'TwoFactor', 'action' => 'verify', 'prefix' => 'Api/V2', '_method' => 'POST']);
+        $builder->connect('/2fa/disable', ['controller' => 'TwoFactor', 'action' => 'disable', 'prefix' => 'Api/V2', '_method' => 'POST']);
+        $builder->connect('/2fa/recovery-codes', ['controller' => 'TwoFactor', 'action' => 'recoveryCodes', 'prefix' => 'Api/V2', '_method' => ['GET', 'POST']]);
+
+        // Activity Log
+        $builder->connect('/activity-log', ['controller' => 'ActivityLog', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
+
+        // Organizations
+        $builder->connect('/organizations', ['controller' => 'Organizations', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
+        $builder->connect('/organizations/current', ['controller' => 'Organizations', 'action' => 'current', 'prefix' => 'Api/V2', '_method' => 'GET']);
+        $builder->connect('/organizations/switch', ['controller' => 'Organizations', 'action' => 'switchOrg', 'prefix' => 'Api/V2', '_method' => 'POST']);
+
+        // Super Admin
+        $builder->connect('/super-admin/dashboard', ['controller' => 'Dashboard', 'action' => 'index', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'GET']);
+        $builder->connect('/super-admin/organizations', ['controller' => 'Organizations', 'action' => 'index', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'GET']);
+        $builder->connect('/super-admin/organizations/{id}', ['controller' => 'Organizations', 'action' => 'view', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/super-admin/organizations/{id}/impersonate', ['controller' => 'Organizations', 'action' => 'impersonate', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/super-admin/organizations/{id}/grant-credits', ['controller' => 'Organizations', 'action' => 'grantCredits', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/super-admin/stop-impersonation', ['controller' => 'Organizations', 'action' => 'stopImpersonation', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'POST']);
+        $builder->connect('/super-admin/users', ['controller' => 'Users', 'action' => 'index', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'GET']);
+        $builder->connect('/super-admin/users/{id}', ['controller' => 'Users', 'action' => 'view', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/super-admin/revenue', ['controller' => 'Revenue', 'action' => 'index', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'GET']);
+        $builder->connect('/super-admin/health', ['controller' => 'Health', 'action' => 'index', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'GET']);
+        $builder->connect('/super-admin/settings', ['controller' => 'Settings', 'action' => 'index', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'GET']);
+        $builder->connect('/super-admin/settings', ['controller' => 'Settings', 'action' => 'save', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'PUT']);
+        $builder->connect('/super-admin/settings/test-email', ['controller' => 'Settings', 'action' => 'testEmail', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'POST']);
+        $builder->connect('/super-admin/settings/test-ftp', ['controller' => 'Settings', 'action' => 'testFtp', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'POST']);
+        $builder->connect('/super-admin/security-logs', ['controller' => 'SecurityLogs', 'action' => 'index', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'GET']);
+
         $builder->fallbacks();
     });
 };
