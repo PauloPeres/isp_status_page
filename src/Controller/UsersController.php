@@ -6,6 +6,9 @@ namespace App\Controller;
 /**
  * Users Controller
  *
+ * All user management UI is handled by the Angular SPA.
+ * This controller only processes server-side auth actions and redirects.
+ *
  * @property \App\Model\Table\UsersTable $Users
  */
 class UsersController extends AppController
@@ -20,44 +23,48 @@ class UsersController extends AppController
     {
         parent::beforeFilter($event);
 
-        // Allow public access to login action
-        $this->Authentication->addUnauthenticatedActions(['login']);
+        $this->Authentication->addUnauthenticatedActions([
+            'login',
+            'forgotPassword',
+            'resetPassword',
+        ]);
     }
 
     /**
-     * Login action
+     * Login action — redirect to Angular SPA login.
+     *
+     * POST requests are still processed server-side for session-based auth,
+     * but all UI is handled by Angular.
      *
      * @return \Cake\Http\Response|null|void
      */
     public function login()
     {
-        // Disable layout - use standalone HTML
-        $this->viewBuilder()->disableAutoLayout();
-
-        $this->request->allowMethod(['get', 'post']);
         $result = $this->Authentication->getResult();
 
-        // If user is logged in redirect them away
+        // If already logged in, go to Angular dashboard
         if ($result && $result->isValid()) {
-            // Get redirect parameter or default to /admin
-            $redirect = $this->request->getQuery('redirect', [
-                'controller' => 'Admin',
-                'action' => 'index',
-            ]);
-
-            return $this->redirect($redirect);
+            return $this->redirect('/app/dashboard');
         }
 
-        // Pass result to view only when it's a POST (login attempt)
-        if ($this->request->is('post')) {
-            $this->set(compact('result'));
-        } else {
-            $this->set('result', null);
+        // Redirect GET requests to Angular login
+        if ($this->request->is('get')) {
+            return $this->redirect('/app/login');
         }
+
+        // POST: process authentication, then redirect
+        $this->request->allowMethod(['post']);
+
+        if ($result && $result->isValid()) {
+            return $this->redirect('/app/dashboard');
+        }
+
+        // Auth failed — redirect back to Angular login with error flag
+        return $this->redirect('/app/login?error=invalid_credentials');
     }
 
     /**
-     * Logout action
+     * Logout action — clear session, redirect to Angular login.
      *
      * @return \Cake\Http\Response|null
      */
@@ -67,109 +74,101 @@ class UsersController extends AppController
 
         if ($result && $result->isValid()) {
             $this->Authentication->logout();
-            $this->Flash->success(__('Você saiu com sucesso.'));
         }
 
-        return $this->redirect(['controller' => 'Users', 'action' => 'login']);
+        return $this->redirect('/app/login');
     }
 
     /**
-     * Index method - List all users
+     * Forgot password — redirect to Angular.
      *
-     * @return \Cake\Http\Response|null|void Renders view
+     * @return \Cake\Http\Response
+     */
+    public function forgotPassword()
+    {
+        return $this->redirect('/app/forgot-password');
+    }
+
+    /**
+     * Reset password — redirect to Angular with token.
+     *
+     * @param string|null $token Reset token from email link.
+     * @return \Cake\Http\Response
+     */
+    public function resetPassword($token = null)
+    {
+        if ($token) {
+            return $this->redirect('/app/reset-password?token=' . urlencode($token));
+        }
+
+        return $this->redirect('/app/forgot-password');
+    }
+
+    /**
+     * Change password — redirect to Angular.
+     *
+     * @return \Cake\Http\Response
+     */
+    public function changePassword()
+    {
+        return $this->redirect('/app/change-password');
+    }
+
+    /**
+     * Index — redirect to Angular user management.
+     *
+     * @return \Cake\Http\Response
      */
     public function index()
     {
-        $query = $this->Users->find()
-            ->orderBy(['Users.created' => 'DESC']);
-
-        $users = $this->paginate($query);
-
-        $this->set(compact('users'));
+        return $this->redirect('/app/team');
     }
 
     /**
-     * View method
+     * View — redirect to Angular.
      *
      * @param string|null $id User id.
-     * @return \Cake\Http\Response|null|void Renders view
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
+     * @return \Cake\Http\Response
      */
     public function view($id = null)
     {
-        $user = $this->Users->get($id);
-
-        $this->set(compact('user'));
+        return $this->redirect('/app/team');
     }
 
     /**
-     * Add method
+     * Add — redirect to Angular.
      *
-     * @return \Cake\Http\Response|null|void Redirects on successful add, renders view otherwise.
+     * @return \Cake\Http\Response
      */
     public function add()
     {
-        $user = $this->Users->newEmptyEntity();
-
-        if ($this->request->is('post')) {
-            $user = $this->Users->patchEntity($user, $this->request->getData());
-
-            if ($this->Users->save($user)) {
-                $this->Flash->success(__('Usuário salvo com sucesso.'));
-
-                return $this->redirect(['action' => 'index']);
-            }
-
-            $this->Flash->error(__('Não foi possível salvar o usuário. Tente novamente.'));
-        }
-
-        $this->set(compact('user'));
+        return $this->redirect('/app/team');
     }
 
     /**
-     * Edit method
+     * Edit — redirect to Angular.
      *
      * @param string|null $id User id.
-     * @return \Cake\Http\Response|null|void Redirects on successful edit, renders view otherwise.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
+     * @return \Cake\Http\Response
      */
     public function edit($id = null)
     {
-        $user = $this->Users->get($id);
-
-        if ($this->request->is(['patch', 'post', 'put'])) {
-            $user = $this->Users->patchEntity($user, $this->request->getData());
-
-            if ($this->Users->save($user)) {
-                $this->Flash->success(__('Usuário atualizado com sucesso.'));
-
-                return $this->redirect(['action' => 'index']);
-            }
-
-            $this->Flash->error(__('Não foi possível atualizar o usuário. Tente novamente.'));
-        }
-
-        $this->set(compact('user'));
+        return $this->redirect('/app/settings/profile');
     }
 
     /**
-     * Delete method
+     * Delete — process server-side, redirect to Angular.
      *
      * @param string|null $id User id.
-     * @return \Cake\Http\Response|null Redirects to index.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
+     * @return \Cake\Http\Response|null
      */
     public function delete($id = null)
     {
         $this->request->allowMethod(['post', 'delete']);
         $user = $this->Users->get($id);
 
-        if ($this->Users->delete($user)) {
-            $this->Flash->success(__('Usuário excluído com sucesso.'));
-        } else {
-            $this->Flash->error(__('Não foi possível excluir o usuário. Tente novamente.'));
-        }
+        $this->Users->delete($user);
 
-        return $this->redirect(['action' => 'index']);
+        return $this->redirect('/app/team');
     }
 }
