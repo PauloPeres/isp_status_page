@@ -16,7 +16,7 @@
 
         <div class="navbar-user">
             <button id="themeToggle" class="theme-toggle" title="Toggle dark mode">
-                <span class="theme-icon">&#127769;</span>
+                <span class="theme-icon"><i data-lucide="moon"></i></span>
             </button>
 
             <?= $this->element('admin/org_switcher') ?>
@@ -37,18 +37,18 @@
 
                 <div class="dropdown-menu" id="userMenu">
                     <?= $this->Html->link(
-                        '👤 ' . __('My Profile'),
+                        '<i data-lucide="user-circle"></i> ' . __('My Profile'),
                         ['controller' => 'Users', 'action' => 'view', $this->Identity->get('id')],
                         ['class' => 'dropdown-item', 'escape' => false]
                     ) ?>
                     <?= $this->Html->link(
-                        '⚙️ ' . __('Settings'),
+                        '<i data-lucide="settings"></i> ' . __('Settings'),
                         ['controller' => 'Settings', 'action' => 'index'],
                         ['class' => 'dropdown-item', 'escape' => false]
                     ) ?>
                     <div class="dropdown-divider"></div>
                     <?= $this->Html->link(
-                        '🚪 ' . __('Logout'),
+                        '<i data-lucide="log-out"></i> ' . __('Logout'),
                         ['controller' => 'Users', 'action' => 'logout'],
                         ['class' => 'dropdown-item logout', 'escape' => false]
                     ) ?>
@@ -93,14 +93,16 @@ document.addEventListener('click', function(e) {
     const stored = localStorage.getItem('theme') || 'light';
     document.documentElement.setAttribute('data-theme', stored);
     if (toggle) {
-        toggle.querySelector('.theme-icon').textContent = stored === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF19';
+        toggle.querySelector('.theme-icon').innerHTML = stored === 'dark' ? '<i data-lucide="sun"></i>' : '<i data-lucide="moon"></i>';
+        lucide.createIcons({nodes: toggle.querySelectorAll('i[data-lucide]')});
     }
     toggle?.addEventListener('click', function() {
         const current = document.documentElement.getAttribute('data-theme');
         const next = current === 'dark' ? 'light' : 'dark';
         document.documentElement.setAttribute('data-theme', next);
         localStorage.setItem('theme', next);
-        toggle.querySelector('.theme-icon').textContent = next === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF19';
+        toggle.querySelector('.theme-icon').innerHTML = next === 'dark' ? '<i data-lucide="sun"></i>' : '<i data-lucide="moon"></i>';
+        lucide.createIcons({nodes: toggle.querySelectorAll('i[data-lucide]')});
     });
 })();
 </script>

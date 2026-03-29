@@ -26,7 +26,7 @@ function isSuperAdminActive($currentController, $targetController, $currentActio
             <span class="nav-section-title"><?= __('Overview') ?></span>
 
             <?= $this->Html->link(
-                '<span class="nav-icon">&#x1F4CA;</span> ' . __('Dashboard'),
+                '<span class="nav-icon"><i data-lucide="layout-dashboard"></i></span> ' . __('Dashboard'),
                 ['prefix' => 'SuperAdmin', 'controller' => 'Dashboard', 'action' => 'index'],
                 [
                     'escape' => false,
@@ -39,7 +39,7 @@ function isSuperAdminActive($currentController, $targetController, $currentActio
             <span class="nav-section-title"><?= __('Management') ?></span>
 
             <?= $this->Html->link(
-                '<span class="nav-icon">&#x1F3E2;</span> ' . __('Organizations'),
+                '<span class="nav-icon"><i data-lucide="building-2"></i></span> ' . __('Organizations'),
                 ['prefix' => 'SuperAdmin', 'controller' => 'Organizations', 'action' => 'index'],
                 [
                     'escape' => false,
@@ -48,7 +48,7 @@ function isSuperAdminActive($currentController, $targetController, $currentActio
             ) ?>
 
             <?= $this->Html->link(
-                '<span class="nav-icon">&#x1F465;</span> ' . __('Users'),
+                '<span class="nav-icon"><i data-lucide="users"></i></span> ' . __('Users'),
                 ['prefix' => 'SuperAdmin', 'controller' => 'Users', 'action' => 'index'],
                 [
                     'escape' => false,
@@ -61,7 +61,7 @@ function isSuperAdminActive($currentController, $targetController, $currentActio
             <span class="nav-section-title"><?= __('Analytics') ?></span>
 
             <?= $this->Html->link(
-                '<span class="nav-icon">&#x1F4B0;</span> ' . __('Revenue'),
+                '<span class="nav-icon"><i data-lucide="trending-up"></i></span> ' . __('Revenue'),
                 ['prefix' => 'SuperAdmin', 'controller' => 'Revenue', 'action' => 'index'],
                 [
                     'escape' => false,
@@ -70,7 +70,7 @@ function isSuperAdminActive($currentController, $targetController, $currentActio
             ) ?>
 
             <?= $this->Html->link(
-                '<span class="nav-icon">&#x1F3E5;</span> ' . __('Platform Health'),
+                '<span class="nav-icon"><i data-lucide="heart-pulse"></i></span> ' . __('Platform Health'),
                 ['prefix' => 'SuperAdmin', 'controller' => 'Health', 'action' => 'index'],
                 [
                     'escape' => false,
@@ -79,7 +79,7 @@ function isSuperAdminActive($currentController, $targetController, $currentActio
             ) ?>
 
             <?= $this->Html->link(
-                '<span class="nav-icon">&#x1F6E1;</span> ' . __('Security Logs'),
+                '<span class="nav-icon"><i data-lucide="shield-alert"></i></span> ' . __('Security Logs'),
                 ['prefix' => 'SuperAdmin', 'controller' => 'SecurityLogs', 'action' => 'index'],
                 [
                     'escape' => false,
@@ -92,7 +92,7 @@ function isSuperAdminActive($currentController, $targetController, $currentActio
             <span class="nav-section-title"><?= __('Configuration') ?></span>
 
             <?= $this->Html->link(
-                '<span class="nav-icon">&#x2699;</span> ' . __('Settings'),
+                '<span class="nav-icon"><i data-lucide="settings"></i></span> ' . __('Settings'),
                 ['prefix' => 'SuperAdmin', 'controller' => 'Settings', 'action' => 'index'],
                 [
                     'escape' => false,
@@ -105,7 +105,7 @@ function isSuperAdminActive($currentController, $targetController, $currentActio
             <span class="nav-section-title"><?= __('Navigation') ?></span>
 
             <?= $this->Html->link(
-                '<span class="nav-icon">&#x2B05;</span> ' . __('Back to Admin'),
+                '<span class="nav-icon"><i data-lucide="arrow-left"></i></span> ' . __('Back to Admin'),
                 ['prefix' => false, 'controller' => 'Dashboard', 'action' => 'index'],
                 [
                     'escape' => false,

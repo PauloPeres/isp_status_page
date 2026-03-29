@@ -18,9 +18,10 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="ISP Status">
 
-    <?= $this->Html->css(['admin']) ?>
+    <?= $this->Html->css(['design-tokens', 'admin']) ?>
     <?= $this->fetch('meta') ?>
     <?= $this->fetch('css') ?>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 </head>
 <body class="super-admin-body">
     <?php
@@ -59,6 +60,7 @@
 
     <?= $this->Html->script('datetime-utils') ?>
     <?= $this->fetch('script') ?>
+    <script>lucide.createIcons();</script>
     <script>
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/sw.js').catch(() => {});

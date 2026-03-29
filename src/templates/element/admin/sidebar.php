@@ -26,7 +26,7 @@ function isActive($currentController, $targetController, $currentAction = null, 
             <span class="nav-section-title"><?= __('Main') ?></span>
 
             <?= $this->Html->link(
-                '<span class="nav-icon">📊</span> ' . __('Dashboard'),
+                '<span class="nav-icon"><i data-lucide="layout-dashboard"></i></span> ' . __('Dashboard'),
                 ['controller' => 'Dashboard', 'action' => 'index'],
                 [
                     'escape' => false,
@@ -39,7 +39,7 @@ function isActive($currentController, $targetController, $currentAction = null, 
             <span class="nav-section-title"><?= __('Monitoring') ?></span>
 
             <?= $this->Html->link(
-                '<span class="nav-icon">🖥️</span> ' . __('Monitors'),
+                '<span class="nav-icon"><i data-lucide="monitor"></i></span> ' . __('Monitors'),
                 ['controller' => 'Monitors', 'action' => 'index'],
                 [
                     'escape' => false,
@@ -48,7 +48,7 @@ function isActive($currentController, $targetController, $currentAction = null, 
             ) ?>
 
             <?= $this->Html->link(
-                '<span class="nav-icon">📈</span> ' . __('Checks'),
+                '<span class="nav-icon"><i data-lucide="activity"></i></span> ' . __('Checks'),
                 ['controller' => 'Checks', 'action' => 'index'],
                 [
                     'escape' => false,
@@ -57,7 +57,7 @@ function isActive($currentController, $targetController, $currentAction = null, 
             ) ?>
 
             <?= $this->Html->link(
-                '<span class="nav-icon">🚨</span> ' . __('Incidents'),
+                '<span class="nav-icon"><i data-lucide="alert-triangle"></i></span> ' . __('Incidents'),
                 ['controller' => 'Incidents', 'action' => 'index'],
                 [
                     'escape' => false,
@@ -66,7 +66,7 @@ function isActive($currentController, $targetController, $currentAction = null, 
             ) ?>
 
             <?= $this->Html->link(
-                '<span class="nav-icon">&#x1F514;</span> ' . __('Alert Rules'),
+                '<span class="nav-icon"><i data-lucide="bell"></i></span> ' . __('Alert Rules'),
                 ['controller' => 'AlertRules', 'action' => 'index'],
                 [
                     'escape' => false,
@@ -75,7 +75,7 @@ function isActive($currentController, $targetController, $currentAction = null, 
             ) ?>
 
             <?= $this->Html->link(
-                '<span class="nav-icon">&#x26A1;</span> ' . __('Escalation'),
+                '<span class="nav-icon"><i data-lucide="zap"></i></span> ' . __('Escalation'),
                 ['controller' => 'EscalationPolicies', 'action' => 'index'],
                 [
                     'escape' => false,
@@ -84,7 +84,7 @@ function isActive($currentController, $targetController, $currentAction = null, 
             ) ?>
 
             <?= $this->Html->link(
-                '<span class="nav-icon">🔗</span> ' . __('Integrations'),
+                '<span class="nav-icon"><i data-lucide="plug"></i></span> ' . __('Integrations'),
                 ['controller' => 'Integrations', 'action' => 'index'],
                 [
                     'escape' => false,
@@ -93,7 +93,7 @@ function isActive($currentController, $targetController, $currentAction = null, 
             ) ?>
 
             <?= $this->Html->link(
-                '<span class="nav-icon">📄</span> ' . __('Status Pages'),
+                '<span class="nav-icon"><i data-lucide="globe"></i></span> ' . __('Status Pages'),
                 ['controller' => 'StatusPages', 'action' => 'index'],
                 [
                     'escape' => false,
@@ -102,7 +102,7 @@ function isActive($currentController, $targetController, $currentAction = null, 
             ) ?>
 
             <?= $this->Html->link(
-                '<span class="nav-icon">🔧</span> ' . __('Maintenance'),
+                '<span class="nav-icon"><i data-lucide="wrench"></i></span> ' . __('Maintenance'),
                 ['controller' => 'MaintenanceWindows', 'action' => 'index'],
                 [
                     'escape' => false,
@@ -111,7 +111,7 @@ function isActive($currentController, $targetController, $currentAction = null, 
             ) ?>
 
             <?= $this->Html->link(
-                '<span class="nav-icon">&#x1F4CA;</span> ' . __('Reports'),
+                '<span class="nav-icon"><i data-lucide="bar-chart-3"></i></span> ' . __('Reports'),
                 ['controller' => 'Reports', 'action' => 'index'],
                 [
                     'escape' => false,
@@ -120,7 +120,7 @@ function isActive($currentController, $targetController, $currentAction = null, 
             ) ?>
 
             <?= $this->Html->link(
-                '<span class="nav-icon">&#x1F4E8;</span> ' . __('Scheduled Reports'),
+                '<span class="nav-icon"><i data-lucide="calendar-clock"></i></span> ' . __('Scheduled Reports'),
                 ['controller' => 'ScheduledReports', 'action' => 'index'],
                 [
                     'escape' => false,
@@ -129,7 +129,7 @@ function isActive($currentController, $targetController, $currentAction = null, 
             ) ?>
 
             <?= $this->Html->link(
-                '<span class="nav-icon">&#x1F4DD;</span> ' . __('SLA'),
+                '<span class="nav-icon"><i data-lucide="shield-check"></i></span> ' . __('SLA'),
                 ['controller' => 'Sla', 'action' => 'index'],
                 [
                     'escape' => false,
@@ -142,7 +142,7 @@ function isActive($currentController, $targetController, $currentAction = null, 
             <span class="nav-section-title"><?= __('Communication') ?></span>
 
             <?= $this->Html->link(
-                '<span class="nav-icon">📧</span> ' . __('Subscribers'),
+                '<span class="nav-icon"><i data-lucide="users"></i></span> ' . __('Subscribers'),
                 ['controller' => 'Subscribers', 'action' => 'index'],
                 [
                     'escape' => false,
@@ -151,7 +151,7 @@ function isActive($currentController, $targetController, $currentAction = null, 
             ) ?>
 
             <?= $this->Html->link(
-                '<span class="nav-icon">✉️</span> ' . __('Email Logs'),
+                '<span class="nav-icon"><i data-lucide="mail"></i></span> ' . __('Email Logs'),
                 ['controller' => 'EmailLogs', 'action' => 'index'],
                 [
                     'escape' => false,
@@ -172,7 +172,7 @@ function isActive($currentController, $targetController, $currentAction = null, 
 
             <?php if ($canManageTeam): ?>
             <?= $this->Html->link(
-                '<span class="nav-icon">👥</span> ' . __('Users'),
+                '<span class="nav-icon"><i data-lucide="user-cog"></i></span> ' . __('Users'),
                 ['controller' => 'Users', 'action' => 'index'],
                 [
                     'escape' => false,
@@ -181,7 +181,7 @@ function isActive($currentController, $targetController, $currentAction = null, 
             ) ?>
 
             <?= $this->Html->link(
-                '<span class="nav-icon">📨</span> ' . __('Invitations'),
+                '<span class="nav-icon"><i data-lucide="user-plus"></i></span> ' . __('Invitations'),
                 ['controller' => 'Invitations', 'action' => 'index'],
                 [
                     'escape' => false,
@@ -192,7 +192,7 @@ function isActive($currentController, $targetController, $currentAction = null, 
 
             <?php if ($canManageSettings): ?>
             <?= $this->Html->link(
-                '<span class="nav-icon">🔑</span> ' . __('API Keys'),
+                '<span class="nav-icon"><i data-lucide="key"></i></span> ' . __('API Keys'),
                 ['controller' => 'ApiKeys', 'action' => 'index'],
                 [
                     'escape' => false,
@@ -203,7 +203,7 @@ function isActive($currentController, $targetController, $currentAction = null, 
 
             <?php if ($canManageSettings): ?>
             <?= $this->Html->link(
-                '<span class="nav-icon">⚙️</span> ' . __('Settings'),
+                '<span class="nav-icon"><i data-lucide="settings"></i></span> ' . __('Settings'),
                 ['controller' => 'Settings', 'action' => 'index'],
                 [
                     'escape' => false,
@@ -217,7 +217,7 @@ function isActive($currentController, $targetController, $currentAction = null, 
             ?>
             <?php if ($canManageBilling): ?>
             <?= $this->Html->link(
-                '<span class="nav-icon">💳</span> ' . __('Billing'),
+                '<span class="nav-icon"><i data-lucide="credit-card"></i></span> ' . __('Billing'),
                 ['controller' => 'Billing', 'action' => 'plans'],
                 [
                     'escape' => false,
@@ -231,7 +231,7 @@ function isActive($currentController, $targetController, $currentAction = null, 
             <span class="nav-section-title"><?= __('View') ?></span>
 
             <?= $this->Html->link(
-                '<span class="nav-icon">🌐</span> ' . __('Public Page'),
+                '<span class="nav-icon"><i data-lucide="external-link"></i></span> ' . __('Public Page'),
                 ['controller' => 'Status', 'action' => 'index'],
                 [
                     'escape' => false,
@@ -245,7 +245,7 @@ function isActive($currentController, $targetController, $currentAction = null, 
         <div class="nav-section">
             <span class="nav-section-title"><?= __('Platform') ?></span>
             <?= $this->Html->link(
-                '<span class="nav-icon">&#x1F451;</span> ' . __('Super Admin'),
+                '<span class="nav-icon"><i data-lucide="crown"></i></span> ' . __('Super Admin'),
                 ['prefix' => 'SuperAdmin', 'controller' => 'Dashboard', 'action' => 'index'],
                 ['escape' => false, 'class' => 'nav-item']
             ) ?>
