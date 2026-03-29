@@ -48,15 +48,19 @@ $descriptions = [
 /**
  * Get translated label for setting key
  */
-function getLabel($key, $labels) {
-    return $labels[$key] ?? ucwords(str_replace('_', ' ', $key));
+if (!function_exists('getLabel')) {
+    function getLabel($key, $labels) {
+        return $labels[$key] ?? ucwords(str_replace('_', ' ', $key));
+    }
 }
 
 /**
  * Get translated description for setting key
  */
-function getDescription($key, $descriptions, $fallback = '') {
-    return $descriptions[$key] ?? $fallback;
+if (!function_exists('getDescription')) {
+    function getDescription($key, $descriptions, $fallback = '') {
+        return $descriptions[$key] ?? $fallback;
+    }
 }
 ?>
 

@@ -101,7 +101,7 @@ class JwtServiceTest extends TestCase
      */
     public function testVerifyTokenWithWrongKey(): void
     {
-        $wrongKey = 'completely-different-secret-key';
+        $wrongKey = 'completely-different-secret-key-that-is-long-enough-for-hs256';
         $payload = [
             'iss' => 'isp-status-page',
             'sub' => 1,

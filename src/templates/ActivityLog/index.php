@@ -10,29 +10,30 @@ $this->assign('title', __('Activity Log'));
 /**
  * Get badge class for event type
  */
-function getEventBadgeClass(string $eventType): string
-{
-    return match (true) {
-        str_contains($eventType, 'login_success') => 'badge-success',
-        str_contains($eventType, 'login_fail') => 'badge-danger',
-        str_contains($eventType, 'logout') => 'badge-secondary',
-        str_contains($eventType, 'password') => 'badge-warning',
-        str_contains($eventType, '2fa') => 'badge-info',
-        str_contains($eventType, 'delete') => 'badge-danger',
-        str_contains($eventType, 'create') => 'badge-success',
-        str_contains($eventType, 'update') => 'badge-primary',
-        str_contains($eventType, 'invite') => 'badge-info',
-        str_contains($eventType, 'api_key') => 'badge-warning',
-        default => 'badge-secondary',
-    };
+if (!function_exists('getEventBadgeClass')) {
+    function getEventBadgeClass(string $eventType): string
+    {
+        return match (true) {
+            str_contains($eventType, 'login_success') => 'badge-success',
+            str_contains($eventType, 'login_fail') => 'badge-danger',
+            str_contains($eventType, 'logout') => 'badge-secondary',
+            str_contains($eventType, 'password') => 'badge-warning',
+            str_contains($eventType, '2fa') => 'badge-info',
+            str_contains($eventType, 'delete') => 'badge-danger',
+            str_contains($eventType, 'create') => 'badge-success',
+            str_contains($eventType, 'update') => 'badge-primary',
+            str_contains($eventType, 'invite') => 'badge-info',
+            str_contains($eventType, 'api_key') => 'badge-warning',
+            default => 'badge-secondary',
+        };
+    }
 }
 
-/**
- * Format event type for display
- */
-function formatEventType(string $eventType): string
-{
-    return ucwords(str_replace('_', ' ', $eventType));
+if (!function_exists('formatEventType')) {
+    function formatEventType(string $eventType): string
+    {
+        return ucwords(str_replace('_', ' ', $eventType));
+    }
 }
 ?>
 

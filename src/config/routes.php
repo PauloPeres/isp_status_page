@@ -391,6 +391,13 @@ return function (RouteBuilder $routes): void {
         );
 
         /*
+         * SPA catch-all — Angular app served at /app/* (TASK-NG-050)
+         * Must be BEFORE the fallbacks so /app/* doesn't hit CakePHP controllers.
+         */
+        $builder->connect('/app', ['controller' => 'Spa', 'action' => 'index']);
+        $builder->connect('/app/*', ['controller' => 'Spa', 'action' => 'index']);
+
+        /*
          * ...and connect the rest of 'Pages' controller's URLs.
          */
         $builder->connect('/pages/*', 'Pages::display');

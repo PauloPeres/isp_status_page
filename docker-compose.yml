@@ -1,4 +1,7 @@
 # Copy .env.example to .env and set secrets for production
+# NOTE: Build the Angular frontend before deploying:
+#   make build-frontend   (or: cd frontend && npx ng build --configuration=production)
+#   This copies the SPA to src/webroot/app/ which is served at /app/*
 services:
   # ISP Status Page Application (includes cron for monitoring)
   app:

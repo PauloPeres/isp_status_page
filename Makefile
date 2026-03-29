@@ -1,7 +1,7 @@
 # ISP Status Page - Makefile
 # Simplifica comandos Docker e desenvolvimento
 
-.PHONY: help dev prod build up down logs shell clean migrate seed test test-all test-unit test-coverage db-shell redis-cli redis-flush
+.PHONY: help dev prod build up down logs shell clean migrate seed test test-all test-unit test-coverage db-shell redis-cli redis-flush build-frontend dev-frontend build-all
 
 # Default target
 .DEFAULT_GOAL := help
@@ -246,6 +246,23 @@ quick-start: ## Setup rápido completo (build + up + migrate + seed)
 	@echo "  - make shell     # Acessar container"
 	@echo "  - make migrate   # Executar migrations"
 	@echo "  - make test      # Rodar testes"
+
+# Frontend (Angular + Ionic)
+build-frontend: ## Build Angular frontend for production and copy to webroot
+	@echo "$(BLUE)Building Angular frontend...$(NC)"
+	cd frontend && npm install && npx ng build --configuration=production
+	rm -rf src/webroot/app
+	cp -r frontend/dist/frontend/browser src/webroot/app
+	@echo "$(GREEN)✓ Frontend build complete! Copied to src/webroot/app$(NC)"
+
+dev-frontend: ## Start Angular dev server with API proxy
+	@echo "$(BLUE)Starting Angular dev server...$(NC)"
+	cd frontend && npx ng serve --proxy-config proxy.conf.json
+
+# Full build (frontend + Docker)
+build-all: build-frontend ## Build frontend + Docker images
+	docker-compose build
+	@echo "$(GREEN)✓ Full build complete!$(NC)"
 
 # Install (first time setup)
 install: quick-start ## Instalação completa (alias para quick-start)

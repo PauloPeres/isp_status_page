@@ -97,13 +97,15 @@ class ApplicationTest extends TestCase
 
         $middleware = $app->middleware($middleware);
 
-        // SecurityHeadersMiddleware is first in the stack
-        $this->assertInstanceOf(\App\Middleware\SecurityHeadersMiddleware::class, $middleware->current());
+        // CorsMiddleware is first in the stack (TASK-NG-001)
+        $this->assertInstanceOf(\App\Middleware\CorsMiddleware::class, $middleware->current());
         $middleware->seek(1);
-        $this->assertInstanceOf(ErrorHandlerMiddleware::class, $middleware->current());
+        $this->assertInstanceOf(\App\Middleware\SecurityHeadersMiddleware::class, $middleware->current());
         $middleware->seek(2);
-        $this->assertInstanceOf(AssetMiddleware::class, $middleware->current());
+        $this->assertInstanceOf(ErrorHandlerMiddleware::class, $middleware->current());
         $middleware->seek(3);
+        $this->assertInstanceOf(AssetMiddleware::class, $middleware->current());
+        $middleware->seek(4);
         $this->assertInstanceOf(RoutingMiddleware::class, $middleware->current());
     }
 }

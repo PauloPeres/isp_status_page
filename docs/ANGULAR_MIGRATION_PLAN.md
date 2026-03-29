@@ -90,9 +90,9 @@ ALL admin functionality (~20 feature areas, ~110 API endpoints)
 - TASK-NG-048: Super Admin (largest — 9 sub-pages) -- COMPLETED (2026-03-29)
 
 ### Phase 4: Integration + Cutover (5 tasks)
-- TASK-NG-050: CakePHP catch-all route for /app/*
-- TASK-NG-051: CORS Configuration
-- TASK-NG-052: Build + Deploy Pipeline
+- TASK-NG-050: CakePHP catch-all route for /app/* -- COMPLETED (2026-03-29)
+- TASK-NG-051: CORS Configuration -- COMPLETED (verified, CorsMiddleware already in place)
+- TASK-NG-052: Build + Deploy Pipeline -- COMPLETED (2026-03-29)
 - TASK-NG-053: Capacitor Native Build (iOS + Android)
 - TASK-NG-054: Admin URL Redirects
 
