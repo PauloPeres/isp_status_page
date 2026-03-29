@@ -51,7 +51,8 @@ class AdminControllerTest extends TestCase
                 'id' => 1,
                 'username' => 'admin',
                 'active' => true,
-            ]
+            ],
+            'current_organization_id' => 1,
         ]);
 
         $this->get('/admin');

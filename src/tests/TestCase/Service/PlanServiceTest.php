@@ -20,6 +20,7 @@ class PlanServiceTest extends TestCase
      */
     protected array $fixtures = [
         'app.Plans',
+        'app.Users',
         'app.Organizations',
         'app.OrganizationUsers',
         'app.Monitors',

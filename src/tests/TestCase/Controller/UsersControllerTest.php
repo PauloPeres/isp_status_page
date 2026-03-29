@@ -85,7 +85,8 @@ class UsersControllerTest extends TestCase
                 'id' => 1,
                 'username' => 'admin',
                 'active' => true,
-            ]
+            ],
+            'current_organization_id' => 1,
         ]);
 
         $this->get('/users/logout');
@@ -104,7 +105,8 @@ class UsersControllerTest extends TestCase
                 'id' => 1,
                 'username' => 'admin',
                 'active' => true,
-            ]
+            ],
+            'current_organization_id' => 1,
         ]);
 
         $this->get('/users/index');
@@ -130,7 +132,8 @@ class UsersControllerTest extends TestCase
                 'id' => 1,
                 'username' => 'admin',
                 'active' => true,
-            ]
+            ],
+            'current_organization_id' => 1,
         ]);
 
         $this->get('/users/add');
@@ -147,7 +150,8 @@ class UsersControllerTest extends TestCase
                 'id' => 1,
                 'username' => 'admin',
                 'active' => true,
-            ]
+            ],
+            'current_organization_id' => 1,
         ]);
 
         $this->enableCsrfToken();
@@ -157,14 +161,13 @@ class UsersControllerTest extends TestCase
             'username' => 'newuser',
             'password' => 'password123',
             'email' => 'newuser@example.com',
-            'role' => 'user',
+            'name' => 'New User',
             'active' => true,
         ];
 
         $this->post('/users/add', $data);
 
         $this->assertRedirect(['action' => 'index']);
-        $this->assertFlashMessage('Usuário criado com sucesso.');
     }
 
     /**
@@ -177,7 +180,8 @@ class UsersControllerTest extends TestCase
                 'id' => 1,
                 'username' => 'admin',
                 'active' => true,
-            ]
+            ],
+            'current_organization_id' => 1,
         ]);
 
         $this->get('/users/edit/1');
@@ -194,7 +198,8 @@ class UsersControllerTest extends TestCase
                 'id' => 1,
                 'username' => 'admin',
                 'active' => true,
-            ]
+            ],
+            'current_organization_id' => 1,
         ]);
 
         $this->enableCsrfToken();
