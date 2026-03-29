@@ -222,194 +222,56 @@ class SubscribersController extends AppController
     }
 
     /**
-     * Index method - List all subscribers with filters
+     * Index - redirect to Angular subscribers admin.
      *
-     * @return \Cake\Http\Response|null|void Renders view
+     * @return \Cake\Http\Response
      */
     public function index()
     {
-        $this->viewBuilder()->setLayout('admin');
-
-        $query = $this->Subscribers->find()->contain(['Subscriptions']);
-
-        // Filter by verification status
-        $status = $this->request->getQuery('status');
-        if ($status === 'verified') {
-            $query->where(['Subscribers.verified' => true]);
-        } elseif ($status === 'unverified') {
-            $query->where(['Subscribers.verified' => false]);
-        }
-
-        // Filter by active status
-        $active = $this->request->getQuery('active');
-        if ($active === 'active') {
-            $query->where(['Subscribers.active' => true]);
-        } elseif ($active === 'inactive') {
-            $query->where(['Subscribers.active' => false]);
-        }
-
-        // Search by email
-        $search = $this->request->getQuery('search');
-        if (!empty($search)) {
-            $query->where([
-                'OR' => [
-                    'Subscribers.email LIKE' => '%' . $search . '%',
-                    'Subscribers.name LIKE' => '%' . $search . '%',
-                ],
-            ]);
-        }
-
-        // Filter by period
-        $period = $this->request->getQuery('period', '30d');
-        $periodStart = $this->getPeriodStartDate($period);
-        if ($periodStart) {
-            $query->where(['Subscribers.created >=' => $periodStart]);
-        }
-
-        // Order by most recent first
-        $query->orderBy(['Subscribers.created' => 'DESC']);
-
-        // Paginate
-        $this->paginate = [
-            'limit' => 50,
-        ];
-        $subscribers = $this->paginate($query);
-
-        // Calculate statistics
-        $stats = [
-            'total' => $this->Subscribers->find()->count(),
-            'verified' => $this->Subscribers->find()->where(['verified' => true])->count(),
-            'unverified' => $this->Subscribers->find()->where(['verified' => false])->count(),
-            'active' => $this->Subscribers->find()->where(['active' => true])->count(),
-            'recentlyAdded' => $this->Subscribers->find()
-                ->where(['Subscribers.created >=' => new \DateTime('-7 days')])
-                ->count(),
-        ];
-
-        $this->set(compact('subscribers', 'stats', 'period'));
+        return $this->redirect('/app/subscribers');
     }
 
     /**
-     * View method - View subscriber details
+     * View - redirect to Angular subscriber detail.
      *
      * @param string|null $id Subscriber id.
-     * @return \Cake\Http\Response|null|void Renders view
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
+     * @return \Cake\Http\Response
      */
     public function view($id = null)
     {
-        $this->viewBuilder()->setLayout('admin');
-
-        $subscriber = $this->Subscribers->get($id, contain: [
-            'Subscriptions' => ['Monitors'],
-        ]);
-
-        // Get email logs count (if EmailLogs table exists)
-        $emailLogsCount = 0;
-        try {
-            $EmailLogs = $this->fetchTable('EmailLogs');
-            $emailLogsCount = $EmailLogs->find()
-                ->where(['recipient' => $subscriber->email])
-                ->count();
-        } catch (\Exception $e) {
-            // EmailLogs table doesn't exist yet
-        }
-
-        $this->set(compact('subscriber', 'emailLogsCount'));
+        return $this->redirect('/app/subscribers/' . $id);
     }
 
     /**
-     * Delete method - Delete a subscriber
+     * Delete - redirect to Angular subscribers list.
      *
      * @param string|null $id Subscriber id.
-     * @return \Cake\Http\Response|null Redirects to index.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
+     * @return \Cake\Http\Response
      */
     public function delete($id = null)
     {
-        $this->request->allowMethod(['post', 'delete']);
-        $subscriber = $this->Subscribers->get($id);
-
-        if ($this->Subscribers->delete($subscriber)) {
-            $this->Flash->success(__d('subscribers', 'The subscriber has been deleted successfully.'));
-        } else {
-            $this->Flash->error(__d('subscribers', 'Unable to delete subscriber. Please try again.'));
-        }
-
-        return $this->redirect(['action' => 'index']);
+        return $this->redirect('/app/subscribers');
     }
 
     /**
-     * Toggle active status
+     * Toggle - redirect to Angular subscribers list.
      *
      * @param string|null $id Subscriber id.
-     * @return \Cake\Http\Response|null Redirects to referer or index.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
+     * @return \Cake\Http\Response
      */
     public function toggle($id = null)
     {
-        $this->request->allowMethod(['post']);
-        $subscriber = $this->Subscribers->get($id);
-
-        $subscriber->active = !$subscriber->active;
-
-        if ($this->Subscribers->save($subscriber)) {
-            $status = $subscriber->active ? 'ativado' : 'desativado';
-            $this->Flash->success(__d('subscribers', "Subscriber has been {$status} successfully."));
-        } else {
-            $this->Flash->error(__d('subscribers', 'Unable to update status. Please try again.'));
-        }
-
-        return $this->redirect($this->referer(['action' => 'index']));
+        return $this->redirect('/app/subscribers');
     }
 
     /**
-     * Resend verification email
+     * Resend verification - redirect to Angular.
      *
      * @param string|null $id Subscriber id.
-     * @return \Cake\Http\Response|null Redirects to referer or view.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
+     * @return \Cake\Http\Response
      */
     public function resendVerification($id = null)
     {
-        $this->request->allowMethod(['post']);
-        $subscriber = $this->Subscribers->get($id);
-
-        if ($subscriber->verified) {
-            $this->Flash->warning(__d('subscribers', 'This subscriber is already verified.'));
-            return $this->redirect($this->referer(['action' => 'view', $id]));
-        }
-
-        // Generate new token if needed
-        if (empty($subscriber->verification_token)) {
-            $subscriber->generateVerificationToken();
-            $this->Subscribers->save($subscriber);
-        }
-
-        // Send verification email
-        if ($this->emailService->sendVerificationEmail($subscriber)) {
-            $this->Flash->success(__d('subscribers', 'Verification email sent to {0}.', $subscriber->email));
-        } else {
-            $this->Flash->error(__d('subscribers', 'Unable to send verification email. Please try again.'));
-        }
-
-        return $this->redirect($this->referer(['action' => 'view', $id]));
-    }
-
-    /**
-     * Get period start date based on period string
-     *
-     * @param string $period Period string (7d, 30d, 90d, all)
-     * @return \DateTime|null
-     */
-    private function getPeriodStartDate(string $period): ?\DateTime
-    {
-        return match ($period) {
-            '7d' => new \DateTime('-7 days'),
-            '30d' => new \DateTime('-30 days'),
-            '90d' => new \DateTime('-90 days'),
-            'all' => null,
-            default => new \DateTime('-30 days'),
-        };
+        return $this->redirect('/app/subscribers/' . $id);
     }
 }

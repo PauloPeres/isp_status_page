@@ -42,8 +42,8 @@ class PagesController extends AppController
         $identity = $this->Authentication->getIdentity();
 
         if ($identity) {
-            // User is logged in, redirect to admin dashboard
-            return $this->redirect(['controller' => 'Dashboard', 'action' => 'index']);
+            // User is logged in, redirect to Angular dashboard
+            return $this->redirect('/app/dashboard');
         }
 
         // User is not logged in, render the landing page

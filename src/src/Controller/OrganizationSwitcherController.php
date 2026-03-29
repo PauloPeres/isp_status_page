@@ -8,36 +8,26 @@ use Cake\Log\Log;
 /**
  * Organization Switcher Controller
  *
- * Allows users who belong to multiple organizations to switch between them.
+ * Handles server-side organization switching (updates session).
+ * Organization selection UI is handled by the Angular SPA.
  */
 class OrganizationSwitcherController extends AppController
 {
     /**
-     * Show list of user's organizations for selection.
+     * Select page - redirect to Angular.
      *
-     * @return \Cake\Http\Response|null|void Renders view.
+     * @return \Cake\Http\Response
      */
     public function select()
     {
-        $this->viewBuilder()->setLayout('admin');
-
-        $identity = $this->request->getAttribute('identity');
-        $userId = (int)$identity->getIdentifier();
-
-        $orgUsersTable = $this->fetchTable('OrganizationUsers');
-        $userOrgs = $orgUsersTable->find()
-            ->contain(['Organizations'])
-            ->where(['OrganizationUsers.user_id' => $userId])
-            ->all();
-
-        $this->set('userOrgs', $userOrgs);
-        $this->set('currentOrgId', $this->currentOrganization['id'] ?? null);
+        return $this->redirect('/app/organizations');
     }
 
     /**
      * Switch to a different organization.
      *
      * Updates the session to set the new current organization.
+     * This server-side action is still needed for session management.
      *
      * @param int|null $orgId The organization ID to switch to.
      * @return \Cake\Http\Response|null Redirects to dashboard.
@@ -49,7 +39,7 @@ class OrganizationSwitcherController extends AppController
         if (!$orgId) {
             $this->Flash->error(__('Invalid organization.'));
 
-            return $this->redirect(['action' => 'select']);
+            return $this->redirect('/app/organizations');
         }
 
         $identity = $this->request->getAttribute('identity');
@@ -68,14 +58,14 @@ class OrganizationSwitcherController extends AppController
         if (!$membership || !$membership->organization) {
             $this->Flash->error(__('You do not have access to this organization.'));
 
-            return $this->redirect(['action' => 'select']);
+            return $this->redirect('/app/organizations');
         }
 
         // Check if the organization is active
         if (!$membership->organization->active) {
             $this->Flash->error(__('This organization is not active.'));
 
-            return $this->redirect(['action' => 'select']);
+            return $this->redirect('/app/organizations');
         }
 
         // Update session with new organization
@@ -90,6 +80,6 @@ class OrganizationSwitcherController extends AppController
 
         $this->Flash->success(__('Switched to {0}.', $membership->organization->name));
 
-        return $this->redirect(['controller' => 'Dashboard', 'action' => 'index']);
+        return $this->redirect('/app/dashboard');
     }
 }

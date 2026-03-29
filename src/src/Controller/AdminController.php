@@ -6,17 +6,12 @@ namespace App\Controller;
 /**
  * Admin Controller
  *
- * Main dashboard for administrative panel
+ * Redirects legacy admin routes to the Angular SPA.
  */
 class AdminController extends AppController
 {
-    /**
-     * Index method - Admin Dashboard
-     *
-     * @return \Cake\Http\Response|null|void Renders view
-     */
     public function index()
     {
-        return $this->redirect(['controller' => 'Dashboard', 'action' => 'index']);
+        return $this->redirect('/app/dashboard');
     }
 }

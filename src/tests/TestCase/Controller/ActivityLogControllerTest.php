@@ -9,7 +9,7 @@ use Cake\TestSuite\TestCase;
 /**
  * App\Controller\ActivityLogController Test Case
  *
- * @uses \App\Controller\ActivityLogController
+ * Tests that legacy admin routes redirect to the Angular SPA.
  */
 class ActivityLogControllerTest extends TestCase
 {
@@ -46,24 +46,9 @@ class ActivityLogControllerTest extends TestCase
         $this->assertRedirectContains('/users/login');
     }
 
-    public function testIndexLoadsForAuthenticatedUser(): void
+    public function testIndexRedirectsToAngular(): void
     {
         $this->get('/activity-log');
-        $this->assertResponseOk();
-    }
-
-    public function testIndexSetsLogsVariable(): void
-    {
-        $this->get('/activity-log');
-        $this->assertResponseOk();
-
-        $logs = $this->viewVariable('logs');
-        $this->assertNotNull($logs);
-    }
-
-    public function testIndexWithEventTypeFilter(): void
-    {
-        $this->get('/activity-log?event_type=login');
-        $this->assertResponseOk();
+        $this->assertRedirectContains('/app/activity-log');
     }
 }

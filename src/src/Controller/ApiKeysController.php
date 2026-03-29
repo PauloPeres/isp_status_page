@@ -3,165 +3,25 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Service\ApiKeyService;
-use App\Service\AuditLogService;
-use App\Service\PermissionService;
-
 /**
  * ApiKeys Controller
  *
- * Admin CRUD for managing API keys.
- *
- * @property \App\Model\Table\ApiKeysTable $ApiKeys
+ * Redirects legacy admin routes to the Angular SPA.
  */
 class ApiKeysController extends AppController
 {
-    /**
-     * API key service instance
-     *
-     * @var \App\Service\ApiKeyService
-     */
-    protected ApiKeyService $apiKeyService;
-
-    /**
-     * Audit log service instance.
-     *
-     * @var \App\Service\AuditLogService
-     */
-    private AuditLogService $audit;
-
-    /**
-     * Initialize method
-     *
-     * @return void
-     */
-    public function initialize(): void
-    {
-        parent::initialize();
-        $this->apiKeyService = new ApiKeyService();
-        $this->audit = new AuditLogService();
-    }
-
-    /**
-     * Index method
-     *
-     * Lists all API keys for the current organization.
-     *
-     * @return \Cake\Http\Response|null|void Renders view
-     */
     public function index()
     {
-        $this->viewBuilder()->setLayout('admin');
-        $this->checkPermission(PermissionService::ACTION_MANAGE_SETTINGS);
-
-        $query = $this->ApiKeys->find()
-            ->contain(['Users'])
-            ->orderBy(['ApiKeys.created' => 'DESC']);
-
-        $apiKeys = $this->paginate($query);
-
-        $this->set(compact('apiKeys'));
+        return $this->redirect('/app/api-keys');
     }
 
-    /**
-     * Add method
-     *
-     * Create a new API key. Shows the plain key once after creation.
-     *
-     * @return \Cake\Http\Response|null|void Renders view or redirects
-     */
     public function add()
     {
-        $this->viewBuilder()->setLayout('admin');
-        $this->checkPermission(PermissionService::ACTION_MANAGE_SETTINGS);
-
-        $plainKey = null;
-
-        if ($this->request->is('post')) {
-            $data = $this->request->getData();
-
-            $identity = $this->request->getAttribute('identity');
-            $userId = $identity ? (int)$identity->getIdentifier() : 0;
-            $orgId = (int)$this->currentOrganization['id'];
-
-            // Build permissions array from checkboxes
-            $permissions = [];
-            if (!empty($data['perm_read'])) {
-                $permissions[] = 'read';
-            }
-            if (!empty($data['perm_write'])) {
-                $permissions[] = 'write';
-            }
-            if (!empty($data['perm_admin'])) {
-                $permissions[] = 'admin';
-            }
-
-            // Default to read if nothing selected
-            if (empty($permissions)) {
-                $permissions = ['read'];
-            }
-
-            try {
-                $result = $this->apiKeyService->generate(
-                    $orgId,
-                    $userId,
-                    $data['name'] ?? '',
-                    $permissions
-                );
-
-                $plainKey = $result['key'];
-
-                // TASK-AUTH-018: Audit log API key creation
-                $this->audit->log(
-                    'api_key_created',
-                    $userId,
-                    $this->request->clientIp(),
-                    $this->request->getHeaderLine('User-Agent'),
-                    ['key_name' => $data['name'] ?? '', 'permissions' => $permissions]
-                );
-
-                $this->Flash->success(__('API key created successfully. Copy the key now - you will not see it again!'));
-                $this->set('newApiKey', $result['entity']);
-            } catch (\Exception $e) {
-                $this->Flash->error(__('Could not create API key. Please try again.'));
-            }
-        }
-
-        $this->set('plainKey', $plainKey);
+        return $this->redirect('/app/api-keys/new');
     }
 
-    /**
-     * Delete method
-     *
-     * Revokes and deletes an API key.
-     *
-     * @param string|null $id API key id
-     * @return \Cake\Http\Response|null Redirects to index
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
     public function delete($id = null)
     {
-        $this->request->allowMethod(['post', 'delete']);
-        $this->checkPermission(PermissionService::ACTION_MANAGE_SETTINGS);
-
-        $apiKey = $this->ApiKeys->get($id);
-
-        if ($this->apiKeyService->revoke((int)$apiKey->id)) {
-            // TASK-AUTH-018: Audit log API key revocation
-            $identity = $this->request->getAttribute('identity');
-            $this->audit->log(
-                'api_key_revoked',
-                $identity ? (int)$identity->getIdentifier() : null,
-                $this->request->clientIp(),
-                $this->request->getHeaderLine('User-Agent'),
-                ['key_id' => (int)$apiKey->id, 'key_name' => $apiKey->name]
-            );
-
-            $this->Flash->success(__('The API key has been revoked.'));
-        } else {
-            $this->Flash->error(__('The API key could not be revoked. Please try again.'));
-        }
-
-        return $this->redirect(['action' => 'index']);
+        return $this->redirect('/app/api-keys');
     }
 }

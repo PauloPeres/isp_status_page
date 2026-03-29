@@ -33,136 +33,22 @@ class StatusPagesController extends AppController
      */
     public function index()
     {
-        $this->viewBuilder()->setLayout('admin');
-        $this->checkPermission('manage_resources');
-
-        $statusPages = $this->paginate(
-            $this->StatusPages->find()->orderBy(['created' => 'DESC'])
-        );
-
-        $this->set(compact('statusPages'));
+        return $this->redirect('/app/status-pages');
     }
 
-    /**
-     * Add method - create a new status page
-     *
-     * @return \Cake\Http\Response|null|void Redirects on successful add, renders view otherwise.
-     */
     public function add()
     {
-        $this->viewBuilder()->setLayout('admin');
-        $this->checkPermission('manage_resources');
-
-        $statusPage = $this->StatusPages->newEmptyEntity();
-
-        if ($this->request->is('post')) {
-            $data = $this->request->getData();
-
-            // Set organization_id from current context
-            if ($this->currentOrganization) {
-                $data['organization_id'] = $this->currentOrganization['id'];
-            }
-
-            // Handle monitors as JSON
-            if (isset($data['monitor_ids']) && is_array($data['monitor_ids'])) {
-                $data['monitors'] = json_encode(array_map('intval', $data['monitor_ids']));
-            }
-
-            // Handle theme/branding fields (P3-011)
-            $data = $this->_mergeThemeData($data, []);
-
-            $statusPage = $this->StatusPages->patchEntity($statusPage, $data);
-
-            if ($this->StatusPages->save($statusPage)) {
-                $this->Flash->success(__('The status page has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The status page could not be saved. Please try again.'));
-        }
-
-        // Get available monitors for selection
-        $monitorsTable = $this->fetchTable('Monitors');
-        $monitors = $monitorsTable->find('list', keyField: 'id', valueField: 'name')
-            ->where(['active' => true])
-            ->orderBy(['name' => 'ASC'])
-            ->toArray();
-
-        $this->set(compact('statusPage', 'monitors'));
+        return $this->redirect('/app/status-pages/new');
     }
 
-    /**
-     * Edit method - update an existing status page
-     *
-     * @param string|null $id Status Page id.
-     * @return \Cake\Http\Response|null|void Redirects on successful edit, renders view otherwise.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
     public function edit($id = null)
     {
-        $this->viewBuilder()->setLayout('admin');
-        $this->checkPermission('manage_resources');
-
-        $statusPage = $this->StatusPages->get($id);
-
-        if ($this->request->is(['patch', 'post', 'put'])) {
-            $data = $this->request->getData();
-
-            // Handle monitors as JSON
-            if (isset($data['monitor_ids']) && is_array($data['monitor_ids'])) {
-                $data['monitors'] = json_encode(array_map('intval', $data['monitor_ids']));
-            }
-
-            // Handle theme/branding fields (P3-011)
-            $data = $this->_mergeThemeData($data, $statusPage->getThemeConfig());
-
-            $statusPage = $this->StatusPages->patchEntity($statusPage, $data);
-
-            if ($this->StatusPages->save($statusPage)) {
-                $this->Flash->success(__('The status page has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The status page could not be saved. Please try again.'));
-        }
-
-        // Get available monitors for selection
-        $monitorsTable = $this->fetchTable('Monitors');
-        $monitors = $monitorsTable->find('list', keyField: 'id', valueField: 'name')
-            ->where(['active' => true])
-            ->orderBy(['name' => 'ASC'])
-            ->toArray();
-
-        $this->set(compact('statusPage', 'monitors'));
+        return $this->redirect('/app/status-pages/' . $id . '/edit');
     }
 
-    /**
-     * View method - view a status page details (admin)
-     *
-     * @param string|null $id Status Page id.
-     * @return \Cake\Http\Response|null|void Renders view
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
     public function view($id = null)
     {
-        $this->viewBuilder()->setLayout('admin');
-        $this->checkPermission('manage_resources');
-
-        $statusPage = $this->StatusPages->get($id);
-
-        // Load associated monitors
-        $monitorIds = $statusPage->getMonitorIds();
-        $monitors = [];
-        if (!empty($monitorIds)) {
-            $monitorsTable = $this->fetchTable('Monitors');
-            $monitors = $monitorsTable->find()
-                ->where(['id IN' => $monitorIds])
-                ->orderBy(['name' => 'ASC'])
-                ->all()
-                ->toArray();
-        }
-
-        $this->set(compact('statusPage', 'monitors'));
+        return $this->redirect('/app/status-pages/' . $id);
     }
 
     /**
@@ -237,55 +123,8 @@ class StatusPagesController extends AppController
         $this->set('requirePassword', false);
     }
 
-    /**
-     * Merge theme branding fields from form data into the theme JSON (P3-011).
-     *
-     * @param array $data The form data.
-     * @param array $existingTheme The existing theme config array.
-     * @return array The modified form data with theme JSON set.
-     */
-    private function _mergeThemeData(array $data, array $existingTheme): array
-    {
-        $theme = $existingTheme;
-
-        if (isset($data['theme_primary_color'])) {
-            $theme['primary_color'] = $data['theme_primary_color'];
-            unset($data['theme_primary_color']);
-        }
-        if (isset($data['theme_logo_url'])) {
-            $theme['logo_url'] = $data['theme_logo_url'];
-            unset($data['theme_logo_url']);
-        }
-        if (isset($data['theme_custom_css'])) {
-            $theme['custom_css'] = $data['theme_custom_css'];
-            unset($data['theme_custom_css']);
-        }
-
-        $data['theme'] = json_encode($theme);
-
-        return $data;
-    }
-
-    /**
-     * Delete method
-     *
-     * @param string|null $id Status Page id.
-     * @return \Cake\Http\Response|null Redirects to index.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
     public function delete($id = null)
     {
-        $this->request->allowMethod(['post', 'delete']);
-        $this->checkPermission('manage_resources');
-
-        $statusPage = $this->StatusPages->get($id);
-
-        if ($this->StatusPages->delete($statusPage)) {
-            $this->Flash->success(__('The status page has been deleted.'));
-        } else {
-            $this->Flash->error(__('The status page could not be deleted. Please try again.'));
-        }
-
-        return $this->redirect(['action' => 'index']);
+        return $this->redirect('/app/status-pages');
     }
 }

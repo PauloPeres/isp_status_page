@@ -36,50 +36,17 @@ class InvitationsController extends AppController
      */
     public function index()
     {
-        $this->viewBuilder()->setLayout('admin');
-        $this->checkPermission(PermissionService::ACTION_MANAGE_TEAM);
-
-        $orgId = (int)$this->currentOrganization['id'];
-
-        $invitations = $this->Invitations->find()
-            ->where(['Invitations.organization_id' => $orgId])
-            ->contain(['Inviter'])
-            ->orderBy(['Invitations.created' => 'DESC'])
-            ->all();
-
-        $this->set(compact('invitations'));
+        return $this->redirect('/app/team');
     }
 
     /**
-     * Send a team invitation.
+     * Send - redirect to Angular team management.
      *
-     * POST: requires email and role fields.
-     *
-     * @return \Cake\Http\Response|null|void Redirects to index.
+     * @return \Cake\Http\Response
      */
     public function send()
     {
-        $this->request->allowMethod(['post']);
-        $this->viewBuilder()->setLayout('admin');
-        $this->checkPermission(PermissionService::ACTION_MANAGE_TEAM);
-
-        $orgId = (int)$this->currentOrganization['id'];
-        $identity = $this->request->getAttribute('identity');
-        $userId = (int)$identity->getIdentifier();
-
-        $email = $this->request->getData('email');
-        $role = $this->request->getData('role', 'member');
-
-        try {
-            $invitationService = new InvitationService();
-            $invitation = $invitationService->send($orgId, $email, $role, $userId);
-
-            $this->Flash->success(__('Invitation sent to {0}.', $email));
-        } catch (\RuntimeException $e) {
-            $this->Flash->error($e->getMessage());
-        }
-
-        return $this->redirect(['action' => 'index']);
+        return $this->redirect('/app/team');
     }
 
     /**
@@ -160,6 +127,6 @@ class InvitationsController extends AppController
             $this->Flash->error(__('Could not revoke the invitation.'));
         }
 
-        return $this->redirect(['action' => 'index']);
+        return $this->redirect('/app/team');
     }
 }

@@ -59,72 +59,7 @@ class IncidentsController extends AppController
      */
     public function index()
     {
-        $this->viewBuilder()->setLayout('admin');
-
-        // Build query with filters
-        $query = $this->Incidents->find()
-            ->contain(['Monitors']);
-
-        // Filter by status
-        if ($this->request->getQuery('status')) {
-            $status = $this->request->getQuery('status');
-            if ($status === 'active') {
-                $query->find('active');
-            } else {
-                $query->where(['Incidents.status' => $status]);
-            }
-        }
-
-        // Filter by monitor
-        if ($this->request->getQuery('monitor_id')) {
-            $query->where(['Incidents.monitor_id' => $this->request->getQuery('monitor_id')]);
-        }
-
-        // Filter by severity
-        if ($this->request->getQuery('severity')) {
-            $query->where(['Incidents.severity' => $this->request->getQuery('severity')]);
-        }
-
-        // Filter by auto-created
-        if ($this->request->getQuery('auto_created') !== null) {
-            $query->where(['Incidents.auto_created' => (bool)$this->request->getQuery('auto_created')]);
-        }
-
-        // Search by title or description
-        if ($this->request->getQuery('search')) {
-            $search = $this->request->getQuery('search');
-            $query->where([
-                'OR' => [
-                    'Incidents.title LIKE' => '%' . $search . '%',
-                    'Incidents.description LIKE' => '%' . $search . '%',
-                ]
-            ]);
-        }
-
-        // Order by most recent first
-        $query->orderBy(['Incidents.started_at' => 'DESC']);
-
-        $incidents = $this->paginate($query);
-
-        // Statistics
-        $stats = [
-            'total' => $this->Incidents->find()->count(),
-            'active' => $this->Incidents->find('active')->count(),
-            'resolved' => $this->Incidents->find()
-                ->where(['status' => \App\Model\Entity\Incident::STATUS_RESOLVED])
-                ->count(),
-            'critical' => $this->Incidents->find()
-                ->where(['severity' => \App\Model\Entity\Incident::SEVERITY_CRITICAL])
-                ->count(),
-        ];
-
-        // Get list of monitors for filter dropdown
-        $monitors = $this->Incidents->Monitors
-            ->find('list', ['keyField' => 'id', 'valueField' => 'name'])
-            ->orderBy(['name' => 'ASC'])
-            ->toArray();
-
-        $this->set(compact('incidents', 'stats', 'monitors'));
+        return $this->redirect('/app/incidents');
     }
 
     /**
@@ -136,18 +71,7 @@ class IncidentsController extends AppController
      */
     public function add()
     {
-        $this->viewBuilder()->setLayout('admin');
-        $incident = $this->Incidents->newEmptyEntity();
-        if ($this->request->is('post')) {
-            $incident = $this->Incidents->patchEntity($incident, $this->request->getData());
-            if ($this->Incidents->save($incident)) {
-                $this->Flash->success(__('Incident created'));
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('Could not create incident'));
-        }
-        $monitors = $this->fetchTable('Monitors')->find('list')->toArray();
-        $this->set(compact('incident', 'monitors'));
+        return $this->redirect('/app/incidents/new');
     }
 
     /**
@@ -162,38 +86,7 @@ class IncidentsController extends AppController
      */
     public function view($id = null)
     {
-        $this->viewBuilder()->setLayout('admin');
-
-        $incident = $this->Incidents->get($id, [
-            'contain' => [
-                'Monitors',
-                'AcknowledgedByUsers',
-                'AlertLogs' => function ($q) {
-                    return $q->orderBy(['created' => 'DESC']);
-                },
-            ],
-        ]);
-
-        // Build timeline of events
-        $timeline = $this->buildTimeline($incident);
-
-        // Load incident updates for the timeline
-        $incidentUpdates = $this->fetchTable('IncidentUpdates')
-            ->find()
-            ->contain(['Users'])
-            ->where(['IncidentUpdates.incident_id' => $id])
-            ->orderBy(['IncidentUpdates.created' => 'ASC'])
-            ->all();
-
-        // Get monitor's recent checks
-        $recentChecks = $this->Incidents->Monitors->MonitorChecks
-            ->find()
-            ->where(['monitor_id' => $incident->monitor_id])
-            ->orderBy(['checked_at' => 'DESC'])
-            ->limit(20)
-            ->all();
-
-        $this->set(compact('incident', 'timeline', 'incidentUpdates', 'recentChecks'));
+        return $this->redirect('/app/incidents/' . $id);
     }
 
     /**
@@ -207,31 +100,7 @@ class IncidentsController extends AppController
      */
     public function edit($id = null)
     {
-        $this->viewBuilder()->setLayout('admin');
-
-        $incident = $this->Incidents->get($id, [
-            'contain' => ['Monitors'],
-        ]);
-
-        if ($this->request->is(['patch', 'post', 'put'])) {
-            $data = $this->request->getData();
-
-            // Use IncidentService to update incident
-            $newStatus = $data['status'] ?? $incident->status;
-            $description = $data['description'] ?? null;
-
-            $updated = $this->incidentService->updateIncident($incident, $newStatus, $description);
-
-            if ($updated) {
-                $this->Flash->success(__d('incidents', 'The incident has been updated.'));
-
-                return $this->redirect(['action' => 'view', $id]);
-            }
-
-            $this->Flash->error(__d('incidents', 'The incident could not be updated. Please, try again.'));
-        }
-
-        $this->set(compact('incident'));
+        return $this->redirect('/app/incidents/' . $id . '/edit');
     }
 
     /**
@@ -252,7 +121,7 @@ class IncidentsController extends AppController
         if ($incident->isResolved()) {
             $this->Flash->warning(__d('incidents', 'This incident is already resolved.'));
 
-            return $this->redirect(['action' => 'view', $id]);
+            return $this->redirect('/app/incidents/' . $id);
         }
 
         $resolved = $this->incidentService->resolveIncident($incident);
@@ -263,7 +132,7 @@ class IncidentsController extends AppController
             $this->Flash->error(__d('incidents', 'The incident could not be resolved. Please, try again.'));
         }
 
-        return $this->redirect(['action' => 'view', $id]);
+        return $this->redirect('/app/incidents/' . $id);
     }
 
     /**
@@ -362,7 +231,7 @@ class IncidentsController extends AppController
         if ($incident->isAcknowledged()) {
             $this->Flash->warning(__d('incidents', 'This incident has already been acknowledged.'));
 
-            return $this->redirect(['action' => 'view', $id]);
+            return $this->redirect('/app/incidents/' . $id);
         }
 
         // Get the authenticated user
@@ -384,7 +253,7 @@ class IncidentsController extends AppController
             $this->Flash->error(__d('incidents', 'Error acknowledging incident.'));
         }
 
-        return $this->redirect(['action' => 'view', $id]);
+        return $this->redirect('/app/incidents/' . $id);
     }
 
     /**
@@ -502,7 +371,7 @@ class IncidentsController extends AppController
             $this->Flash->error(__('Could not post update'));
         }
 
-        return $this->redirect(['action' => 'view', $id]);
+        return $this->redirect('/app/incidents/' . $id);
     }
 
     /**

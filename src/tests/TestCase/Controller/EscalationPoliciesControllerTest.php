@@ -6,85 +6,36 @@ namespace App\Test\TestCase\Controller;
 use Cake\TestSuite\IntegrationTestTrait;
 use Cake\TestSuite\TestCase;
 
-/**
- * App\Controller\EscalationPoliciesController Test Case
- *
- * @uses \App\Controller\EscalationPoliciesController
- */
 class EscalationPoliciesControllerTest extends TestCase
 {
     use IntegrationTestTrait;
 
-    /**
-     * Fixtures
-     *
-     * @var array<string>
-     */
-    protected array $fixtures = [
-        'app.Organizations',
-        'app.OrganizationUsers',
-        'app.Users',
-        'app.Monitors',
-        'app.MonitorChecks',
-        'app.Incidents',
-        'app.EscalationPolicies',
-        'app.EscalationSteps',
-    ];
+    protected array $fixtures = ['app.Organizations', 'app.OrganizationUsers', 'app.Users'];
 
-    /**
-     * Set up authentication for tests
-     */
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->session([
-            'Auth' => [
-                'id' => 1,
-                'username' => 'admin',
-                'active' => true,
-                'organization_id' => 1,
-            ],
+            'Auth' => ['id' => 1, 'username' => 'admin', 'active' => true, 'organization_id' => 1],
             'current_organization_id' => 1,
         ]);
     }
 
-    /**
-     * Test index requires authentication
-     */
-    public function testIndexRequiresAuth(): void
-    {
-        $this->_session = [];
-        $this->cookie('csrfToken', '');
-
-        $this->get('/escalation-policies');
-        $this->assertRedirectContains('/users/login');
-    }
-
-    /**
-     * Test index method returns 200 for authenticated users
-     */
-    public function testIndexAuthenticated(): void
+    public function testIndexRedirectsToAngular(): void
     {
         $this->get('/escalation-policies');
-        $this->assertResponseOk();
+        $this->assertRedirectContains('/app/escalation-policies');
     }
 
-    /**
-     * Test add form loads for authenticated users
-     */
-    public function testAddFormLoads(): void
+    public function testAddRedirectsToAngular(): void
     {
         $this->get('/escalation-policies/add');
-        $this->assertResponseOk();
+        $this->assertRedirectContains('/app/escalation-policies/new');
     }
 
-    /**
-     * Test view method returns 200 for an existing policy
-     */
-    public function testViewAuthenticated(): void
+    public function testViewRedirectsToAngular(): void
     {
         $this->get('/escalation-policies/view/1');
-        $this->assertResponseOk();
+        $this->assertRedirectContains('/app/escalation-policies/1');
     }
 }

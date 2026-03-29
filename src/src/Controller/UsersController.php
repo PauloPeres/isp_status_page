@@ -134,10 +134,10 @@ class UsersController extends AppController
                 return $this->redirect(['action' => 'changePassword']);
             }
 
-            // Get redirect parameter or default to /admin (TASK-AUTH-009: validate redirect to prevent open redirect)
-            $redirect = $this->request->getQuery('redirect', '/admin');
+            // Get redirect parameter or default to /app/dashboard (TASK-AUTH-009: validate redirect to prevent open redirect)
+            $redirect = $this->request->getQuery('redirect', '/app/dashboard');
             if (!is_string($redirect) || !str_starts_with($redirect, '/') || str_starts_with($redirect, '//')) {
-                $redirect = '/admin';
+                $redirect = '/app/dashboard';
             }
 
             return $this->redirect($redirect);
@@ -440,36 +440,7 @@ class UsersController extends AppController
      */
     public function index()
     {
-        $this->viewBuilder()->setLayout('admin');
-
-        $query = $this->Users->find();
-
-        // Filtro por função
-        if ($this->request->getQuery('role')) {
-            $query->where(['role' => $this->request->getQuery('role')]);
-        }
-
-        // Filtro por status ativo/inativo
-        if ($this->request->getQuery('active') !== null && $this->request->getQuery('active') !== '') {
-            $query->where(['active' => (bool)$this->request->getQuery('active')]);
-        }
-
-        // Busca por username ou email
-        if ($this->request->getQuery('search')) {
-            $search = $this->request->getQuery('search');
-            $query->where([
-                'OR' => [
-                    'username LIKE' => '%' . $search . '%',
-                    'email LIKE' => '%' . $search . '%',
-                ]
-            ]);
-        }
-
-        $query->orderBy(['Users.created' => 'DESC']);
-
-        $users = $this->paginate($query);
-
-        $this->set(compact('users'));
+        return $this->redirect('/app/users');
     }
 
     /**
@@ -481,117 +452,17 @@ class UsersController extends AppController
      */
     public function view($id = null)
     {
-        $this->viewBuilder()->setLayout('admin');
-
-        $user = $this->Users->get($id);
-
-        $this->set(compact('user'));
+        return $this->redirect('/app/users/' . $id);
     }
 
     /**
-     * Add method
+     * Add method - redirect to Angular user management.
      *
-     * @return \Cake\Http\Response|null|void Redirects on successful add, renders view otherwise.
+     * @return \Cake\Http\Response
      */
     public function add()
     {
-        $this->viewBuilder()->setLayout('admin');
-
-        $user = $this->Users->newEmptyEntity();
-
-        if ($this->request->is('post')) {
-            $data = $this->request->getData();
-
-            $generatePassword = !empty($data['generate_password']);
-            $sendInvite = !empty($data['send_invite']);
-            $generatedPassword = null;
-
-            // Generate random password if requested
-            if ($generatePassword) {
-                // Generate secure random password (12 characters with letters, numbers and symbols)
-                $generatedPassword = bin2hex(random_bytes(6)); // 12 character hex string
-                $data['password'] = $generatedPassword;
-                $data['force_password_change'] = true; // Force password change on first login
-
-                $this->log("Generated password for new user: {$data['username']}", 'info');
-            } else {
-                // Validate password confirmation only if not auto-generated
-                if (!empty($data['password']) && !empty($data['confirm_password'])) {
-                    if ($data['password'] !== $data['confirm_password']) {
-                        $this->Flash->error(__('Passwords do not match.'));
-                        $this->set(compact('user'));
-                        return;
-                    }
-                } elseif (empty($data['password'])) {
-                    $this->Flash->error(__('Password is required.'));
-                    $this->set(compact('user'));
-                    return;
-                }
-            }
-
-            // Remover campos extras antes de salvar
-            unset($data['confirm_password'], $data['generate_password'], $data['send_invite']);
-
-            // Extract sensitive fields before mass assignment
-            $role = $data['role'] ?? 'user';
-            $active = $data['active'] ?? true;
-            $forcePasswordChange = $data['force_password_change'] ?? false;
-            unset($data['role'], $data['active'], $data['force_password_change'],
-                  $data['is_super_admin'], $data['email_verified'], $data['reset_token'],
-                  $data['oauth_provider'], $data['oauth_id']);
-
-            $user = $this->Users->patchEntity($user, $data);
-
-            // Set sensitive fields directly (not mass-assignable)
-            $user->set('role', $role);
-            $user->set('active', $active);
-            $user->set('force_password_change', $forcePasswordChange);
-
-            if ($this->Users->save($user)) {
-                // TASK-AUTH-018: Audit log user creation
-                $identity = $this->Authentication->getIdentity();
-                $this->audit->log(
-                    'user_created',
-                    $identity ? (int)$identity->id : null,
-                    $this->request->clientIp(),
-                    $this->request->getHeaderLine('User-Agent'),
-                    ['created_user_id' => $user->id, 'username' => $user->username, 'role' => $role]
-                );
-
-                $successMessage = __('User created successfully.');
-
-                // Send invitation email if requested
-                if ($sendInvite && $generatedPassword) {
-                    $emailService = new \App\Service\EmailService();
-                    $loginUrl = \Cake\Routing\Router::url([
-                        'controller' => 'Users',
-                        'action' => 'login'
-                    ], true);
-
-                    $result = $emailService->sendUserInvite($user, $generatedPassword, $loginUrl);
-
-                    if ($result['success']) {
-                        $successMessage .= ' ' . __('Invitation email sent successfully.');
-                        $this->log("Invitation email sent successfully to {$user->email}", 'info');
-                    } else {
-                        // Show error but don't fail the user creation
-                        $this->Flash->warning(__('User created, but there was an error sending the invitation email: ') . $result['message']);
-                        $this->log("Failed to send invitation email to {$user->email}: " .
-                            ($result['technical_error'] ?? $result['message']), 'error');
-
-                        // Log that credentials were generated (do not log actual password)
-                        $this->log("Generated credentials for user {$user->username} (email delivery failed, password not logged for security)", 'warning');
-                    }
-                }
-
-                $this->Flash->success($successMessage);
-                return $this->redirect(['action' => 'index']);
-            }
-
-            $this->Flash->error(__('Unable to create user. Please check the errors below.'));
-        }
-
-        $this->set(compact('user'));
+        return $this->redirect('/app/users/new');
     }
 
     /**
@@ -603,73 +474,7 @@ class UsersController extends AppController
      */
     public function edit($id = null)
     {
-        $this->viewBuilder()->setLayout('admin');
-
-        $user = $this->Users->get($id);
-
-        // Only allow users to edit their own profile
-        $identity = $this->Authentication->getIdentity();
-        if (!$identity || $identity->id != $user->id) {
-            $this->Flash->error(__('You do not have permission to edit this user.'));
-
-            return $this->redirect(['action' => 'view', $identity->id]);
-        }
-
-        if ($this->request->is(['patch', 'post', 'put'])) {
-            $data = $this->request->getData();
-
-            // Handle password change (TASK-AUTH-010: require current password)
-            $passwordChanged = false;
-            if (!empty($data['new_password'])) {
-                // Verify current password first
-                $currentPassword = $data['current_password'] ?? '';
-                $hasher = new \Authentication\PasswordHasher\DefaultPasswordHasher();
-                if (empty($currentPassword) || !$hasher->check($currentPassword, $user->password)) {
-                    $this->Flash->error(__('Current password is incorrect.'));
-                    unset($data['new_password'], $data['confirm_password'], $data['current_password']);
-                    $this->set(compact('user'));
-                    return;
-                }
-
-                // Validate password confirmation
-                if ($data['new_password'] !== ($data['confirm_password'] ?? '')) {
-                    $this->Flash->error(__('Passwords do not match.'));
-                } else {
-                    // Set the new password
-                    $data['password'] = $data['new_password'];
-                    $passwordChanged = true;
-                }
-            }
-
-            // Remove temporary password fields
-            unset($data['new_password'], $data['confirm_password'], $data['current_password']);
-
-            // Don't allow changing role or active status through profile edit
-            unset($data['role'], $data['active']);
-
-            $user = $this->Users->patchEntity($user, $data);
-
-            if ($this->Users->save($user)) {
-                // TASK-AUTH-018: Audit log password changed via profile edit
-                if ($passwordChanged) {
-                    $this->audit->log(
-                        'password_changed',
-                        (int)$user->id,
-                        $this->request->clientIp(),
-                        $this->request->getHeaderLine('User-Agent'),
-                        ['via' => 'profile_edit']
-                    );
-                }
-
-                $this->Flash->success(__('Profile updated successfully.'));
-
-                return $this->redirect(['action' => 'view', $user->id]);
-            }
-
-            $this->Flash->error(__('Unable to update profile. Please try again.'));
-        }
-
-        $this->set(compact('user'));
+        return $this->redirect('/app/profile');
     }
 
     /**
@@ -681,25 +486,6 @@ class UsersController extends AppController
      */
     public function delete($id = null)
     {
-        $this->request->allowMethod(['post', 'delete']);
-        $user = $this->Users->get($id);
-
-        if ($this->Users->delete($user)) {
-            // TASK-AUTH-018: Audit log user deletion
-            $identity = $this->Authentication->getIdentity();
-            $this->audit->log(
-                'user_deleted',
-                $identity ? (int)$identity->id : null,
-                $this->request->clientIp(),
-                $this->request->getHeaderLine('User-Agent'),
-                ['deleted_user_id' => (int)$id, 'username' => $user->username]
-            );
-
-            $this->Flash->success(__('User deleted successfully.'));
-        } else {
-            $this->Flash->error(__('Unable to delete user. Please try again.'));
-        }
-
-        return $this->redirect(['action' => 'index']);
+        return $this->redirect('/app/users');
     }
 }
