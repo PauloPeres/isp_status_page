@@ -19,10 +19,10 @@ class SlaController extends AppController
     {
         $this->request->allowMethod(['get']);
 
-        $table = $this->fetchTable('Slas');
+        $table = $this->fetchTable('SlaDefinitions');
         $slas = $table->find()
-            ->where(['Slas.organization_id' => $this->currentOrgId])
-            ->orderBy(['Slas.name' => 'ASC'])
+            ->where(['SlaDefinitions.organization_id' => $this->currentOrgId])
+            ->orderBy(['SlaDefinitions.name' => 'ASC'])
             ->all();
 
         $this->success(['slas' => $slas->toArray()]);
@@ -38,11 +38,11 @@ class SlaController extends AppController
     {
         $this->request->allowMethod(['get']);
 
-        $table = $this->fetchTable('Slas');
+        $table = $this->fetchTable('SlaDefinitions');
         $sla = $table->find()
             ->where([
-                'Slas.id' => $id,
-                'Slas.organization_id' => $this->currentOrgId,
+                'SlaDefinitions.id' => $id,
+                'SlaDefinitions.organization_id' => $this->currentOrgId,
             ])
             ->first();
 
@@ -68,7 +68,7 @@ class SlaController extends AppController
             return;
         }
 
-        $table = $this->fetchTable('Slas');
+        $table = $this->fetchTable('SlaDefinitions');
         $sla = $table->newEntity($this->request->getData());
         $sla->set('organization_id', $this->currentOrgId);
 
@@ -95,11 +95,11 @@ class SlaController extends AppController
             return;
         }
 
-        $table = $this->fetchTable('Slas');
+        $table = $this->fetchTable('SlaDefinitions');
         $sla = $table->find()
             ->where([
-                'Slas.id' => $id,
-                'Slas.organization_id' => $this->currentOrgId,
+                'SlaDefinitions.id' => $id,
+                'SlaDefinitions.organization_id' => $this->currentOrgId,
             ])
             ->first();
 
@@ -133,11 +133,11 @@ class SlaController extends AppController
             return;
         }
 
-        $table = $this->fetchTable('Slas');
+        $table = $this->fetchTable('SlaDefinitions');
         $sla = $table->find()
             ->where([
-                'Slas.id' => $id,
-                'Slas.organization_id' => $this->currentOrgId,
+                'SlaDefinitions.id' => $id,
+                'SlaDefinitions.organization_id' => $this->currentOrgId,
             ])
             ->first();
 
@@ -168,11 +168,11 @@ class SlaController extends AppController
     {
         $this->request->allowMethod(['get']);
 
-        $table = $this->fetchTable('Slas');
+        $table = $this->fetchTable('SlaDefinitions');
         $sla = $table->find()
             ->where([
-                'Slas.id' => $id,
-                'Slas.organization_id' => $this->currentOrgId,
+                'SlaDefinitions.id' => $id,
+                'SlaDefinitions.organization_id' => $this->currentOrgId,
             ])
             ->first();
 
@@ -204,11 +204,11 @@ class SlaController extends AppController
     {
         $this->request->allowMethod(['get']);
 
-        $table = $this->fetchTable('Slas');
+        $table = $this->fetchTable('SlaDefinitions');
         $sla = $table->find()
             ->where([
-                'Slas.id' => $id,
-                'Slas.organization_id' => $this->currentOrgId,
+                'SlaDefinitions.id' => $id,
+                'SlaDefinitions.organization_id' => $this->currentOrgId,
             ])
             ->first();
 

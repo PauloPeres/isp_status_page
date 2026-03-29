@@ -22,7 +22,7 @@ class AlertRulesController extends AppController
         $table = $this->fetchTable('AlertRules');
         $rules = $table->find()
             ->where(['AlertRules.organization_id' => $this->currentOrgId])
-            ->orderBy(['AlertRules.name' => 'ASC'])
+            ->orderBy(['AlertRules.created' => 'DESC'])
             ->all();
 
         $this->success(['alert_rules' => $rules->toArray()]);

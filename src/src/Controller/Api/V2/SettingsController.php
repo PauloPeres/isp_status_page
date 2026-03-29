@@ -28,7 +28,7 @@ class SettingsController extends AppController
         }
 
         $service = new SettingService();
-        $settings = $service->getAllForOrganization($this->currentOrgId);
+        $settings = $service->getAll();
 
         $this->success(['settings' => $settings]);
     }

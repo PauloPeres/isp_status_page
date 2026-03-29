@@ -22,7 +22,7 @@ class MaintenanceWindowsController extends AppController
         $table = $this->fetchTable('MaintenanceWindows');
         $windows = $table->find()
             ->where(['MaintenanceWindows.organization_id' => $this->currentOrgId])
-            ->orderBy(['MaintenanceWindows.start_time' => 'DESC'])
+            ->orderBy(['MaintenanceWindows.starts_at' => 'DESC'])
             ->all();
 
         $this->success(['maintenance_windows' => $windows->toArray()]);

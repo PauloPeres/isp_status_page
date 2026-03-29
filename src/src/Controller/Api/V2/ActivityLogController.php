@@ -25,14 +25,13 @@ class ActivityLogController extends AppController
             return;
         }
 
-        $table = $this->fetchTable('ActivityLogs');
+        $table = $this->fetchTable('SecurityAuditLogs');
         $query = $table->find()
-            ->where(['ActivityLogs.organization_id' => $this->currentOrgId])
-            ->orderBy(['ActivityLogs.created' => 'DESC']);
+            ->orderBy(['SecurityAuditLogs.created' => 'DESC']);
 
         $eventType = $this->request->getQuery('event_type');
         if (!empty($eventType)) {
-            $query->where(['ActivityLogs.event_type' => $eventType]);
+            $query->where(['SecurityAuditLogs.event_type' => $eventType]);
         }
 
         $limit = (int)($this->request->getQuery('limit') ?: 50);
