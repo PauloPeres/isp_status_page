@@ -64,9 +64,9 @@ ALL admin functionality (~20 feature areas, ~110 API endpoints)
 - TASK-NG-021: Core Module (auth service, JWT interceptor, guards) -- COMPLETED (2026-03-29)
 - TASK-NG-022: API Service + TypeScript models -- COMPLETED (2026-03-29)
 - TASK-NG-023: Design System / Ionic Theme (Indigo palette, fonts) -- COMPLETED (2026-03-29)
-- TASK-NG-024: App Shell (layout, sidebar, navbar)
-- TASK-NG-025: Auth Module (login + 2FA verify pages)
-- TASK-NG-026: Routing Configuration (lazy-loaded feature routes)
+- TASK-NG-024: App Shell (layout, sidebar, navbar) -- COMPLETED (2026-03-29)
+- TASK-NG-025: Auth Module (login + 2FA verify pages) -- COMPLETED (2026-03-29)
+- TASK-NG-026: Routing Configuration (lazy-loaded feature routes) -- COMPLETED (2026-03-29)
 
 ### Phase 3: Feature Modules (19 tasks)
 - TASK-NG-030: Dashboard
