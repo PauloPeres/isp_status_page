@@ -14,6 +14,13 @@ export const routes: Routes = [
         (m) => m.RegisterComponent,
       ),
   },
+  {
+    path: 'oauth-callback',
+    loadComponent: () =>
+      import('./auth/oauth-callback/oauth-callback.component').then(
+        (m) => m.OAuthCallbackComponent,
+      ),
+  },
 
   {
     path: '',

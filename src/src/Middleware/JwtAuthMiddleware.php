@@ -34,6 +34,15 @@ class JwtAuthMiddleware implements MiddlewareInterface
     ];
 
     /**
+     * Path prefixes under /api/v2/ that do NOT require JWT authentication.
+     *
+     * @var array<string>
+     */
+    private const EXCLUDED_PREFIXES = [
+        '/api/v2/auth/oauth/',
+    ];
+
+    /**
      * Process the incoming request.
      *
      * @param \Psr\Http\Message\ServerRequestInterface $request The request.
@@ -52,6 +61,13 @@ class JwtAuthMiddleware implements MiddlewareInterface
         // Skip authentication for excluded paths
         foreach (self::EXCLUDED_PATHS as $excluded) {
             if ($path === $excluded) {
+                return $handler->handle($request);
+            }
+        }
+
+        // Skip authentication for excluded path prefixes (OAuth routes)
+        foreach (self::EXCLUDED_PREFIXES as $prefix) {
+            if (str_starts_with($path, $prefix)) {
                 return $handler->handle($request);
             }
         }

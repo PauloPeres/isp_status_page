@@ -35,6 +35,7 @@ class OAuthService
      */
     public const PROVIDER_GOOGLE = 'google';
     public const PROVIDER_GITHUB = 'github';
+    public const PROVIDER_MICROSOFT = 'microsoft';
 
     /**
      * Google OAuth endpoints.
@@ -50,6 +51,13 @@ class OAuthService
     private const GITHUB_TOKEN_URL = 'https://github.com/login/oauth/access_token';
     private const GITHUB_USERINFO_URL = 'https://api.github.com/user';
     private const GITHUB_EMAILS_URL = 'https://api.github.com/user/emails';
+
+    /**
+     * Microsoft OAuth endpoints.
+     */
+    private const MICROSOFT_AUTH_URL = 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize';
+    private const MICROSOFT_TOKEN_URL = 'https://login.microsoftonline.com/common/oauth2/v2.0/token';
+    private const MICROSOFT_USERINFO_URL = 'https://graph.microsoft.com/v1.0/me';
 
     /**
      * HTTP client instance.
@@ -81,6 +89,7 @@ class OAuthService
         return match ($provider) {
             self::PROVIDER_GOOGLE => $this->getGoogleAuthUrl($session),
             self::PROVIDER_GITHUB => $this->getGitHubAuthUrl($session),
+            self::PROVIDER_MICROSOFT => $this->getMicrosoftAuthUrl($session),
             default => throw new \InvalidArgumentException("Unsupported OAuth provider: {$provider}"),
         };
     }
@@ -167,7 +176,7 @@ class OAuthService
      */
     public function isValidProvider(string $provider): bool
     {
-        return in_array($provider, [self::PROVIDER_GOOGLE, self::PROVIDER_GITHUB], true);
+        return in_array($provider, [self::PROVIDER_GOOGLE, self::PROVIDER_GITHUB, self::PROVIDER_MICROSOFT], true);
     }
 
     /**
@@ -232,6 +241,32 @@ class OAuthService
     }
 
     /**
+     * Get Microsoft OAuth authorization URL.
+     *
+     * @param \Cake\Http\Session|null $session The session to store state in.
+     * @return string
+     */
+    private function getMicrosoftAuthUrl(?Session $session = null): string
+    {
+        $params = [
+            'client_id' => env('MICROSOFT_CLIENT_ID', ''),
+            'redirect_uri' => $this->getCallbackUrl(self::PROVIDER_MICROSOFT),
+            'response_type' => 'code',
+            'response_mode' => 'query',
+            'scope' => 'openid profile email User.Read',
+        ];
+
+        // Generate and store state parameter for CSRF protection
+        if ($session) {
+            $state = bin2hex(random_bytes(16));
+            $session->write('oauth_state', $state);
+            $params['state'] = $state;
+        }
+
+        return self::MICROSOFT_AUTH_URL . '?' . http_build_query($params);
+    }
+
+    /**
      * Exchange authorization code for access token.
      *
      * @param string $provider The OAuth provider.
@@ -246,6 +281,10 @@ class OAuthService
 
         if ($provider === self::PROVIDER_GITHUB) {
             return $this->exchangeGitHubToken($code);
+        }
+
+        if ($provider === self::PROVIDER_MICROSOFT) {
+            return $this->exchangeMicrosoftToken($code);
         }
 
         return null;
@@ -306,6 +345,32 @@ class OAuthService
     }
 
     /**
+     * Exchange Microsoft authorization code for token.
+     *
+     * @param string $code The authorization code.
+     * @return string|null
+     */
+    private function exchangeMicrosoftToken(string $code): ?string
+    {
+        $response = $this->httpClient->post(self::MICROSOFT_TOKEN_URL, [
+            'client_id' => env('MICROSOFT_CLIENT_ID', ''),
+            'client_secret' => env('MICROSOFT_CLIENT_SECRET', ''),
+            'code' => $code,
+            'grant_type' => 'authorization_code',
+            'redirect_uri' => $this->getCallbackUrl(self::PROVIDER_MICROSOFT),
+            'scope' => 'openid profile email User.Read',
+        ]);
+
+        if (!$response->isOk()) {
+            $this->log('Microsoft token exchange failed: ' . $response->getStringBody(), 'error');
+            return null;
+        }
+
+        $data = $response->getJson();
+        return $data['access_token'] ?? null;
+    }
+
+    /**
      * Fetch user info from the OAuth provider.
      *
      * @param string $provider The OAuth provider.
@@ -320,6 +385,10 @@ class OAuthService
 
         if ($provider === self::PROVIDER_GITHUB) {
             return $this->fetchGitHubUserInfo($accessToken);
+        }
+
+        if ($provider === self::PROVIDER_MICROSOFT) {
+            return $this->fetchMicrosoftUserInfo($accessToken);
         }
 
         return null;
@@ -393,6 +462,31 @@ class OAuthService
             'id' => (string)($data['id'] ?? ''),
             'email' => $email,
             'name' => $data['name'] ?? $data['login'] ?? 'User',
+        ];
+    }
+
+    /**
+     * Fetch Microsoft user info from Graph API.
+     *
+     * @param string $accessToken The access token.
+     * @return array|null
+     */
+    private function fetchMicrosoftUserInfo(string $accessToken): ?array
+    {
+        $response = $this->httpClient->get(self::MICROSOFT_USERINFO_URL, [], [
+            'headers' => ['Authorization' => "Bearer {$accessToken}"],
+        ]);
+
+        if (!$response->isOk()) {
+            return null;
+        }
+
+        $data = $response->getJson();
+
+        return [
+            'id' => $data['id'] ?? null,
+            'email' => $data['mail'] ?? $data['userPrincipalName'] ?? null,
+            'name' => $data['displayName'] ?? ($data['givenName'] ?? 'User'),
         ];
     }
 
@@ -604,8 +698,223 @@ class OAuthService
      * @param string $provider The OAuth provider.
      * @return string
      */
-    private function getCallbackUrl(string $provider): string
+    /**
+     * Get the callback URL for a provider.
+     *
+     * Supports both legacy web routes (/auth/{provider}/callback) and
+     * API v2 routes (/api/v2/auth/oauth/{provider}/callback).
+     *
+     * @param string $provider The OAuth provider.
+     * @param bool $apiV2 Whether to use the API v2 callback route.
+     * @return string
+     */
+    private function getCallbackUrl(string $provider, bool $apiV2 = false): string
     {
+        if ($apiV2) {
+            return rtrim((string)env('APP_URL', 'http://localhost:8765'), '/')
+                . "/api/v2/auth/oauth/{$provider}/callback";
+        }
+
         return \Cake\Routing\Router::url("/auth/{$provider}/callback", true);
+    }
+
+    /**
+     * Get the authorization URL for use from the API v2 (Angular frontend).
+     *
+     * Uses API v2 callback URLs instead of web callback URLs.
+     *
+     * @param string $provider The OAuth provider.
+     * @param \Cake\Http\Session|null $session The session to store OAuth state in.
+     * @return string|null The authorization URL, or null if provider is not configured.
+     */
+    public function getApiAuthorizationUrl(string $provider, ?Session $session = null): ?string
+    {
+        if (!$this->isValidProvider($provider)) {
+            return null;
+        }
+
+        $clientIdVar = strtoupper($provider) . '_CLIENT_ID';
+        if (empty(env($clientIdVar, ''))) {
+            return null;
+        }
+
+        $state = bin2hex(random_bytes(16));
+        if ($session) {
+            $session->write('oauth_state', $state);
+        }
+
+        $redirectUri = rtrim((string)env('APP_URL', 'http://localhost:8765'), '/')
+            . "/api/v2/auth/oauth/{$provider}/callback";
+
+        return match ($provider) {
+            self::PROVIDER_GOOGLE => self::GOOGLE_AUTH_URL . '?' . http_build_query([
+                'client_id' => env('GOOGLE_CLIENT_ID', ''),
+                'redirect_uri' => $redirectUri,
+                'response_type' => 'code',
+                'scope' => 'openid email profile',
+                'access_type' => 'offline',
+                'prompt' => 'select_account',
+                'state' => $state,
+            ]),
+            self::PROVIDER_GITHUB => self::GITHUB_AUTH_URL . '?' . http_build_query([
+                'client_id' => env('GITHUB_CLIENT_ID', ''),
+                'redirect_uri' => $redirectUri,
+                'scope' => 'user:email read:user',
+                'state' => $state,
+            ]),
+            self::PROVIDER_MICROSOFT => self::MICROSOFT_AUTH_URL . '?' . http_build_query([
+                'client_id' => env('MICROSOFT_CLIENT_ID', ''),
+                'redirect_uri' => $redirectUri,
+                'response_type' => 'code',
+                'response_mode' => 'query',
+                'scope' => 'openid profile email User.Read',
+                'state' => $state,
+            ]),
+            default => null,
+        };
+    }
+
+    /**
+     * Handle the OAuth callback for API v2 routes.
+     *
+     * Accepts a custom redirect_uri to match the one used in the authorization URL.
+     *
+     * @param string $provider The OAuth provider.
+     * @param array $params Parameters including 'code' and 'redirect_uri'.
+     * @return \App\Model\Entity\User|null
+     */
+    public function handleApiCallback(string $provider, array $params): ?User
+    {
+        try {
+            $code = $params['code'] ?? null;
+            if (empty($code)) {
+                $this->log('OAuth API callback missing authorization code', 'warning');
+                return null;
+            }
+
+            $redirectUri = $params['redirect_uri'] ?? '';
+
+            // Exchange code for access token with the API v2 redirect_uri
+            $accessToken = $this->exchangeCodeForTokenWithUri($provider, $code, $redirectUri);
+            if (empty($accessToken)) {
+                $this->log("OAuth API token exchange failed for provider: {$provider}", 'error');
+                return null;
+            }
+
+            // Fetch user info from provider
+            $providerUser = $this->fetchUserInfo($provider, $accessToken);
+            if (empty($providerUser) || empty($providerUser['email'])) {
+                $this->log("OAuth API user info fetch failed for provider: {$provider}", 'error');
+                return null;
+            }
+
+            // Find or create user
+            return $this->findOrCreateUser($provider, $providerUser);
+        } catch (\Exception $e) {
+            $this->log("OAuth API callback error for {$provider}: {$e->getMessage()}", 'error');
+            return null;
+        }
+    }
+
+    /**
+     * Exchange authorization code for token with a custom redirect_uri.
+     *
+     * @param string $provider The OAuth provider.
+     * @param string $code The authorization code.
+     * @param string $redirectUri The redirect URI used in the authorization request.
+     * @return string|null The access token.
+     */
+    private function exchangeCodeForTokenWithUri(string $provider, string $code, string $redirectUri): ?string
+    {
+        return match ($provider) {
+            self::PROVIDER_GOOGLE => $this->exchangeTokenWithUri(
+                self::GOOGLE_TOKEN_URL,
+                env('GOOGLE_CLIENT_ID', ''),
+                env('GOOGLE_CLIENT_SECRET', ''),
+                $code,
+                $redirectUri
+            ),
+            self::PROVIDER_GITHUB => $this->exchangeGitHubTokenWithUri($code, $redirectUri),
+            self::PROVIDER_MICROSOFT => $this->exchangeTokenWithUri(
+                self::MICROSOFT_TOKEN_URL,
+                env('MICROSOFT_CLIENT_ID', ''),
+                env('MICROSOFT_CLIENT_SECRET', ''),
+                $code,
+                $redirectUri,
+                'openid profile email User.Read'
+            ),
+            default => null,
+        };
+    }
+
+    /**
+     * Generic token exchange with custom redirect_uri (for Google, Microsoft).
+     *
+     * @param string $tokenUrl The token endpoint URL.
+     * @param string $clientId The client ID.
+     * @param string $clientSecret The client secret.
+     * @param string $code The authorization code.
+     * @param string $redirectUri The redirect URI.
+     * @param string|null $scope Optional scope parameter.
+     * @return string|null
+     */
+    private function exchangeTokenWithUri(
+        string $tokenUrl,
+        string $clientId,
+        string $clientSecret,
+        string $code,
+        string $redirectUri,
+        ?string $scope = null,
+    ): ?string {
+        $params = [
+            'client_id' => $clientId,
+            'client_secret' => $clientSecret,
+            'code' => $code,
+            'grant_type' => 'authorization_code',
+            'redirect_uri' => $redirectUri,
+        ];
+        if ($scope) {
+            $params['scope'] = $scope;
+        }
+
+        $response = $this->httpClient->post($tokenUrl, $params);
+
+        if (!$response->isOk()) {
+            $this->log("Token exchange failed at {$tokenUrl}: " . $response->getStringBody(), 'error');
+            return null;
+        }
+
+        $data = $response->getJson();
+        return $data['access_token'] ?? null;
+    }
+
+    /**
+     * Exchange GitHub token with custom redirect_uri.
+     *
+     * @param string $code The authorization code.
+     * @param string $redirectUri The redirect URI.
+     * @return string|null
+     */
+    private function exchangeGitHubTokenWithUri(string $code, string $redirectUri): ?string
+    {
+        $response = $this->httpClient->post(self::GITHUB_TOKEN_URL, json_encode([
+            'client_id' => env('GITHUB_CLIENT_ID', ''),
+            'client_secret' => env('GITHUB_CLIENT_SECRET', ''),
+            'code' => $code,
+            'redirect_uri' => $redirectUri,
+        ]), [
+            'headers' => [
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+            ],
+        ]);
+
+        if (!$response->isOk()) {
+            $this->log('GitHub token exchange failed: ' . $response->getStringBody(), 'error');
+            return null;
+        }
+
+        $data = $response->getJson();
+        return $data['access_token'] ?? null;
     }
 }

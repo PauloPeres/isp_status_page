@@ -88,6 +88,23 @@ export class AuthService {
     return false;
   }
 
+  async fetchMe(): Promise<void> {
+    const response = await this.http
+      .get<any>(`${environment.apiUrl}/auth/me`)
+      .toPromise();
+    if (response?.success) {
+      this.currentUser.set(response.data.user);
+      this.currentOrg.set(response.data.organizations?.[0] || null);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+      if (response.data.organizations?.[0]) {
+        localStorage.setItem(
+          'organization',
+          JSON.stringify(response.data.organizations[0]),
+        );
+      }
+    }
+  }
+
   logout(): void {
     this.http
       .post(`${environment.apiUrl}/auth/logout`, {

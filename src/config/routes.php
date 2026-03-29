@@ -491,6 +491,18 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/auth/me', ['controller' => 'Auth', 'action' => 'me', 'prefix' => 'Api/V2', '_method' => 'GET']);
         $builder->connect('/auth/switch-org', ['controller' => 'Auth', 'action' => 'switchOrg', 'prefix' => 'Api/V2', '_method' => 'POST']);
 
+        // --- OAuth (no JWT required) ---
+        $builder->connect(
+            '/auth/oauth/{provider}/redirect',
+            ['controller' => 'OAuth', 'action' => 'redirect', 'prefix' => 'Api/V2'],
+            ['pass' => ['provider'], 'provider' => '(google|github|microsoft)']
+        );
+        $builder->connect(
+            '/auth/oauth/{provider}/callback',
+            ['controller' => 'OAuth', 'action' => 'callback', 'prefix' => 'Api/V2'],
+            ['pass' => ['provider'], 'provider' => '(google|github|microsoft)']
+        );
+
         // --- Dashboard (TASK-NG-003) ---
         $builder->connect('/dashboard/summary', ['controller' => 'Dashboard', 'action' => 'summary', 'prefix' => 'Api/V2', '_method' => 'GET']);
         $builder->connect('/dashboard/uptime', ['controller' => 'Dashboard', 'action' => 'uptime', 'prefix' => 'Api/V2', '_method' => 'GET']);

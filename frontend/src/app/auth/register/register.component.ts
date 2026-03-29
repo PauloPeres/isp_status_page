@@ -9,7 +9,10 @@ import {
   IonSpinner,
   IonText,
   IonCheckbox,
+  IonIcon,
 } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { logoGoogle, logoMicrosoft } from 'ionicons/icons';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../core/services/auth.service';
 import { environment } from '../../../environments/environment';
@@ -25,6 +28,7 @@ import { environment } from '../../../environments/environment';
     IonSpinner,
     IonText,
     IonCheckbox,
+    IonIcon,
     FormsModule,
     RouterLink,
   ],
@@ -36,6 +40,18 @@ import { environment } from '../../../environments/environment';
             <h1>ISP Status</h1>
             <p>Create your free account</p>
           </div>
+
+          <div class="oauth-buttons">
+            <ion-button expand="block" fill="outline" (click)="onOAuth('google')" class="oauth-google">
+              <ion-icon name="logo-google" slot="start"></ion-icon>
+              Sign up with Google
+            </ion-button>
+            <ion-button expand="block" fill="outline" (click)="onOAuth('microsoft')" class="oauth-microsoft">
+              <ion-icon name="logo-microsoft" slot="start"></ion-icon>
+              Sign up with Microsoft
+            </ion-button>
+          </div>
+          <div class="divider">or create an account with email</div>
 
           <form (ngSubmit)="onRegister()">
             <ion-item>
@@ -186,6 +202,30 @@ import { environment } from '../../../environments/environment';
         text-decoration: none;
         font-weight: 600;
       }
+      .oauth-buttons {
+        margin-bottom: 1rem;
+      }
+      .oauth-buttons ion-button {
+        margin-top: 0;
+        margin-bottom: 8px;
+        --border-radius: 8px;
+        height: 44px;
+        font-weight: 500;
+      }
+      .oauth-google {
+        --border-color: #4285f4;
+        --color: #4285f4;
+      }
+      .oauth-microsoft {
+        --border-color: #00a4ef;
+        --color: #00a4ef;
+      }
+      .divider {
+        text-align: center;
+        margin: 1rem 0;
+        color: var(--ion-color-medium);
+        font-size: 0.85rem;
+      }
     `,
   ],
 })
@@ -203,7 +243,24 @@ export class RegisterComponent {
     private http: HttpClient,
     private auth: AuthService,
     private router: Router,
-  ) {}
+  ) {
+    addIcons({ logoGoogle, logoMicrosoft });
+  }
+
+  async onOAuth(provider: string) {
+    try {
+      const response = await this.http
+        .get<any>(`${environment.apiUrl}/auth/oauth/${provider}/redirect`)
+        .toPromise();
+      if (response?.success && response.data?.authorization_url) {
+        window.location.href = response.data.authorization_url;
+      } else {
+        this.errorMessage = `${provider} login is not configured`;
+      }
+    } catch {
+      this.errorMessage = `Unable to connect to ${provider}`;
+    }
+  }
 
   async onRegister() {
     this.errorMessage = '';
