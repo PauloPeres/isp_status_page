@@ -21,7 +21,7 @@
     <meta name="description" content="<?= __('Real-time status page for internet services') ?>">
     <meta name="robots" content="index, follow">
 
-    <?= $this->Html->css(['public']) ?>
+    <?= $this->Html->css(['design-tokens', 'public']) ?>
     <?= $this->fetch('meta') ?>
     <?= $this->fetch('css') ?>
 </head>
