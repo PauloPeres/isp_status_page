@@ -59,6 +59,9 @@ addIcons({ walletOutline, checkmarkCircleOutline, starOutline, rocketOutline });
                 {{ credits()!.monthly_grant }} credits/month included in your plan
               </p>
             }
+            <ion-button fill="outline" style="margin-top: 12px" (click)="onBuyCredits()">
+              Buy Credits
+            </ion-button>
           </ion-card-content>
         </ion-card>
 
@@ -149,6 +152,19 @@ export class BillingComponent implements OnInit {
   onRefresh(event: any): void {
     this.loadAll();
     setTimeout(() => event.target.complete(), 1000);
+  }
+
+  async onBuyCredits(): Promise<void> {
+    this.service.buyCredits(100).subscribe({
+      next: (res: any) => {
+        if (res?.checkout_url) window.location.href = res.checkout_url;
+      },
+      error: async (err: any) => {
+        const msg = err.error?.message || 'Stripe is not configured. Contact support.';
+        const toast = await this.toastCtrl.create({ message: msg, color: 'warning', duration: 3000, position: 'bottom' });
+        await toast.present();
+      },
+    });
   }
 
   async onUpgrade(plan: Plan): Promise<void> {

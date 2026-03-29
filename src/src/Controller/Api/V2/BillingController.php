@@ -57,6 +57,12 @@ class BillingController extends AppController
             $service = new \App\Service\BillingService();
             $session = $service->createCheckoutSession($this->currentOrgId, $planSlug);
 
+            if (empty($session)) {
+                $this->error('Stripe is not configured. Contact support to upgrade your plan.', 422);
+
+                return;
+            }
+
             $this->success(['checkout_url' => $session]);
         } catch (\Exception $e) {
             $this->error('Failed to create checkout session: ' . $e->getMessage(), 422);
@@ -135,6 +141,44 @@ class BillingController extends AppController
             $this->success(['credits' => $credits]);
         } catch (\Exception $e) {
             $this->error('Failed to fetch credits: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * POST /api/v2/billing/credits/buy
+     *
+     * Create a Stripe checkout session for purchasing notification credits.
+     *
+     * @return void
+     */
+    public function buyCredits(): void
+    {
+        $this->request->allowMethod(['post']);
+
+        if (!$this->requireRole(['owner'])) {
+            return;
+        }
+
+        $amount = (int)$this->request->getData('amount', 100);
+        if ($amount <= 0) {
+            $this->error('Amount must be greater than 0', 400);
+
+            return;
+        }
+
+        try {
+            $creditService = new \App\Service\Billing\NotificationCreditService();
+            $checkoutUrl = $creditService->purchaseCredits($this->currentOrgId, $amount);
+
+            if ($checkoutUrl === null) {
+                $this->error('Stripe is not configured. Contact support to purchase credits.', 422);
+
+                return;
+            }
+
+            $this->success(['checkout_url' => $checkoutUrl]);
+        } catch (\Exception $e) {
+            $this->error('Failed to create credit purchase session: ' . $e->getMessage(), 422);
         }
     }
 }

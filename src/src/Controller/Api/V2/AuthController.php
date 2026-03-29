@@ -6,6 +6,7 @@ namespace App\Controller\Api\V2;
 use App\Service\JwtService;
 use App\Service\TwoFactorService;
 use Cake\I18n\DateTime;
+use Cake\Validation\Validator;
 
 /**
  * AuthController
@@ -15,6 +16,130 @@ use Cake\I18n\DateTime;
  */
 class AuthController extends AppController
 {
+    /**
+     * POST /api/v2/auth/register
+     *
+     * Create a new user account with an organization.
+     * Returns JWT tokens on success so the user is immediately logged in.
+     *
+     * @return void
+     */
+    public function register(): void
+    {
+        $this->request->allowMethod(['post']);
+
+        $data = $this->request->getData();
+        $username = trim((string)($data['username'] ?? ''));
+        $email = trim((string)($data['email'] ?? ''));
+        $password = (string)($data['password'] ?? '');
+
+        if (empty($username) || empty($email) || empty($password)) {
+            $this->error('Username, email, and password are required', 422);
+
+            return;
+        }
+
+        if (strlen($password) < 8) {
+            $this->error('Password must be at least 8 characters', 422);
+
+            return;
+        }
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $this->error('Invalid email address', 422);
+
+            return;
+        }
+
+        // Check for existing user
+        $usersTable = $this->fetchTable('Users');
+        $existing = $usersTable->find()
+            ->where(['OR' => ['Users.email' => $email, 'Users.username' => $username]])
+            ->first();
+
+        if ($existing) {
+            $field = $existing->email === $email ? 'email' : 'username';
+            $this->error("A user with this {$field} already exists", 422);
+
+            return;
+        }
+
+        // Create user
+        $user = $usersTable->newEntity([
+            'username' => $username,
+            'email' => $email,
+            'password' => $password,
+        ]);
+        $user->set('role', 'admin');
+        $user->set('active', true);
+        $user->set('email_verified', true);
+
+        if (!$usersTable->save($user)) {
+            $this->error('Registration failed', 422, $user->getErrors());
+
+            return;
+        }
+
+        // Create organization
+        $orgsTable = $this->fetchTable('Organizations');
+        $slug = strtolower(preg_replace('/[^a-z0-9]/', '-', $username));
+        $org = $orgsTable->newEntity([
+            'name' => $username . "'s Organization",
+            'slug' => $slug . '-' . substr(bin2hex(random_bytes(3)), 0, 6),
+            'plan' => 'free',
+            'active' => true,
+        ]);
+
+        if (!$orgsTable->save($org)) {
+            // Rollback user creation
+            $usersTable->delete($user);
+            $this->error('Failed to create organization', 500);
+
+            return;
+        }
+
+        // Link user to org
+        $orgUsersTable = $this->fetchTable('OrganizationUsers');
+        $orgUser = $orgUsersTable->newEntity([
+            'organization_id' => $org->id,
+            'user_id' => $user->id,
+            'role' => 'owner',
+            'accepted_at' => DateTime::now(),
+        ]);
+        $orgUsersTable->save($orgUser);
+
+        // Generate tokens
+        $jwtService = new JwtService();
+        $accessToken = $jwtService->generateAccessToken(
+            $user->id,
+            $org->id,
+            'owner',
+            false
+        );
+        $refreshToken = $jwtService->generateRefreshToken(
+            $user->id,
+            $this->request->clientIp(),
+            $this->request->getHeaderLine('User-Agent')
+        );
+
+        $this->success([
+            'access_token' => $accessToken,
+            'refresh_token' => $refreshToken,
+            'token_type' => 'Bearer',
+            'expires_in' => $jwtService->getAccessTokenTtl(),
+            'user' => [
+                'id' => $user->id,
+                'username' => $user->username,
+                'email' => $user->email,
+                'is_super_admin' => false,
+            ],
+            'organization' => [
+                'id' => $org->id,
+                'role' => 'owner',
+            ],
+        ], 201);
+    }
+
     /**
      * POST /api/v2/auth/login
      *

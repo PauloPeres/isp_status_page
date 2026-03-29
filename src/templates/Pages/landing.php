@@ -23,8 +23,8 @@
             <a href="#features">Features</a>
             <a href="#pricing">Pricing</a>
             <a href="/status" class="nav-link-subtle">Status</a>
-            <a href="/users/login" class="nav-btn nav-btn-outline">Sign In</a>
-            <a href="/register" class="nav-btn nav-btn-primary">Start Free</a>
+            <a href="/app/login" class="nav-btn nav-btn-outline">Sign In</a>
+            <a href="/app/register" class="nav-btn nav-btn-primary">Start Free</a>
         </div>
         <button class="nav-toggle" aria-label="Toggle navigation" onclick="document.querySelector('.nav-links').classList.toggle('nav-links-open')">
             <span></span><span></span><span></span>
@@ -38,7 +38,7 @@
         <h1>Monitor Your Infrastructure.<br>Know When Things Go Down.</h1>
         <p class="hero-subtitle">Real-time uptime monitoring, beautiful status pages, and instant alerts. Free to start.</p>
         <div class="hero-actions">
-            <a href="/register" class="btn btn-hero-primary">Start Free</a>
+            <a href="/app/register" class="btn btn-hero-primary">Start Free</a>
             <a href="/status" class="btn btn-hero-secondary">View Demo</a>
         </div>
         <p class="hero-note">No credit card required. Monitor up to 5 services free.</p>
@@ -124,7 +124,7 @@
                     <li>24-hour data retention</li>
                     <li>Community support</li>
                 </ul>
-                <a href="/register" class="btn btn-pricing">Start Free</a>
+                <a href="/app/register" class="btn btn-pricing">Start Free</a>
             </div>
 
             <!-- Pro Plan -->
@@ -148,7 +148,7 @@
                     <li>API access</li>
                     <li>Priority support</li>
                 </ul>
-                <a href="/register" class="btn btn-pricing-featured">Start Free Trial</a>
+                <a href="/app/register" class="btn btn-pricing-featured">Start Free Trial</a>
             </div>
 
             <!-- Business Plan -->
@@ -173,7 +173,7 @@
                     <li>SSO / SAML</li>
                     <li>Dedicated support</li>
                 </ul>
-                <a href="/register" class="btn btn-pricing">Start Free Trial</a>
+                <a href="/app/register" class="btn btn-pricing">Start Free Trial</a>
             </div>
         </div>
     </div>
@@ -196,8 +196,8 @@
             </div>
             <div class="footer-links">
                 <h4>Account</h4>
-                <a href="/users/login">Sign In</a>
-                <a href="/register">Register</a>
+                <a href="/app/login">Sign In</a>
+                <a href="/app/register">Register</a>
             </div>
             <div class="footer-links">
                 <h4>Legal</h4>

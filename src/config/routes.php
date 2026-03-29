@@ -483,7 +483,8 @@ return function (RouteBuilder $routes): void {
     $routes->scope('/api/v2', function (RouteBuilder $builder): void {
         $builder->setExtensions(['json']);
 
-        // --- Auth (no JWT required for login/refresh) ---
+        // --- Auth (no JWT required for login/refresh/register) ---
+        $builder->connect('/auth/register', ['controller' => 'Auth', 'action' => 'register', 'prefix' => 'Api/V2', '_method' => 'POST']);
         $builder->connect('/auth/login', ['controller' => 'Auth', 'action' => 'login', 'prefix' => 'Api/V2', '_method' => 'POST']);
         $builder->connect('/auth/refresh', ['controller' => 'Auth', 'action' => 'refresh', 'prefix' => 'Api/V2', '_method' => 'POST']);
         $builder->connect('/auth/logout', ['controller' => 'Auth', 'action' => 'logout', 'prefix' => 'Api/V2', '_method' => 'POST']);
@@ -570,6 +571,7 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/billing/portal', ['controller' => 'Billing', 'action' => 'portal', 'prefix' => 'Api/V2', '_method' => 'POST']);
         $builder->connect('/billing/usage', ['controller' => 'Billing', 'action' => 'usage', 'prefix' => 'Api/V2', '_method' => 'GET']);
         $builder->connect('/billing/credits', ['controller' => 'Billing', 'action' => 'credits', 'prefix' => 'Api/V2', '_method' => 'GET']);
+        $builder->connect('/billing/credits/buy', ['controller' => 'Billing', 'action' => 'buyCredits', 'prefix' => 'Api/V2', '_method' => 'POST']);
 
         // Users (Team)
         $builder->connect('/users', ['controller' => 'Users', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);

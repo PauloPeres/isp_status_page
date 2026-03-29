@@ -30,6 +30,7 @@ class JwtAuthMiddleware implements MiddlewareInterface
     private const EXCLUDED_PATHS = [
         '/api/v2/auth/login',
         '/api/v2/auth/refresh',
+        '/api/v2/auth/register',
     ];
 
     /**

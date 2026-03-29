@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import {
   IonContent,
   IonItem,
@@ -22,6 +22,7 @@ import { AuthService } from '../../core/services/auth.service';
     IonSpinner,
     IonText,
     FormsModule,
+    RouterLink,
   ],
   template: `
     <ion-content class="ion-padding" [fullscreen]="true">
@@ -83,6 +84,11 @@ import { AuthService } from '../../core/services/auth.service';
               }
             </ion-button>
           </form>
+
+          <p class="register-link">
+            Don't have an account?
+            <a routerLink="/register">Create one free</a>
+          </p>
         </div>
       </div>
     </ion-content>
@@ -124,6 +130,17 @@ import { AuthService } from '../../core/services/auth.service';
         margin-top: 1.5rem;
         --border-radius: 8px;
         height: 48px;
+        font-weight: 600;
+      }
+      .register-link {
+        text-align: center;
+        margin-top: 1.5rem;
+        color: var(--ion-color-medium);
+        font-size: 0.9rem;
+      }
+      .register-link a {
+        color: var(--ion-color-primary);
+        text-decoration: none;
         font-weight: 600;
       }
     `,
