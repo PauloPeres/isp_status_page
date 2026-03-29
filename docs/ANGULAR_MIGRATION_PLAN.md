@@ -69,7 +69,7 @@ ALL admin functionality (~20 feature areas, ~110 API endpoints)
 - TASK-NG-026: Routing Configuration (lazy-loaded feature routes) -- COMPLETED (2026-03-29)
 
 ### Phase 3: Feature Modules (19 tasks)
-- TASK-NG-030: Dashboard
+- TASK-NG-030: Dashboard -- COMPLETED (2026-03-29)
 - TASK-NG-031: Monitors (largest — dynamic forms for 9 monitor types)
 - TASK-NG-032: Incidents + Timeline
 - TASK-NG-033: Checks
