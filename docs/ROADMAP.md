@@ -91,7 +91,7 @@
 
 | # | Task | Complexity | Description |
 |---|------|-----------|-------------|
-| A-01 | Real-time updates (SSE) | Medium | Server-Sent Events for live dashboard/monitor status updates without refresh |
+| ~~A-01~~ | ~~Real-time updates (SSE)~~ | ~~Medium~~ | ~~Server-Sent Events for live dashboard/monitor status updates without refresh~~ **DONE** |
 | A-02 | Angular onboarding wizard | Medium | Step-by-step guide after registration (org setup → first monitor → invite team) |
 | A-03 | Angular dark mode toggle | Small | Wire Ionic dark mode toggle in settings/navbar |
 | A-04 | Improve form validation | Small | Better error messages, field-level validation in all Angular forms |

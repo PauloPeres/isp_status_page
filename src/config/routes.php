@@ -638,6 +638,9 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/2fa/disable', ['controller' => 'TwoFactor', 'action' => 'disable', 'prefix' => 'Api/V2', '_method' => 'POST']);
         $builder->connect('/2fa/recovery-codes', ['controller' => 'TwoFactor', 'action' => 'recoveryCodes', 'prefix' => 'Api/V2', '_method' => ['GET', 'POST']]);
 
+        // SSE Events Stream (A-01)
+        $builder->connect('/events/stream', ['controller' => 'Events', 'action' => 'stream', 'prefix' => 'Api/V2', '_method' => 'GET']);
+
         // Activity Log
         $builder->connect('/activity-log', ['controller' => 'ActivityLog', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
 

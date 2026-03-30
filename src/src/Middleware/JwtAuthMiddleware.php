@@ -73,12 +73,21 @@ class JwtAuthMiddleware implements MiddlewareInterface
         }
 
         // Extract Bearer token from Authorization header
+        $token = null;
         $authHeader = $request->getHeaderLine('Authorization');
-        if (!str_starts_with($authHeader, 'Bearer ')) {
-            return $this->unauthorized('Missing or invalid Authorization header. Use: Bearer {token}');
+        if (str_starts_with($authHeader, 'Bearer ')) {
+            $token = substr($authHeader, 7);
         }
 
-        $token = substr($authHeader, 7);
+        // Also check query param (for SSE — EventSource doesn't support custom headers)
+        if (!$token) {
+            $queryParams = $request->getQueryParams();
+            $token = $queryParams['token'] ?? null;
+        }
+
+        if (!$token) {
+            return $this->unauthorized('Missing or invalid Authorization header. Use: Bearer {token}');
+        }
 
         // Verify JWT
         $jwtService = new JwtService();

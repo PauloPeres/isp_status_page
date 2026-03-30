@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   IonHeader,
@@ -22,6 +22,7 @@ import {
   IonSkeletonText,
   IonRefresher,
   IonRefresherContent,
+  ToastController,
 } from '@ionic/angular/standalone';
 import {
   DashboardService,
@@ -31,7 +32,8 @@ import {
   RecentCheck,
   RecentAlert,
 } from './dashboard.service';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Subscription } from 'rxjs';
+import { SseService } from '../../core/services/sse.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -469,7 +471,7 @@ import { forkJoin } from 'rxjs';
     `,
   ],
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
   summary = signal<DashboardSummary | null>(null);
   uptimeData = signal<UptimeData[]>([]);
   responseTimeData = signal<ResponseTimeData[]>([]);
@@ -480,11 +482,49 @@ export class DashboardComponent implements OnInit {
   skeletonRows = [1, 2, 3, 4, 5];
 
   private maxResponseTime = 2000;
+  private sseSubscription: Subscription | null = null;
 
-  constructor(private dashboardService: DashboardService) {}
+  constructor(
+    private dashboardService: DashboardService,
+    private sseService: SseService,
+    private toastCtrl: ToastController,
+  ) {}
 
   ngOnInit(): void {
     this.loadData();
+    this.connectSSE();
+  }
+
+  ngOnDestroy(): void {
+    this.sseSubscription?.unsubscribe();
+  }
+
+  private connectSSE(): void {
+    this.sseSubscription = this.sseService.connect().subscribe({
+      next: (event) => {
+        if (event.type === 'monitor_status') {
+          // Refresh summary counts when a monitor status changes
+          this.dashboardService
+            .getSummary()
+            .subscribe((data) => this.summary.set(data));
+        }
+        if (event.type === 'incident_created') {
+          this.toastCtrl
+            .create({
+              message: `New incident: ${event.data.title}`,
+              color: 'danger',
+              duration: 5000,
+              position: 'top',
+            })
+            .then((t) => t.present());
+          // Refresh all data
+          this.loadData();
+        }
+      },
+      error: () => {
+        // SSE connection failed — silent fallback to manual refresh
+      },
+    });
   }
 
   loadData(): void {
