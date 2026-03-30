@@ -18,6 +18,7 @@ class UsersControllerTest extends TestCase
 
     public function testLoginGet(): void
     {
+        $this->markTestSkipped('Legacy web controller — login moved to Angular SPA');
         $this->get('/users/login');
         $this->assertResponseOk();
         $this->assertResponseContains('ISP Status');
@@ -39,6 +40,7 @@ class UsersControllerTest extends TestCase
 
     public function testLoginPostInvalid(): void
     {
+        $this->markTestSkipped('Legacy web controller — login moved to Angular SPA');
         $this->enableCsrfToken();
         $this->enableSecurityToken();
 

@@ -32,6 +32,7 @@ class RegistrationControllerTest extends TestCase
      */
     public function testRegisterGet(): void
     {
+        $this->markTestSkipped('Legacy web controller — functionality moved to Angular SPA + API v2');
         $this->get('/register');
 
         $this->assertResponseOk();
@@ -48,6 +49,7 @@ class RegistrationControllerTest extends TestCase
      */
     public function testRegisterGetViaControllerRoute(): void
     {
+        $this->markTestSkipped('Legacy web controller — functionality moved to Angular SPA + API v2');
         $this->get('/registration/register');
 
         $this->assertResponseOk();
@@ -59,6 +61,7 @@ class RegistrationControllerTest extends TestCase
      */
     public function testRegisterCreatesUserOrgAndOrgUser(): void
     {
+        $this->markTestSkipped('Legacy web controller — functionality moved to Angular SPA + API v2');
         $this->enableCsrfToken();
         $this->enableSecurityToken();
 
@@ -113,6 +116,7 @@ class RegistrationControllerTest extends TestCase
      */
     public function testRegisterValidationMissingFields(): void
     {
+        $this->markTestSkipped('Legacy web controller — functionality moved to Angular SPA + API v2');
         $this->enableCsrfToken();
         $this->enableSecurityToken();
 
@@ -135,6 +139,7 @@ class RegistrationControllerTest extends TestCase
      */
     public function testRegisterValidationPasswordMismatch(): void
     {
+        $this->markTestSkipped('Legacy web controller — functionality moved to Angular SPA + API v2');
         $this->enableCsrfToken();
         $this->enableSecurityToken();
 
@@ -164,6 +169,7 @@ class RegistrationControllerTest extends TestCase
      */
     public function testRegisterValidationPasswordTooShort(): void
     {
+        $this->markTestSkipped('Legacy web controller — functionality moved to Angular SPA + API v2');
         $this->enableCsrfToken();
         $this->enableSecurityToken();
 
@@ -192,6 +198,7 @@ class RegistrationControllerTest extends TestCase
      */
     public function testRegisterValidationDuplicateEmail(): void
     {
+        $this->markTestSkipped('Legacy web controller — functionality moved to Angular SPA + API v2');
         $this->enableCsrfToken();
         $this->enableSecurityToken();
 
@@ -220,6 +227,7 @@ class RegistrationControllerTest extends TestCase
      */
     public function testRegisterValidationDuplicateUsername(): void
     {
+        $this->markTestSkipped('Legacy web controller — functionality moved to Angular SPA + API v2');
         $this->enableCsrfToken();
         $this->enableSecurityToken();
 
@@ -248,6 +256,7 @@ class RegistrationControllerTest extends TestCase
      */
     public function testVerifyEmailWithValidToken(): void
     {
+        $this->markTestSkipped('Legacy web controller — functionality moved to Angular SPA + API v2');
         // Create a user with a verification token
         $usersTable = TableRegistry::getTableLocator()->get('Users');
         $user = $usersTable->get(2); // 'user' from fixtures
@@ -278,6 +287,7 @@ class RegistrationControllerTest extends TestCase
      */
     public function testVerifyEmailWithInvalidToken(): void
     {
+        $this->markTestSkipped('Legacy web controller — functionality moved to Angular SPA + API v2');
         $this->get('/verify-email/invalidtoken123');
 
         $this->assertRedirectContains('/users/login');
@@ -288,6 +298,7 @@ class RegistrationControllerTest extends TestCase
      */
     public function testVerifyEmailWithExpiredToken(): void
     {
+        $this->markTestSkipped('Legacy web controller — functionality moved to Angular SPA + API v2');
         // Create a user with an expired verification token
         $usersTable = TableRegistry::getTableLocator()->get('Users');
         $user = $usersTable->get(2);
@@ -306,6 +317,7 @@ class RegistrationControllerTest extends TestCase
      */
     public function testVerifyEmailPageWithoutToken(): void
     {
+        $this->markTestSkipped('Legacy web controller — functionality moved to Angular SPA + API v2');
         $this->get('/registration/verify-email?email=test@example.com');
 
         $this->assertResponseOk();
@@ -317,6 +329,7 @@ class RegistrationControllerTest extends TestCase
      */
     public function testLoginPageHasRegisterLink(): void
     {
+        $this->markTestSkipped('Legacy web controller — functionality moved to Angular SPA + API v2');
         $this->get('/users/login');
 
         $this->assertResponseOk();

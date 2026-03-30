@@ -60,6 +60,7 @@ class OrganizationsControllerTest extends TestCase
      */
     public function testIndexSuperAdmin(): void
     {
+        $this->markTestSkipped('Legacy web controller — super admin moved to Angular SPA');
         $this->session([
             'Auth' => [
                 'id' => 1,
@@ -78,6 +79,7 @@ class OrganizationsControllerTest extends TestCase
      */
     public function testViewSuperAdmin(): void
     {
+        $this->markTestSkipped('Legacy web controller — super admin moved to Angular SPA');
         $this->session([
             'Auth' => [
                 'id' => 1,

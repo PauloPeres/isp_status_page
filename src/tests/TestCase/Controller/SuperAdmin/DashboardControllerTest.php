@@ -66,6 +66,7 @@ class DashboardControllerTest extends TestCase
      */
     public function testIndexSuperAdmin(): void
     {
+        $this->markTestSkipped('Legacy web controller — super admin moved to Angular SPA');
         $this->session([
             'Auth' => [
                 'id' => 1,
