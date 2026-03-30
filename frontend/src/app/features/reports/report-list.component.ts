@@ -149,10 +149,10 @@ export class ReportListComponent {
         a.click();
         URL.revokeObjectURL(url);
       },
-      error: async () => {
+      error: async (err: any) => {
         this.downloading.set(null);
         const toast = await this.toastCtrl.create({
-          message: 'Failed to download report', color: 'danger', duration: 3000, position: 'bottom',
+          message: err?.message || 'Failed to download report', color: 'danger', duration: 4000, position: 'bottom',
         });
         await toast.present();
       },

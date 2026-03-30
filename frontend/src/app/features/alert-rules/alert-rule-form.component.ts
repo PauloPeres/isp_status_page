@@ -9,12 +9,13 @@ import {
 } from '@ionic/angular/standalone';
 import { AlertRuleService } from './alert-rule.service';
 import { MonitorService } from '../monitors/monitor.service';
+import { FieldErrorComponent } from '../../shared/components/field-error.component';
 
 @Component({
   selector: 'app-alert-rule-form',
   standalone: true,
   imports: [
-    CommonModule, ReactiveFormsModule,
+    CommonModule, ReactiveFormsModule, FieldErrorComponent,
     IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonBackButton, IonButton,
     IonList, IonItem, IonInput, IonSelect, IonSelectOption, IonToggle, IonNote, IonSpinner,
   ],
@@ -43,6 +44,7 @@ import { MonitorService } from '../monitors/monitor.service';
           <ion-item>
             <ion-input label="Name" labelPlacement="stacked" placeholder="Alert rule name" formControlName="name" required></ion-input>
           </ion-item>
+          <app-field-error [control]="form.get('name')" label="Name"></app-field-error>
 
           <ion-item>
             <ion-select label="Monitor" labelPlacement="stacked" formControlName="monitor_id" interface="popover">
@@ -64,8 +66,12 @@ import { MonitorService } from '../monitors/monitor.service';
           <ion-item>
             <ion-select label="Channel" labelPlacement="stacked" formControlName="channel" interface="popover">
               <ion-select-option value="email">Email</ion-select-option>
-              <ion-select-option value="sms">SMS</ion-select-option>
+              <ion-select-option value="slack">Slack</ion-select-option>
+              <ion-select-option value="discord">Discord</ion-select-option>
               <ion-select-option value="telegram">Telegram</ion-select-option>
+              <ion-select-option value="sms">SMS</ion-select-option>
+              <ion-select-option value="pagerduty">PagerDuty</ion-select-option>
+              <ion-select-option value="opsgenie">OpsGenie</ion-select-option>
               <ion-select-option value="webhook">Webhook</ion-select-option>
             </ion-select>
           </ion-item>
@@ -73,10 +79,12 @@ import { MonitorService } from '../monitors/monitor.service';
           <ion-item>
             <ion-input label="Recipients" labelPlacement="stacked" placeholder="email1&#64;example.com, email2&#64;example.com" formControlName="recipients_raw"></ion-input>
           </ion-item>
+          <app-field-error [control]="form.get('recipients_raw')" label="Recipients"></app-field-error>
 
           <ion-item>
             <ion-input label="Cooldown (minutes)" labelPlacement="stacked" formControlName="cooldown_minutes" type="number" placeholder="5"></ion-input>
           </ion-item>
+          <app-field-error [control]="form.get('cooldown_minutes')" label="Cooldown"></app-field-error>
 
           <ion-item>
             <ion-toggle formControlName="active">Active</ion-toggle>
@@ -140,6 +148,7 @@ export class AlertRuleFormComponent implements OnInit {
   }
 
   onSave(): void {
+    this.form.markAllAsTouched();
     if (this.form.invalid) return;
     this.saving.set(true);
 
@@ -165,9 +174,9 @@ export class AlertRuleFormComponent implements OnInit {
         await toast.present();
         this.router.navigate(['/alert-rules']);
       },
-      error: async () => {
+      error: async (err: any) => {
         this.saving.set(false);
-        const toast = await this.toastCtrl.create({ message: 'Failed to save', color: 'danger', duration: 3000, position: 'bottom' });
+        const toast = await this.toastCtrl.create({ message: err?.message || 'Failed to save', color: 'danger', duration: 4000, position: 'bottom' });
         await toast.present();
       },
     });

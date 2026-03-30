@@ -5,10 +5,11 @@ import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonBackButton, IonButton,
   IonList, IonItem, IonItemSliding, IonItemOptions, IonItemOption,
   IonLabel, IonBadge, IonNote, IonIcon, IonInput, IonSelect, IonSelectOption,
-  IonRefresher, IonRefresherContent, IonSpinner,
+  IonRefresher, IonRefresherContent, IonSpinner, IonSearchbar,
   AlertController, ToastController,
 } from '@ionic/angular/standalone';
 import { UserService, Invitation } from '../users/user.service';
+import { ListSkeletonComponent } from '../../shared/components/list-skeleton.component';
 import { addIcons } from 'ionicons';
 import { mailOutline } from 'ionicons/icons';
 
@@ -22,7 +23,8 @@ addIcons({ mailOutline });
     IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonBackButton, IonButton,
     IonList, IonItem, IonItemSliding, IonItemOptions, IonItemOption,
     IonLabel, IonBadge, IonNote, IonIcon, IonInput, IonSelect, IonSelectOption,
-    IonRefresher, IonRefresherContent, IonSpinner,
+    IonRefresher, IonRefresherContent, IonSpinner, IonSearchbar,
+    ListSkeletonComponent,
   ],
   template: `
     <ion-header>
@@ -31,6 +33,14 @@ addIcons({ mailOutline });
           <ion-back-button defaultHref="/users"></ion-back-button>
         </ion-buttons>
         <ion-title>Invitations</ion-title>
+      </ion-toolbar>
+      <ion-toolbar>
+        <ion-searchbar
+          [(ngModel)]="searchQuery"
+          (ionInput)="onSearch()"
+          placeholder="Search..."
+          [debounce]="300"
+        ></ion-searchbar>
       </ion-toolbar>
     </ion-header>
 
@@ -64,6 +74,9 @@ addIcons({ mailOutline });
       </div>
 
       <!-- Pending invitations -->
+      @if (loading()) {
+        <app-list-skeleton></app-list-skeleton>
+      } @else {
       <ion-list>
         @for (item of items(); track item.id) {
           <ion-item-sliding>
@@ -90,6 +103,7 @@ addIcons({ mailOutline });
           </div>
         }
       </ion-list>
+      }
     </ion-content>
   `,
   styles: [`
@@ -99,6 +113,9 @@ addIcons({ mailOutline });
 })
 export class InvitationListComponent implements OnInit {
   items = signal<Invitation[]>([]);
+  allItems = signal<Invitation[]>([]);
+  loading = signal(true);
+  searchQuery = '';
   newEmail = '';
   newRole = 'member';
   sending = signal(false);
@@ -112,14 +129,39 @@ export class InvitationListComponent implements OnInit {
   ngOnInit(): void { this.load(); }
 
   load(): void {
-    this.service.getInvitations().subscribe((data) => this.items.set(data.items));
+    this.service.getInvitations().subscribe((data) => {
+      this.allItems.set(data.items);
+      this.applyFilter();
+      this.loading.set(false);
+    });
   }
 
   onRefresh(event: any): void {
     this.service.getInvitations().subscribe({
-      next: (data) => { this.items.set(data.items); event.target.complete(); },
+      next: (data) => {
+        this.allItems.set(data.items);
+        this.applyFilter();
+        event.target.complete();
+      },
       error: () => event.target.complete(),
     });
+  }
+
+  onSearch(): void {
+    this.applyFilter();
+  }
+
+  applyFilter(): void {
+    const query = this.searchQuery.toLowerCase().trim();
+    if (!query) {
+      this.items.set(this.allItems());
+      return;
+    }
+    this.items.set(
+      this.allItems().filter((item) =>
+        item.email.toLowerCase().includes(query)
+      )
+    );
   }
 
   onSend(): void {
@@ -133,9 +175,9 @@ export class InvitationListComponent implements OnInit {
         const toast = await this.toastCtrl.create({ message: 'Invitation sent', color: 'success', duration: 2000, position: 'bottom' });
         await toast.present();
       },
-      error: async () => {
+      error: async (err: any) => {
         this.sending.set(false);
-        const toast = await this.toastCtrl.create({ message: 'Failed to send invitation', color: 'danger', duration: 3000, position: 'bottom' });
+        const toast = await this.toastCtrl.create({ message: err?.message || 'Failed to send invitation', color: 'danger', duration: 4000, position: 'bottom' });
         await toast.present();
       },
     });

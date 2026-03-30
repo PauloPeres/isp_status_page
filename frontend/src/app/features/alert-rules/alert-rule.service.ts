@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ApiService, PaginatedResponse } from '../../core/services/api.service';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 export interface AlertRule {
   id: number;
@@ -21,7 +22,12 @@ export class AlertRuleService {
   constructor(private api: ApiService) {}
 
   getAll(params?: any): Observable<PaginatedResponse<AlertRule>> {
-    return this.api.get<PaginatedResponse<AlertRule>>('/alert-rules', params);
+    return this.api.get<any>('/alert-rules', params).pipe(
+      map(data => ({
+        items: data.alert_rules || data.items || [],
+        pagination: data.pagination || { page: 1, limit: 999, total: (data.alert_rules || data.items || []).length, pages: 1 },
+      }))
+    );
   }
 
   get(id: number): Observable<AlertRule> {

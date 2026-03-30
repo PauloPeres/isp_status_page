@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonBackButton, IonButton,
-  IonList, IonItem, IonInput, IonSelect, IonSelectOption, IonToggle, IonSpinner,
+  IonList, IonItem, IonInput, IonSelect, IonSelectOption, IonToggle, IonSpinner, IonNote,
   ToastController,
 } from '@ionic/angular/standalone';
 import { ScheduledReportService } from './scheduled-report.service';
@@ -15,7 +15,7 @@ import { ScheduledReportService } from './scheduled-report.service';
   imports: [
     CommonModule, FormsModule, RouterLink,
     IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonBackButton, IonButton,
-    IonList, IonItem, IonInput, IonSelect, IonSelectOption, IonToggle, IonSpinner,
+    IonList, IonItem, IonInput, IonSelect, IonSelectOption, IonToggle, IonSpinner, IonNote,
   ],
   template: `
     <ion-header>
@@ -31,6 +31,9 @@ import { ScheduledReportService } from './scheduled-report.service';
         <ion-item>
           <ion-input label="Name" labelPlacement="floating" [(ngModel)]="form.name" name="name" required></ion-input>
         </ion-item>
+        @if (submitted && !form.name) {
+          <ion-note color="danger" class="field-error">Name is required</ion-note>
+        }
         <ion-item>
           <ion-select label="Report Type" labelPlacement="floating" [(ngModel)]="form.report_type" name="report_type">
             <ion-select-option value="uptime">Uptime</ion-select-option>
@@ -47,8 +50,11 @@ import { ScheduledReportService } from './scheduled-report.service';
           </ion-select>
         </ion-item>
         <ion-item>
-          <ion-input label="Recipients (comma-separated)" labelPlacement="floating" [(ngModel)]="form.recipients_text" name="recipients"></ion-input>
+          <ion-input label="Recipients (comma-separated)" labelPlacement="floating" [(ngModel)]="form.recipients_text" name="recipients" required></ion-input>
         </ion-item>
+        @if (submitted && !form.recipients_text) {
+          <ion-note color="danger" class="field-error">At least one recipient is required</ion-note>
+        }
         <ion-item>
           <ion-toggle [(ngModel)]="form.active" name="active">Active</ion-toggle>
         </ion-item>
@@ -59,10 +65,20 @@ import { ScheduledReportService } from './scheduled-report.service';
       </ion-button>
     </ion-content>
   `,
+  styles: [
+    `
+      .field-error {
+        display: block;
+        padding: 4px 16px;
+        font-size: 0.75rem;
+      }
+    `,
+  ],
 })
 export class ScheduledReportFormComponent {
   form: any = { name: '', report_type: 'uptime', frequency: 'weekly', recipients_text: '', active: true };
   saving = false;
+  submitted = false;
 
   constructor(
     private service: ScheduledReportService,
@@ -71,7 +87,8 @@ export class ScheduledReportFormComponent {
   ) {}
 
   onSave(): void {
-    if (!this.form.name) return;
+    this.submitted = true;
+    if (!this.form.name || !this.form.recipients_text) return;
     this.saving = true;
     const payload = {
       name: this.form.name,
@@ -87,9 +104,9 @@ export class ScheduledReportFormComponent {
         await toast.present();
         this.router.navigate(['/scheduled-reports']);
       },
-      error: async () => {
+      error: async (err: any) => {
         this.saving = false;
-        const toast = await this.toastCtrl.create({ message: 'Failed to create report', color: 'danger', duration: 3000, position: 'bottom' });
+        const toast = await this.toastCtrl.create({ message: err?.message || 'Failed to create report', color: 'danger', duration: 4000, position: 'bottom' });
         await toast.present();
       },
     });

@@ -6,10 +6,11 @@ import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonButton,
   IonList, IonItem, IonItemSliding, IonItemOptions, IonItemOption,
   IonLabel, IonBadge, IonIcon,
-  IonRefresher, IonRefresherContent,
+  IonRefresher, IonRefresherContent, IonSearchbar,
   AlertController,
 } from '@ionic/angular/standalone';
 import { EscalationService, EscalationPolicy } from './escalation.service';
+import { ListSkeletonComponent } from '../../shared/components/list-skeleton.component';
 import { addIcons } from 'ionicons';
 import { gitNetworkOutline } from 'ionicons/icons';
 
@@ -23,7 +24,8 @@ addIcons({ gitNetworkOutline });
     IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonButton,
     IonList, IonItem, IonItemSliding, IonItemOptions, IonItemOption,
     IonLabel, IonBadge, IonIcon,
-    IonRefresher, IonRefresherContent,
+    IonRefresher, IonRefresherContent, IonSearchbar,
+    ListSkeletonComponent,
   ],
   template: `
     <ion-header>
@@ -34,6 +36,14 @@ addIcons({ gitNetworkOutline });
           <ion-button routerLink="/escalation/new" fill="solid" color="primary" size="small">+ New Policy</ion-button>
         </ion-buttons>
       </ion-toolbar>
+      <ion-toolbar>
+        <ion-searchbar
+          [(ngModel)]="searchQuery"
+          (ionInput)="onSearch()"
+          placeholder="Search..."
+          [debounce]="300"
+        ></ion-searchbar>
+      </ion-toolbar>
     </ion-header>
 
     <ion-content>
@@ -41,6 +51,9 @@ addIcons({ gitNetworkOutline });
         <ion-refresher-content></ion-refresher-content>
       </ion-refresher>
 
+      @if (loading()) {
+        <app-list-skeleton></app-list-skeleton>
+      } @else {
       <ion-list>
         @for (item of items(); track item.id) {
           <ion-item-sliding>
@@ -70,6 +83,7 @@ addIcons({ gitNetworkOutline });
           </div>
         }
       </ion-list>
+      }
     </ion-content>
   `,
   styles: [`
@@ -79,20 +93,48 @@ addIcons({ gitNetworkOutline });
 })
 export class EscalationPolicyListComponent implements OnInit {
   items = signal<EscalationPolicy[]>([]);
+  allItems = signal<EscalationPolicy[]>([]);
+  loading = signal(true);
+  searchQuery = '';
 
   constructor(private service: EscalationService, private alertCtrl: AlertController) {}
 
   ngOnInit(): void { this.load(); }
 
   load(): void {
-    this.service.getAll().subscribe((data) => this.items.set(data.items));
+    this.service.getAll().subscribe((data) => {
+      this.allItems.set(data.items);
+      this.applyFilter();
+      this.loading.set(false);
+    });
   }
 
   onRefresh(event: any): void {
     this.service.getAll().subscribe({
-      next: (data) => { this.items.set(data.items); event.target.complete(); },
+      next: (data) => {
+        this.allItems.set(data.items);
+        this.applyFilter();
+        event.target.complete();
+      },
       error: () => event.target.complete(),
     });
+  }
+
+  onSearch(): void {
+    this.applyFilter();
+  }
+
+  applyFilter(): void {
+    const query = this.searchQuery.toLowerCase().trim();
+    if (!query) {
+      this.items.set(this.allItems());
+      return;
+    }
+    this.items.set(
+      this.allItems().filter((item) =>
+        item.name.toLowerCase().includes(query)
+      )
+    );
   }
 
   async onDelete(item: EscalationPolicy): Promise<void> {

@@ -5,10 +5,11 @@ import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonButton,
   IonList, IonItem, IonItemSliding, IonItemOptions, IonItemOption,
   IonLabel, IonBadge, IonChip, IonNote, IonIcon, IonInput,
-  IonRefresher, IonRefresherContent, IonSpinner,
+  IonRefresher, IonRefresherContent, IonSpinner, IonSearchbar,
   AlertController, ToastController,
 } from '@ionic/angular/standalone';
 import { ApiKeyService, ApiKey, ApiKeyCreateResponse } from './api-key.service';
+import { ListSkeletonComponent } from '../../shared/components/list-skeleton.component';
 import { addIcons } from 'ionicons';
 import { keyOutline, copyOutline } from 'ionicons/icons';
 
@@ -22,7 +23,8 @@ addIcons({ keyOutline, copyOutline });
     IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonButton,
     IonList, IonItem, IonItemSliding, IonItemOptions, IonItemOption,
     IonLabel, IonBadge, IonChip, IonNote, IonIcon, IonInput,
-    IonRefresher, IonRefresherContent, IonSpinner,
+    IonRefresher, IonRefresherContent, IonSpinner, IonSearchbar,
+    ListSkeletonComponent,
   ],
   template: `
     <ion-header>
@@ -32,6 +34,14 @@ addIcons({ keyOutline, copyOutline });
         <ion-buttons slot="end">
           <ion-button (click)="onCreate()" fill="solid" color="primary" size="small">+ New Key</ion-button>
         </ion-buttons>
+      </ion-toolbar>
+      <ion-toolbar>
+        <ion-searchbar
+          [(ngModel)]="searchQuery"
+          (ionInput)="onSearch()"
+          placeholder="Search..."
+          [debounce]="300"
+        ></ion-searchbar>
       </ion-toolbar>
     </ion-header>
 
@@ -54,6 +64,9 @@ addIcons({ keyOutline, copyOutline });
         </div>
       }
 
+      @if (loading()) {
+        <app-list-skeleton></app-list-skeleton>
+      } @else {
       <ion-list>
         @for (item of items(); track item.id) {
           <ion-item-sliding>
@@ -92,6 +105,7 @@ addIcons({ keyOutline, copyOutline });
           </div>
         }
       </ion-list>
+      }
     </ion-content>
   `,
   styles: [`
@@ -101,6 +115,9 @@ addIcons({ keyOutline, copyOutline });
 })
 export class ApiKeyListComponent implements OnInit {
   items = signal<ApiKey[]>([]);
+  allItems = signal<ApiKey[]>([]);
+  loading = signal(true);
+  searchQuery = '';
   newKey = signal<string | null>(null);
 
   constructor(
@@ -112,14 +129,40 @@ export class ApiKeyListComponent implements OnInit {
   ngOnInit(): void { this.load(); }
 
   load(): void {
-    this.service.getAll().subscribe((data) => this.items.set(data.items));
+    this.service.getAll().subscribe((data) => {
+      this.allItems.set(data.items);
+      this.applyFilter();
+      this.loading.set(false);
+    });
   }
 
   onRefresh(event: any): void {
     this.service.getAll().subscribe({
-      next: (data) => { this.items.set(data.items); event.target.complete(); },
+      next: (data) => {
+        this.allItems.set(data.items);
+        this.applyFilter();
+        event.target.complete();
+      },
       error: () => event.target.complete(),
     });
+  }
+
+  onSearch(): void {
+    this.applyFilter();
+  }
+
+  applyFilter(): void {
+    const query = this.searchQuery.toLowerCase().trim();
+    if (!query) {
+      this.items.set(this.allItems());
+      return;
+    }
+    this.items.set(
+      this.allItems().filter((item) =>
+        item.name.toLowerCase().includes(query) ||
+        item.prefix.toLowerCase().includes(query)
+      )
+    );
   }
 
   async onCreate(): Promise<void> {
@@ -137,8 +180,8 @@ export class ApiKeyListComponent implements OnInit {
               this.newKey.set(res.key);
               this.load();
             },
-            error: async () => {
-              const toast = await this.toastCtrl.create({ message: 'Failed to create key', color: 'danger', duration: 3000, position: 'bottom' });
+            error: async (err: any) => {
+              const toast = await this.toastCtrl.create({ message: err?.message || 'Failed to create key', color: 'danger', duration: 4000, position: 'bottom' });
               await toast.present();
             },
           });

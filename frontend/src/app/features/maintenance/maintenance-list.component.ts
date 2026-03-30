@@ -1,14 +1,16 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonButton,
   IonList, IonItem, IonItemSliding, IonItemOptions, IonItemOption,
   IonLabel, IonBadge, IonNote, IonIcon,
-  IonRefresher, IonRefresherContent,
+  IonRefresher, IonRefresherContent, IonSearchbar,
   AlertController,
 } from '@ionic/angular/standalone';
 import { MaintenanceService, MaintenanceWindow } from './maintenance.service';
+import { ListSkeletonComponent } from '../../shared/components/list-skeleton.component';
 import { addIcons } from 'ionicons';
 import { constructOutline } from 'ionicons/icons';
 
@@ -18,11 +20,12 @@ addIcons({ constructOutline });
   selector: 'app-maintenance-list',
   standalone: true,
   imports: [
-    CommonModule, RouterLink,
+    CommonModule, RouterLink, FormsModule,
     IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonButton,
     IonList, IonItem, IonItemSliding, IonItemOptions, IonItemOption,
     IonLabel, IonBadge, IonNote, IonIcon,
-    IonRefresher, IonRefresherContent,
+    IonRefresher, IonRefresherContent, IonSearchbar,
+    ListSkeletonComponent,
   ],
   template: `
     <ion-header>
@@ -33,6 +36,14 @@ addIcons({ constructOutline });
           <ion-button routerLink="/maintenance/new" fill="solid" color="primary" size="small">+ New Window</ion-button>
         </ion-buttons>
       </ion-toolbar>
+      <ion-toolbar>
+        <ion-searchbar
+          [(ngModel)]="searchQuery"
+          (ionInput)="onSearch()"
+          placeholder="Search..."
+          [debounce]="300"
+        ></ion-searchbar>
+      </ion-toolbar>
     </ion-header>
 
     <ion-content>
@@ -40,6 +51,9 @@ addIcons({ constructOutline });
         <ion-refresher-content></ion-refresher-content>
       </ion-refresher>
 
+      @if (loading()) {
+        <app-list-skeleton></app-list-skeleton>
+      } @else {
       <ion-list>
         @for (item of items(); track item.id) {
           <ion-item-sliding>
@@ -68,6 +82,7 @@ addIcons({ constructOutline });
           </div>
         }
       </ion-list>
+      }
     </ion-content>
   `,
   styles: [`
@@ -77,20 +92,48 @@ addIcons({ constructOutline });
 })
 export class MaintenanceListComponent implements OnInit {
   items = signal<MaintenanceWindow[]>([]);
+  allItems = signal<MaintenanceWindow[]>([]);
+  loading = signal(true);
+  searchQuery = '';
 
   constructor(private service: MaintenanceService, private alertCtrl: AlertController) {}
 
   ngOnInit(): void { this.load(); }
 
   load(): void {
-    this.service.getAll().subscribe((data) => this.items.set(data.items));
+    this.service.getAll().subscribe((data) => {
+      this.allItems.set(data.items);
+      this.applyFilter();
+      this.loading.set(false);
+    });
   }
 
   onRefresh(event: any): void {
     this.service.getAll().subscribe({
-      next: (data) => { this.items.set(data.items); event.target.complete(); },
+      next: (data) => {
+        this.allItems.set(data.items);
+        this.applyFilter();
+        event.target.complete();
+      },
       error: () => event.target.complete(),
     });
+  }
+
+  onSearch(): void {
+    this.applyFilter();
+  }
+
+  applyFilter(): void {
+    const query = this.searchQuery.toLowerCase().trim();
+    if (!query) {
+      this.items.set(this.allItems());
+      return;
+    }
+    this.items.set(
+      this.allItems().filter((item) =>
+        item.title.toLowerCase().includes(query)
+      )
+    );
   }
 
   async onDelete(item: MaintenanceWindow): Promise<void> {

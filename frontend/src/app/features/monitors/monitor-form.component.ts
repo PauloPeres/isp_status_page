@@ -28,6 +28,7 @@ import {
 } from '@ionic/angular/standalone';
 import { MonitorService } from './monitor.service';
 import { MonitorType } from '../../core/models/monitor.model';
+import { FieldErrorComponent } from '../../shared/components/field-error.component';
 
 @Component({
   selector: 'app-monitor-form',
@@ -51,6 +52,7 @@ import { MonitorType } from '../../core/models/monitor.model';
     IonToggle,
     IonNote,
     IonSpinner,
+    FieldErrorComponent,
   ],
   template: `
     <ion-header>
@@ -124,9 +126,7 @@ import { MonitorType } from '../../core/models/monitor.model';
                   required
                 ></ion-input>
               </ion-item>
-              @if (form.get('name')?.touched && form.get('name')?.hasError('required')) {
-                <ion-note color="danger" class="field-error">Name is required</ion-note>
-              }
+              <app-field-error [control]="form.get('name')" label="Name"></app-field-error>
 
               <ion-item>
                 <ion-textarea
@@ -352,6 +352,7 @@ import { MonitorType } from '../../core/models/monitor.model';
                   placeholder="300"
                 ></ion-input>
               </ion-item>
+              <app-field-error [control]="form.get('check_interval')" label="Check interval"></app-field-error>
 
               <ion-item>
                 <ion-input
@@ -362,6 +363,7 @@ import { MonitorType } from '../../core/models/monitor.model';
                   placeholder="30"
                 ></ion-input>
               </ion-item>
+              <app-field-error [control]="form.get('timeout')" label="Timeout"></app-field-error>
 
               <ion-item>
                 <ion-input
@@ -521,9 +523,9 @@ export class MonitorFormComponent implements OnInit {
 
         this.loading.set(false);
       },
-      error: () => {
+      error: (err: any) => {
         this.loading.set(false);
-        this.showToast('Failed to load monitor', 'danger');
+        this.showToast(err?.message || 'Failed to load monitor', 'danger');
       },
     });
   }
@@ -562,14 +564,15 @@ export class MonitorFormComponent implements OnInit {
           this.showToast('Monitor created successfully', 'success');
           this.router.navigate(['/monitors']);
         },
-        error: () => {
+        error: (err: any) => {
           this.saving.set(false);
-          this.showToast('Failed to create monitor', 'danger');
+          this.showToast(err?.message || 'Failed to create monitor', 'danger');
         },
       });
   }
 
   onSave(): void {
+    this.form.markAllAsTouched();
     if (this.form.invalid) return;
 
     const formValue = this.form.getRawValue();
@@ -617,12 +620,12 @@ export class MonitorFormComponent implements OnInit {
         );
         this.router.navigate(['/monitors']);
       },
-      error: () => {
+      error: (err: any) => {
         this.saving.set(false);
         this.showToast(
-          this.isEdit()
+          err?.message || (this.isEdit()
             ? 'Failed to update monitor'
-            : 'Failed to create monitor',
+            : 'Failed to create monitor'),
           'danger',
         );
       },
@@ -683,7 +686,7 @@ export class MonitorFormComponent implements OnInit {
   ): Promise<void> {
     const toast = await this.toastCtrl.create({
       message,
-      duration: 3000,
+      duration: color === 'danger' ? 4000 : 3000,
       color,
       position: 'bottom',
     });

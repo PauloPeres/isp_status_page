@@ -18,7 +18,9 @@ use Cake\ORM\Entity;
  * @property \Cake\I18n\DateTime $checked_at
  * @property \Cake\I18n\DateTime $created
  *
+ * @property int|null $region_id
  * @property \App\Model\Entity\Monitor $monitor
+ * @property \App\Model\Entity\CheckRegion|null $check_region
  */
 class MonitorCheck extends Entity
 {
@@ -39,8 +41,10 @@ class MonitorCheck extends Entity
         'status_code' => true,
         'error_message' => true,
         'details' => true,
+        'region_id' => true,
         'checked_at' => true,
         'created' => true,
         'monitor' => true,
+        'check_region' => true,
     ];
 }

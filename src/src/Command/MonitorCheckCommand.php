@@ -11,6 +11,8 @@ use App\Service\Alert\TelegramAlertChannel;
 use App\Service\Alert\SmsAlertChannel;
 use App\Service\Alert\WebhookAlertChannel;
 use App\Service\Alert\WhatsAppAlertChannel;
+use App\Service\Alert\PagerDutyAlertChannel;
+use App\Service\Alert\OpsGenieAlertChannel;
 use App\Service\Check\CheckService;
 use App\Service\Check\HeartbeatChecker;
 use App\Service\Check\HttpChecker;
@@ -93,6 +95,8 @@ class MonitorCheckCommand extends Command
         $this->alertService->registerChannel(new WebhookAlertChannel());
         $this->alertService->registerChannel(new SmsAlertChannel());
         $this->alertService->registerChannel(new WhatsAppAlertChannel());
+        $this->alertService->registerChannel(new PagerDutyAlertChannel());
+        $this->alertService->registerChannel(new OpsGenieAlertChannel());
 
         // Initialize incident service
         $this->incidentService = new IncidentService();
@@ -119,6 +123,11 @@ class MonitorCheckCommand extends Command
                 'help' => 'Check only a specific monitor by ID',
                 'required' => false,
             ])
+            ->addOption('region', [
+                'short' => 'r',
+                'help' => 'Run checks as a specific region (code, e.g. us-east-1). Tags results with region_id.',
+                'required' => false,
+            ])
             ->addOption('verbose', [
                 'short' => 'v',
                 'help' => 'Enable verbose output',
@@ -139,9 +148,28 @@ class MonitorCheckCommand extends Command
     {
         $startTime = microtime(true);
         $monitorId = $args->getOption('monitor-id');
+        $regionCode = $args->getOption('region');
+        $regionId = null;
 
         $io->out('<info>Monitor Check Command Started</info>');
         $io->out('Time: ' . date('Y-m-d H:i:s'));
+
+        // Resolve region if specified
+        if ($regionCode) {
+            $regionsTable = $this->fetchTable('CheckRegions');
+            $region = $regionsTable->find()
+                ->where(['code' => $regionCode, 'active' => true])
+                ->first();
+
+            if (!$region) {
+                $io->error("Region '{$regionCode}' not found or inactive");
+                return self::CODE_ERROR;
+            }
+
+            $regionId = $region->id;
+            $io->out("Region: {$region->name} ({$region->code})");
+        }
+
         $io->hr();
 
         try {
@@ -166,7 +194,7 @@ class MonitorCheckCommand extends Command
             $io->hr();
 
             // Execute checks
-            $results = $this->executeChecks($monitors, $io, $args->getOption('verbose'));
+            $results = $this->executeChecks($monitors, $io, $args->getOption('verbose'), $regionId);
 
             // Display summary
             $this->displaySummary($io, $results, microtime(true) - $startTime);
@@ -221,7 +249,7 @@ class MonitorCheckCommand extends Command
      * @param bool $verbose Verbose output
      * @return array Results summary
      */
-    protected function executeChecks(array $monitors, ConsoleIo $io, bool $verbose = false): array
+    protected function executeChecks(array $monitors, ConsoleIo $io, bool $verbose = false, ?int $regionId = null): array
     {
         $results = [
             'up' => 0,
@@ -244,6 +272,7 @@ class MonitorCheckCommand extends Command
                 $batchResults[] = [
                     'organization_id' => $monitor->organization_id,
                     'monitor_id' => $monitor->id,
+                    'region_id' => $regionId,
                     'status' => $status,
                     'response_time' => $checkResult['response_time'] ?? null,
                     'status_code' => $checkResult['status_code'] ?? null,

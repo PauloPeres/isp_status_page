@@ -28,6 +28,7 @@ import {
   AlertController,
 } from '@ionic/angular/standalone';
 import { MonitorService } from './monitor.service';
+import { ListSkeletonComponent } from '../../shared/components/list-skeleton.component';
 import { Monitor, MonitorStatus } from '../../core/models/monitor.model';
 import { addIcons } from 'ionicons';
 import { pulseOutline } from 'ionicons/icons';
@@ -63,6 +64,7 @@ addIcons({ pulseOutline });
     IonRefresherContent,
     IonInfiniteScroll,
     IonInfiniteScrollContent,
+    ListSkeletonComponent,
   ],
   template: `
     <ion-header>
@@ -72,6 +74,9 @@ addIcons({ pulseOutline });
         </ion-buttons>
         <ion-title>Monitors</ion-title>
         <ion-buttons slot="end">
+          <ion-button routerLink="/monitors/import" fill="clear" color="medium" title="Import monitors">
+            Import
+          </ion-button>
           <ion-button
             routerLink="/monitors/new"
             fill="solid"
@@ -97,6 +102,9 @@ addIcons({ pulseOutline });
         <ion-refresher-content></ion-refresher-content>
       </ion-refresher>
 
+      @if (loading()) {
+        <app-list-skeleton></app-list-skeleton>
+      } @else {
       <ion-list>
         @for (monitor of monitors(); track monitor.id) {
           <ion-item-sliding>
@@ -169,6 +177,7 @@ addIcons({ pulseOutline });
           </div>
         }
       </ion-list>
+      }
 
       <ion-infinite-scroll (ionInfinite)="loadMore($event)">
         <ion-infinite-scroll-content
@@ -193,6 +202,7 @@ addIcons({ pulseOutline });
 })
 export class MonitorListComponent implements OnInit {
   monitors = signal<Monitor[]>([]);
+  loading = signal(true);
   searchQuery = '';
   page = 1;
   hasMore = true;
@@ -220,6 +230,7 @@ export class MonitorListComponent implements OnInit {
           this.monitors.set(data.items);
         }
         this.hasMore = this.page < data.pagination.pages;
+        this.loading.set(false);
       });
   }
 

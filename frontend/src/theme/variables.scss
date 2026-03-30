@@ -90,34 +90,71 @@
   --ion-border-radius: 8px;
 }
 
-// Dark mode
+// Dark mode — triggered by .dark class on body (set by ThemeService)
+// or by system preference when no class is set
+@mixin dark-theme {
+  --ion-background-color: #0F172A;
+  --ion-background-color-rgb: 15, 23, 42;
+  --ion-text-color: #F8FAFC;
+  --ion-text-color-rgb: 248, 250, 252;
+  --ion-toolbar-background: rgba(15, 23, 42, 0.85);
+  --ion-item-background: #1E293B;
+  --ion-card-background: #1E293B;
+
+  --ion-color-primary: #818CF8;
+  --ion-color-primary-rgb: 129, 140, 248;
+  --ion-color-primary-shade: #6366F1;
+  --ion-color-primary-tint: #A5B4FC;
+
+  --ion-color-light: #1E293B;
+  --ion-color-light-rgb: 30, 41, 59;
+  --ion-color-light-contrast: #F8FAFC;
+  --ion-color-light-contrast-rgb: 248, 250, 252;
+  --ion-color-light-shade: #0F172A;
+  --ion-color-light-tint: #334155;
+
+  --ion-color-dark: #F8FAFC;
+  --ion-color-dark-rgb: 248, 250, 252;
+  --ion-color-dark-contrast: #0F172A;
+  --ion-color-dark-contrast-rgb: 15, 23, 42;
+  --ion-color-dark-shade: #E2E8F0;
+  --ion-color-dark-tint: #F8FAFC;
+
+  --ion-color-secondary: #94A3B8;
+  --ion-color-secondary-rgb: 148, 163, 184;
+  --ion-color-secondary-contrast: #0F172A;
+  --ion-color-secondary-contrast-rgb: 15, 23, 42;
+  --ion-color-secondary-shade: #64748B;
+  --ion-color-secondary-tint: #CBD5E1;
+
+  --ion-toolbar-color: #F8FAFC;
+}
+
+// Manual toggle via ThemeService
+body.dark {
+  @include dark-theme;
+}
+
+// System preference fallback (when ThemeService hasn't loaded yet)
 @media (prefers-color-scheme: dark) {
-  :root {
-    --ion-background-color: #0F172A;
-    --ion-background-color-rgb: 15, 23, 42;
-    --ion-text-color: #F8FAFC;
-    --ion-text-color-rgb: 248, 250, 252;
-    --ion-toolbar-background: rgba(15, 23, 42, 0.85);
-    --ion-item-background: #1E293B;
-    --ion-card-background: #1E293B;
+  body:not(.light-forced) {
+    @include dark-theme;
+  }
+}
 
-    --ion-color-primary: #818CF8;
-    --ion-color-primary-rgb: 129, 140, 248;
-    --ion-color-primary-shade: #6366F1;
-    --ion-color-primary-tint: #A5B4FC;
-
-    --ion-color-light: #1E293B;
-    --ion-color-light-rgb: 30, 41, 59;
-    --ion-color-light-contrast: #F8FAFC;
-    --ion-color-light-contrast-rgb: 248, 250, 252;
-    --ion-color-light-shade: #0F172A;
-    --ion-color-light-tint: #334155;
-
-    --ion-color-dark: #F8FAFC;
-    --ion-color-dark-rgb: 248, 250, 252;
-    --ion-color-dark-contrast: #0F172A;
-    --ion-color-dark-contrast-rgb: 15, 23, 42;
-    --ion-color-dark-shade: #E2E8F0;
-    --ion-color-dark-tint: #F8FAFC;
+body.dark {
+  ion-card-title, ion-card-subtitle, ion-item-divider {
+    color: var(--ion-text-color) !important;
+  }
+  ion-segment-button {
+    --color-checked: var(--ion-color-primary);
+    --color: var(--ion-text-color);
+  }
+  ion-searchbar {
+    --color: var(--ion-text-color);
+    --placeholder-color: var(--ion-color-medium);
+  }
+  .summary-label, .stat-label, .empty-state p, .help-text {
+    color: var(--ion-color-medium) !important;
   }
 }

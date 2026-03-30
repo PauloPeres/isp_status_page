@@ -30,6 +30,7 @@ import {
   ToastController,
 } from '@ionic/angular/standalone';
 import { IncidentService } from './incident.service';
+import { ListSkeletonComponent } from '../../shared/components/list-skeleton.component';
 import {
   Incident,
   IncidentStatus,
@@ -71,6 +72,7 @@ addIcons({ warningOutline, checkmarkCircleOutline });
     IonInfiniteScrollContent,
     IonSegment,
     IonSegmentButton,
+    ListSkeletonComponent,
   ],
   template: `
     <ion-header>
@@ -121,6 +123,9 @@ addIcons({ warningOutline, checkmarkCircleOutline });
         <ion-refresher-content></ion-refresher-content>
       </ion-refresher>
 
+      @if (loading()) {
+        <app-list-skeleton></app-list-skeleton>
+      } @else {
       <ion-list>
         @for (incident of incidents(); track incident.id) {
           <ion-item-sliding>
@@ -200,6 +205,7 @@ addIcons({ warningOutline, checkmarkCircleOutline });
           </div>
         }
       </ion-list>
+      }
 
       <ion-infinite-scroll (ionInfinite)="loadMore($event)">
         <ion-infinite-scroll-content
@@ -248,6 +254,7 @@ addIcons({ warningOutline, checkmarkCircleOutline });
 })
 export class IncidentListComponent implements OnInit {
   incidents = signal<Incident[]>([]);
+  loading = signal(true);
   searchQuery = '';
   statusFilter = 'all';
   page = 1;
@@ -283,6 +290,7 @@ export class IncidentListComponent implements OnInit {
         this.incidents.set(data.items);
       }
       this.hasMore = this.page < data.pagination.pages;
+      this.loading.set(false);
     });
   }
 
@@ -375,10 +383,10 @@ export class IncidentListComponent implements OnInit {
         });
         await toast.present();
       },
-      error: async () => {
+      error: async (err: any) => {
         const toast = await this.toastCtrl.create({
-          message: 'Failed to acknowledge incident',
-          duration: 2000,
+          message: err?.message || 'Failed to acknowledge incident',
+          duration: 4000,
           color: 'danger',
         });
         await toast.present();

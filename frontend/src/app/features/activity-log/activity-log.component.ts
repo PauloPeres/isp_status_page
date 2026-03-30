@@ -2,22 +2,24 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
-  IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons,
+  IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonButton,
   IonList, IonItem, IonLabel, IonBadge, IonNote, IonIcon, IonSelect, IonSelectOption,
   IonRefresher, IonRefresherContent,
+  ActionSheetController,
 } from '@ionic/angular/standalone';
 import { ActivityLogService, ActivityLogEntry } from './activity-log.service';
+import { environment } from '../../../environments/environment';
 import { addIcons } from 'ionicons';
-import { listOutline } from 'ionicons/icons';
+import { listOutline, downloadOutline } from 'ionicons/icons';
 
-addIcons({ listOutline });
+addIcons({ listOutline, 'download-outline': downloadOutline });
 
 @Component({
   selector: 'app-activity-log',
   standalone: true,
   imports: [
     CommonModule, FormsModule,
-    IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons,
+    IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonButton,
     IonList, IonItem, IonLabel, IonBadge, IonNote, IonIcon, IonSelect, IonSelectOption,
     IonRefresher, IonRefresherContent,
   ],
@@ -26,6 +28,11 @@ addIcons({ listOutline });
       <ion-toolbar>
         <ion-buttons slot="start"><ion-menu-button></ion-menu-button></ion-buttons>
         <ion-title>Activity Log</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="onExport()">
+            <ion-icon name="download-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+        </ion-buttons>
       </ion-toolbar>
     </ion-header>
 
@@ -84,7 +91,10 @@ export class ActivityLogComponent implements OnInit {
   items = signal<ActivityLogEntry[]>([]);
   eventFilter = '';
 
-  constructor(private service: ActivityLogService) {}
+  constructor(
+    private service: ActivityLogService,
+    private actionSheetCtrl: ActionSheetController,
+  ) {}
 
   ngOnInit(): void { this.load(); }
 
@@ -101,6 +111,46 @@ export class ActivityLogComponent implements OnInit {
       next: (data) => { this.items.set(data.items); event.target.complete(); },
       error: () => event.target.complete(),
     });
+  }
+
+  async onExport(): Promise<void> {
+    const sheet = await this.actionSheetCtrl.create({
+      header: 'Export Audit Log',
+      buttons: [
+        {
+          text: 'Export as CSV',
+          handler: () => {
+            this.downloadExport('csv');
+          },
+        },
+        {
+          text: 'Export as JSON',
+          handler: () => {
+            this.downloadExport('json');
+          },
+        },
+        { text: 'Cancel', role: 'cancel' },
+      ],
+    });
+    await sheet.present();
+  }
+
+  private downloadExport(format: string): void {
+    const token = localStorage.getItem('access_token');
+    let url = `${environment.apiUrl}/activity-log/export?format=${format}`;
+    if (this.eventFilter) {
+      url += `&event_type=${this.eventFilter}`;
+    }
+    // Open in new tab with auth header via fetch + blob download
+    fetch(url, { headers: { Authorization: `Bearer ${token}` } })
+      .then((res) => res.blob())
+      .then((blob) => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `audit_log_export.${format}`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+      });
   }
 
   getEventColor(type: string): string {

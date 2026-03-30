@@ -56,6 +56,10 @@ class MonitorChecksTable extends Table
             'foreignKey' => 'organization_id',
             'joinType' => 'INNER',
         ]);
+        $this->belongsTo('CheckRegions', [
+            'foreignKey' => 'region_id',
+            'joinType' => 'LEFT',
+        ]);
         $this->hasOne('MonitorCheckDetails', [
             'foreignKey' => 'check_id',
             'dependent' => true,

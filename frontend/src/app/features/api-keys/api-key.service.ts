@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ApiService, PaginatedResponse } from '../../core/services/api.service';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 export interface ApiKey {
   id: number;
@@ -25,7 +26,12 @@ export class ApiKeyService {
   constructor(private api: ApiService) {}
 
   getAll(params?: any): Observable<PaginatedResponse<ApiKey>> {
-    return this.api.get<PaginatedResponse<ApiKey>>('/api-keys', params);
+    return this.api.get<any>('/api-keys', params).pipe(
+      map(data => ({
+        items: data.api_keys || data.items || [],
+        pagination: data.pagination || { page: 1, limit: 999, total: (data.api_keys || data.items || []).length, pages: 1 },
+      }))
+    );
   }
 
   create(data: { name: string; permissions: string[]; expires_at?: string }): Observable<ApiKeyCreateResponse> {

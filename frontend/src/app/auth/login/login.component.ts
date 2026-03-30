@@ -141,7 +141,9 @@ import { environment } from '../../../environments/environment';
         font-size: 0.875rem;
       }
       ion-item {
-        --padding-start: 0;
+        --padding-start: 12px;
+        --inner-padding-end: 12px;
+        --min-height: 56px;
         margin-bottom: 1rem;
       }
       ion-button {

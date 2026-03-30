@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ApiService, PaginatedResponse } from '../../core/services/api.service';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 export interface Integration {
   id: number;
@@ -19,7 +20,12 @@ export class IntegrationService {
   constructor(private api: ApiService) {}
 
   getAll(params?: any): Observable<PaginatedResponse<Integration>> {
-    return this.api.get<PaginatedResponse<Integration>>('/integrations', params);
+    return this.api.get<any>('/integrations', params).pipe(
+      map(data => ({
+        items: data.integrations || data.items || [],
+        pagination: data.pagination || { page: 1, limit: 999, total: (data.integrations || data.items || []).length, pages: 1 },
+      }))
+    );
   }
 
   get(id: number): Observable<Integration> {

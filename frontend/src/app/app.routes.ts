@@ -32,6 +32,13 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
+        path: 'onboarding',
+        loadComponent: () =>
+          import('./features/onboarding/onboarding.component').then(
+            (m) => m.OnboardingComponent,
+          ),
+      },
+      {
         path: 'dashboard',
         loadComponent: () =>
           import('./features/dashboard/dashboard.component').then(
@@ -43,6 +50,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/monitors/monitor-list.component').then(
             (m) => m.MonitorListComponent,
+          ),
+      },
+      {
+        path: 'monitors/import',
+        loadComponent: () =>
+          import('./features/monitors/monitor-import.component').then(
+            (m) => m.MonitorImportComponent,
           ),
       },
       {
@@ -283,6 +297,13 @@ export const routes: Routes = [
             (m) => m.TwoFactorComponent,
           ),
       },
+      {
+        path: 'profile',
+        loadComponent: () =>
+          import('./features/profile/profile.component').then(
+            (m) => m.ProfileComponent,
+          ),
+      },
     ],
   },
 
@@ -313,6 +334,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/super-admin/super-admin-users.component').then(
             (m) => m.SuperAdminUsersComponent,
+          ),
+      },
+      {
+        path: 'plans',
+        loadComponent: () =>
+          import('./features/super-admin/super-admin-plans.component').then(
+            (m) => m.SuperAdminPlansComponent,
           ),
       },
       {

@@ -9,6 +9,7 @@ import {
   ToastController,
 } from '@ionic/angular/standalone';
 import { EscalationService } from './escalation.service';
+import { FieldErrorComponent } from '../../shared/components/field-error.component';
 import { addIcons } from 'ionicons';
 import { addCircleOutline, removeCircleOutline } from 'ionicons/icons';
 
@@ -18,7 +19,7 @@ addIcons({ addCircleOutline, removeCircleOutline });
   selector: 'app-escalation-form',
   standalone: true,
   imports: [
-    CommonModule, ReactiveFormsModule,
+    CommonModule, ReactiveFormsModule, FieldErrorComponent,
     IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonBackButton, IonButton,
     IonList, IonItem, IonInput, IonSelect, IonSelectOption, IonToggle, IonLabel,
     IonNote, IonSpinner, IonIcon, IonCard, IonCardHeader, IonCardTitle, IonCardContent,
@@ -48,6 +49,7 @@ addIcons({ addCircleOutline, removeCircleOutline });
           <ion-item>
             <ion-input label="Name" labelPlacement="stacked" placeholder="Policy name" formControlName="name" required></ion-input>
           </ion-item>
+          <app-field-error [control]="form.get('name')" label="Name"></app-field-error>
           <ion-item>
             <ion-input label="Description" labelPlacement="stacked" placeholder="Optional description" formControlName="description"></ion-input>
           </ion-item>
@@ -85,8 +87,12 @@ addIcons({ addCircleOutline, removeCircleOutline });
                     <ion-item>
                       <ion-select label="Channel" labelPlacement="stacked" formControlName="channel" interface="popover">
                         <ion-select-option value="email">Email</ion-select-option>
-                        <ion-select-option value="sms">SMS</ion-select-option>
+                        <ion-select-option value="slack">Slack</ion-select-option>
+                        <ion-select-option value="discord">Discord</ion-select-option>
                         <ion-select-option value="telegram">Telegram</ion-select-option>
+                        <ion-select-option value="sms">SMS</ion-select-option>
+                        <ion-select-option value="pagerduty">PagerDuty</ion-select-option>
+                        <ion-select-option value="opsgenie">OpsGenie</ion-select-option>
                         <ion-select-option value="webhook">Webhook</ion-select-option>
                       </ion-select>
                     </ion-item>
@@ -173,6 +179,7 @@ export class EscalationFormComponent implements OnInit {
   }
 
   onSave(): void {
+    this.form.markAllAsTouched();
     if (this.form.invalid || this.stepsArray.length === 0) return;
     this.saving.set(true);
 
@@ -199,9 +206,9 @@ export class EscalationFormComponent implements OnInit {
         await toast.present();
         this.router.navigate(['/escalation']);
       },
-      error: async () => {
+      error: async (err: any) => {
         this.saving.set(false);
-        const toast = await this.toastCtrl.create({ message: 'Failed to save', color: 'danger', duration: 3000, position: 'bottom' });
+        const toast = await this.toastCtrl.create({ message: err?.message || 'Failed to save', color: 'danger', duration: 4000, position: 'bottom' });
         await toast.present();
       },
     });

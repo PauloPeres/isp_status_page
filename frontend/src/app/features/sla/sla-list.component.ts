@@ -6,10 +6,11 @@ import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonButton,
   IonList, IonItem, IonItemSliding, IonItemOptions, IonItemOption,
   IonLabel, IonBadge, IonNote, IonIcon, IonProgressBar,
-  IonRefresher, IonRefresherContent,
+  IonRefresher, IonRefresherContent, IonSearchbar,
   AlertController,
 } from '@ionic/angular/standalone';
 import { SlaService, Sla } from './sla.service';
+import { ListSkeletonComponent } from '../../shared/components/list-skeleton.component';
 import { addIcons } from 'ionicons';
 import { ribbonOutline } from 'ionicons/icons';
 
@@ -23,7 +24,8 @@ addIcons({ ribbonOutline });
     IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonButton,
     IonList, IonItem, IonItemSliding, IonItemOptions, IonItemOption,
     IonLabel, IonBadge, IonNote, IonIcon, IonProgressBar,
-    IonRefresher, IonRefresherContent,
+    IonRefresher, IonRefresherContent, IonSearchbar,
+    ListSkeletonComponent,
   ],
   template: `
     <ion-header>
@@ -34,6 +36,14 @@ addIcons({ ribbonOutline });
           <ion-button routerLink="/sla/new" fill="solid" color="primary" size="small">+ New SLA</ion-button>
         </ion-buttons>
       </ion-toolbar>
+      <ion-toolbar>
+        <ion-searchbar
+          [(ngModel)]="searchQuery"
+          (ionInput)="onSearch()"
+          placeholder="Search..."
+          [debounce]="300"
+        ></ion-searchbar>
+      </ion-toolbar>
     </ion-header>
 
     <ion-content>
@@ -41,6 +51,9 @@ addIcons({ ribbonOutline });
         <ion-refresher-content></ion-refresher-content>
       </ion-refresher>
 
+      @if (loading()) {
+        <app-list-skeleton></app-list-skeleton>
+      } @else {
       <ion-list>
         @for (item of items(); track item.id) {
           <ion-item-sliding>
@@ -48,18 +61,16 @@ addIcons({ ribbonOutline });
               <ion-label>
                 <h2>{{ item.name }}</h2>
                 <p>
-                  Target: {{ item.target_uptime }}% | Actual: {{ item.actual_uptime }}%
+                  Target: {{ item.target_uptime }}%
+                  @if (item.actual_uptime != null) {
+                    | Actual: {{ item.actual_uptime }}%
+                  }
                   @if (item.monitor_name) {
                     <span style="margin-left: 8px; color: var(--ion-color-medium)">{{ item.monitor_name }}</span>
                   }
                 </p>
-                <ion-progress-bar
-                  [value]="getBudgetUsed(item)"
-                  [color]="getStatusColor(item.status)"
-                  style="margin-top: 4px"
-                ></ion-progress-bar>
-                <p style="font-size: 0.7rem; margin-top: 2px">
-                  Downtime budget: {{ item.downtime_used_minutes }}/{{ item.downtime_budget_minutes }} min used
+                <p style="font-size: 0.7rem; margin-top: 2px; color: var(--ion-color-medium)">
+                  {{ item.measurement_period | titlecase }}
                 </p>
               </ion-label>
               <ion-badge slot="end" [color]="getStatusColor(item.status)">
@@ -80,6 +91,7 @@ addIcons({ ribbonOutline });
           </div>
         }
       </ion-list>
+      }
     </ion-content>
   `,
   styles: [`
@@ -89,20 +101,48 @@ addIcons({ ribbonOutline });
 })
 export class SlaListComponent implements OnInit {
   items = signal<Sla[]>([]);
+  allItems = signal<Sla[]>([]);
+  loading = signal(true);
+  searchQuery = '';
 
   constructor(private service: SlaService, private alertCtrl: AlertController) {}
 
   ngOnInit(): void { this.load(); }
 
   load(): void {
-    this.service.getAll().subscribe((data) => this.items.set(data.items));
+    this.service.getAll().subscribe((data) => {
+      this.allItems.set(data.items);
+      this.applyFilter();
+      this.loading.set(false);
+    });
   }
 
   onRefresh(event: any): void {
     this.service.getAll().subscribe({
-      next: (data) => { this.items.set(data.items); event.target.complete(); },
+      next: (data) => {
+        this.allItems.set(data.items);
+        this.applyFilter();
+        event.target.complete();
+      },
       error: () => event.target.complete(),
     });
+  }
+
+  onSearch(): void {
+    this.applyFilter();
+  }
+
+  applyFilter(): void {
+    const query = this.searchQuery.toLowerCase().trim();
+    if (!query) {
+      this.items.set(this.allItems());
+      return;
+    }
+    this.items.set(
+      this.allItems().filter((item) =>
+        item.name.toLowerCase().includes(query)
+      )
+    );
   }
 
   async onDelete(item: Sla): Promise<void> {
@@ -121,17 +161,13 @@ export class SlaListComponent implements OnInit {
     await alert.present();
   }
 
-  getStatusColor(status: string): string {
+  getStatusColor(status: string | undefined): string {
     switch (status) {
+      case 'compliant':
       case 'met': return 'success';
       case 'at_risk': return 'warning';
       case 'breached': return 'danger';
       default: return 'medium';
     }
-  }
-
-  getBudgetUsed(item: Sla): number {
-    if (!item.downtime_budget_minutes || item.downtime_budget_minutes === 0) return 0;
-    return Math.min(item.downtime_used_minutes / item.downtime_budget_minutes, 1);
   }
 }

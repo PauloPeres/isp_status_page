@@ -515,6 +515,7 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/monitors', ['controller' => 'Monitors', 'action' => 'add', 'prefix' => 'Api/V2', '_method' => 'POST']);
         $builder->connect('/monitors/bulk-action', ['controller' => 'Monitors', 'action' => 'bulkAction', 'prefix' => 'Api/V2', '_method' => 'POST']);
         $builder->connect('/monitors/import', ['controller' => 'Monitors', 'action' => 'import', 'prefix' => 'Api/V2', '_method' => 'POST']);
+        $builder->connect('/monitors/import-competitor', ['controller' => 'Monitors', 'action' => 'importCompetitor', 'prefix' => 'Api/V2', '_method' => 'POST']);
         $builder->connect('/monitors/{id}', ['controller' => 'Monitors', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
         $builder->connect('/monitors/{id}', ['controller' => 'Monitors', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
         $builder->connect('/monitors/{id}', ['controller' => 'Monitors', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '\d+']);
@@ -643,11 +644,39 @@ return function (RouteBuilder $routes): void {
 
         // Activity Log
         $builder->connect('/activity-log', ['controller' => 'ActivityLog', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
+        $builder->connect('/activity-log/export', ['controller' => 'ActivityLog', 'action' => 'export', 'prefix' => 'Api/V2', '_method' => 'GET']);
 
         // Organizations
         $builder->connect('/organizations', ['controller' => 'Organizations', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
         $builder->connect('/organizations/current', ['controller' => 'Organizations', 'action' => 'current', 'prefix' => 'Api/V2', '_method' => 'GET']);
         $builder->connect('/organizations/switch', ['controller' => 'Organizations', 'action' => 'switchOrg', 'prefix' => 'Api/V2', '_method' => 'POST']);
+
+        // Notification Schedules (C-05)
+        $builder->connect('/notification-schedules', ['controller' => 'NotificationSchedules', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
+        $builder->connect('/notification-schedules', ['controller' => 'NotificationSchedules', 'action' => 'add', 'prefix' => 'Api/V2', '_method' => 'POST']);
+        $builder->connect('/notification-schedules/{id}', ['controller' => 'NotificationSchedules', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/notification-schedules/{id}', ['controller' => 'NotificationSchedules', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/notification-schedules/{id}', ['controller' => 'NotificationSchedules', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
+
+        // Telegram Bot Webhook (C-04) - no JWT auth, verified by URL token
+        $builder->connect('/telegram/webhook/{org_id}/{token}', ['controller' => 'TelegramWebhook', 'action' => 'webhook', 'prefix' => 'Api/V2', '_method' => 'POST'], ['pass' => ['org_id', 'token']]);
+
+        // Webhook Endpoints (C-04)
+        $builder->connect('/webhook-endpoints', ['controller' => 'WebhookEndpoints', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
+        $builder->connect('/webhook-endpoints', ['controller' => 'WebhookEndpoints', 'action' => 'add', 'prefix' => 'Api/V2', '_method' => 'POST']);
+        $builder->connect('/webhook-endpoints/{id}', ['controller' => 'WebhookEndpoints', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/webhook-endpoints/{id}', ['controller' => 'WebhookEndpoints', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/webhook-endpoints/{id}', ['controller' => 'WebhookEndpoints', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/webhook-endpoints/{id}/test', ['controller' => 'WebhookEndpoints', 'action' => 'test', 'prefix' => 'Api/V2', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/webhook-endpoints/{id}/deliveries', ['controller' => 'WebhookEndpoints', 'action' => 'deliveries', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
+
+        // Check Regions (C-01)
+        $builder->connect('/check-regions', ['controller' => 'CheckRegions', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
+        $builder->connect('/check-regions', ['controller' => 'CheckRegions', 'action' => 'add', 'prefix' => 'Api/V2', '_method' => 'POST']);
+        $builder->connect('/check-regions/{id}', ['controller' => 'CheckRegions', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/check-regions/{id}', ['controller' => 'CheckRegions', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/check-regions/{id}', ['controller' => 'CheckRegions', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/check-regions/{id}', ['controller' => 'CheckRegions', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
 
         // Super Admin
         $builder->connect('/super-admin/dashboard', ['controller' => 'Dashboard', 'action' => 'index', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'GET']);
@@ -665,6 +694,15 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/super-admin/settings/test-email', ['controller' => 'Settings', 'action' => 'testEmail', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'POST']);
         $builder->connect('/super-admin/settings/test-ftp', ['controller' => 'Settings', 'action' => 'testFtp', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'POST']);
         $builder->connect('/super-admin/security-logs', ['controller' => 'SecurityLogs', 'action' => 'index', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'GET']);
+
+        // Super Admin — Plans (D-02)
+        $builder->connect('/super-admin/plans', ['controller' => 'Plans', 'action' => 'index', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'GET']);
+        $builder->connect('/super-admin/plans', ['controller' => 'Plans', 'action' => 'add', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'POST']);
+        $builder->connect('/super-admin/plans/{id}', ['controller' => 'Plans', 'action' => 'view', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/super-admin/plans/{id}', ['controller' => 'Plans', 'action' => 'edit', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/super-admin/plans/{id}', ['controller' => 'Plans', 'action' => 'edit', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/super-admin/plans/{id}', ['controller' => 'Plans', 'action' => 'delete', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/super-admin/plans/{id}/duplicate', ['controller' => 'Plans', 'action' => 'duplicate', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
 
         $builder->fallbacks();
     });

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ApiService, PaginatedResponse } from '../../core/services/api.service';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 export interface ActivityLogEntry {
   id: number;
@@ -18,6 +19,11 @@ export class ActivityLogService {
   constructor(private api: ApiService) {}
 
   getAll(params?: { event_type?: string; page?: number; limit?: number }): Observable<PaginatedResponse<ActivityLogEntry>> {
-    return this.api.get<PaginatedResponse<ActivityLogEntry>>('/activity-log', params);
+    return this.api.get<any>('/activity-log', params).pipe(
+      map(data => ({
+        items: data.activity_log || data.items || [],
+        pagination: data.pagination || { page: 1, limit: 50, total: (data.activity_log || data.items || []).length, pages: 1 },
+      }))
+    );
   }
 }

@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import {
   IonHeader,
   IonToolbar,
@@ -7,6 +8,7 @@ import {
   IonContent,
   IonMenuButton,
   IonButtons,
+  IonButton,
   IonGrid,
   IonRow,
   IonCol,
@@ -19,11 +21,15 @@ import {
   IonLabel,
   IonBadge,
   IonChip,
+  IonIcon,
+  IonProgressBar,
   IonSkeletonText,
   IonRefresher,
   IonRefresherContent,
   ToastController,
 } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { rocketOutline, closeOutline } from 'ionicons/icons';
 import {
   DashboardService,
   DashboardSummary,
@@ -34,18 +40,26 @@ import {
 } from './dashboard.service';
 import { forkJoin, Subscription } from 'rxjs';
 import { SseService } from '../../core/services/sse.service';
+import { OnboardingService } from '../onboarding/onboarding.service';
+
+addIcons({
+  'rocket-outline': rocketOutline,
+  'close-outline': closeOutline,
+});
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   imports: [
     CommonModule,
+    RouterLink,
     IonHeader,
     IonToolbar,
     IonTitle,
     IonContent,
     IonMenuButton,
     IonButtons,
+    IonButton,
     IonGrid,
     IonRow,
     IonCol,
@@ -58,6 +72,8 @@ import { SseService } from '../../core/services/sse.service';
     IonLabel,
     IonBadge,
     IonChip,
+    IonIcon,
+    IonProgressBar,
     IonSkeletonText,
     IonRefresher,
     IonRefresherContent,
@@ -76,6 +92,27 @@ import { SseService } from '../../core/services/sse.service';
       <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
         <ion-refresher-content></ion-refresher-content>
       </ion-refresher>
+
+      <!-- Onboarding Banner -->
+      @if (onboardingService.shouldShow() && onboardingService.progress()) {
+        <ion-card class="onboarding-banner" routerLink="/onboarding">
+          <ion-card-content class="banner-content">
+            <ion-icon name="rocket-outline" class="banner-icon"></ion-icon>
+            <div class="banner-text">
+              <h3>Complete your setup</h3>
+              <p>{{ onboardingService.progress()!.completedCount }} of {{ onboardingService.progress()!.totalCount }} steps done</p>
+              <ion-progress-bar
+                [value]="onboardingService.progress()!.completedCount / onboardingService.progress()!.totalCount"
+                color="primary"
+                class="banner-progress"
+              ></ion-progress-bar>
+            </div>
+            <ion-button fill="clear" size="small" (click)="dismissOnboarding($event)">
+              <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+          </ion-card-content>
+        </ion-card>
+      }
 
       <!-- Summary Cards -->
       <ion-grid>
@@ -171,23 +208,38 @@ import { SseService } from '../../core/services/sse.service';
           <ion-col size="12" sizeMd="6">
             <ion-card>
               <ion-card-header>
-                <ion-card-title>SLA Status</ion-card-title>
+                <ion-card-title>SLA Compliance</ion-card-title>
               </ion-card-header>
               <ion-card-content>
                 @if (loading()) {
-                  <ion-skeleton-text [animated]="true" style="width: 100%; height: 3rem;"></ion-skeleton-text>
+                  <ion-skeleton-text [animated]="true" style="width: 100%; height: 5rem;"></ion-skeleton-text>
                 } @else {
-                  <div class="sla-summary">
-                    <ion-chip color="success">
-                      <ion-label>Compliant: {{ summary()?.sla?.compliant ?? 0 }}</ion-label>
-                    </ion-chip>
-                    <ion-chip color="warning">
-                      <ion-label>At Risk: {{ summary()?.sla?.at_risk ?? 0 }}</ion-label>
-                    </ion-chip>
-                    <ion-chip color="danger">
-                      <ion-label>Breached: {{ summary()?.sla?.breached ?? 0 }}</ion-label>
-                    </ion-chip>
+                  <div class="sla-overview">
+                    <div class="sla-stat">
+                      <div class="sla-stat-value sla-compliant">{{ summary()?.sla?.compliant ?? 0 }}</div>
+                      <div class="sla-stat-label">Compliant</div>
+                    </div>
+                    <div class="sla-stat">
+                      <div class="sla-stat-value sla-at-risk">{{ summary()?.sla?.at_risk ?? 0 }}</div>
+                      <div class="sla-stat-label">At Risk</div>
+                    </div>
+                    <div class="sla-stat">
+                      <div class="sla-stat-value sla-breached">{{ summary()?.sla?.breached ?? 0 }}</div>
+                      <div class="sla-stat-label">Breached</div>
+                    </div>
                   </div>
+                  @if ((summary()?.sla?.compliant ?? 0) + (summary()?.sla?.at_risk ?? 0) + (summary()?.sla?.breached ?? 0) > 0) {
+                    <div class="sla-bar-container">
+                      <div class="sla-bar-segment sla-bar-compliant"
+                        [style.flex]="summary()?.sla?.compliant ?? 0"></div>
+                      <div class="sla-bar-segment sla-bar-at-risk"
+                        [style.flex]="summary()?.sla?.at_risk ?? 0"></div>
+                      <div class="sla-bar-segment sla-bar-breached"
+                        [style.flex]="summary()?.sla?.breached ?? 0"></div>
+                    </div>
+                  } @else {
+                    <p class="empty-text">No SLAs configured</p>
+                  }
                 }
               </ion-card-content>
             </ion-card>
@@ -399,12 +451,38 @@ import { SseService } from '../../core/services/sse.service';
         gap: 8px;
       }
 
-      .sla-summary {
+      .sla-overview {
         display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        justify-content: center;
+        justify-content: space-around;
+        text-align: center;
+        margin-bottom: 16px;
       }
+      .sla-stat-value {
+        font-family: 'DM Sans', sans-serif;
+        font-size: 1.75rem;
+        font-weight: 700;
+      }
+      .sla-stat-label {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--ion-color-medium);
+        margin-top: 2px;
+      }
+      .sla-compliant { color: var(--ion-color-success); }
+      .sla-at-risk { color: var(--ion-color-warning); }
+      .sla-breached { color: var(--ion-color-danger); }
+      .sla-bar-container {
+        display: flex;
+        height: 8px;
+        border-radius: 4px;
+        overflow: hidden;
+        gap: 2px;
+      }
+      .sla-bar-segment { border-radius: 4px; min-width: 2px; }
+      .sla-bar-compliant { background: var(--ion-color-success); }
+      .sla-bar-at-risk { background: var(--ion-color-warning); }
+      .sla-bar-breached { background: var(--ion-color-danger); }
 
       .uptime-row,
       .response-row {
@@ -468,6 +546,41 @@ import { SseService } from '../../core/services/sse.service';
       ion-badge {
         text-transform: capitalize;
       }
+
+      .onboarding-banner {
+        cursor: pointer;
+        margin-bottom: 16px;
+        --background: var(--ion-color-primary-tint);
+      }
+      .banner-content {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 12px 16px;
+      }
+      .banner-icon {
+        font-size: 2rem;
+        color: var(--ion-color-primary);
+        flex-shrink: 0;
+      }
+      .banner-text {
+        flex: 1;
+        min-width: 0;
+      }
+      .banner-text h3 {
+        margin: 0 0 2px;
+        font-size: 1rem;
+        font-weight: 600;
+      }
+      .banner-text p {
+        margin: 0 0 6px;
+        font-size: 0.8rem;
+        color: var(--ion-color-medium);
+      }
+      .banner-progress {
+        height: 4px;
+        border-radius: 2px;
+      }
     `,
   ],
 })
@@ -488,11 +601,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private dashboardService: DashboardService,
     private sseService: SseService,
     private toastCtrl: ToastController,
+    public onboardingService: OnboardingService,
   ) {}
 
   ngOnInit(): void {
     this.loadData();
     this.connectSSE();
+    if (!this.onboardingService.isDismissed()) {
+      this.onboardingService.loadProgress();
+    }
   }
 
   ngOnDestroy(): void {
@@ -583,5 +700,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
   getResponseBarWidth(avgTime: number): number {
     if (this.maxResponseTime <= 0) return 0;
     return Math.min((avgTime / this.maxResponseTime) * 100, 100);
+  }
+
+  dismissOnboarding(event: Event): void {
+    event.stopPropagation();
+    event.preventDefault();
+    this.onboardingService.dismiss();
   }
 }

@@ -4,7 +4,8 @@ import { FormsModule } from '@angular/forms';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonButton,
   IonList, IonItem, IonInput, IonToggle, IonLabel, IonNote, IonIcon,
-  IonSegment, IonSegmentButton, IonSpinner,
+  IonSegment, IonSegmentButton, IonSpinner, IonSelect, IonSelectOption,
+  IonRefresher, IonRefresherContent, IonSkeletonText,
   ToastController,
 } from '@ionic/angular/standalone';
 import { SettingsService, Settings } from './settings.service';
@@ -20,7 +21,8 @@ addIcons({ settingsOutline });
     CommonModule, FormsModule,
     IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonButton,
     IonList, IonItem, IonInput, IonToggle, IonLabel, IonNote, IonIcon,
-    IonSegment, IonSegmentButton, IonSpinner,
+    IonSegment, IonSegmentButton, IonSpinner, IonSelect, IonSelectOption,
+    IonRefresher, IonRefresherContent, IonSkeletonText,
   ],
   template: `
     <ion-header>
@@ -41,16 +43,26 @@ addIcons({ settingsOutline });
         <ion-segment [(ngModel)]="activeTab" (ionChange)="onTabChange()">
           <ion-segment-button value="general"><ion-label>General</ion-label></ion-segment-button>
           <ion-segment-button value="notifications"><ion-label>Notifications</ion-label></ion-segment-button>
-          <ion-segment-button value="channels"><ion-label>Channels</ion-label></ion-segment-button>
         </ion-segment>
       </ion-toolbar>
     </ion-header>
 
     <ion-content class="ion-padding">
+      <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+        <ion-refresher-content></ion-refresher-content>
+      </ion-refresher>
+
       @if (loading()) {
-        <div style="text-align: center; padding: 2rem">
-          <ion-spinner name="crescent"></ion-spinner>
-        </div>
+        <ion-list>
+          @for (i of [1,2,3,4]; track i) {
+            <ion-item>
+              <ion-label>
+                <ion-skeleton-text [animated]="true" style="width: 30%; height: 0.75rem; margin-bottom: 6px;"></ion-skeleton-text>
+                <ion-skeleton-text [animated]="true" style="width: 70%; height: 1rem;"></ion-skeleton-text>
+              </ion-label>
+            </ion-item>
+          }
+        </ion-list>
       } @else {
         @switch (activeTab) {
           @case ('general') {
@@ -59,7 +71,21 @@ addIcons({ settingsOutline });
                 <ion-input label="Organization Name" labelPlacement="stacked" [(ngModel)]="settings['org_name']" placeholder="My Organization"></ion-input>
               </ion-item>
               <ion-item>
-                <ion-input label="Timezone" labelPlacement="stacked" [(ngModel)]="settings['timezone']" placeholder="UTC"></ion-input>
+                <ion-select label="Timezone" labelPlacement="stacked" [(ngModel)]="settings['timezone']" interface="popover">
+                  <ion-select-option value="UTC">UTC</ion-select-option>
+                  <ion-select-option value="America/New_York">America/New_York (EST)</ion-select-option>
+                  <ion-select-option value="America/Chicago">America/Chicago (CST)</ion-select-option>
+                  <ion-select-option value="America/Denver">America/Denver (MST)</ion-select-option>
+                  <ion-select-option value="America/Los_Angeles">America/Los_Angeles (PST)</ion-select-option>
+                  <ion-select-option value="America/Sao_Paulo">America/Sao_Paulo (BRT)</ion-select-option>
+                  <ion-select-option value="Europe/London">Europe/London (GMT)</ion-select-option>
+                  <ion-select-option value="Europe/Paris">Europe/Paris (CET)</ion-select-option>
+                  <ion-select-option value="Europe/Berlin">Europe/Berlin (CET)</ion-select-option>
+                  <ion-select-option value="Asia/Tokyo">Asia/Tokyo (JST)</ion-select-option>
+                  <ion-select-option value="Asia/Shanghai">Asia/Shanghai (CST)</ion-select-option>
+                  <ion-select-option value="Asia/Singapore">Asia/Singapore (SGT)</ion-select-option>
+                  <ion-select-option value="Australia/Sydney">Australia/Sydney (AEST)</ion-select-option>
+                </ion-select>
               </ion-item>
               <ion-item>
                 <ion-input label="Date Format" labelPlacement="stacked" [(ngModel)]="settings['date_format']" placeholder="YYYY-MM-DD"></ion-input>
@@ -88,28 +114,6 @@ addIcons({ settingsOutline });
               </ion-item>
             </ion-list>
           }
-          @case ('channels') {
-            <ion-list>
-              <ion-item>
-                <ion-input label="SMTP Host" labelPlacement="stacked" [(ngModel)]="settings['smtp_host']" placeholder="smtp.example.com"></ion-input>
-              </ion-item>
-              <ion-item>
-                <ion-input label="SMTP Port" labelPlacement="stacked" [(ngModel)]="settings['smtp_port']" type="number" placeholder="587"></ion-input>
-              </ion-item>
-              <ion-item>
-                <ion-input label="SMTP Username" labelPlacement="stacked" [(ngModel)]="settings['smtp_username']" placeholder="user"></ion-input>
-              </ion-item>
-              <ion-item>
-                <ion-input label="SMTP Password" labelPlacement="stacked" [(ngModel)]="settings['smtp_password']" type="password" placeholder="password"></ion-input>
-              </ion-item>
-              <ion-item>
-                <ion-input label="Telegram Bot Token" labelPlacement="stacked" [(ngModel)]="settings['telegram_bot_token']" placeholder="Bot token"></ion-input>
-              </ion-item>
-              <ion-item>
-                <ion-input label="Webhook URL" labelPlacement="stacked" [(ngModel)]="settings['webhook_url']" placeholder="https://hooks.example.com/..."></ion-input>
-              </ion-item>
-            </ion-list>
-          }
         }
       }
     </ion-content>
@@ -135,6 +139,13 @@ export class SettingsComponent implements OnInit {
 
   onTabChange(): void {}
 
+  onRefresh(event: any): void {
+    this.service.get().subscribe({
+      next: (data) => { this.settings = data || {}; event.target.complete(); },
+      error: () => event.target.complete(),
+    });
+  }
+
   onSave(): void {
     this.saving.set(true);
     this.service.save(this.settings).subscribe({
@@ -143,9 +154,9 @@ export class SettingsComponent implements OnInit {
         const toast = await this.toastCtrl.create({ message: 'Settings saved', color: 'success', duration: 2000, position: 'bottom' });
         await toast.present();
       },
-      error: async () => {
+      error: async (err: any) => {
         this.saving.set(false);
-        const toast = await this.toastCtrl.create({ message: 'Failed to save settings', color: 'danger', duration: 3000, position: 'bottom' });
+        const toast = await this.toastCtrl.create({ message: err?.message || 'Failed to save settings', color: 'danger', duration: 4000, position: 'bottom' });
         await toast.present();
       },
     });

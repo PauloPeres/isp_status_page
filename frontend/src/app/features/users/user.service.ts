@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ApiService, PaginatedResponse } from '../../core/services/api.service';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 export interface User {
   id: number;
@@ -27,7 +28,12 @@ export class UserService {
   constructor(private api: ApiService) {}
 
   getAll(params?: any): Observable<PaginatedResponse<User>> {
-    return this.api.get<PaginatedResponse<User>>('/users', params);
+    return this.api.get<any>('/users', params).pipe(
+      map(data => ({
+        items: data.users || data.items || [],
+        pagination: data.pagination || { page: 1, limit: 999, total: (data.users || data.items || []).length, pages: 1 },
+      }))
+    );
   }
 
   get(id: number): Observable<User> {
@@ -43,7 +49,12 @@ export class UserService {
   }
 
   getInvitations(params?: any): Observable<PaginatedResponse<Invitation>> {
-    return this.api.get<PaginatedResponse<Invitation>>('/invitations', params);
+    return this.api.get<any>('/invitations', params).pipe(
+      map(data => ({
+        items: data.invitations || data.items || [],
+        pagination: data.pagination || { page: 1, limit: 999, total: (data.invitations || data.items || []).length, pages: 1 },
+      }))
+    );
   }
 
   sendInvitation(data: { email: string; role: string }): Observable<Invitation> {

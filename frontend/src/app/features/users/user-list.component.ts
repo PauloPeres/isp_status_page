@@ -6,10 +6,11 @@ import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonButton,
   IonList, IonItem, IonItemSliding, IonItemOptions, IonItemOption,
   IonLabel, IonBadge, IonNote, IonIcon, IonAvatar,
-  IonRefresher, IonRefresherContent,
+  IonRefresher, IonRefresherContent, IonSearchbar,
   AlertController,
 } from '@ionic/angular/standalone';
 import { UserService, User } from './user.service';
+import { ListSkeletonComponent } from '../../shared/components/list-skeleton.component';
 import { addIcons } from 'ionicons';
 import { peopleOutline, personCircleOutline } from 'ionicons/icons';
 
@@ -23,7 +24,8 @@ addIcons({ peopleOutline, personCircleOutline });
     IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonButton,
     IonList, IonItem, IonItemSliding, IonItemOptions, IonItemOption,
     IonLabel, IonBadge, IonNote, IonIcon, IonAvatar,
-    IonRefresher, IonRefresherContent,
+    IonRefresher, IonRefresherContent, IonSearchbar,
+    ListSkeletonComponent,
   ],
   template: `
     <ion-header>
@@ -34,6 +36,14 @@ addIcons({ peopleOutline, personCircleOutline });
           <ion-button routerLink="/invitations" fill="solid" color="primary" size="small">+ Invite</ion-button>
         </ion-buttons>
       </ion-toolbar>
+      <ion-toolbar>
+        <ion-searchbar
+          [(ngModel)]="searchQuery"
+          (ionInput)="onSearch()"
+          placeholder="Search..."
+          [debounce]="300"
+        ></ion-searchbar>
+      </ion-toolbar>
     </ion-header>
 
     <ion-content>
@@ -41,6 +51,9 @@ addIcons({ peopleOutline, personCircleOutline });
         <ion-refresher-content></ion-refresher-content>
       </ion-refresher>
 
+      @if (loading()) {
+        <app-list-skeleton></app-list-skeleton>
+      } @else {
       <ion-list>
         @for (user of items(); track user.id) {
           <ion-item-sliding>
@@ -73,6 +86,7 @@ addIcons({ peopleOutline, personCircleOutline });
           </div>
         }
       </ion-list>
+      }
     </ion-content>
   `,
   styles: [`
@@ -82,20 +96,49 @@ addIcons({ peopleOutline, personCircleOutline });
 })
 export class UserListComponent implements OnInit {
   items = signal<User[]>([]);
+  allItems = signal<User[]>([]);
+  loading = signal(true);
+  searchQuery = '';
 
   constructor(private service: UserService, private alertCtrl: AlertController) {}
 
   ngOnInit(): void { this.load(); }
 
   load(): void {
-    this.service.getAll().subscribe((data) => this.items.set(data.items));
+    this.service.getAll().subscribe((data) => {
+      this.allItems.set(data.items);
+      this.applyFilter();
+      this.loading.set(false);
+    });
   }
 
   onRefresh(event: any): void {
     this.service.getAll().subscribe({
-      next: (data) => { this.items.set(data.items); event.target.complete(); },
+      next: (data) => {
+        this.allItems.set(data.items);
+        this.applyFilter();
+        event.target.complete();
+      },
       error: () => event.target.complete(),
     });
+  }
+
+  onSearch(): void {
+    this.applyFilter();
+  }
+
+  applyFilter(): void {
+    const query = this.searchQuery.toLowerCase().trim();
+    if (!query) {
+      this.items.set(this.allItems());
+      return;
+    }
+    this.items.set(
+      this.allItems().filter((item) =>
+        item.name.toLowerCase().includes(query) ||
+        item.email.toLowerCase().includes(query)
+      )
+    );
   }
 
   async onChangeRole(user: User): Promise<void> {

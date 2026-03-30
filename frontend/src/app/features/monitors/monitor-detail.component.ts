@@ -50,6 +50,15 @@ interface UptimeHistoryEntry {
   checks: number;
 }
 
+interface RegionBreakdown {
+  region_id: number;
+  region_name: string;
+  region_code: string;
+  uptime: number;
+  avg_response_time: number | null;
+  total_checks: number;
+}
+
 interface MonitorDetailData {
   monitor: Monitor;
   uptime_24h: number;
@@ -57,6 +66,7 @@ interface MonitorDetailData {
   total_checks_24h: number;
   uptime_history: UptimeHistoryEntry[];
   sla: any | null;
+  region_breakdown: RegionBreakdown[];
 }
 
 interface Check {
@@ -311,6 +321,39 @@ interface Check {
                   </ion-col>
                 </ion-row>
               </ion-grid>
+            </ion-card-content>
+          </ion-card>
+        }
+
+        <!-- Region Breakdown (C-01) -->
+        @if (detail()!.region_breakdown && detail()!.region_breakdown.length > 0) {
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>Check Regions (24h)</ion-card-title>
+            </ion-card-header>
+            <ion-card-content class="list-card-content">
+              <ion-list>
+                @for (region of detail()!.region_breakdown; track region.region_id) {
+                  <ion-item>
+                    <ion-label>
+                      <h3>{{ region.region_name }}</h3>
+                      <p>
+                        {{ region.uptime | number: '1.1-2' }}% uptime
+                        @if (region.avg_response_time !== null) {
+                          &mdash; {{ region.avg_response_time | number: '1.0-0' }}ms avg
+                        }
+                        &mdash; {{ region.total_checks }} checks
+                      </p>
+                    </ion-label>
+                    <ion-badge
+                      slot="end"
+                      [color]="region.uptime >= 99 ? 'success' : region.uptime >= 95 ? 'warning' : 'danger'"
+                    >
+                      {{ region.region_code }}
+                    </ion-badge>
+                  </ion-item>
+                }
+              </ion-list>
             </ion-card-content>
           </ion-card>
         }

@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonBackButton, IonButton,
-  IonList, IonItem, IonInput, IonSelect, IonSelectOption, IonToggle, IonSpinner,
+  IonList, IonItem, IonInput, IonSelect, IonSelectOption, IonToggle, IonSpinner, IonNote,
   ToastController,
 } from '@ionic/angular/standalone';
 import { IntegrationService } from './integration.service';
@@ -15,7 +15,7 @@ import { IntegrationService } from './integration.service';
   imports: [
     CommonModule, FormsModule, RouterLink,
     IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonBackButton, IonButton,
-    IonList, IonItem, IonInput, IonSelect, IonSelectOption, IonToggle, IonSpinner,
+    IonList, IonItem, IonInput, IonSelect, IonSelectOption, IonToggle, IonSpinner, IonNote,
   ],
   template: `
     <ion-header>
@@ -31,6 +31,9 @@ import { IntegrationService } from './integration.service';
         <ion-item>
           <ion-input label="Name" labelPlacement="floating" [(ngModel)]="form.name" name="name" required></ion-input>
         </ion-item>
+        @if (submitted && !form.name) {
+          <ion-note color="danger" class="field-error">Name is required</ion-note>
+        }
         <ion-item>
           <ion-select label="Type" labelPlacement="floating" [(ngModel)]="form.type" name="type">
             <ion-select-option value="ixc">IXC</ion-select-option>
@@ -39,8 +42,11 @@ import { IntegrationService } from './integration.service';
           </ion-select>
         </ion-item>
         <ion-item>
-          <ion-input label="Base URL" labelPlacement="floating" [(ngModel)]="form.base_url" name="base_url"></ion-input>
+          <ion-input label="Base URL" labelPlacement="floating" [(ngModel)]="form.base_url" name="base_url" required></ion-input>
         </ion-item>
+        @if (submitted && !form.base_url) {
+          <ion-note color="danger" class="field-error">Base URL is required</ion-note>
+        }
         <ion-item>
           <ion-input label="Username" labelPlacement="floating" [(ngModel)]="form.username" name="username"></ion-input>
         </ion-item>
@@ -57,10 +63,20 @@ import { IntegrationService } from './integration.service';
       </ion-button>
     </ion-content>
   `,
+  styles: [
+    `
+      .field-error {
+        display: block;
+        padding: 4px 16px;
+        font-size: 0.75rem;
+      }
+    `,
+  ],
 })
 export class IntegrationFormComponent {
   form: any = { name: '', type: 'rest_api', base_url: '', username: '', password: '', active: true };
   saving = false;
+  submitted = false;
 
   constructor(
     private service: IntegrationService,
@@ -69,7 +85,8 @@ export class IntegrationFormComponent {
   ) {}
 
   onSave(): void {
-    if (!this.form.name) return;
+    this.submitted = true;
+    if (!this.form.name || !this.form.base_url) return;
     this.saving = true;
     const payload = {
       name: this.form.name,
@@ -88,9 +105,9 @@ export class IntegrationFormComponent {
         await toast.present();
         this.router.navigate(['/integrations']);
       },
-      error: async () => {
+      error: async (err: any) => {
         this.saving = false;
-        const toast = await this.toastCtrl.create({ message: 'Failed to create integration', color: 'danger', duration: 3000, position: 'bottom' });
+        const toast = await this.toastCtrl.create({ message: err?.message || 'Failed to create integration', color: 'danger', duration: 4000, position: 'bottom' });
         await toast.present();
       },
     });

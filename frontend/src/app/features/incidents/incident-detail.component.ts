@@ -491,10 +491,10 @@ export class IncidentDetailComponent implements OnInit {
         });
         await toast.present();
       },
-      error: async () => {
+      error: async (err: any) => {
         const toast = await this.toastCtrl.create({
-          message: 'Failed to acknowledge incident',
-          duration: 2000,
+          message: err?.message || 'Failed to acknowledge incident',
+          duration: 4000,
           color: 'danger',
         });
         await toast.present();
@@ -534,10 +534,10 @@ export class IncidentDetailComponent implements OnInit {
           });
           await toast.present();
         },
-        error: async () => {
+        error: async (err: any) => {
           const toast = await this.toastCtrl.create({
-            message: 'Failed to post update',
-            duration: 2000,
+            message: err?.message || 'Failed to post update',
+            duration: 4000,
             color: 'danger',
           });
           await toast.present();

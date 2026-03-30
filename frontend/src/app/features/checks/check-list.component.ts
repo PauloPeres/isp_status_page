@@ -20,8 +20,10 @@ import {
   IonInfiniteScrollContent,
   IonSelect,
   IonSelectOption,
+  IonSearchbar,
 } from '@ionic/angular/standalone';
 import { CheckService, CheckWithMonitor } from './check.service';
+import { ListSkeletonComponent } from '../../shared/components/list-skeleton.component';
 import { MonitorService } from '../monitors/monitor.service';
 import { Monitor } from '../../core/models/monitor.model';
 import { addIcons } from 'ionicons';
@@ -53,6 +55,8 @@ addIcons({ pulseOutline });
     IonInfiniteScrollContent,
     IonSelect,
     IonSelectOption,
+    IonSearchbar,
+    ListSkeletonComponent,
   ],
   template: `
     <ion-header>
@@ -80,6 +84,14 @@ addIcons({ pulseOutline });
           </ion-select>
         </ion-item>
       </ion-toolbar>
+      <ion-toolbar>
+        <ion-searchbar
+          [(ngModel)]="searchQuery"
+          (ionInput)="onSearch()"
+          placeholder="Search..."
+          [debounce]="300"
+        ></ion-searchbar>
+      </ion-toolbar>
     </ion-header>
 
     <ion-content>
@@ -87,6 +99,9 @@ addIcons({ pulseOutline });
         <ion-refresher-content></ion-refresher-content>
       </ion-refresher>
 
+      @if (loading()) {
+        <app-list-skeleton></app-list-skeleton>
+      } @else {
       <ion-list>
         @for (check of checks(); track check.id) {
           <ion-item>
@@ -136,6 +151,7 @@ addIcons({ pulseOutline });
           </div>
         }
       </ion-list>
+      }
 
       <ion-infinite-scroll (ionInfinite)="loadMore($event)">
         <ion-infinite-scroll-content
@@ -186,7 +202,10 @@ addIcons({ pulseOutline });
 })
 export class CheckListComponent implements OnInit {
   checks = signal<CheckWithMonitor[]>([]);
+  allChecks = signal<CheckWithMonitor[]>([]);
   monitors = signal<Monitor[]>([]);
+  loading = signal(true);
+  searchQuery = '';
   monitorFilter = 0;
   page = 1;
   hasMore = true;
@@ -220,11 +239,13 @@ export class CheckListComponent implements OnInit {
 
     this.checkService.getChecks(params).subscribe((data) => {
       if (append) {
-        this.checks.update((current) => [...current, ...data.items]);
+        this.allChecks.update((current) => [...current, ...data.items]);
       } else {
-        this.checks.set(data.items);
+        this.allChecks.set(data.items);
       }
+      this.applyFilter();
       this.hasMore = this.page < data.pagination.pages;
+      this.loading.set(false);
     });
   }
 
@@ -244,7 +265,8 @@ export class CheckListComponent implements OnInit {
 
     this.checkService.getChecks(params).subscribe({
       next: (data) => {
-        this.checks.set(data.items);
+        this.allChecks.set(data.items);
+        this.applyFilter();
         this.hasMore = this.page < data.pagination.pages;
         event.target.complete();
       },
@@ -252,6 +274,24 @@ export class CheckListComponent implements OnInit {
         event.target.complete();
       },
     });
+  }
+
+  onSearch(): void {
+    this.applyFilter();
+  }
+
+  applyFilter(): void {
+    const query = this.searchQuery.toLowerCase().trim();
+    if (!query) {
+      this.checks.set(this.allChecks());
+      return;
+    }
+    this.checks.set(
+      this.allChecks().filter((item) =>
+        (item.monitor?.name ?? '').toLowerCase().includes(query) ||
+        item.status.toLowerCase().includes(query)
+      )
+    );
   }
 
   loadMore(event: any): void {
@@ -267,7 +307,8 @@ export class CheckListComponent implements OnInit {
 
     this.checkService.getChecks(params).subscribe({
       next: (data) => {
-        this.checks.update((current) => [...current, ...data.items]);
+        this.allChecks.update((current) => [...current, ...data.items]);
+        this.applyFilter();
         this.hasMore = this.page < data.pagination.pages;
         event.target.complete();
         if (!this.hasMore) {

@@ -199,6 +199,37 @@ class MonitorsController extends AppController
             // SLA tables may not exist yet
         }
 
+        // Per-region breakdown (C-01: Multi-region)
+        $regionBreakdown = [];
+        try {
+            $regionStmt = $conn->execute(
+                "SELECT cr.id, cr.name, cr.code,
+                        COUNT(*) as total_checks,
+                        SUM(CASE WHEN mc.status = 'success' THEN 1 ELSE 0 END) as success_checks,
+                        ROUND(AVG(mc.response_time)::numeric, 2) as avg_response_time
+                 FROM monitor_checks mc
+                 JOIN check_regions cr ON cr.id = mc.region_id
+                 WHERE mc.monitor_id = ? AND mc.checked_at >= ?
+                 GROUP BY cr.id, cr.name, cr.code
+                 ORDER BY cr.name",
+                [(int)$id, $since24h]
+            );
+            foreach ($regionStmt->fetchAll('assoc') as $row) {
+                $rTotal = (int)$row['total_checks'];
+                $rSuccess = (int)$row['success_checks'];
+                $regionBreakdown[] = [
+                    'region_id' => (int)$row['id'],
+                    'region_name' => $row['name'],
+                    'region_code' => $row['code'],
+                    'uptime' => $rTotal > 0 ? round(($rSuccess / $rTotal) * 100, 2) : 0,
+                    'avg_response_time' => $row['avg_response_time'] !== null ? (float)$row['avg_response_time'] : null,
+                    'total_checks' => $rTotal,
+                ];
+            }
+        } catch (\Exception $e) {
+            // check_regions table may not exist or no regional data
+        }
+
         $this->success([
             'monitor' => $monitor,
             'uptime_24h' => $uptime,
@@ -206,6 +237,7 @@ class MonitorsController extends AppController
             'total_checks_24h' => $totalChecks,
             'uptime_history' => $uptimeHistory,
             'sla' => $slaData,
+            'region_breakdown' => $regionBreakdown,
         ]);
     }
 
@@ -658,6 +690,91 @@ class MonitorsController extends AppController
 
         $this->success([
             'created' => $created,
+            'errors' => $errors,
+        ], $created > 0 ? 201 : 200);
+    }
+
+    /**
+     * POST /api/v2/monitors/import-competitor
+     *
+     * Import monitors from competitor platforms.
+     * Supported formats: uptimerobot, pingdom, betteruptime, csv (auto-detected).
+     *
+     * @return void
+     */
+    public function importCompetitor(): void
+    {
+        $this->request->allowMethod(['post']);
+
+        if (!$this->requireRole(['owner', 'admin'])) {
+            return;
+        }
+
+        $content = $this->request->getData('content');
+        $format = $this->request->getData('format'); // optional: uptimerobot, pingdom, betteruptime
+
+        if (empty($content)) {
+            $file = $this->request->getUploadedFile('file');
+            if ($file && $file->getError() === UPLOAD_ERR_OK) {
+                $content = (string)$file->getStream();
+            }
+        }
+
+        if (empty($content)) {
+            $this->error('No import data provided. Send "content" field or upload "file".', 400);
+            return;
+        }
+
+        $importService = new \App\Service\Import\MonitorImportService();
+        $result = $importService->parse($content, $format);
+
+        if (empty($result['monitors'])) {
+            $this->error('No monitors could be parsed from the import data', 400, $result['errors'] ?? []);
+            return;
+        }
+
+        $monitorsTable = $this->fetchTable('Monitors');
+        $created = 0;
+        $errors = $result['errors'];
+
+        foreach ($result['monitors'] as $i => $monitorData) {
+            $data = [
+                'name' => $monitorData['name'],
+                'type' => $monitorData['type'],
+                'configuration' => json_encode($monitorData['configuration']),
+                'check_interval' => $monitorData['check_interval'] ?? 300,
+                'timeout' => 30,
+                'retry_count' => 3,
+                'status' => 'unknown',
+                'active' => $monitorData['active'] ?? true,
+            ];
+
+            if (!empty($monitorData['tags'])) {
+                $tags = is_array($monitorData['tags'])
+                    ? $monitorData['tags']
+                    : array_map('trim', explode(',', $monitorData['tags']));
+                $data['tags'] = json_encode(array_values(array_filter($tags)));
+            }
+
+            $monitor = $monitorsTable->newEntity($data);
+
+            if ($monitorsTable->save($monitor)) {
+                $created++;
+            } else {
+                $validationErrors = [];
+                foreach ($monitor->getErrors() as $field => $fieldErrors) {
+                    foreach ($fieldErrors as $error) {
+                        $validationErrors[] = "{$field}: {$error}";
+                    }
+                }
+                $errors[] = "Monitor \"{$monitorData['name']}\": " . implode(', ', $validationErrors);
+            }
+        }
+
+        $this->success([
+            'created' => $created,
+            'total_parsed' => count($result['monitors']),
+            'format_detected' => $result['format'],
             'errors' => $errors,
         ], $created > 0 ? 201 : 200);
     }

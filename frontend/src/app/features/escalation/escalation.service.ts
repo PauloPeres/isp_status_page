@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ApiService, PaginatedResponse } from '../../core/services/api.service';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 export interface EscalationStep {
   delay_minutes: number;
@@ -25,7 +26,12 @@ export class EscalationService {
   constructor(private api: ApiService) {}
 
   getAll(params?: any): Observable<PaginatedResponse<EscalationPolicy>> {
-    return this.api.get<PaginatedResponse<EscalationPolicy>>('/escalation-policies', params);
+    return this.api.get<any>('/escalation-policies', params).pipe(
+      map(data => ({
+        items: data.escalation_policies || data.items || [],
+        pagination: data.pagination || { page: 1, limit: 999, total: (data.escalation_policies || data.items || []).length, pages: 1 },
+      }))
+    );
   }
 
   get(id: number): Observable<EscalationPolicy> {

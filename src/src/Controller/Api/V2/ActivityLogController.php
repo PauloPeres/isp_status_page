@@ -51,4 +51,104 @@ class ActivityLogController extends AppController
             ],
         ]);
     }
+
+    /**
+     * GET /api/v2/activity-log/export
+     *
+     * Export audit logs as CSV or JSON for compliance.
+     * Query params: format (csv|json, default csv), from, to, event_type
+     *
+     * @return void
+     */
+    public function export(): void
+    {
+        $this->request->allowMethod(['get']);
+
+        if (!$this->requireRole(['owner', 'admin'])) {
+            return;
+        }
+
+        $format = strtolower($this->request->getQuery('format') ?: 'csv');
+        $from = $this->request->getQuery('from');
+        $to = $this->request->getQuery('to');
+        $eventType = $this->request->getQuery('event_type');
+
+        $table = $this->fetchTable('SecurityAuditLogs');
+        $query = $table->find()
+            ->contain(['Users' => ['fields' => ['id', 'username', 'email']]])
+            ->orderBy(['SecurityAuditLogs.created' => 'ASC']);
+
+        if (!empty($eventType)) {
+            $query->where(['SecurityAuditLogs.event_type' => $eventType]);
+        }
+        if (!empty($from)) {
+            $query->where(['SecurityAuditLogs.created >=' => $from]);
+        }
+        if (!empty($to)) {
+            $query->where(['SecurityAuditLogs.created <=' => $to . ' 23:59:59']);
+        }
+
+        $entries = $query->limit(10000)->all()->toArray();
+
+        if ($format === 'json') {
+            $rows = [];
+            foreach ($entries as $entry) {
+                $rows[] = [
+                    'id' => $entry->id,
+                    'event_type' => $entry->event_type,
+                    'user_id' => $entry->user_id,
+                    'username' => $entry->user->username ?? null,
+                    'email' => $entry->user->email ?? null,
+                    'ip_address' => $entry->ip_address,
+                    'user_agent' => $entry->user_agent,
+                    'details' => $entry->details,
+                    'created' => $entry->created ? $entry->created->format('Y-m-d H:i:s') : null,
+                ];
+            }
+
+            $this->response = $this->response
+                ->withType('application/json')
+                ->withHeader('Content-Disposition', 'attachment; filename="audit_log_export.json"');
+            $this->set('data', $rows);
+            $this->viewBuilder()->setOption('serialize', 'data');
+            return;
+        }
+
+        // CSV format
+        $csvLines = [];
+        $csvLines[] = implode(',', ['ID', 'Event Type', 'User ID', 'Username', 'Email', 'IP Address', 'Details', 'Timestamp']);
+
+        foreach ($entries as $entry) {
+            $csvLines[] = implode(',', [
+                $entry->id,
+                $this->csvEscape($entry->event_type),
+                $entry->user_id ?? '',
+                $this->csvEscape($entry->user->username ?? ''),
+                $this->csvEscape($entry->user->email ?? ''),
+                $this->csvEscape($entry->ip_address ?? ''),
+                $this->csvEscape($entry->details ?? ''),
+                $entry->created ? $entry->created->format('Y-m-d H:i:s') : '',
+            ]);
+        }
+
+        $csvContent = implode("\n", $csvLines);
+
+        $this->response = $this->response
+            ->withType('text/csv')
+            ->withHeader('Content-Disposition', 'attachment; filename="audit_log_export.csv"')
+            ->withStringBody($csvContent);
+        $this->set('data', null);
+        $this->viewBuilder()->setClassName('Json');
+    }
+
+    /**
+     * Escape a value for CSV output.
+     */
+    private function csvEscape(string $value): string
+    {
+        if (str_contains($value, ',') || str_contains($value, '"') || str_contains($value, "\n")) {
+            return '"' . str_replace('"', '""', $value) . '"';
+        }
+        return $value;
+    }
 }

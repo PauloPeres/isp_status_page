@@ -9,12 +9,13 @@ import {
 } from '@ionic/angular/standalone';
 import { SlaService } from './sla.service';
 import { MonitorService } from '../monitors/monitor.service';
+import { FieldErrorComponent } from '../../shared/components/field-error.component';
 
 @Component({
   selector: 'app-sla-form',
   standalone: true,
   imports: [
-    CommonModule, ReactiveFormsModule,
+    CommonModule, ReactiveFormsModule, FieldErrorComponent,
     IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonBackButton, IonButton,
     IonList, IonItem, IonInput, IonSelect, IonSelectOption, IonNote, IonSpinner,
   ],
@@ -43,6 +44,7 @@ import { MonitorService } from '../monitors/monitor.service';
           <ion-item>
             <ion-input label="Name" labelPlacement="stacked" placeholder="SLA name" formControlName="name" required></ion-input>
           </ion-item>
+          <app-field-error [control]="form.get('name')" label="Name"></app-field-error>
 
           <ion-item>
             <ion-select label="Monitor" labelPlacement="stacked" formControlName="monitor_id" interface="popover">
@@ -51,22 +53,21 @@ import { MonitorService } from '../monitors/monitor.service';
               }
             </ion-select>
           </ion-item>
+          <app-field-error [control]="form.get('monitor_id')" label="Monitor"></app-field-error>
 
           <ion-item>
             <ion-input label="Target Uptime (%)" labelPlacement="stacked" formControlName="target_uptime" type="number" placeholder="99.9" step="0.01"></ion-input>
           </ion-item>
+          <app-field-error [control]="form.get('target_uptime')" label="Target uptime"></app-field-error>
 
           <ion-item>
-            <ion-select label="Period" labelPlacement="stacked" formControlName="period" interface="popover">
+            <ion-select label="Measurement Period" labelPlacement="stacked" formControlName="measurement_period" interface="popover">
               <ion-select-option value="monthly">Monthly</ion-select-option>
               <ion-select-option value="quarterly">Quarterly</ion-select-option>
               <ion-select-option value="yearly">Yearly</ion-select-option>
             </ion-select>
           </ion-item>
-
-          <ion-item>
-            <ion-input label="Downtime Budget (minutes)" labelPlacement="stacked" formControlName="downtime_budget_minutes" type="number" placeholder="43"></ion-input>
-          </ion-item>
+          <app-field-error [control]="form.get('measurement_period')" label="Measurement period"></app-field-error>
         </ion-list>
 
         <div style="padding: 1rem 0 2rem">
@@ -96,9 +97,8 @@ export class SlaFormComponent implements OnInit {
     this.form = this.fb.group({
       name: ['', Validators.required],
       monitor_id: [null, Validators.required],
-      target_uptime: [99.9, [Validators.required, Validators.min(0), Validators.max(100)]],
-      period: ['monthly', Validators.required],
-      downtime_budget_minutes: [43, [Validators.required, Validators.min(0)]],
+      target_uptime: [99.9, [Validators.required, Validators.min(90), Validators.max(100)]],
+      measurement_period: ['monthly', Validators.required],
     });
   }
 
@@ -114,14 +114,14 @@ export class SlaFormComponent implements OnInit {
           name: sla.name,
           monitor_id: sla.monitor_id,
           target_uptime: sla.target_uptime,
-          period: sla.period,
-          downtime_budget_minutes: sla.downtime_budget_minutes,
+          measurement_period: sla.measurement_period || sla.period,
         });
       });
     }
   }
 
   onSave(): void {
+    this.form.markAllAsTouched();
     if (this.form.invalid) return;
     this.saving.set(true);
 
@@ -137,9 +137,9 @@ export class SlaFormComponent implements OnInit {
         await toast.present();
         this.router.navigate(['/sla']);
       },
-      error: async () => {
+      error: async (err: any) => {
         this.saving.set(false);
-        const toast = await this.toastCtrl.create({ message: 'Failed to save', color: 'danger', duration: 3000, position: 'bottom' });
+        const toast = await this.toastCtrl.create({ message: err?.message || 'Failed to save SLA', color: 'danger', duration: 4000, position: 'bottom' });
         await toast.present();
       },
     });

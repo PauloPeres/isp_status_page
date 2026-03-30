@@ -6,10 +6,11 @@ import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonButton,
   IonList, IonItem, IonItemSliding, IonItemOptions, IonItemOption,
   IonLabel, IonBadge, IonChip, IonIcon,
-  IonRefresher, IonRefresherContent, IonSpinner,
+  IonRefresher, IonRefresherContent, IonSpinner, IonSearchbar,
   AlertController, ToastController,
 } from '@ionic/angular/standalone';
 import { IntegrationService, Integration } from './integration.service';
+import { ListSkeletonComponent } from '../../shared/components/list-skeleton.component';
 import { addIcons } from 'ionicons';
 import { extensionPuzzleOutline } from 'ionicons/icons';
 
@@ -23,7 +24,8 @@ addIcons({ extensionPuzzleOutline });
     IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonButton,
     IonList, IonItem, IonItemSliding, IonItemOptions, IonItemOption,
     IonLabel, IonBadge, IonChip, IonIcon,
-    IonRefresher, IonRefresherContent, IonSpinner,
+    IonRefresher, IonRefresherContent, IonSpinner, IonSearchbar,
+    ListSkeletonComponent,
   ],
   template: `
     <ion-header>
@@ -34,6 +36,14 @@ addIcons({ extensionPuzzleOutline });
           <ion-button routerLink="/integrations/new" fill="solid" color="primary" size="small">+ New Integration</ion-button>
         </ion-buttons>
       </ion-toolbar>
+      <ion-toolbar>
+        <ion-searchbar
+          [(ngModel)]="searchQuery"
+          (ionInput)="onSearch()"
+          placeholder="Search..."
+          [debounce]="300"
+        ></ion-searchbar>
+      </ion-toolbar>
     </ion-header>
 
     <ion-content>
@@ -41,6 +51,9 @@ addIcons({ extensionPuzzleOutline });
         <ion-refresher-content></ion-refresher-content>
       </ion-refresher>
 
+      @if (loading()) {
+        <app-list-skeleton></app-list-skeleton>
+      } @else {
       <ion-list>
         @for (item of items(); track item.id) {
           <ion-item-sliding>
@@ -79,6 +92,7 @@ addIcons({ extensionPuzzleOutline });
           </div>
         }
       </ion-list>
+      }
     </ion-content>
   `,
   styles: [`
@@ -88,6 +102,9 @@ addIcons({ extensionPuzzleOutline });
 })
 export class IntegrationListComponent implements OnInit {
   items = signal<Integration[]>([]);
+  allItems = signal<Integration[]>([]);
+  loading = signal(true);
+  searchQuery = '';
   testing = signal<number | null>(null);
 
   constructor(
@@ -99,14 +116,39 @@ export class IntegrationListComponent implements OnInit {
   ngOnInit(): void { this.load(); }
 
   load(): void {
-    this.service.getAll().subscribe((data) => this.items.set(data.items));
+    this.service.getAll().subscribe((data) => {
+      this.allItems.set(data.items);
+      this.applyFilter();
+      this.loading.set(false);
+    });
   }
 
   onRefresh(event: any): void {
     this.service.getAll().subscribe({
-      next: (data) => { this.items.set(data.items); event.target.complete(); },
+      next: (data) => {
+        this.allItems.set(data.items);
+        this.applyFilter();
+        event.target.complete();
+      },
       error: () => event.target.complete(),
     });
+  }
+
+  onSearch(): void {
+    this.applyFilter();
+  }
+
+  applyFilter(): void {
+    const query = this.searchQuery.toLowerCase().trim();
+    if (!query) {
+      this.items.set(this.allItems());
+      return;
+    }
+    this.items.set(
+      this.allItems().filter((item) =>
+        item.name.toLowerCase().includes(query)
+      )
+    );
   }
 
   onTest(item: Integration): void {

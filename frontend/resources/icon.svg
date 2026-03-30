@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <rect width="1024" height="1024" rx="224" fill="#6366F1"/>
+  <g transform="translate(512, 512)">
+    <!-- Pulse/heartbeat line -->
+    <path d="M-320 0 L-180 0 L-120 -160 L-40 200 L40 -120 L120 80 L180 0 L320 0"
+          fill="none" stroke="white" stroke-width="48" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Small circle dot for status -->
+    <circle cx="0" cy="280" r="32" fill="#34D399"/>
+  </g>
+  <!-- Text "ISP" -->
+  <text x="512" y="880" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="120" fill="rgba(255,255,255,0.6)">STATUS</text>
+</svg>

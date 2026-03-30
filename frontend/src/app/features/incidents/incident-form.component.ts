@@ -16,6 +16,7 @@ import {
   IonTextarea,
   IonSelect,
   IonSelectOption,
+  IonNote,
   ToastController,
 } from '@ionic/angular/standalone';
 import { IncidentService } from './incident.service';
@@ -42,6 +43,7 @@ import { signal } from '@angular/core';
     IonTextarea,
     IonSelect,
     IonSelectOption,
+    IonNote,
   ],
   template: `
     <ion-header>
@@ -71,8 +73,12 @@ import { signal } from '@angular/core';
             labelPlacement="stacked"
             [(ngModel)]="form.title"
             placeholder="Brief incident title"
+            required
           ></ion-input>
         </ion-item>
+        @if (submitted && !form.title) {
+          <ion-note color="danger" class="field-error">Title is required</ion-note>
+        }
         <ion-item>
           <ion-textarea
             label="Description"
@@ -97,6 +103,9 @@ import { signal } from '@angular/core';
             }
           </ion-select>
         </ion-item>
+        @if (submitted && !form.monitor_id) {
+          <ion-note color="danger" class="field-error">Please select a monitor</ion-note>
+        }
         <ion-item>
           <ion-select
             label="Severity"
@@ -129,9 +138,19 @@ import { signal } from '@angular/core';
       </ion-list>
     </ion-content>
   `,
+  styles: [
+    `
+      .field-error {
+        display: block;
+        padding: 4px 16px;
+        font-size: 0.75rem;
+      }
+    `,
+  ],
 })
 export class IncidentFormComponent {
   monitors = signal<Monitor[]>([]);
+  submitted = false;
   form = {
     title: '',
     description: '',
@@ -152,16 +171,17 @@ export class IncidentFormComponent {
   }
 
   onSave(): void {
+    this.submitted = true;
     if (!this.form.title) return;
 
     this.incidentService.createIncident(this.form as any).subscribe({
       next: (incident) => {
         this.router.navigate(['/incidents', incident.id]);
       },
-      error: async () => {
+      error: async (err: any) => {
         const toast = await this.toastCtrl.create({
-          message: 'Failed to create incident',
-          duration: 2000,
+          message: err?.message || 'Failed to create incident',
+          duration: 4000,
           color: 'danger',
         });
         await toast.present();

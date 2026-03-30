@@ -1,14 +1,16 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonButton,
   IonList, IonItem, IonItemSliding, IonItemOptions, IonItemOption,
   IonLabel, IonBadge, IonNote, IonIcon, IonSpinner,
-  IonRefresher, IonRefresherContent,
+  IonRefresher, IonRefresherContent, IonSearchbar,
   AlertController, ToastController,
 } from '@ionic/angular/standalone';
 import { ScheduledReportService, ScheduledReport } from './scheduled-report.service';
+import { ListSkeletonComponent } from '../../shared/components/list-skeleton.component';
 import { addIcons } from 'ionicons';
 import { calendarOutline, sendOutline } from 'ionicons/icons';
 
@@ -18,11 +20,12 @@ addIcons({ calendarOutline, sendOutline });
   selector: 'app-scheduled-report-list',
   standalone: true,
   imports: [
-    CommonModule, RouterLink,
+    CommonModule, RouterLink, FormsModule,
     IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonButton,
     IonList, IonItem, IonItemSliding, IonItemOptions, IonItemOption,
     IonLabel, IonBadge, IonNote, IonIcon, IonSpinner,
-    IonRefresher, IonRefresherContent,
+    IonRefresher, IonRefresherContent, IonSearchbar,
+    ListSkeletonComponent,
   ],
   template: `
     <ion-header>
@@ -33,6 +36,14 @@ addIcons({ calendarOutline, sendOutline });
           <ion-button routerLink="/scheduled-reports/new" fill="solid" color="primary" size="small">+ New Report</ion-button>
         </ion-buttons>
       </ion-toolbar>
+      <ion-toolbar>
+        <ion-searchbar
+          [(ngModel)]="searchQuery"
+          (ionInput)="onSearch()"
+          placeholder="Search..."
+          [debounce]="300"
+        ></ion-searchbar>
+      </ion-toolbar>
     </ion-header>
 
     <ion-content>
@@ -40,6 +51,9 @@ addIcons({ calendarOutline, sendOutline });
         <ion-refresher-content></ion-refresher-content>
       </ion-refresher>
 
+      @if (loading()) {
+        <app-list-skeleton></app-list-skeleton>
+      } @else {
       <ion-list>
         @for (item of items(); track item.id) {
           <ion-item-sliding>
@@ -80,6 +94,7 @@ addIcons({ calendarOutline, sendOutline });
           </div>
         }
       </ion-list>
+      }
     </ion-content>
   `,
   styles: [`
@@ -89,6 +104,9 @@ addIcons({ calendarOutline, sendOutline });
 })
 export class ScheduledReportListComponent implements OnInit {
   items = signal<ScheduledReport[]>([]);
+  allItems = signal<ScheduledReport[]>([]);
+  loading = signal(true);
+  searchQuery = '';
   sending = signal<number | null>(null);
 
   constructor(
@@ -100,14 +118,39 @@ export class ScheduledReportListComponent implements OnInit {
   ngOnInit(): void { this.load(); }
 
   load(): void {
-    this.service.getAll().subscribe((data) => this.items.set(data.items));
+    this.service.getAll().subscribe((data) => {
+      this.allItems.set(data.items);
+      this.applyFilter();
+      this.loading.set(false);
+    });
   }
 
   onRefresh(event: any): void {
     this.service.getAll().subscribe({
-      next: (data) => { this.items.set(data.items); event.target.complete(); },
+      next: (data) => {
+        this.allItems.set(data.items);
+        this.applyFilter();
+        event.target.complete();
+      },
       error: () => event.target.complete(),
     });
+  }
+
+  onSearch(): void {
+    this.applyFilter();
+  }
+
+  applyFilter(): void {
+    const query = this.searchQuery.toLowerCase().trim();
+    if (!query) {
+      this.items.set(this.allItems());
+      return;
+    }
+    this.items.set(
+      this.allItems().filter((item) =>
+        item.name.toLowerCase().includes(query)
+      )
+    );
   }
 
   onSendNow(item: ScheduledReport): void {
@@ -122,10 +165,10 @@ export class ScheduledReportListComponent implements OnInit {
         await toast.present();
         this.load();
       },
-      error: async () => {
+      error: async (err: any) => {
         this.sending.set(null);
         const toast = await this.toastCtrl.create({
-          message: 'Failed to send report', color: 'danger', duration: 3000, position: 'bottom',
+          message: err?.message || 'Failed to send report', color: 'danger', duration: 4000, position: 'bottom',
         });
         await toast.present();
       },

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ApiService, PaginatedResponse } from '../../core/services/api.service';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 export interface MaintenanceWindow {
   id: number;
@@ -20,7 +21,12 @@ export class MaintenanceService {
   constructor(private api: ApiService) {}
 
   getAll(params?: any): Observable<PaginatedResponse<MaintenanceWindow>> {
-    return this.api.get<PaginatedResponse<MaintenanceWindow>>('/maintenance', params);
+    return this.api.get<any>('/maintenance', params).pipe(
+      map(data => ({
+        items: data.maintenance_windows || data.items || [],
+        pagination: data.pagination || { page: 1, limit: 999, total: (data.maintenance_windows || data.items || []).length, pages: 1 },
+      }))
+    );
   }
 
   get(id: number): Observable<MaintenanceWindow> {

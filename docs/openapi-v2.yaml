@@ -1,0 +1,3608 @@
+openapi: 3.1.0
+info:
+  title: ISP Status Page API
+  description: |
+    REST API for ISP Status Page — a multi-tenant SaaS monitoring platform.
+    All endpoints (except auth) require JWT Bearer authentication.
+  version: 2.0.0
+  contact:
+    name: ISP Status Page
+  license:
+    name: Proprietary
+
+servers:
+  - url: http://localhost:8765/api/v2
+    description: Development
+  - url: https://your-domain.com/api/v2
+    description: Production
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: Auth
+    description: Authentication, registration, OAuth, token management
+  - name: Dashboard
+    description: Dashboard summary, uptime, response times
+  - name: Monitors
+    description: Monitor CRUD, bulk operations, CSV import
+  - name: Checks
+    description: Monitor check results
+  - name: Incidents
+    description: Incident management, timeline updates, acknowledgement
+  - name: Alert Rules
+    description: Alert rule CRUD
+  - name: Escalation Policies
+    description: Escalation policy CRUD
+  - name: Integrations
+    description: External integrations (IXC, Zabbix, REST API)
+  - name: SLA
+    description: SLA definitions, reports, export
+  - name: Status Pages
+    description: Public status page management
+  - name: Maintenance Windows
+    description: Scheduled maintenance windows
+  - name: Settings
+    description: Organization settings
+  - name: Billing
+    description: Plans, checkout, credits
+  - name: Users
+    description: Team member management
+  - name: Invitations
+    description: Team invitations
+  - name: API Keys
+    description: API key management
+  - name: Reports
+    description: CSV report exports
+  - name: Scheduled Reports
+    description: Automated scheduled reports
+  - name: Activity Log
+    description: Organization audit trail
+  - name: Two-Factor Auth
+    description: TOTP 2FA setup and management
+  - name: Organizations
+    description: Organization switching
+  - name: Events
+    description: Real-time Server-Sent Events
+  - name: Super Admin
+    description: Platform-wide administration (requires super admin)
+
+paths:
+  # ── Auth ──────────────────────────────────────────────
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Register new account
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, email, password]
+              properties:
+                username:
+                  type: string
+                  minLength: 3
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  minLength: 8
+      responses:
+        '201':
+          description: Account created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Login with email/password
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+                two_factor_code:
+                  type: string
+                  description: 6-digit TOTP code (if 2FA enabled)
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/refresh:
+    post:
+      tags: [Auth]
+      summary: Refresh access token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refresh_token]
+              properties:
+                refresh_token:
+                  type: string
+      responses:
+        '200':
+          description: Tokens refreshed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+
+  /auth/logout:
+    post:
+      tags: [Auth]
+      summary: Logout and revoke tokens
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refresh_token:
+                  type: string
+                revoke_all:
+                  type: boolean
+                  default: false
+      responses:
+        '200':
+          $ref: '#/components/responses/Message'
+
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: Get current user profile
+      responses:
+        '200':
+          description: User profile
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          user:
+                            $ref: '#/components/schemas/User'
+                          current_organization:
+                            $ref: '#/components/schemas/OrganizationRef'
+                          organizations:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/OrganizationRef'
+
+  /auth/switch-org:
+    post:
+      tags: [Auth]
+      summary: Switch active organization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [organization_id]
+              properties:
+                organization_id:
+                  type: integer
+      responses:
+        '200':
+          description: Switched organization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+
+  /auth/oauth/{provider}/redirect:
+    get:
+      tags: [Auth]
+      summary: Get OAuth authorization URL
+      security: []
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [google, microsoft]
+      responses:
+        '200':
+          description: Authorization URL
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          authorization_url:
+                            type: string
+                            format: uri
+
+  /auth/oauth/{provider}/callback:
+    get:
+      tags: [Auth]
+      summary: OAuth callback handler
+      security: []
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [google, microsoft]
+        - name: code
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: state
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Redirect to app with tokens in URL fragment
+
+  # ── Dashboard ─────────────────────────────────────────
+  /dashboard/summary:
+    get:
+      tags: [Dashboard]
+      summary: Dashboard summary cards
+      responses:
+        '200':
+          description: Summary data
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/DashboardSummary'
+
+  /dashboard/uptime:
+    get:
+      tags: [Dashboard]
+      summary: Per-monitor uptime percentages
+      parameters:
+        - name: days
+          in: query
+          schema:
+            type: integer
+            default: 1
+            maximum: 30
+      responses:
+        '200':
+          description: Uptime data
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                name:
+                                  type: string
+                                uptime:
+                                  type: number
+
+  /dashboard/response-times:
+    get:
+      tags: [Dashboard]
+      summary: Per-monitor average response times
+      parameters:
+        - name: days
+          in: query
+          schema:
+            type: integer
+            default: 1
+            maximum: 30
+      responses:
+        '200':
+          description: Response time data
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                name:
+                                  type: string
+                                avg_response_time:
+                                  type: number
+
+  /dashboard/recent-checks:
+    get:
+      tags: [Dashboard]
+      summary: Last 20 checks across all monitors
+      responses:
+        '200':
+          description: Recent checks
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/Check'
+
+  /dashboard/recent-alerts:
+    get:
+      tags: [Dashboard]
+      summary: Last 10 alert log entries
+      responses:
+        '200':
+          description: Recent alerts
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/AlertLog'
+
+  # ── Monitors ──────────────────────────────────────────
+  /monitors:
+    get:
+      tags: [Monitors]
+      summary: List monitors
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [up, down, degraded, unknown]
+        - name: type
+          in: query
+          schema:
+            $ref: '#/components/schemas/MonitorType'
+        - name: active
+          in: query
+          schema:
+            type: boolean
+        - name: tag
+          in: query
+          schema:
+            type: string
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Paginated monitor list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/Monitor'
+                          pagination:
+                            $ref: '#/components/schemas/Pagination'
+    post:
+      tags: [Monitors]
+      summary: Create monitor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MonitorInput'
+      responses:
+        '201':
+          description: Monitor created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          monitor:
+                            $ref: '#/components/schemas/Monitor'
+
+  /monitors/{id}:
+    get:
+      tags: [Monitors]
+      summary: Get monitor with stats
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Monitor detail
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          monitor:
+                            $ref: '#/components/schemas/Monitor'
+                          uptime_24h:
+                            type: number
+                          avg_response_time:
+                            type: number
+                            nullable: true
+                          total_checks_24h:
+                            type: integer
+                          uptime_history:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                date:
+                                  type: string
+                                  format: date
+                                uptime:
+                                  type: number
+    put:
+      tags: [Monitors]
+      summary: Update monitor
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MonitorInput'
+      responses:
+        '200':
+          description: Monitor updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          monitor:
+                            $ref: '#/components/schemas/Monitor'
+    delete:
+      tags: [Monitors]
+      summary: Delete monitor
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          $ref: '#/components/responses/Message'
+
+  /monitors/{id}/checks:
+    get:
+      tags: [Monitors]
+      summary: Get checks for a monitor
+      parameters:
+        - $ref: '#/components/parameters/Id'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Paginated check list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/Check'
+                          pagination:
+                            $ref: '#/components/schemas/Pagination'
+
+  /monitors/{id}/pause:
+    post:
+      tags: [Monitors]
+      summary: Pause monitor
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Monitor paused
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          monitor:
+                            $ref: '#/components/schemas/Monitor'
+
+  /monitors/{id}/resume:
+    post:
+      tags: [Monitors]
+      summary: Resume monitor
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Monitor resumed
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          monitor:
+                            $ref: '#/components/schemas/Monitor'
+
+  /monitors/bulk-action:
+    post:
+      tags: [Monitors]
+      summary: Bulk action on monitors
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action, ids]
+              properties:
+                action:
+                  type: string
+                  enum: [pause, resume, delete]
+                ids:
+                  type: array
+                  items:
+                    type: integer
+      responses:
+        '200':
+          description: Bulk action result
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          affected:
+                            type: integer
+                          action:
+                            type: string
+
+  /monitors/import:
+    post:
+      tags: [Monitors]
+      summary: Import monitors from CSV
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                csv:
+                  type: string
+                  description: CSV content as string
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                csv_file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Import result
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          created:
+                            type: integer
+                          errors:
+                            type: array
+                            items:
+                              type: string
+
+  # ── Checks ────────────────────────────────────────────
+  /checks:
+    get:
+      tags: [Checks]
+      summary: List recent checks
+      parameters:
+        - name: monitor_id
+          in: query
+          schema:
+            type: integer
+        - $ref: '#/components/parameters/Page'
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+            maximum: 200
+      responses:
+        '200':
+          description: Check list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          checks:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/Check'
+                          pagination:
+                            $ref: '#/components/schemas/Pagination'
+
+  /checks/{id}:
+    get:
+      tags: [Checks]
+      summary: Get single check
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Check detail
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          check:
+                            $ref: '#/components/schemas/Check'
+
+  # ── Incidents ─────────────────────────────────────────
+  /incidents:
+    get:
+      tags: [Incidents]
+      summary: List incidents
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [investigating, identified, monitoring, resolved, active]
+        - name: severity
+          in: query
+          schema:
+            type: string
+            enum: [critical, major, minor, maintenance]
+        - name: monitor_id
+          in: query
+          schema:
+            type: integer
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Paginated incident list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/Incident'
+                          pagination:
+                            $ref: '#/components/schemas/Pagination'
+    post:
+      tags: [Incidents]
+      summary: Create manual incident
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [monitor_id, title]
+              properties:
+                monitor_id:
+                  type: integer
+                title:
+                  type: string
+                description:
+                  type: string
+                severity:
+                  type: string
+                  enum: [critical, major, minor, maintenance]
+                  default: minor
+                status:
+                  type: string
+                  enum: [investigating, identified, monitoring]
+                  default: investigating
+      responses:
+        '201':
+          description: Incident created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          incident:
+                            $ref: '#/components/schemas/Incident'
+
+  /incidents/{id}:
+    get:
+      tags: [Incidents]
+      summary: Get incident with timeline
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Incident detail
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          incident:
+                            $ref: '#/components/schemas/Incident'
+                          updates:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/IncidentUpdate'
+                          timeline:
+                            type: array
+                            items:
+                              type: object
+    put:
+      tags: [Incidents]
+      summary: Update incident
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                description:
+                  type: string
+      responses:
+        '200':
+          description: Incident updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          incident:
+                            $ref: '#/components/schemas/Incident'
+    delete:
+      tags: [Incidents]
+      summary: Delete incident
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          $ref: '#/components/responses/Message'
+
+  /incidents/{id}/acknowledge:
+    post:
+      tags: [Incidents]
+      summary: Acknowledge incident
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Incident acknowledged
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          incident:
+                            $ref: '#/components/schemas/Incident'
+
+  /incidents/{id}/updates:
+    post:
+      tags: [Incidents]
+      summary: Add timeline update
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message]
+              properties:
+                status:
+                  type: string
+                  enum: [investigating, identified, monitoring, resolved, update]
+                  default: update
+                message:
+                  type: string
+                is_public:
+                  type: boolean
+                  default: true
+      responses:
+        '201':
+          description: Update added
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          update:
+                            $ref: '#/components/schemas/IncidentUpdate'
+
+  # ── Alert Rules ───────────────────────────────────────
+  /alert-rules:
+    get:
+      tags: [Alert Rules]
+      summary: List alert rules
+      responses:
+        '200':
+          description: Alert rule list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/AlertRule'
+                          pagination:
+                            $ref: '#/components/schemas/Pagination'
+    post:
+      tags: [Alert Rules]
+      summary: Create alert rule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AlertRuleInput'
+      responses:
+        '201':
+          description: Alert rule created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          alert_rule:
+                            $ref: '#/components/schemas/AlertRule'
+
+  /alert-rules/{id}:
+    get:
+      tags: [Alert Rules]
+      summary: Get alert rule
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Alert rule detail
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          alert_rule:
+                            $ref: '#/components/schemas/AlertRule'
+    put:
+      tags: [Alert Rules]
+      summary: Update alert rule
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AlertRuleInput'
+      responses:
+        '200':
+          description: Alert rule updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          alert_rule:
+                            $ref: '#/components/schemas/AlertRule'
+    delete:
+      tags: [Alert Rules]
+      summary: Delete alert rule
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          $ref: '#/components/responses/Message'
+
+  # ── Escalation Policies ───────────────────────────────
+  /escalation-policies:
+    get:
+      tags: [Escalation Policies]
+      summary: List escalation policies
+      responses:
+        '200':
+          description: Policy list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/EscalationPolicy'
+                          pagination:
+                            $ref: '#/components/schemas/Pagination'
+    post:
+      tags: [Escalation Policies]
+      summary: Create escalation policy
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EscalationPolicyInput'
+      responses:
+        '201':
+          description: Policy created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          escalation_policy:
+                            $ref: '#/components/schemas/EscalationPolicy'
+
+  /escalation-policies/{id}:
+    get:
+      tags: [Escalation Policies]
+      summary: Get escalation policy
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Policy detail
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          escalation_policy:
+                            $ref: '#/components/schemas/EscalationPolicy'
+    put:
+      tags: [Escalation Policies]
+      summary: Update escalation policy
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EscalationPolicyInput'
+      responses:
+        '200':
+          description: Policy updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          escalation_policy:
+                            $ref: '#/components/schemas/EscalationPolicy'
+    delete:
+      tags: [Escalation Policies]
+      summary: Delete escalation policy
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          $ref: '#/components/responses/Message'
+
+  # ── Integrations ──────────────────────────────────────
+  /integrations:
+    get:
+      tags: [Integrations]
+      summary: List integrations
+      responses:
+        '200':
+          description: Integration list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/Integration'
+                          pagination:
+                            $ref: '#/components/schemas/Pagination'
+    post:
+      tags: [Integrations]
+      summary: Create integration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IntegrationInput'
+      responses:
+        '201':
+          description: Integration created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          integration:
+                            $ref: '#/components/schemas/Integration'
+
+  /integrations/{id}:
+    get:
+      tags: [Integrations]
+      summary: Get integration
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Integration detail
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          integration:
+                            $ref: '#/components/schemas/Integration'
+    put:
+      tags: [Integrations]
+      summary: Update integration
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IntegrationInput'
+      responses:
+        '200':
+          description: Integration updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          integration:
+                            $ref: '#/components/schemas/Integration'
+    delete:
+      tags: [Integrations]
+      summary: Delete integration
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          $ref: '#/components/responses/Message'
+
+  /integrations/{id}/test:
+    post:
+      tags: [Integrations]
+      summary: Test integration connection
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Test result
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          success:
+                            type: boolean
+                          message:
+                            type: string
+
+  # ── SLA ───────────────────────────────────────────────
+  /sla:
+    get:
+      tags: [SLA]
+      summary: List SLA definitions
+      responses:
+        '200':
+          description: SLA list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/Sla'
+                          pagination:
+                            $ref: '#/components/schemas/Pagination'
+    post:
+      tags: [SLA]
+      summary: Create SLA
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SlaInput'
+      responses:
+        '201':
+          description: SLA created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          sla:
+                            $ref: '#/components/schemas/Sla'
+
+  /sla/{id}:
+    get:
+      tags: [SLA]
+      summary: Get SLA
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: SLA detail
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          sla:
+                            $ref: '#/components/schemas/Sla'
+    put:
+      tags: [SLA]
+      summary: Update SLA
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SlaInput'
+      responses:
+        '200':
+          description: SLA updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          sla:
+                            $ref: '#/components/schemas/Sla'
+    delete:
+      tags: [SLA]
+      summary: Delete SLA
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          $ref: '#/components/responses/Message'
+
+  /sla/{id}/report:
+    get:
+      tags: [SLA]
+      summary: Generate SLA compliance report
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: SLA report
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          report:
+                            type: object
+
+  /sla/{id}/export:
+    get:
+      tags: [SLA]
+      summary: Export SLA report as CSV
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: CSV file download
+          content:
+            text/csv:
+              schema:
+                type: string
+
+  # ── Status Pages ──────────────────────────────────────
+  /status-pages:
+    get:
+      tags: [Status Pages]
+      summary: List status pages
+      responses:
+        '200':
+          description: Status page list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/StatusPage'
+                          pagination:
+                            $ref: '#/components/schemas/Pagination'
+    post:
+      tags: [Status Pages]
+      summary: Create status page
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatusPageInput'
+      responses:
+        '201':
+          description: Status page created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          status_page:
+                            $ref: '#/components/schemas/StatusPage'
+
+  /status-pages/{id}:
+    get:
+      tags: [Status Pages]
+      summary: Get status page
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Status page detail
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          status_page:
+                            $ref: '#/components/schemas/StatusPage'
+    put:
+      tags: [Status Pages]
+      summary: Update status page
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatusPageInput'
+      responses:
+        '200':
+          description: Status page updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          status_page:
+                            $ref: '#/components/schemas/StatusPage'
+    delete:
+      tags: [Status Pages]
+      summary: Delete status page
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          $ref: '#/components/responses/Message'
+
+  # ── Maintenance Windows ───────────────────────────────
+  /maintenance-windows:
+    get:
+      tags: [Maintenance Windows]
+      summary: List maintenance windows
+      responses:
+        '200':
+          description: Maintenance window list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/MaintenanceWindow'
+                          pagination:
+                            $ref: '#/components/schemas/Pagination'
+    post:
+      tags: [Maintenance Windows]
+      summary: Create maintenance window
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MaintenanceWindowInput'
+      responses:
+        '201':
+          description: Maintenance window created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          maintenance_window:
+                            $ref: '#/components/schemas/MaintenanceWindow'
+
+  /maintenance-windows/{id}:
+    get:
+      tags: [Maintenance Windows]
+      summary: Get maintenance window
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Maintenance window detail
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          maintenance_window:
+                            $ref: '#/components/schemas/MaintenanceWindow'
+    put:
+      tags: [Maintenance Windows]
+      summary: Update maintenance window
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MaintenanceWindowInput'
+      responses:
+        '200':
+          description: Maintenance window updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          maintenance_window:
+                            $ref: '#/components/schemas/MaintenanceWindow'
+    delete:
+      tags: [Maintenance Windows]
+      summary: Delete maintenance window
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          $ref: '#/components/responses/Message'
+
+  # ── Settings ──────────────────────────────────────────
+  /settings:
+    get:
+      tags: [Settings]
+      summary: Get organization settings
+      responses:
+        '200':
+          description: Settings map
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        additionalProperties: true
+    put:
+      tags: [Settings]
+      summary: Update organization settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          $ref: '#/components/responses/Message'
+
+  # ── Billing ───────────────────────────────────────────
+  /billing/plans:
+    get:
+      tags: [Billing]
+      summary: List available plans
+      responses:
+        '200':
+          description: Plan list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          plans:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/Plan'
+
+  /billing/checkout:
+    post:
+      tags: [Billing]
+      summary: Create Stripe checkout session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [plan]
+              properties:
+                plan:
+                  type: string
+      responses:
+        '200':
+          description: Checkout URL
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          checkout_url:
+                            type: string
+                            format: uri
+
+  /billing/portal:
+    post:
+      tags: [Billing]
+      summary: Create Stripe customer portal session
+      responses:
+        '200':
+          description: Portal URL
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          portal_url:
+                            type: string
+                            format: uri
+
+  /billing/usage:
+    get:
+      tags: [Billing]
+      summary: Get current usage metrics
+      responses:
+        '200':
+          description: Usage data
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          usage:
+                            type: object
+
+  /billing/credits:
+    get:
+      tags: [Billing]
+      summary: Get credit balance
+      responses:
+        '200':
+          description: Credit info
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          credits:
+                            type: object
+
+  /billing/credits/buy:
+    post:
+      tags: [Billing]
+      summary: Purchase notification credits
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: integer
+                  default: 100
+      responses:
+        '200':
+          description: Checkout URL
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          checkout_url:
+                            type: string
+                            format: uri
+
+  # ── Users ─────────────────────────────────────────────
+  /users:
+    get:
+      tags: [Users]
+      summary: List organization team members
+      responses:
+        '200':
+          description: User list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/TeamMember'
+                          pagination:
+                            $ref: '#/components/schemas/Pagination'
+
+  /users/{id}:
+    get:
+      tags: [Users]
+      summary: Get team member
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: User detail
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          user:
+                            $ref: '#/components/schemas/TeamMember'
+    delete:
+      tags: [Users]
+      summary: Remove user from organization
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          $ref: '#/components/responses/Message'
+
+  /users/{id}/role:
+    put:
+      tags: [Users]
+      summary: Update user role
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [role]
+              properties:
+                role:
+                  type: string
+                  enum: [admin, member, viewer]
+      responses:
+        '200':
+          $ref: '#/components/responses/Message'
+
+  # ── Invitations ───────────────────────────────────────
+  /invitations:
+    get:
+      tags: [Invitations]
+      summary: List pending invitations
+      responses:
+        '200':
+          description: Invitation list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/Invitation'
+                          pagination:
+                            $ref: '#/components/schemas/Pagination'
+    post:
+      tags: [Invitations]
+      summary: Send invitation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+                  format: email
+                role:
+                  type: string
+                  enum: [admin, member, viewer]
+                  default: member
+      responses:
+        '201':
+          description: Invitation sent
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          invitation:
+                            $ref: '#/components/schemas/Invitation'
+
+  /invitations/{id}:
+    delete:
+      tags: [Invitations]
+      summary: Revoke invitation
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          $ref: '#/components/responses/Message'
+
+  # ── API Keys ──────────────────────────────────────────
+  /api-keys:
+    get:
+      tags: [API Keys]
+      summary: List API keys
+      responses:
+        '200':
+          description: API key list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/ApiKey'
+                          pagination:
+                            $ref: '#/components/schemas/Pagination'
+    post:
+      tags: [API Keys]
+      summary: Create API key
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+      responses:
+        '201':
+          description: API key created (key only shown once)
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          api_key:
+                            $ref: '#/components/schemas/ApiKey'
+
+  /api-keys/{id}:
+    delete:
+      tags: [API Keys]
+      summary: Delete API key
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          $ref: '#/components/responses/Message'
+
+  # ── Reports ───────────────────────────────────────────
+  /reports/uptime:
+    get:
+      tags: [Reports]
+      summary: Export uptime report (CSV)
+      parameters:
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: CSV download
+          content:
+            text/csv:
+              schema:
+                type: string
+
+  /reports/incidents:
+    get:
+      tags: [Reports]
+      summary: Export incidents report (CSV)
+      parameters:
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: CSV download
+          content:
+            text/csv:
+              schema:
+                type: string
+
+  /reports/response-times:
+    get:
+      tags: [Reports]
+      summary: Export response times report (CSV)
+      parameters:
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: CSV download
+          content:
+            text/csv:
+              schema:
+                type: string
+
+  # ── Scheduled Reports ─────────────────────────────────
+  /scheduled-reports:
+    get:
+      tags: [Scheduled Reports]
+      summary: List scheduled reports
+      responses:
+        '200':
+          description: Scheduled report list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/ScheduledReport'
+                          pagination:
+                            $ref: '#/components/schemas/Pagination'
+    post:
+      tags: [Scheduled Reports]
+      summary: Create scheduled report
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduledReportInput'
+      responses:
+        '201':
+          description: Scheduled report created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          scheduled_report:
+                            $ref: '#/components/schemas/ScheduledReport'
+
+  /scheduled-reports/{id}:
+    get:
+      tags: [Scheduled Reports]
+      summary: Get scheduled report
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Scheduled report detail
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          scheduled_report:
+                            $ref: '#/components/schemas/ScheduledReport'
+    put:
+      tags: [Scheduled Reports]
+      summary: Update scheduled report
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduledReportInput'
+      responses:
+        '200':
+          description: Scheduled report updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          scheduled_report:
+                            $ref: '#/components/schemas/ScheduledReport'
+    delete:
+      tags: [Scheduled Reports]
+      summary: Delete scheduled report
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          $ref: '#/components/responses/Message'
+
+  /scheduled-reports/{id}/preview:
+    get:
+      tags: [Scheduled Reports]
+      summary: Preview scheduled report
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Report preview
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          preview:
+                            type: object
+
+  /scheduled-reports/{id}/send-now:
+    post:
+      tags: [Scheduled Reports]
+      summary: Send report immediately
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          $ref: '#/components/responses/Message'
+
+  # ── Activity Log ──────────────────────────────────────
+  /activity-log:
+    get:
+      tags: [Activity Log]
+      summary: List activity log entries
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+            maximum: 200
+        - name: event_type
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Activity log
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          activity_log:
+                            type: array
+                            items:
+                              type: object
+                          pagination:
+                            $ref: '#/components/schemas/Pagination'
+
+  # ── Two-Factor Auth ───────────────────────────────────
+  /2fa/setup:
+    get:
+      tags: [Two-Factor Auth]
+      summary: Generate TOTP secret and QR URI
+      responses:
+        '200':
+          description: Setup data
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          secret:
+                            type: string
+                          qr_uri:
+                            type: string
+    post:
+      tags: [Two-Factor Auth]
+      summary: Verify code and enable 2FA
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code, secret]
+              properties:
+                code:
+                  type: string
+                secret:
+                  type: string
+      responses:
+        '200':
+          description: 2FA enabled
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                          recovery_codes:
+                            type: array
+                            items:
+                              type: string
+
+  /2fa/verify:
+    post:
+      tags: [Two-Factor Auth]
+      summary: Verify TOTP code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code]
+              properties:
+                code:
+                  type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/Message'
+
+  /2fa/disable:
+    post:
+      tags: [Two-Factor Auth]
+      summary: Disable 2FA
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code]
+              properties:
+                code:
+                  type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/Message'
+
+  /2fa/recovery-codes:
+    get:
+      tags: [Two-Factor Auth]
+      summary: Get current recovery codes
+      responses:
+        '200':
+          description: Recovery codes
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          recovery_codes:
+                            type: array
+                            items:
+                              type: string
+    post:
+      tags: [Two-Factor Auth]
+      summary: Regenerate recovery codes
+      responses:
+        '200':
+          description: New recovery codes
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          recovery_codes:
+                            type: array
+                            items:
+                              type: string
+
+  # ── Organizations ─────────────────────────────────────
+  /organizations:
+    get:
+      tags: [Organizations]
+      summary: List user organizations
+      responses:
+        '200':
+          description: Organization list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          organizations:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/OrganizationRef'
+
+  /organizations/current:
+    get:
+      tags: [Organizations]
+      summary: Get current organization
+      responses:
+        '200':
+          description: Current organization
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          organization:
+                            type: object
+
+  # ── Events (SSE) ──────────────────────────────────────
+  /events/stream:
+    get:
+      tags: [Events]
+      summary: Real-time event stream (SSE)
+      description: |
+        Server-Sent Events stream. Events: monitor_status, incident_created, heartbeat.
+      responses:
+        '200':
+          description: SSE stream
+          content:
+            text/event-stream:
+              schema:
+                type: string
+
+  # ── Super Admin ───────────────────────────────────────
+  /super-admin/dashboard:
+    get:
+      tags: [Super Admin]
+      summary: Platform metrics
+      responses:
+        '200':
+          description: Platform summary
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          metrics:
+                            type: object
+                            properties:
+                              total_organizations:
+                                type: integer
+                              total_users:
+                                type: integer
+                              total_monitors:
+                                type: integer
+                              active_incidents:
+                                type: integer
+
+  /super-admin/organizations:
+    get:
+      tags: [Super Admin]
+      summary: List all organizations
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+            maximum: 200
+      responses:
+        '200':
+          description: Organization list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          organizations:
+                            type: array
+                            items:
+                              type: object
+                          pagination:
+                            $ref: '#/components/schemas/Pagination'
+
+  /super-admin/organizations/{id}:
+    get:
+      tags: [Super Admin]
+      summary: Get organization details
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Organization detail
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+
+  /super-admin/organizations/{id}/impersonate:
+    post:
+      tags: [Super Admin]
+      summary: Impersonate organization
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Impersonation token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+
+  /super-admin/organizations/{id}/grant-credits:
+    post:
+      tags: [Super Admin]
+      summary: Grant credits to organization
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [amount]
+              properties:
+                amount:
+                  type: integer
+                reason:
+                  type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/Message'
+
+  /super-admin/organizations/stop-impersonation:
+    post:
+      tags: [Super Admin]
+      summary: Stop impersonation
+      responses:
+        '200':
+          description: Own token restored
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+
+  /super-admin/users:
+    get:
+      tags: [Super Admin]
+      summary: List all platform users
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+            maximum: 200
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User list
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          users:
+                            type: array
+                            items:
+                              type: object
+                          pagination:
+                            $ref: '#/components/schemas/Pagination'
+
+  /super-admin/users/{id}:
+    get:
+      tags: [Super Admin]
+      summary: Get user details
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: User detail with org memberships
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+
+  /super-admin/revenue:
+    get:
+      tags: [Super Admin]
+      summary: Platform revenue metrics
+      responses:
+        '200':
+          description: Revenue data
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          revenue:
+                            type: object
+
+  /super-admin/health:
+    get:
+      tags: [Super Admin]
+      summary: Platform health checks
+      responses:
+        '200':
+          description: Health status
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          healthy:
+                            type: boolean
+                          checks:
+                            type: object
+                            properties:
+                              database:
+                                type: object
+                                properties:
+                                  healthy:
+                                    type: boolean
+                                  message:
+                                    type: string
+                              cache:
+                                type: object
+                                properties:
+                                  healthy:
+                                    type: boolean
+                                  message:
+                                    type: string
+                              disk:
+                                type: object
+                                properties:
+                                  healthy:
+                                    type: boolean
+                                  free_gb:
+                                    type: number
+
+  /super-admin/settings:
+    get:
+      tags: [Super Admin]
+      summary: Get system-wide settings
+      responses:
+        '200':
+          description: System settings
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          settings:
+                            type: object
+                            additionalProperties: true
+    put:
+      tags: [Super Admin]
+      summary: Update system-wide settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          $ref: '#/components/responses/Message'
+
+  /super-admin/settings/test-email:
+    post:
+      tags: [Super Admin]
+      summary: Send test email
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [to]
+              properties:
+                to:
+                  type: string
+                  format: email
+      responses:
+        '200':
+          $ref: '#/components/responses/Message'
+
+  /super-admin/settings/test-ftp:
+    post:
+      tags: [Super Admin]
+      summary: Test FTP/SFTP connection
+      responses:
+        '200':
+          $ref: '#/components/responses/Message'
+
+  /super-admin/security-logs:
+    get:
+      tags: [Super Admin]
+      summary: Platform security audit logs
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+            maximum: 200
+        - name: event_type
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Security logs
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiWrapper'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          security_logs:
+                            type: array
+                            items:
+                              type: object
+                          pagination:
+                            $ref: '#/components/schemas/Pagination'
+
+# ── Components ────────────────────────────────────────────
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        default: 25
+        maximum: 100
+
+  responses:
+    Message:
+      description: Success message
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ApiWrapper'
+              - type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              message:
+                type: string
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              message:
+                type: string
+
+  schemas:
+    ApiWrapper:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+        pages:
+          type: integer
+
+    AuthResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            access_token:
+              type: string
+            refresh_token:
+              type: string
+            token_type:
+              type: string
+              example: Bearer
+            expires_in:
+              type: integer
+            user:
+              $ref: '#/components/schemas/User'
+            organization:
+              $ref: '#/components/schemas/OrganizationRef'
+
+    TokenResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            access_token:
+              type: string
+            refresh_token:
+              type: string
+            token_type:
+              type: string
+              example: Bearer
+            expires_in:
+              type: integer
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        is_super_admin:
+          type: boolean
+        two_factor_enabled:
+          type: boolean
+        language:
+          type: string
+        timezone:
+          type: string
+
+    OrganizationRef:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        role:
+          type: string
+          enum: [owner, admin, member, viewer]
+        is_current:
+          type: boolean
+
+    TeamMember:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+        role:
+          type: string
+          enum: [owner, admin, member, viewer]
+        joined_at:
+          type: string
+          format: date-time
+
+    MonitorType:
+      type: string
+      enum: [http, ping, port, api, keyword, ssl, heartbeat, ixc_service, ixc_equipment, zabbix_host, zabbix_trigger]
+
+    Monitor:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        type:
+          $ref: '#/components/schemas/MonitorType'
+        status:
+          type: string
+          enum: [up, down, degraded, unknown]
+        active:
+          type: boolean
+        check_interval:
+          type: integer
+        timeout:
+          type: integer
+        configuration:
+          type: object
+        tags:
+          type: array
+          items:
+            type: string
+        uptime_percentage:
+          type: number
+          nullable: true
+        last_check_at:
+          type: string
+          format: date-time
+          nullable: true
+        created:
+          type: string
+          format: date-time
+        modified:
+          type: string
+          format: date-time
+
+    MonitorInput:
+      type: object
+      required: [name, type, configuration]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        type:
+          $ref: '#/components/schemas/MonitorType'
+        configuration:
+          type: object
+          description: Type-specific configuration (url, host, port, etc.)
+        check_interval:
+          type: integer
+          default: 300
+          minimum: 30
+        timeout:
+          type: integer
+          default: 30
+          minimum: 1
+        active:
+          type: boolean
+          default: true
+        tags:
+          type: array
+          items:
+            type: string
+
+    Check:
+      type: object
+      properties:
+        id:
+          type: integer
+        monitor_id:
+          type: integer
+        monitor:
+          type: object
+          properties:
+            name:
+              type: string
+        status:
+          type: string
+          enum: [success, error, timeout]
+        response_time:
+          type: number
+        status_code:
+          type: integer
+          nullable: true
+        error_message:
+          type: string
+          nullable: true
+        checked_at:
+          type: string
+          format: date-time
+
+    Incident:
+      type: object
+      properties:
+        id:
+          type: integer
+        monitor_id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [investigating, identified, monitoring, resolved]
+        severity:
+          type: string
+          enum: [critical, major, minor, maintenance]
+        acknowledged_at:
+          type: string
+          format: date-time
+          nullable: true
+        acknowledged_by:
+          type: string
+          nullable: true
+        auto_created:
+          type: boolean
+        started_at:
+          type: string
+          format: date-time
+        resolved_at:
+          type: string
+          format: date-time
+          nullable: true
+        created:
+          type: string
+          format: date-time
+
+    IncidentUpdate:
+      type: object
+      properties:
+        id:
+          type: integer
+        incident_id:
+          type: integer
+        status:
+          type: string
+        message:
+          type: string
+        is_public:
+          type: boolean
+        user_id:
+          type: integer
+          nullable: true
+        created:
+          type: string
+          format: date-time
+
+    AlertRule:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        monitor_id:
+          type: integer
+        monitor_name:
+          type: string
+        trigger_type:
+          type: string
+          enum: [down, up, degraded, any]
+        channel:
+          type: string
+          enum: [email, sms, telegram, webhook]
+        recipients:
+          type: array
+          items:
+            type: string
+        cooldown_minutes:
+          type: integer
+        active:
+          type: boolean
+        created:
+          type: string
+          format: date-time
+
+    AlertRuleInput:
+      type: object
+      required: [name, monitor_id, trigger_type, channel, recipients]
+      properties:
+        name:
+          type: string
+        monitor_id:
+          type: integer
+        trigger_type:
+          type: string
+          enum: [down, up, degraded, any]
+        channel:
+          type: string
+          enum: [email, sms, telegram, webhook]
+        recipients:
+          type: array
+          items:
+            type: string
+        cooldown_minutes:
+          type: integer
+          default: 15
+          minimum: 1
+        active:
+          type: boolean
+          default: true
+
+    AlertLog:
+      type: object
+      properties:
+        id:
+          type: integer
+        alert_rule:
+          type: object
+          properties:
+            name:
+              type: string
+        monitor:
+          type: object
+          properties:
+            name:
+              type: string
+        channel:
+          type: string
+        status:
+          type: string
+          enum: [sent, failed]
+        created:
+          type: string
+          format: date-time
+
+    EscalationPolicy:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        active:
+          type: boolean
+        steps:
+          type: array
+          items:
+            type: object
+            properties:
+              delay_minutes:
+                type: integer
+              channel:
+                type: string
+              recipients:
+                type: array
+                items:
+                  type: string
+        created:
+          type: string
+          format: date-time
+
+    EscalationPolicyInput:
+      type: object
+      required: [name, steps]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        active:
+          type: boolean
+          default: true
+        steps:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [delay_minutes, channel, recipients]
+            properties:
+              delay_minutes:
+                type: integer
+                minimum: 1
+              channel:
+                type: string
+                enum: [email, sms, telegram, webhook]
+              recipients:
+                type: array
+                items:
+                  type: string
+
+    Integration:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        type:
+          type: string
+          enum: [ixc, zabbix, rest_api]
+        active:
+          type: boolean
+        last_test_status:
+          type: string
+          nullable: true
+        created:
+          type: string
+          format: date-time
+
+    IntegrationInput:
+      type: object
+      required: [name, type, configuration]
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+          enum: [ixc, zabbix, rest_api]
+        configuration:
+          type: object
+          description: Type-specific config (base_url, username, password, etc.)
+        active:
+          type: boolean
+          default: true
+
+    Sla:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        monitor_id:
+          type: integer
+        target_uptime:
+          type: number
+        period:
+          type: string
+          enum: [monthly, quarterly, yearly]
+        downtime_budget_minutes:
+          type: integer
+        actual_uptime:
+          type: number
+          nullable: true
+        status:
+          type: string
+          enum: [compliant, at_risk, breached]
+          nullable: true
+        created:
+          type: string
+          format: date-time
+
+    SlaInput:
+      type: object
+      required: [name, monitor_id, target_uptime, period]
+      properties:
+        name:
+          type: string
+        monitor_id:
+          type: integer
+        target_uptime:
+          type: number
+          minimum: 0
+          maximum: 100
+        period:
+          type: string
+          enum: [monthly, quarterly, yearly]
+        downtime_budget_minutes:
+          type: integer
+          minimum: 0
+
+    StatusPage:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        custom_domain:
+          type: string
+          nullable: true
+        is_active:
+          type: boolean
+        created:
+          type: string
+          format: date-time
+
+    StatusPageInput:
+      type: object
+      required: [name, slug]
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+        custom_domain:
+          type: string
+        is_active:
+          type: boolean
+          default: true
+
+    MaintenanceWindow:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+          nullable: true
+        start_at:
+          type: string
+          format: date-time
+        end_at:
+          type: string
+          format: date-time
+        created:
+          type: string
+          format: date-time
+
+    MaintenanceWindowInput:
+      type: object
+      required: [title, start_at, end_at]
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        start_at:
+          type: string
+          format: date-time
+        end_at:
+          type: string
+          format: date-time
+
+    ScheduledReport:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        report_type:
+          type: string
+          enum: [uptime, incidents, response_times, sla]
+        frequency:
+          type: string
+          enum: [daily, weekly, monthly]
+        recipients:
+          type: array
+          items:
+            type: string
+        active:
+          type: boolean
+        last_sent_at:
+          type: string
+          format: date-time
+          nullable: true
+        created:
+          type: string
+          format: date-time
+
+    ScheduledReportInput:
+      type: object
+      required: [name, report_type, frequency, recipients]
+      properties:
+        name:
+          type: string
+        report_type:
+          type: string
+          enum: [uptime, incidents, response_times, sla]
+        frequency:
+          type: string
+          enum: [daily, weekly, monthly]
+        recipients:
+          type: array
+          items:
+            type: string
+        active:
+          type: boolean
+          default: true
+
+    Plan:
+      type: object
+      properties:
+        slug:
+          type: string
+        name:
+          type: string
+        price_monthly:
+          type: number
+        monitors_limit:
+          type: integer
+        check_interval_min:
+          type: integer
+        team_members_limit:
+          type: integer
+        features:
+          type: array
+          items:
+            type: string
+
+    Invitation:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [admin, member, viewer]
+        status:
+          type: string
+          enum: [pending, accepted, expired]
+        created:
+          type: string
+          format: date-time
+
+    ApiKey:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        prefix:
+          type: string
+        key:
+          type: string
+          description: Full key value (only on creation)
+        last_used_at:
+          type: string
+          format: date-time
+          nullable: true
+        created:
+          type: string
+          format: date-time
+
+    DashboardSummary:
+      type: object
+      properties:
+        monitors:
+          type: object
+          properties:
+            total:
+              type: integer
+            up:
+              type: integer
+            down:
+              type: integer
+            degraded:
+              type: integer
+            unknown:
+              type: integer
+        active_incidents:
+          type: object
+          properties:
+            total:
+              type: integer
+            by_severity:
+              type: object
+              properties:
+                critical:
+                  type: integer
+                major:
+                  type: integer
+                minor:
+                  type: integer
+                maintenance:
+                  type: integer
+        sla:
+          type: object
+          nullable: true
+          properties:
+            compliant:
+              type: integer
+            at_risk:
+              type: integer
+            breached:
+              type: integer

@@ -19,6 +19,7 @@ import {
 } from '@ionic/angular/standalone';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../core/services/auth.service';
+import { ThemeService } from '../core/services/theme.service';
 import { addIcons } from 'ionicons';
 import {
   gridOutline,
@@ -48,6 +49,7 @@ import {
   sendOutline,
   swapHorizontalOutline,
   listOutline,
+  personCircleOutline,
 } from 'ionicons/icons';
 
 addIcons({
@@ -78,6 +80,7 @@ addIcons({
   'send-outline': sendOutline,
   'swap-horizontal-outline': swapHorizontalOutline,
   'list-outline': listOutline,
+  'person-circle-outline': personCircleOutline,
 });
 
 @Component({
@@ -111,6 +114,12 @@ addIcons({
             <ion-toolbar color="primary">
               <ion-title>ISP Status</ion-title>
               <ion-buttons slot="end">
+                <ion-button (click)="theme.toggle()" [title]="'Theme: ' + theme.mode()">
+                  <ion-icon
+                    [name]="theme.isDark() ? 'sunny-outline' : 'moon-outline'"
+                    slot="icon-only"
+                  ></ion-icon>
+                </ion-button>
                 <ion-button (click)="auth.logout()">
                   <ion-icon name="log-out-outline" slot="icon-only"></ion-icon>
                 </ion-button>
@@ -239,6 +248,13 @@ addIcons({
               </ion-item-divider>
 
               <ion-menu-toggle auto-hide="false">
+                <ion-item routerLink="/profile" routerLinkActive="selected">
+                  <ion-icon name="person-circle-outline" slot="start"></ion-icon>
+                  <ion-label>My Profile</ion-label>
+                </ion-item>
+              </ion-menu-toggle>
+
+              <ion-menu-toggle auto-hide="false">
                 <ion-item routerLink="/users" routerLinkActive="selected">
                   <ion-icon name="person-outline" slot="start"></ion-icon>
                   <ion-label>Users</ion-label>
@@ -314,5 +330,8 @@ addIcons({
   ],
 })
 export class AppLayoutComponent {
-  constructor(public auth: AuthService) {}
+  constructor(
+    public auth: AuthService,
+    public theme: ThemeService,
+  ) {}
 }

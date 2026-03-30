@@ -11,6 +11,7 @@ use App\Model\Table\AlertLogsTable;
 use App\Model\Table\AlertRulesTable;
 use App\Service\MaintenanceService;
 use App\Service\NotificationCreditService;
+use App\Service\NotificationScheduleService;
 use App\Service\QuietHoursService;
 use Cake\I18n\DateTime;
 use Cake\Log\Log;
@@ -61,6 +62,7 @@ class AlertService
      * @var \App\Service\QuietHoursService
      */
     protected QuietHoursService $quietHoursService;
+    protected NotificationScheduleService $scheduleService;
 
     /**
      * Constructor
@@ -71,6 +73,7 @@ class AlertService
         $this->AlertLogs = $this->fetchTable('AlertLogs');
         $this->maintenanceService = new MaintenanceService();
         $this->quietHoursService = new QuietHoursService();
+        $this->scheduleService = new NotificationScheduleService();
     }
 
     /**
@@ -173,6 +176,14 @@ class AlertService
                     if ($channel === null) {
                         Log::warning("No channel registered for type: {$rule->channel}");
                         $this->logAlert($rule, $incident, AlertLog::STATUS_FAILED, "Channel '{$rule->channel}' not registered");
+                        continue;
+                    }
+
+                    // Check per-channel notification schedule (C-05)
+                    $alertSeverity = $incident->severity ?? 'major';
+                    if ($this->scheduleService->shouldSuppress((int)$monitor->organization_id, $rule->channel, $alertSeverity)) {
+                        Log::debug("Alert rule {$rule->id} suppressed by notification schedule for channel {$rule->channel}");
+                        $this->logAlert($rule, $incident, AlertLog::STATUS_SUPPRESSED ?? 'suppressed', "Suppressed by notification schedule");
                         continue;
                     }
 
