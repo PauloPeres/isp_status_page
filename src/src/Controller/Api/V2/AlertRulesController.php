@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Controller\Api\V2;
 
+use App\Service\PlanService;
+
 /**
  * AlertRulesController (TASK-NG-007)
  *
@@ -66,6 +68,23 @@ class AlertRulesController extends AppController
 
         if (!$this->requireRole(['owner', 'admin'])) {
             return;
+        }
+
+        $planService = new PlanService();
+        $channel = $this->request->getData('channel') ?? 'email';
+        $featureMap = [
+            'slack' => 'slack_alerts', 'discord' => 'slack_alerts',
+            'telegram' => 'all_alert_channels', 'sms' => 'all_alert_channels',
+            'whatsapp' => 'all_alert_channels', 'pagerduty' => 'all_alert_channels',
+            'opsgenie' => 'all_alert_channels', 'webhook' => 'webhook_alerts',
+        ];
+        $requiredFeature = $featureMap[$channel] ?? null;
+        if ($requiredFeature) {
+            $check = $planService->checkFeature($this->currentOrgId, $requiredFeature);
+            if (!$check['allowed']) {
+                $this->planLimitError("{$channel} alerts are not available on your {$check['plan_name']} plan. Upgrade to use this channel.", $check);
+                return;
+            }
         }
 
         $table = $this->fetchTable('AlertRules');

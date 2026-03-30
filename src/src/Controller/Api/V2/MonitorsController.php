@@ -257,19 +257,19 @@ class MonitorsController extends AppController
         }
 
         // Check plan limit
-        try {
-            $planService = new PlanService();
-            if (!$planService->canAddMonitor($this->currentOrgId)) {
-                $this->error('Monitor limit reached for your plan. Upgrade to add more monitors.', 403);
-
-                return;
-            }
-        } catch (\Exception $e) {
-            // Plan service may not be available — allow creation
+        $planService = new PlanService();
+        $check = $planService->checkLimit($this->currentOrgId, 'monitor');
+        if (!$check['allowed']) {
+            $this->planLimitError(
+                "Monitor limit reached. Your {$check['plan_name']} plan allows {$check['limit']} monitors. Upgrade to add more.",
+                $check
+            );
+            return;
         }
 
         $monitorsTable = $this->fetchTable('Monitors');
         $data = $this->request->getData();
+        $data['check_interval'] = $planService->validateCheckInterval($this->currentOrgId, $data['check_interval'] ?? 300);
         $data = $this->processTagsData($data);
         $data = $this->processConfigurationData($data);
 

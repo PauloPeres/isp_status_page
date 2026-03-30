@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Controller\Api\V2;
 
+use App\Service\PlanService;
+
 /**
  * ApiKeysController (TASK-NG-010)
  *
@@ -46,6 +48,13 @@ class ApiKeysController extends AppController
         $this->request->allowMethod(['post']);
 
         if (!$this->requireRole(['owner', 'admin'])) {
+            return;
+        }
+
+        $planService = new PlanService();
+        $check = $planService->checkFeature($this->currentOrgId, 'api_access');
+        if (!$check['allowed']) {
+            $this->planLimitError("API keys are not available on your {$check['plan_name']} plan. Upgrade to use the API.", $check);
             return;
         }
 

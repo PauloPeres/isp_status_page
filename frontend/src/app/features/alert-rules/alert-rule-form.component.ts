@@ -10,6 +10,7 @@ import {
 import { AlertRuleService } from './alert-rule.service';
 import { MonitorService } from '../monitors/monitor.service';
 import { FieldErrorComponent } from '../../shared/components/field-error.component';
+import { showApiError } from '../../core/services/plan-error.helper';
 
 @Component({
   selector: 'app-alert-rule-form',
@@ -176,8 +177,7 @@ export class AlertRuleFormComponent implements OnInit {
       },
       error: async (err: any) => {
         this.saving.set(false);
-        const toast = await this.toastCtrl.create({ message: err?.message || 'Failed to save', color: 'danger', duration: 4000, position: 'bottom' });
-        await toast.present();
+        await showApiError(err, 'Failed to save alert rule', this.toastCtrl, this.router);
       },
     });
   }

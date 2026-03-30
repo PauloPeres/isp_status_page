@@ -8,6 +8,7 @@ import {
   ToastController,
 } from '@ionic/angular/standalone';
 import { StatusPageService } from './status-page.service';
+import { showApiError } from '../../core/services/plan-error.helper';
 
 @Component({
   selector: 'app-status-page-form',
@@ -87,8 +88,7 @@ export class StatusPageFormComponent {
       },
       error: async (err: any) => {
         this.saving = false;
-        const toast = await this.toastCtrl.create({ message: err?.message || 'Failed to create status page', color: 'danger', duration: 4000, position: 'bottom' });
-        await toast.present();
+        await showApiError(err, 'Failed to create status page', this.toastCtrl, this.router);
       },
     });
   }

@@ -10,6 +10,7 @@ import {
 } from '@ionic/angular/standalone';
 import { EscalationService } from './escalation.service';
 import { FieldErrorComponent } from '../../shared/components/field-error.component';
+import { showApiError } from '../../core/services/plan-error.helper';
 import { addIcons } from 'ionicons';
 import { addCircleOutline, removeCircleOutline } from 'ionicons/icons';
 
@@ -208,8 +209,7 @@ export class EscalationFormComponent implements OnInit {
       },
       error: async (err: any) => {
         this.saving.set(false);
-        const toast = await this.toastCtrl.create({ message: err?.message || 'Failed to save', color: 'danger', duration: 4000, position: 'bottom' });
-        await toast.present();
+        await showApiError(err, 'Failed to save escalation policy', this.toastCtrl, this.router);
       },
     });
   }

@@ -8,6 +8,7 @@ import {
   ToastController,
 } from '@ionic/angular/standalone';
 import { IntegrationService } from './integration.service';
+import { showApiError } from '../../core/services/plan-error.helper';
 
 @Component({
   selector: 'app-integration-form',
@@ -107,8 +108,7 @@ export class IntegrationFormComponent {
       },
       error: async (err: any) => {
         this.saving = false;
-        const toast = await this.toastCtrl.create({ message: err?.message || 'Failed to create integration', color: 'danger', duration: 4000, position: 'bottom' });
-        await toast.present();
+        await showApiError(err, 'Failed to create integration', this.toastCtrl, this.router);
       },
     });
   }

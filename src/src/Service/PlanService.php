@@ -232,6 +232,190 @@ class PlanService
     }
 
     /**
+     * Check if an organization can add another status page
+     */
+    public function canAddStatusPage(int $orgId): bool
+    {
+        $plan = $this->getPlanForOrganization($orgId);
+
+        if ($plan->isUnlimited('status_page_limit')) {
+            return true;
+        }
+
+        $currentCount = $this->fetchTable('StatusPages')->find()
+            ->where(['StatusPages.organization_id' => $orgId])
+            ->count();
+
+        return $currentCount < $plan->status_page_limit;
+    }
+
+    /**
+     * Validate and clamp a check interval to the plan minimum.
+     */
+    public function validateCheckInterval(int $orgId, int $requested): int
+    {
+        $minInterval = $this->getMinCheckInterval($orgId);
+        return max($requested, $minInterval);
+    }
+
+    /**
+     * Get a structured limit check result with current usage, limit, and upgrade info.
+     *
+     * @return array{allowed: bool, current: int, limit: int|string, plan_name: string, plan_slug: string, upgrade_to: string|null}
+     */
+    public function checkLimit(int $orgId, string $limitType): array
+    {
+        $plan = $this->getPlanForOrganization($orgId);
+
+        $current = 0;
+        $limit = 0;
+        $unlimited = false;
+
+        switch ($limitType) {
+            case 'monitor':
+                $unlimited = $plan->isUnlimited('monitor_limit');
+                $limit = $plan->monitor_limit;
+                $current = $this->Monitors->find()
+                    ->where(['Monitors.organization_id' => $orgId])
+                    ->count();
+                break;
+
+            case 'team_member':
+                $unlimited = $plan->isUnlimited('team_member_limit');
+                $limit = $plan->team_member_limit;
+                $current = $this->OrganizationUsers->find()
+                    ->where(['OrganizationUsers.organization_id' => $orgId])
+                    ->count();
+                // Also count pending invitations
+                try {
+                    $pendingInvites = $this->fetchTable('Invitations')->find()
+                        ->where([
+                            'Invitations.organization_id' => $orgId,
+                            'Invitations.status' => 'pending',
+                        ])
+                        ->count();
+                    $current += $pendingInvites;
+                } catch (\Exception $e) {
+                    // Invitations table may not exist
+                }
+                break;
+
+            case 'status_page':
+                $unlimited = $plan->isUnlimited('status_page_limit');
+                $limit = $plan->status_page_limit;
+                $current = $this->fetchTable('StatusPages')->find()
+                    ->where(['StatusPages.organization_id' => $orgId])
+                    ->count();
+                break;
+
+            default:
+                return ['allowed' => true, 'current' => 0, 'limit' => 'unlimited', 'plan_name' => $plan->name, 'plan_slug' => $plan->slug, 'upgrade_to' => null];
+        }
+
+        $allowed = $unlimited || $current < $limit;
+
+        // Find the next plan up for the upgrade suggestion
+        $upgradeTo = null;
+        if (!$allowed) {
+            $nextPlan = $this->Plans->find()
+                ->where([
+                    'Plans.active' => true,
+                    'Plans.price_monthly >' => $plan->price_monthly,
+                ])
+                ->orderBy(['Plans.price_monthly' => 'ASC'])
+                ->first();
+            if ($nextPlan) {
+                $upgradeTo = $nextPlan->slug;
+            }
+        }
+
+        return [
+            'allowed' => $allowed,
+            'current' => $current,
+            'limit' => $unlimited ? 'unlimited' : $limit,
+            'plan_name' => $plan->name,
+            'plan_slug' => $plan->slug,
+            'upgrade_to' => $upgradeTo,
+        ];
+    }
+
+    /**
+     * Check if a feature is available and return structured result.
+     */
+    public function checkFeature(int $orgId, string $feature): array
+    {
+        $plan = $this->getPlanForOrganization($orgId);
+        $allowed = $plan->hasFeature($feature);
+
+        $upgradeTo = null;
+        if (!$allowed) {
+            $nextPlan = $this->Plans->find()
+                ->where([
+                    'Plans.active' => true,
+                    'Plans.price_monthly >' => $plan->price_monthly,
+                ])
+                ->orderBy(['Plans.price_monthly' => 'ASC'])
+                ->first();
+            if ($nextPlan) {
+                $upgradeTo = $nextPlan->slug;
+            }
+        }
+
+        return [
+            'allowed' => $allowed,
+            'feature' => $feature,
+            'plan_name' => $plan->name,
+            'plan_slug' => $plan->slug,
+            'upgrade_to' => $upgradeTo,
+        ];
+    }
+
+    /**
+     * Get full usage summary for an organization (for billing/usage page).
+     */
+    public function getUsageSummary(int $orgId): array
+    {
+        $plan = $this->getPlanForOrganization($orgId);
+
+        $monitorCount = $this->Monitors->find()
+            ->where(['Monitors.organization_id' => $orgId])
+            ->count();
+
+        $teamCount = $this->OrganizationUsers->find()
+            ->where(['OrganizationUsers.organization_id' => $orgId])
+            ->count();
+
+        $statusPageCount = 0;
+        try {
+            $statusPageCount = $this->fetchTable('StatusPages')->find()
+                ->where(['StatusPages.organization_id' => $orgId])
+                ->count();
+        } catch (\Exception $e) {}
+
+        return [
+            'plan' => [
+                'slug' => $plan->slug,
+                'name' => $plan->name,
+            ],
+            'monitors' => [
+                'current' => $monitorCount,
+                'limit' => $plan->isUnlimited('monitor_limit') ? 'unlimited' : $plan->monitor_limit,
+            ],
+            'team_members' => [
+                'current' => $teamCount,
+                'limit' => $plan->isUnlimited('team_member_limit') ? 'unlimited' : $plan->team_member_limit,
+            ],
+            'status_pages' => [
+                'current' => $statusPageCount,
+                'limit' => $plan->isUnlimited('status_page_limit') ? 'unlimited' : $plan->status_page_limit,
+            ],
+            'check_interval_min' => $plan->check_interval_min,
+            'data_retention_days' => $plan->data_retention_days,
+            'features' => $plan->getFeatures(),
+        ];
+    }
+
+    /**
      * Clear the in-memory plan cache for an organization
      *
      * Useful when an organization's plan changes.

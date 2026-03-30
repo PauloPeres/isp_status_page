@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Controller\Api\V2;
 
+use App\Service\PlanService;
+
 /**
  * StatusPagesController (TASK-NG-012)
  *
@@ -65,6 +67,13 @@ class StatusPagesController extends AppController
         $this->request->allowMethod(['post']);
 
         if (!$this->requireRole(['owner', 'admin'])) {
+            return;
+        }
+
+        $planService = new PlanService();
+        $check = $planService->checkLimit($this->currentOrgId, 'status_page');
+        if (!$check['allowed']) {
+            $this->planLimitError("Status page limit reached. Your {$check['plan_name']} plan allows {$check['limit']} status pages.", $check);
             return;
         }
 

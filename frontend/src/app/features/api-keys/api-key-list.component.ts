@@ -1,6 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonButton,
   IonList, IonItem, IonItemSliding, IonItemOptions, IonItemOption,
@@ -10,6 +11,7 @@ import {
 } from '@ionic/angular/standalone';
 import { ApiKeyService, ApiKey, ApiKeyCreateResponse } from './api-key.service';
 import { ListSkeletonComponent } from '../../shared/components/list-skeleton.component';
+import { showApiError } from '../../core/services/plan-error.helper';
 import { addIcons } from 'ionicons';
 import { keyOutline, copyOutline } from 'ionicons/icons';
 
@@ -124,6 +126,7 @@ export class ApiKeyListComponent implements OnInit {
     private service: ApiKeyService,
     private alertCtrl: AlertController,
     private toastCtrl: ToastController,
+    private router: Router,
   ) {}
 
   ngOnInit(): void { this.load(); }
@@ -181,8 +184,7 @@ export class ApiKeyListComponent implements OnInit {
               this.load();
             },
             error: async (err: any) => {
-              const toast = await this.toastCtrl.create({ message: err?.message || 'Failed to create key', color: 'danger', duration: 4000, position: 'bottom' });
-              await toast.present();
+              await showApiError(err, 'Failed to create API key', this.toastCtrl, this.router);
             },
           });
           return true;

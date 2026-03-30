@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Controller\Api\V2;
 
+use App\Service\PlanService;
+
 /**
  * IntegrationsController (TASK-NG-006)
  *
@@ -71,6 +73,13 @@ class IntegrationsController extends AppController
         $this->request->allowMethod(['post']);
 
         if (!$this->requireRole(['owner', 'admin'])) {
+            return;
+        }
+
+        $planService = new PlanService();
+        $check = $planService->checkFeature($this->currentOrgId, 'api_access');
+        if (!$check['allowed']) {
+            $this->planLimitError("Integrations are not available on your {$check['plan_name']} plan. Upgrade to use integrations.", $check);
             return;
         }
 

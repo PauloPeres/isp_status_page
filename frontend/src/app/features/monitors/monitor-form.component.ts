@@ -29,6 +29,7 @@ import {
 import { MonitorService } from './monitor.service';
 import { MonitorType } from '../../core/models/monitor.model';
 import { FieldErrorComponent } from '../../shared/components/field-error.component';
+import { showApiError } from '../../core/services/plan-error.helper';
 
 @Component({
   selector: 'app-monitor-form',
@@ -566,7 +567,7 @@ export class MonitorFormComponent implements OnInit {
         },
         error: (err: any) => {
           this.saving.set(false);
-          this.showToast(err?.message || 'Failed to create monitor', 'danger');
+          showApiError(err, 'Failed to create monitor', this.toastCtrl, this.router);
         },
       });
   }
@@ -622,12 +623,7 @@ export class MonitorFormComponent implements OnInit {
       },
       error: (err: any) => {
         this.saving.set(false);
-        this.showToast(
-          err?.message || (this.isEdit()
-            ? 'Failed to update monitor'
-            : 'Failed to create monitor'),
-          'danger',
-        );
+        showApiError(err, this.isEdit() ? 'Failed to update monitor' : 'Failed to create monitor', this.toastCtrl, this.router);
       },
     });
   }

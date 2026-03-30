@@ -1,6 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonBackButton, IonButton,
   IonList, IonItem, IonItemSliding, IonItemOptions, IonItemOption,
@@ -10,6 +11,7 @@ import {
 } from '@ionic/angular/standalone';
 import { UserService, Invitation } from '../users/user.service';
 import { ListSkeletonComponent } from '../../shared/components/list-skeleton.component';
+import { showApiError } from '../../core/services/plan-error.helper';
 import { addIcons } from 'ionicons';
 import { mailOutline } from 'ionicons/icons';
 
@@ -124,6 +126,7 @@ export class InvitationListComponent implements OnInit {
     private service: UserService,
     private alertCtrl: AlertController,
     private toastCtrl: ToastController,
+    private router: Router,
   ) {}
 
   ngOnInit(): void { this.load(); }
@@ -177,8 +180,7 @@ export class InvitationListComponent implements OnInit {
       },
       error: async (err: any) => {
         this.sending.set(false);
-        const toast = await this.toastCtrl.create({ message: err?.message || 'Failed to send invitation', color: 'danger', duration: 4000, position: 'bottom' });
-        await toast.present();
+        await showApiError(err, 'Failed to send invitation', this.toastCtrl, this.router);
       },
     });
   }

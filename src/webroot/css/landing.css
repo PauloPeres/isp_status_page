@@ -320,7 +320,7 @@ h1, h2, h3, h4 {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 32px;
-    align-items: start;
+    align-items: stretch;
 }
 
 .pricing-card {
@@ -330,6 +330,17 @@ h1, h2, h3, h4 {
     padding: 40px 32px;
     position: relative;
     transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.pricing-features {
+    flex: 1;
+}
+
+.pricing-card .btn-pricing,
+.pricing-card .btn-pricing-featured {
+    margin-top: auto;
 }
 
 .pricing-card:hover {

@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Controller\Api\V2;
 
+use App\Service\PlanService;
+
 /**
  * InvitationsController (TASK-NG-010)
  *
@@ -46,6 +48,13 @@ class InvitationsController extends AppController
         $this->request->allowMethod(['post']);
 
         if (!$this->requireRole(['owner', 'admin'])) {
+            return;
+        }
+
+        $planService = new PlanService();
+        $check = $planService->checkLimit($this->currentOrgId, 'team_member');
+        if (!$check['allowed']) {
+            $this->planLimitError("Team member limit reached. Your {$check['plan_name']} plan allows {$check['limit']} team members.", $check);
             return;
         }
 

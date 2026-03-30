@@ -1,0 +1,1 @@
+import{e as a}from"./chunk-JHI3MBHO.js";function s(t,e,i,r){return a(this,null,function*(){let o=t?.status===402||t?.error_type==="plan_limit_exceeded";yield(yield i.create({message:t?.message||e,color:o?"warning":"danger",duration:o?6e3:4e3,position:"bottom",buttons:o&&r?[{text:"Upgrade",handler:()=>{r.navigate(["/billing"])}}]:[]})).present()})}export{s as a};

@@ -24,12 +24,24 @@ export interface ApiError {
   message: string;
   errors?: Record<string, Record<string, string>>;
   status: number;
+  error_type?: string;
+  data?: {
+    allowed?: boolean;
+    current?: number;
+    limit?: number | string;
+    plan_name?: string;
+    plan_slug?: string;
+    upgrade_to?: string | null;
+    feature?: string;
+  };
 }
 
 function extractError(err: HttpErrorResponse): ApiError {
   const body = err.error;
   let message = 'An unexpected error occurred';
   let errors: Record<string, Record<string, string>> | undefined;
+  let error_type: string | undefined;
+  let data: ApiError['data'] | undefined;
 
   if (body) {
     if (typeof body === 'string') {
@@ -39,9 +51,14 @@ function extractError(err: HttpErrorResponse): ApiError {
     } else if (body.error) {
       message = body.error;
     }
+    if (body.error_type) {
+      error_type = body.error_type;
+    }
+    if (body.data && typeof body.data === 'object') {
+      data = body.data;
+    }
     if (body.errors && typeof body.errors === 'object') {
       errors = body.errors;
-      // Build a readable message from validation errors
       const fieldErrors: string[] = [];
       for (const [field, rules] of Object.entries(errors!)) {
         const msgs = Object.values(rules as Record<string, string>);
@@ -65,7 +82,7 @@ function extractError(err: HttpErrorResponse): ApiError {
     message = 'Server error. Please try again later.';
   }
 
-  return { message, errors, status: err.status };
+  return { message, errors, status: err.status, error_type, data };
 }
 
 function handleError(err: HttpErrorResponse): Observable<never> {

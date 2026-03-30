@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Controller\Api\V2;
 
+use App\Service\PlanService;
+
 /**
  * WebhookEndpointsController (C-04)
  *
@@ -42,6 +44,13 @@ class WebhookEndpointsController extends AppController
         $this->request->allowMethod(['post']);
 
         if (!$this->requireRole(['owner', 'admin'])) {
+            return;
+        }
+
+        $planService = new PlanService();
+        $check = $planService->checkFeature($this->currentOrgId, 'webhook_alerts');
+        if (!$check['allowed']) {
+            $this->planLimitError("Webhook endpoints are not available on your {$check['plan_name']} plan. Upgrade to use webhooks.", $check);
             return;
         }
 

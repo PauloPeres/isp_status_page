@@ -131,6 +131,27 @@ class AppController extends Controller
     }
 
     /**
+     * Return a 402 plan limit error with structured upgrade info.
+     *
+     * @param string $message Human-readable message
+     * @param array $limitData Data from PlanService::checkLimit() or checkFeature()
+     * @return void
+     */
+    protected function planLimitError(string $message, array $limitData = []): void
+    {
+        $body = [
+            'success' => false,
+            'message' => $message,
+            'error_type' => 'plan_limit_exceeded',
+            'data' => $limitData,
+        ];
+
+        $this->response = $this->response->withStatus(402);
+        $this->set('response', $body);
+        $this->viewBuilder()->setOption('serialize', 'response');
+    }
+
+    /**
      * Check if the current user has one of the required roles.
      *
      * Sets a 403 error response and returns false when the check fails.
