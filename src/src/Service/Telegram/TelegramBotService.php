@@ -255,10 +255,11 @@ class TelegramBotService
             return "Usage: /check &lt;monitor_name&gt;\nExample: /check My Website";
         }
 
+        $escapedName = str_replace(['%', '_'], ['\\%', '\\_'], strtolower($name));
         $monitor = $this->fetchTable('Monitors')->find()
             ->where([
                 'organization_id' => $orgId,
-                'LOWER(name) LIKE' => '%' . strtolower($name) . '%',
+                'LOWER(name) LIKE' => '%' . $escapedName . '%',
             ])
             ->first();
 
@@ -342,11 +343,12 @@ class TelegramBotService
             return "Usage: /{$action} &lt;monitor_name&gt;";
         }
 
+        $escapedName = str_replace(['%', '_'], ['\\%', '\\_'], strtolower($name));
         $table = $this->fetchTable('Monitors');
         $monitor = $table->find()
             ->where([
                 'organization_id' => $orgId,
-                'LOWER(name) LIKE' => '%' . strtolower($name) . '%',
+                'LOWER(name) LIKE' => '%' . $escapedName . '%',
             ])
             ->first();
 

@@ -5,6 +5,7 @@ namespace App\Controller\Api\V2\SuperAdmin;
 
 use App\Controller\Api\V2\AppController as V2AppController;
 use Cake\Event\EventInterface;
+use Cake\Http\Exception\ForbiddenException;
 
 /**
  * Super Admin Base Controller (TASK-NG-014)
@@ -24,7 +25,7 @@ class AppController extends V2AppController
         parent::beforeFilter($event);
 
         if (!$this->isSuperAdmin) {
-            $this->error('Super admin access required', 403);
+            throw new ForbiddenException('Super admin access required');
         }
     }
 }

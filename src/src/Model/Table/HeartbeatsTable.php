@@ -36,6 +36,8 @@ class HeartbeatsTable extends Table
         $this->setDisplayField('token');
         $this->setPrimaryKey('id');
 
+        $this->addBehavior('TenantScope');
+
         $this->belongsTo('Monitors', [
             'foreignKey' => 'monitor_id',
             'joinType' => 'INNER',

@@ -19,6 +19,10 @@ class WebhookEndpointsController extends AppController
     {
         $this->request->allowMethod(['get']);
 
+        if (!$this->requireRole(['owner', 'admin'])) {
+            return;
+        }
+
         $table = $this->fetchTable('WebhookEndpoints');
         $endpoints = $table->find()
             ->orderBy(['WebhookEndpoints.created' => 'DESC'])

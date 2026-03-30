@@ -30,6 +30,14 @@ class SettingsController extends AppController
         $service = new SettingService();
         $settings = $service->getAll();
 
+        // Mask sensitive values before returning
+        $sensitiveKeys = ['smtp_password', 'backup_ftp_password', 'telegram_bot_token', 'stripe_secret_key', 'twilio_auth_token'];
+        foreach ($sensitiveKeys as $key) {
+            if (isset($settings[$key]) && !empty($settings[$key])) {
+                $settings[$key] = '••••••••';
+            }
+        }
+
         $this->success(['settings' => $settings]);
     }
 

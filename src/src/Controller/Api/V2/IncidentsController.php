@@ -80,6 +80,7 @@ class IncidentsController extends AppController
         // Search by title or description
         $search = $this->request->getQuery('search');
         if ($search) {
+            $search = str_replace(['%', '_'], ['\\%', '\\_'], $search);
             $query->where([
                 'OR' => [
                     'Incidents.title LIKE' => '%' . $search . '%',

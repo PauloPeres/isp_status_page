@@ -27,7 +27,11 @@ class JwtService
 
     public function __construct()
     {
-        $this->secretKey = (string)env('JWT_SECRET', env('SECURITY_SALT', 'change-me'));
+        $secret = env('JWT_SECRET') ?: env('SECURITY_SALT');
+        if (empty($secret) || $secret === 'change-me') {
+            throw new \RuntimeException('JWT_SECRET or SECURITY_SALT must be configured. Do not use default values.');
+        }
+        $this->secretKey = (string)$secret;
     }
 
     /**

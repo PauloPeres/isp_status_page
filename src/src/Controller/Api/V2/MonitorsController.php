@@ -58,6 +58,7 @@ class MonitorsController extends AppController
         // Search by name or description
         $search = $this->request->getQuery('search');
         if ($search) {
+            $search = str_replace(['%', '_'], ['\\%', '\\_'], $search);
             $query->where([
                 'OR' => [
                     'Monitors.name LIKE' => '%' . $search . '%',
@@ -154,11 +155,11 @@ class MonitorsController extends AppController
             "SELECT DATE(checked_at) as check_date,
                     COUNT(*) as total,
                     SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) as success_count
-             FROM monitor_checks
-             WHERE monitor_id = ? AND checked_at >= ?
+             FROM monitor_checks mc
+             WHERE mc.monitor_id = ? AND mc.checked_at >= ? AND mc.organization_id = ?
              GROUP BY DATE(checked_at)
              ORDER BY check_date ASC",
-            [(int)$id, DateTime::now()->subDays(29)->startOfDay()->format('Y-m-d H:i:s')]
+            [(int)$id, DateTime::now()->subDays(29)->startOfDay()->format('Y-m-d H:i:s'), $this->currentOrgId]
         );
         $dailyStats = [];
         foreach ($stmt->fetchAll('assoc') as $row) {
@@ -209,10 +210,10 @@ class MonitorsController extends AppController
                         ROUND(AVG(mc.response_time)::numeric, 2) as avg_response_time
                  FROM monitor_checks mc
                  JOIN check_regions cr ON cr.id = mc.region_id
-                 WHERE mc.monitor_id = ? AND mc.checked_at >= ?
+                 WHERE mc.monitor_id = ? AND mc.checked_at >= ? AND mc.organization_id = ?
                  GROUP BY cr.id, cr.name, cr.code
                  ORDER BY cr.name",
-                [(int)$id, $since24h]
+                [(int)$id, $since24h, $this->currentOrgId]
             );
             foreach ($regionStmt->fetchAll('assoc') as $row) {
                 $rTotal = (int)$row['total_checks'];
@@ -509,7 +510,7 @@ class MonitorsController extends AppController
             case 'pause':
                 $count = $monitorsTable->updateAll(
                     ['active' => false],
-                    ['id IN' => $ids]
+                    ['id IN' => $ids, 'organization_id' => $this->currentOrgId]
                 );
                 $this->success(['affected' => $count, 'action' => 'pause']);
                 break;
@@ -517,13 +518,13 @@ class MonitorsController extends AppController
             case 'resume':
                 $count = $monitorsTable->updateAll(
                     ['active' => true],
-                    ['id IN' => $ids]
+                    ['id IN' => $ids, 'organization_id' => $this->currentOrgId]
                 );
                 $this->success(['affected' => $count, 'action' => 'resume']);
                 break;
 
             case 'delete':
-                $count = $monitorsTable->deleteAll(['id IN' => $ids]);
+                $count = $monitorsTable->deleteAll(['id IN' => $ids, 'organization_id' => $this->currentOrgId]);
                 $this->success(['affected' => $count, 'action' => 'delete']);
                 break;
 
