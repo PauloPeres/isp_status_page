@@ -56,44 +56,6 @@ class OrganizationsControllerTest extends TestCase
     }
 
     /**
-     * Test that a super admin can access the organizations index
-     */
-    public function testIndexSuperAdmin(): void
-    {
-        $this->markTestSkipped('Legacy web controller — super admin moved to Angular SPA');
-        $this->session([
-            'Auth' => [
-                'id' => 1,
-                'username' => 'admin',
-                'active' => true,
-                'is_super_admin' => true,
-            ],
-        ]);
-
-        $this->get('/super-admin/organizations');
-        $this->assertResponseOk();
-    }
-
-    /**
-     * Test that a super admin can view an organization
-     */
-    public function testViewSuperAdmin(): void
-    {
-        $this->markTestSkipped('Legacy web controller — super admin moved to Angular SPA');
-        $this->session([
-            'Auth' => [
-                'id' => 1,
-                'username' => 'admin',
-                'active' => true,
-                'is_super_admin' => true,
-            ],
-        ]);
-
-        $this->get('/super-admin/organizations/1');
-        $this->assertResponseOk();
-    }
-
-    /**
      * Test that a non-super-admin user cannot view an organization
      */
     public function testViewRequiresSuperAdmin(): void

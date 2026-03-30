@@ -61,22 +61,4 @@ class DashboardControllerTest extends TestCase
         $this->assertResponseCode(403);
     }
 
-    /**
-     * Test that a super admin can access the dashboard
-     */
-    public function testIndexSuperAdmin(): void
-    {
-        $this->markTestSkipped('Legacy web controller — super admin moved to Angular SPA');
-        $this->session([
-            'Auth' => [
-                'id' => 1,
-                'username' => 'admin',
-                'active' => true,
-                'is_super_admin' => true,
-            ],
-        ]);
-
-        $this->get('/super-admin');
-        $this->assertResponseOk();
-    }
 }

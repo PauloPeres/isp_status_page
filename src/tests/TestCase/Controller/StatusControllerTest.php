@@ -52,18 +52,6 @@ class StatusControllerTest extends TestCase
     }
 
     /**
-     * Test index method displays system status
-     */
-    public function testIndexDisplaysSystemStatus(): void
-    {
-        $this->markTestSkipped('Legacy web controller — status page moved to Angular SPA');
-        $this->get('/status');
-
-        $this->assertResponseOk();
-        $this->assertResponseContains('Status dos Serviços');
-    }
-
-    /**
      * Test index method with all systems operational
      */
     public function testIndexAllSystemsOperational(): void
