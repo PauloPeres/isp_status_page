@@ -43,6 +43,8 @@ export class ThemeService {
 
   private setDarkClass(dark: boolean): void {
     document.body.classList.toggle('dark', dark);
+    // When user explicitly chooses light, prevent the media query fallback from applying dark
+    document.body.classList.toggle('light-forced', this.mode() === 'light');
   }
 
   private getStored(): ThemeMode {

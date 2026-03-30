@@ -106,75 +106,73 @@
         <p class="section-subtitle">Start free. Upgrade when you need more.</p>
 
         <div class="pricing-grid">
-            <!-- Free Plan -->
-            <div class="pricing-card">
-                <div class="pricing-header">
-                    <h3>Free</h3>
-                    <div class="pricing-price">
-                        <span class="price-amount">$0</span>
-                        <span class="price-period">/month</span>
-                    </div>
-                    <p class="pricing-desc">For personal projects and small sites.</p>
-                </div>
-                <ul class="pricing-features">
-                    <li>Up to 5 monitors</li>
-                    <li>5-minute check interval</li>
-                    <li>1 status page</li>
-                    <li>Email alerts</li>
-                    <li>24-hour data retention</li>
-                    <li>Community support</li>
-                </ul>
-                <a href="/app/register" class="btn btn-pricing">Start Free</a>
-            </div>
+            <?php if (!empty($plans)): ?>
+                <?php foreach ($plans as $i => $plan):
+                    $isFeatured = ($plan->slug === 'pro');
+                    $isFree = ($plan->price_monthly == 0);
+                    $priceFormatted = $isFree ? '$0' : '$' . number_format($plan->price_monthly / 100, 0);
 
-            <!-- Pro Plan -->
-            <div class="pricing-card pricing-card-featured">
-                <div class="pricing-badge">Most Popular</div>
-                <div class="pricing-header">
-                    <h3>Pro</h3>
-                    <div class="pricing-price">
-                        <span class="price-amount">$19</span>
-                        <span class="price-period">/month</span>
-                    </div>
-                    <p class="pricing-desc">For growing teams and businesses.</p>
-                </div>
-                <ul class="pricing-features">
-                    <li>Up to 50 monitors</li>
-                    <li>1-minute check interval</li>
-                    <li>5 status pages</li>
-                    <li>Email, Slack, Discord alerts</li>
-                    <li>90-day data retention</li>
-                    <li>Custom domains</li>
-                    <li>API access</li>
-                    <li>Priority support</li>
-                </ul>
-                <a href="/app/register" class="btn btn-pricing-featured">Start Free Trial</a>
-            </div>
+                    // Build feature list from plan limits
+                    $features = [];
+                    $features[] = ($plan->monitor_limit == -1 ? 'Unlimited' : 'Up to ' . $plan->monitor_limit) . ' monitors';
 
-            <!-- Business Plan -->
-            <div class="pricing-card">
-                <div class="pricing-header">
-                    <h3>Business</h3>
-                    <div class="pricing-price">
-                        <span class="price-amount">$49</span>
-                        <span class="price-period">/month</span>
+                    $interval = $plan->check_interval_min;
+                    if ($interval < 60) {
+                        $features[] = $interval . '-second check interval';
+                    } else {
+                        $features[] = ($interval / 60) . '-minute check interval';
+                    }
+
+                    $features[] = ($plan->status_page_limit == -1 ? 'Unlimited' : $plan->status_page_limit) . ' status page' . ($plan->status_page_limit != 1 ? 's' : '');
+
+                    // Features from JSON
+                    $planFeatures = json_decode($plan->features ?? '[]', true) ?: [];
+                    if (in_array('email_alerts', $planFeatures)) $features[] = 'Email alerts';
+                    if (in_array('slack_alerts', $planFeatures)) $features[] = 'Slack, Discord & Telegram alerts';
+                    if (in_array('all_alert_channels', $planFeatures)) $features[] = 'All alert channels';
+                    if (in_array('api_access', $planFeatures)) $features[] = 'API access';
+                    if (in_array('custom_domains', $planFeatures)) $features[] = 'Custom domains';
+                    if (in_array('multi_region', $planFeatures)) $features[] = 'Multi-region checks';
+                    if (in_array('custom_branding', $planFeatures)) $features[] = 'Custom branding';
+                    if (in_array('sso_saml', $planFeatures)) $features[] = 'SSO / SAML';
+                    if (in_array('priority_support', $planFeatures)) $features[] = 'Priority support';
+                    if (in_array('dedicated_support', $planFeatures)) $features[] = 'Dedicated support';
+
+                    $features[] = $plan->data_retention_days . '-day data retention';
+
+                    $teamLimit = ($plan->team_member_limit == -1 ? 'Unlimited' : $plan->team_member_limit) . ' team member' . ($plan->team_member_limit != 1 ? 's' : '');
+                    $features[] = $teamLimit;
+                ?>
+                <div class="pricing-card<?= $isFeatured ? ' pricing-card-featured' : '' ?>">
+                    <?php if ($isFeatured): ?>
+                        <div class="pricing-badge">Most Popular</div>
+                    <?php endif; ?>
+                    <div class="pricing-header">
+                        <h3><?= h($plan->name) ?></h3>
+                        <div class="pricing-price">
+                            <span class="price-amount"><?= $priceFormatted ?></span>
+                            <span class="price-period">/month</span>
+                        </div>
                     </div>
-                    <p class="pricing-desc">For organizations that need full control.</p>
+                    <ul class="pricing-features">
+                        <?php foreach ($features as $feature): ?>
+                            <li><?= h($feature) ?></li>
+                        <?php endforeach; ?>
+                    </ul>
+                    <a href="/app/register" class="btn <?= $isFeatured ? 'btn-pricing-featured' : 'btn-pricing' ?>"><?= $isFree ? 'Start Free' : 'Start Free Trial' ?></a>
                 </div>
-                <ul class="pricing-features">
-                    <li>Unlimited monitors</li>
-                    <li>30-second check interval</li>
-                    <li>Unlimited status pages</li>
-                    <li>All alert channels</li>
-                    <li>1-year data retention</li>
-                    <li>Custom domains + branding</li>
-                    <li>Full API access</li>
-                    <li>Multi-region checks</li>
-                    <li>SSO / SAML</li>
-                    <li>Dedicated support</li>
-                </ul>
-                <a href="/app/register" class="btn btn-pricing">Start Free Trial</a>
-            </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <!-- Fallback if plans table not available -->
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3>Free</h3>
+                        <div class="pricing-price"><span class="price-amount">$0</span><span class="price-period">/month</span></div>
+                    </div>
+                    <ul class="pricing-features"><li>5 monitors</li><li>Email alerts</li></ul>
+                    <a href="/app/register" class="btn btn-pricing">Start Free</a>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </section>
@@ -201,8 +199,8 @@
             </div>
             <div class="footer-links">
                 <h4>Legal</h4>
-                <a href="#">Privacy Policy</a>
-                <a href="#">Terms of Service</a>
+                <a href="/privacy">Privacy Policy</a>
+                <a href="/terms">Terms of Service</a>
             </div>
         </div>
         <div class="footer-bottom">

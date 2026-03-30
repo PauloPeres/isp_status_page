@@ -75,13 +75,13 @@ import { ApiService } from '../../core/services/api.service';
         <h3 style="margin-top: 2rem;">Change Password</h3>
         <ion-list>
           <ion-item>
-            <ion-input label="Current Password" labelPlacement="stacked" type="password" [(ngModel)]="currentPassword" placeholder="Enter current password"></ion-input>
+            <ion-input #curPwInput label="Current Password" labelPlacement="stacked" type="password" [(ngModel)]="currentPassword" placeholder="Enter current password" autocomplete="current-password" enterkeyhint="next" (keyup.enter)="newPwInput.setFocus()"></ion-input>
           </ion-item>
           <ion-item>
-            <ion-input label="New Password" labelPlacement="stacked" type="password" [(ngModel)]="newPassword" placeholder="Enter new password"></ion-input>
+            <ion-input #newPwInput label="New Password" labelPlacement="stacked" type="password" [(ngModel)]="newPassword" placeholder="Enter new password" autocomplete="new-password" enterkeyhint="next" (keyup.enter)="confirmPwInput.setFocus()"></ion-input>
           </ion-item>
           <ion-item>
-            <ion-input label="Confirm Password" labelPlacement="stacked" type="password" [(ngModel)]="confirmPassword" placeholder="Confirm new password"></ion-input>
+            <ion-input #confirmPwInput label="Confirm Password" labelPlacement="stacked" type="password" [(ngModel)]="confirmPassword" placeholder="Confirm new password" autocomplete="new-password" enterkeyhint="done" (keyup.enter)="onChangePassword()"></ion-input>
           </ion-item>
         </ion-list>
         @if (passwordError) {

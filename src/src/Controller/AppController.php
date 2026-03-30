@@ -155,7 +155,7 @@ class AppController extends Controller
 
         // Allow public access to the display action (status page) and home (root redirect)
         // Login and logout will be configured in UsersController
-        $this->Authentication->addUnauthenticatedActions(['display', 'home']);
+        $this->Authentication->addUnauthenticatedActions(['display', 'home', 'terms', 'privacy']);
     }
 
     /**

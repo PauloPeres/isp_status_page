@@ -237,6 +237,18 @@ return function (RouteBuilder $routes): void {
         );
 
         /*
+         * Legal pages (Terms of Service, Privacy Policy)
+         */
+        $builder->connect(
+            '/terms',
+            ['controller' => 'Pages', 'action' => 'terms']
+        );
+        $builder->connect(
+            '/privacy',
+            ['controller' => 'Pages', 'action' => 'privacy']
+        );
+
+        /*
          * Stripe webhook route (TASK-803)
          */
         $builder->connect(

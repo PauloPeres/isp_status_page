@@ -3,14 +3,33 @@ import { CommonModule } from '@angular/common';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons,
   IonCard, IonCardHeader, IonCardTitle, IonCardContent,
-  IonList, IonItem, IonLabel, IonBadge, IonNote, IonIcon, IonSpinner, IonProgressBar,
+  IonList, IonItem, IonLabel, IonBadge, IonNote, IonIcon,
+  IonSkeletonText, IonGrid, IonRow, IonCol,
   IonRefresher, IonRefresherContent,
+  ToastController,
 } from '@ionic/angular/standalone';
-import { SuperAdminService, AdminHealth } from './super-admin.service';
+import { ApiService } from '../../core/services/api.service';
 import { addIcons } from 'ionicons';
-import { serverOutline, heartOutline } from 'ionicons/icons';
+import {
+  serverOutline, heartOutline, checkmarkCircleOutline, closeCircleOutline,
+} from 'ionicons/icons';
 
-addIcons({ serverOutline, heartOutline });
+addIcons({ serverOutline, heartOutline, checkmarkCircleOutline, closeCircleOutline });
+
+interface HealthCheck {
+  healthy: boolean;
+  message: string;
+  free_gb?: number;
+}
+
+interface HealthData {
+  healthy: boolean;
+  checks: {
+    database: HealthCheck;
+    cache: HealthCheck;
+    disk: HealthCheck;
+  };
+}
 
 @Component({
   selector: 'app-super-admin-health',
@@ -19,7 +38,8 @@ addIcons({ serverOutline, heartOutline });
     CommonModule,
     IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons,
     IonCard, IonCardHeader, IonCardTitle, IonCardContent,
-    IonList, IonItem, IonLabel, IonBadge, IonNote, IonIcon, IonSpinner, IonProgressBar,
+    IonList, IonItem, IonLabel, IonBadge, IonNote, IonIcon,
+    IonSkeletonText, IonGrid, IonRow, IonCol,
     IonRefresher, IonRefresherContent,
   ],
   template: `
@@ -36,114 +56,139 @@ addIcons({ serverOutline, heartOutline });
       </ion-refresher>
 
       @if (loading()) {
-        <div style="text-align: center; padding: 3rem"><ion-spinner name="crescent"></ion-spinner></div>
+        <div style="padding: 16px;">
+          <ion-card>
+            <ion-card-content style="text-align: center; padding: 24px;">
+              <ion-skeleton-text [animated]="true" style="width: 120px; height: 2rem; margin: 0 auto 8px;"></ion-skeleton-text>
+              <ion-skeleton-text [animated]="true" style="width: 80px; height: 1rem; margin: 0 auto;"></ion-skeleton-text>
+            </ion-card-content>
+          </ion-card>
+          <ion-grid>
+            <ion-row>
+              @for (i of [1,2,3]; track i) {
+                <ion-col size="12" size-md="4">
+                  <ion-card>
+                    <ion-card-content>
+                      <ion-skeleton-text [animated]="true" style="width: 50%; height: 1.2rem; margin-bottom: 12px;"></ion-skeleton-text>
+                      <ion-skeleton-text [animated]="true" style="width: 70%; height: 0.85rem; margin-bottom: 8px;"></ion-skeleton-text>
+                      <ion-skeleton-text [animated]="true" style="width: 40%; height: 0.85rem;"></ion-skeleton-text>
+                    </ion-card-content>
+                  </ion-card>
+                </ion-col>
+              }
+            </ion-row>
+          </ion-grid>
+        </div>
       } @else if (data()) {
+        <!-- Overall Health Badge -->
         <ion-card>
-          <ion-card-header>
-            <ion-card-title>
-              <ion-icon name="server-outline" style="vertical-align: middle; margin-right: 8px"></ion-icon>
-              System Resources
-            </ion-card-title>
-          </ion-card-header>
-          <ion-card-content>
-            <ion-list>
-              <ion-item>
-                <ion-label>
-                  <h3>CPU Usage</h3>
-                  <ion-progress-bar [value]="data()!.cpu_usage / 100" [color]="getUsageColor(data()!.cpu_usage)"></ion-progress-bar>
-                </ion-label>
-                <ion-note slot="end">{{ data()!.cpu_usage }}%</ion-note>
-              </ion-item>
-              <ion-item>
-                <ion-label>
-                  <h3>Memory Usage</h3>
-                  <ion-progress-bar [value]="data()!.memory_usage / 100" [color]="getUsageColor(data()!.memory_usage)"></ion-progress-bar>
-                </ion-label>
-                <ion-note slot="end">{{ data()!.memory_usage }}%</ion-note>
-              </ion-item>
-              <ion-item>
-                <ion-label>
-                  <h3>Disk Usage</h3>
-                  <ion-progress-bar [value]="data()!.disk_usage / 100" [color]="getUsageColor(data()!.disk_usage)"></ion-progress-bar>
-                </ion-label>
-                <ion-note slot="end">{{ data()!.disk_usage }}%</ion-note>
-              </ion-item>
-            </ion-list>
+          <ion-card-content style="text-align: center; padding: 24px;">
+            <ion-icon
+              [name]="data()!.healthy ? 'checkmark-circle-outline' : 'close-circle-outline'"
+              [style.font-size]="'3rem'"
+              [style.color]="data()!.healthy ? 'var(--ion-color-success)' : 'var(--ion-color-danger)'"
+            ></ion-icon>
+            <h1 style="margin: 8px 0 0; font-weight: 700;">
+              <ion-badge [color]="data()!.healthy ? 'success' : 'danger'" style="font-size: 1.1rem; padding: 8px 20px;">
+                {{ data()!.healthy ? 'Healthy' : 'Unhealthy' }}
+              </ion-badge>
+            </h1>
           </ion-card-content>
         </ion-card>
 
-        <ion-card>
-          <ion-card-header>
-            <ion-card-title>
-              <ion-icon name="heart-outline" style="vertical-align: middle; margin-right: 8px"></ion-icon>
-              Services
-            </ion-card-title>
-          </ion-card-header>
-          <ion-card-content>
-            <ion-list>
-              <ion-item>
-                <ion-label>Database Connections</ion-label>
-                <ion-note slot="end">{{ data()!.db_connections }}</ion-note>
-              </ion-item>
-              <ion-item>
-                <ion-label>Queue Size</ion-label>
-                <ion-badge slot="end" [color]="data()!.queue_size > 100 ? 'warning' : 'success'">
-                  {{ data()!.queue_size }}
-                </ion-badge>
-              </ion-item>
-              <ion-item>
-                <ion-label>Redis</ion-label>
-                <ion-badge slot="end" [color]="data()!.redis_connected ? 'success' : 'danger'">
-                  {{ data()!.redis_connected ? 'Connected' : 'Disconnected' }}
-                </ion-badge>
-              </ion-item>
-              <ion-item>
-                <ion-label>Uptime</ion-label>
-                <ion-note slot="end">{{ formatUptime(data()!.uptime_seconds) }}</ion-note>
-              </ion-item>
-              <ion-item>
-                <ion-label>Last Health Check</ion-label>
-                <ion-note slot="end">{{ data()!.last_check_at | date:'medium' }}</ion-note>
-              </ion-item>
-            </ion-list>
-          </ion-card-content>
-        </ion-card>
+        <!-- Individual Health Checks -->
+        <ion-grid>
+          <ion-row>
+            <!-- Database -->
+            <ion-col size="12" size-md="4">
+              <ion-card>
+                <ion-card-header>
+                  <ion-card-title style="font-size: 1rem;">
+                    <ion-icon name="server-outline" style="vertical-align: middle; margin-right: 6px;"></ion-icon>
+                    Database
+                  </ion-card-title>
+                </ion-card-header>
+                <ion-card-content>
+                  <ion-badge [color]="data()!.checks.database.healthy ? 'success' : 'danger'" style="margin-bottom: 8px;">
+                    {{ data()!.checks.database.healthy ? 'Healthy' : 'Unhealthy' }}
+                  </ion-badge>
+                  <p style="color: var(--ion-color-medium); margin: 4px 0 0;">{{ data()!.checks.database.message }}</p>
+                </ion-card-content>
+              </ion-card>
+            </ion-col>
+
+            <!-- Cache (Redis) -->
+            <ion-col size="12" size-md="4">
+              <ion-card>
+                <ion-card-header>
+                  <ion-card-title style="font-size: 1rem;">
+                    <ion-icon name="server-outline" style="vertical-align: middle; margin-right: 6px;"></ion-icon>
+                    Cache (Redis)
+                  </ion-card-title>
+                </ion-card-header>
+                <ion-card-content>
+                  <ion-badge [color]="data()!.checks.cache.healthy ? 'success' : 'danger'" style="margin-bottom: 8px;">
+                    {{ data()!.checks.cache.healthy ? 'Healthy' : 'Unhealthy' }}
+                  </ion-badge>
+                  <p style="color: var(--ion-color-medium); margin: 4px 0 0;">{{ data()!.checks.cache.message }}</p>
+                </ion-card-content>
+              </ion-card>
+            </ion-col>
+
+            <!-- Disk -->
+            <ion-col size="12" size-md="4">
+              <ion-card>
+                <ion-card-header>
+                  <ion-card-title style="font-size: 1rem;">
+                    <ion-icon name="server-outline" style="vertical-align: middle; margin-right: 6px;"></ion-icon>
+                    Disk
+                  </ion-card-title>
+                </ion-card-header>
+                <ion-card-content>
+                  <ion-badge [color]="data()!.checks.disk.healthy ? 'success' : 'danger'" style="margin-bottom: 8px;">
+                    {{ data()!.checks.disk.healthy ? 'Healthy' : 'Unhealthy' }}
+                  </ion-badge>
+                  <p style="color: var(--ion-color-medium); margin: 4px 0 0;">{{ data()!.checks.disk.message }}</p>
+                  @if (data()!.checks.disk.free_gb !== undefined) {
+                    <p style="margin: 4px 0 0; font-weight: 600;">
+                      Free: {{ data()!.checks.disk.free_gb }} GB
+                    </p>
+                  }
+                </ion-card-content>
+              </ion-card>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
       }
     </ion-content>
   `,
 })
 export class SuperAdminHealthComponent implements OnInit {
-  data = signal<AdminHealth | null>(null);
+  data = signal<HealthData | null>(null);
   loading = signal(true);
 
-  constructor(private service: SuperAdminService) {}
+  constructor(private api: ApiService, private toastCtrl: ToastController) {}
 
   ngOnInit(): void { this.load(); }
 
   load(): void {
-    this.service.getHealth().subscribe({
+    this.loading.set(true);
+    this.api.get<HealthData>('/super-admin/health').subscribe({
       next: (d) => { this.data.set(d); this.loading.set(false); },
-      error: () => this.loading.set(false),
+      error: async (err) => {
+        this.loading.set(false);
+        const toast = await this.toastCtrl.create({
+          message: err?.message || 'Failed to load health data', color: 'danger', duration: 3000, position: 'bottom',
+        });
+        await toast.present();
+      },
     });
   }
 
   onRefresh(event: any): void {
-    this.service.getHealth().subscribe({
+    this.api.get<HealthData>('/super-admin/health').subscribe({
       next: (d) => { this.data.set(d); event.target.complete(); },
       error: () => event.target.complete(),
     });
-  }
-
-  getUsageColor(pct: number): string {
-    if (pct > 90) return 'danger';
-    if (pct > 70) return 'warning';
-    return 'success';
-  }
-
-  formatUptime(seconds: number): string {
-    const days = Math.floor(seconds / 86400);
-    const hours = Math.floor((seconds % 86400) / 3600);
-    const mins = Math.floor((seconds % 3600) / 60);
-    return `${days}d ${hours}h ${mins}m`;
   }
 }

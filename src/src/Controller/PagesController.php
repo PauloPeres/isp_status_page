@@ -49,7 +49,45 @@ class PagesController extends AppController
         // User is not logged in, render the landing page
         $this->viewBuilder()->disableAutoLayout();
 
+        // Load plans from DB so pricing is always consistent
+        $plans = [];
+        try {
+            $plansTable = $this->fetchTable('Plans');
+            $plans = $plansTable->find()
+                ->where(['Plans.active' => true])
+                ->orderBy(['Plans.display_order' => 'ASC', 'Plans.price_monthly' => 'ASC'])
+                ->all()
+                ->toArray();
+        } catch (\Exception $e) {
+            // Plans table may not exist yet
+        }
+        $this->set('plans', $plans);
+
         return $this->render('landing');
+    }
+
+    /**
+     * Terms of Service page
+     *
+     * @return \Cake\Http\Response|null
+     */
+    public function terms(): ?Response
+    {
+        $this->viewBuilder()->disableAutoLayout();
+
+        return $this->render('terms');
+    }
+
+    /**
+     * Privacy Policy page
+     *
+     * @return \Cake\Http\Response|null
+     */
+    public function privacy(): ?Response
+    {
+        $this->viewBuilder()->disableAutoLayout();
+
+        return $this->render('privacy');
     }
 
     /**

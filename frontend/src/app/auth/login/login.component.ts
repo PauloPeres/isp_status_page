@@ -54,29 +54,38 @@ import { environment } from '../../../environments/environment';
           <form (ngSubmit)="onLogin()">
             <ion-item>
               <ion-input
+                #emailInput
                 label="Email or Username"
                 labelPlacement="floating"
                 [(ngModel)]="email"
                 name="email"
                 type="email"
                 required
+                autocomplete="email"
+                enterkeyhint="next"
+                (keyup.enter)="passwordInput.setFocus()"
               ></ion-input>
             </ion-item>
 
             <ion-item>
               <ion-input
+                #passwordInput
                 label="Password"
                 labelPlacement="floating"
                 [(ngModel)]="password"
                 name="password"
                 type="password"
                 required
+                autocomplete="current-password"
+                enterkeyhint="go"
+                (keyup.enter)="onLogin()"
               ></ion-input>
             </ion-item>
 
             @if (requires2fa) {
               <ion-item>
                 <ion-input
+                  #tfaInput
                   label="2FA Code"
                   labelPlacement="floating"
                   [(ngModel)]="twoFactorCode"
@@ -84,6 +93,8 @@ import { environment } from '../../../environments/environment';
                   type="text"
                   maxlength="6"
                   inputmode="numeric"
+                  enterkeyhint="go"
+                  (keyup.enter)="onLogin()"
                 ></ion-input>
               </ion-item>
             }

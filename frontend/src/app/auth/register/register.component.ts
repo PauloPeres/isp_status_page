@@ -56,6 +56,7 @@ import { environment } from '../../../environments/environment';
           <form (ngSubmit)="onRegister()">
             <ion-item>
               <ion-input
+                #usernameInput
                 label="Username"
                 labelPlacement="floating"
                 [(ngModel)]="username"
@@ -63,22 +64,30 @@ import { environment } from '../../../environments/environment';
                 type="text"
                 required
                 minlength="3"
+                autocomplete="username"
+                enterkeyhint="next"
+                (keyup.enter)="emailInput.setFocus()"
               ></ion-input>
             </ion-item>
 
             <ion-item>
               <ion-input
+                #emailInput
                 label="Email"
                 labelPlacement="floating"
                 [(ngModel)]="email"
                 name="email"
                 type="email"
                 required
+                autocomplete="email"
+                enterkeyhint="next"
+                (keyup.enter)="passwordInput.setFocus()"
               ></ion-input>
             </ion-item>
 
             <ion-item>
               <ion-input
+                #passwordInput
                 label="Password"
                 labelPlacement="floating"
                 [(ngModel)]="password"
@@ -86,29 +95,40 @@ import { environment } from '../../../environments/environment';
                 type="password"
                 required
                 minlength="8"
+                autocomplete="new-password"
+                enterkeyhint="next"
+                (keyup.enter)="confirmInput.setFocus()"
               ></ion-input>
             </ion-item>
 
             <ion-item>
               <ion-input
+                #confirmInput
                 label="Confirm Password"
                 labelPlacement="floating"
                 [(ngModel)]="confirmPassword"
                 name="confirmPassword"
                 type="password"
                 required
+                autocomplete="new-password"
+                enterkeyhint="done"
               ></ion-input>
             </ion-item>
 
-            <ion-item lines="none" class="terms-item">
+            <div class="terms-row">
               <ion-checkbox
                 [(ngModel)]="agreedToTerms"
                 name="agreedToTerms"
                 labelPlacement="end"
               >
-                I agree to the Terms of Service and Privacy Policy
+                <span class="terms-label">
+                  I agree to the
+                  <a href="/terms" target="_blank">Terms of Service</a>
+                  and
+                  <a href="/privacy" target="_blank">Privacy Policy</a>
+                </span>
               </ion-checkbox>
-            </ion-item>
+            </div>
 
             @if (errorMessage) {
               <ion-text color="danger">
@@ -182,10 +202,23 @@ import { environment } from '../../../environments/environment';
         --min-height: 56px;
         margin-bottom: 1rem;
       }
-      .terms-item {
-        --padding-start: 0;
-        font-size: 0.85rem;
+      .terms-row {
+        padding: 0.75rem 12px;
         margin-bottom: 0.5rem;
+      }
+      .terms-row ion-checkbox {
+        --size: 20px;
+      }
+      .terms-label {
+        font-size: 0.82rem;
+        color: var(--ion-color-medium);
+        line-height: 1.4;
+        margin-left: 4px;
+      }
+      .terms-label a {
+        color: var(--ion-color-primary);
+        text-decoration: none;
+        font-weight: 600;
       }
       ion-button {
         margin-top: 1.5rem;

@@ -3,15 +3,16 @@ import { CommonModule } from '@angular/common';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons,
   IonCard, IonCardHeader, IonCardTitle, IonCardContent,
-  IonGrid, IonRow, IonCol, IonBadge, IonIcon, IonSpinner,
-  IonList, IonItem, IonLabel, IonNote,
+  IonGrid, IonRow, IonCol, IonIcon,
+  IonSkeletonText, IonList, IonItem, IonLabel, IonNote,
   IonRefresher, IonRefresherContent,
+  ToastController,
 } from '@ionic/angular/standalone';
-import { SuperAdminService, AdminRevenue } from './super-admin.service';
+import { ApiService } from '../../core/services/api.service';
 import { addIcons } from 'ionicons';
-import { cashOutline, trendingUpOutline } from 'ionicons/icons';
+import { cashOutline, trendingUpOutline, warningOutline } from 'ionicons/icons';
 
-addIcons({ cashOutline, trendingUpOutline });
+addIcons({ cashOutline, trendingUpOutline, warningOutline });
 
 @Component({
   selector: 'app-super-admin-revenue',
@@ -20,8 +21,8 @@ addIcons({ cashOutline, trendingUpOutline });
     CommonModule,
     IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons,
     IonCard, IonCardHeader, IonCardTitle, IonCardContent,
-    IonGrid, IonRow, IonCol, IonBadge, IonIcon, IonSpinner,
-    IonList, IonItem, IonLabel, IonNote,
+    IonGrid, IonRow, IonCol, IonIcon,
+    IonSkeletonText, IonList, IonItem, IonLabel, IonNote,
     IonRefresher, IonRefresherContent,
   ],
   template: `
@@ -38,101 +39,127 @@ addIcons({ cashOutline, trendingUpOutline });
       </ion-refresher>
 
       @if (loading()) {
-        <div style="text-align: center; padding: 3rem"><ion-spinner name="crescent"></ion-spinner></div>
+        <ion-grid>
+          <ion-row>
+            @for (i of [1,2]; track i) {
+              <ion-col size="6">
+                <ion-card>
+                  <ion-card-content style="text-align: center; padding: 20px 8px;">
+                    <ion-skeleton-text [animated]="true" style="width: 40px; height: 40px; margin: 0 auto; border-radius: 50%;"></ion-skeleton-text>
+                    <ion-skeleton-text [animated]="true" style="width: 60%; height: 2rem; margin: 12px auto 4px;"></ion-skeleton-text>
+                    <ion-skeleton-text [animated]="true" style="width: 50%; height: 0.75rem; margin: 0 auto;"></ion-skeleton-text>
+                  </ion-card-content>
+                </ion-card>
+              </ion-col>
+            }
+          </ion-row>
+        </ion-grid>
+      } @else if (error()) {
+        <ion-card>
+          <ion-card-content style="text-align: center; padding: 3rem 1rem;">
+            <ion-icon name="warning-outline" style="font-size: 48px; color: var(--ion-color-warning)"></ion-icon>
+            <h2 style="margin: 1rem 0 0.5rem;">Revenue metrics are being configured</h2>
+            <p style="color: var(--ion-color-medium);">The billing service is not yet available. Revenue data will appear here once it is set up.</p>
+          </ion-card-content>
+        </ion-card>
       } @else if (data()) {
         <ion-grid>
           <ion-row>
-            <ion-col size="6">
-              <ion-card class="kpi-card">
-                <ion-card-content>
-                  <ion-icon name="cash-outline" style="font-size: 24px; color: var(--ion-color-success)"></ion-icon>
-                  <div class="kpi-value">\${{ data()!.mrr | number:'1.0-0' }}</div>
-                  <div class="kpi-label">MRR</div>
-                </ion-card-content>
-              </ion-card>
-            </ion-col>
-            <ion-col size="6">
-              <ion-card class="kpi-card">
-                <ion-card-content>
-                  <ion-icon name="trending-up-outline" style="font-size: 24px; color: var(--ion-color-primary)"></ion-icon>
-                  <div class="kpi-value">\${{ data()!.arr | number:'1.0-0' }}</div>
-                  <div class="kpi-label">ARR</div>
-                </ion-card-content>
-              </ion-card>
-            </ion-col>
+            @if (data()?.revenue?.mrr !== undefined) {
+              <ion-col size="6">
+                <ion-card class="kpi-card">
+                  <ion-card-content>
+                    <ion-icon name="cash-outline" style="font-size: 2rem; color: var(--ion-color-success)"></ion-icon>
+                    <div class="kpi-value">\${{ data()!.revenue.mrr | number:'1.0-0' }}</div>
+                    <div class="kpi-label">MRR</div>
+                  </ion-card-content>
+                </ion-card>
+              </ion-col>
+            }
+            @if (data()?.revenue?.arr !== undefined) {
+              <ion-col size="6">
+                <ion-card class="kpi-card">
+                  <ion-card-content>
+                    <ion-icon name="trending-up-outline" style="font-size: 2rem; color: var(--ion-color-primary)"></ion-icon>
+                    <div class="kpi-value">\${{ data()!.revenue.arr | number:'1.0-0' }}</div>
+                    <div class="kpi-label">ARR</div>
+                  </ion-card-content>
+                </ion-card>
+              </ion-col>
+            }
           </ion-row>
         </ion-grid>
 
-        <ion-card>
-          <ion-card-header>
-            <ion-card-title>Plan Breakdown</ion-card-title>
-          </ion-card-header>
-          <ion-card-content>
-            <ion-list>
-              @for (plan of data()!.plan_breakdown; track plan.plan) {
-                <ion-item>
-                  <ion-badge slot="start" [color]="getPlanColor(plan.plan)">{{ plan.plan }}</ion-badge>
-                  <ion-label>{{ plan.count }} orgs</ion-label>
-                  <ion-note slot="end">\${{ plan.revenue | number:'1.0-0' }}/mo</ion-note>
-                </ion-item>
-              }
-            </ion-list>
-          </ion-card-content>
-        </ion-card>
+        @if (data()?.revenue?.plan_counts) {
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>Plan Distribution</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-list>
+                @for (entry of revenueEntries(); track entry.key) {
+                  <ion-item>
+                    <ion-label>{{ entry.key }}</ion-label>
+                    <ion-note slot="end">{{ entry.value }}</ion-note>
+                  </ion-item>
+                }
+              </ion-list>
+            </ion-card-content>
+          </ion-card>
+        }
 
-        <ion-card>
-          <ion-card-header>
-            <ion-card-title>Monthly Trend</ion-card-title>
-          </ion-card-header>
-          <ion-card-content>
-            <ion-list>
-              @for (month of data()!.monthly_trend; track month.month) {
-                <ion-item>
-                  <ion-label>{{ month.month }}</ion-label>
-                  <ion-note slot="end">\${{ month.mrr | number:'1.0-0' }}</ion-note>
-                </ion-item>
-              }
-            </ion-list>
-          </ion-card-content>
-        </ion-card>
+        @if (!data()?.revenue?.mrr && !data()?.revenue?.arr && !data()?.revenue?.plan_counts) {
+          <ion-card>
+            <ion-card-content style="text-align: center; padding: 2rem;">
+              <ion-icon name="cash-outline" style="font-size: 48px; color: var(--ion-color-medium)"></ion-icon>
+              <h3 style="color: var(--ion-color-medium);">Revenue data loaded</h3>
+              <p style="color: var(--ion-color-medium); font-size: 0.85rem;">
+                No specific MRR/ARR metrics found in the response.
+              </p>
+            </ion-card-content>
+          </ion-card>
+        }
       }
     </ion-content>
   `,
   styles: [`
-    .kpi-card ion-card-content { text-align: center; padding: 12px 8px; }
-    .kpi-value { font-size: 1.5rem; font-weight: 700; margin: 4px 0; }
-    .kpi-label { font-size: 0.75rem; color: var(--ion-color-medium); text-transform: uppercase; }
+    .kpi-card ion-card-content { text-align: center; padding: 20px 8px; }
+    .kpi-value { font-size: 2rem; font-weight: 700; margin: 8px 0 2px; }
+    .kpi-label { font-size: 0.75rem; color: var(--ion-color-medium); text-transform: uppercase; letter-spacing: 0.5px; }
   `],
 })
 export class SuperAdminRevenueComponent implements OnInit {
-  data = signal<AdminRevenue | null>(null);
+  data = signal<any>(null);
   loading = signal(true);
+  error = signal(false);
 
-  constructor(private service: SuperAdminService) {}
+  constructor(private api: ApiService, private toastCtrl: ToastController) {}
 
   ngOnInit(): void { this.load(); }
 
   load(): void {
-    this.service.getRevenue().subscribe({
+    this.loading.set(true);
+    this.error.set(false);
+    this.api.get<any>('/super-admin/revenue').subscribe({
       next: (d) => { this.data.set(d); this.loading.set(false); },
-      error: () => this.loading.set(false),
+      error: () => {
+        this.loading.set(false);
+        this.error.set(true);
+      },
     });
   }
 
   onRefresh(event: any): void {
-    this.service.getRevenue().subscribe({
+    this.error.set(false);
+    this.api.get<any>('/super-admin/revenue').subscribe({
       next: (d) => { this.data.set(d); event.target.complete(); },
-      error: () => event.target.complete(),
+      error: () => { this.error.set(true); event.target.complete(); },
     });
   }
 
-  getPlanColor(plan: string): string {
-    switch (plan.toLowerCase()) {
-      case 'free': return 'medium';
-      case 'pro': return 'primary';
-      case 'business': return 'success';
-      case 'enterprise': return 'tertiary';
-      default: return 'medium';
-    }
+  revenueEntries(): { key: string; value: any }[] {
+    const planCounts = this.data()?.revenue?.plan_counts;
+    if (!planCounts || typeof planCounts !== 'object') return [];
+    return Object.entries(planCounts).map(([key, value]) => ({ key, value }));
   }
 }

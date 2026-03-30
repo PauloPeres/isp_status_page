@@ -50,6 +50,10 @@ import {
   swapHorizontalOutline,
   listOutline,
   personCircleOutline,
+  shieldOutline,
+  statsChartOutline,
+  serverOutline,
+  walletOutline,
 } from 'ionicons/icons';
 
 addIcons({
@@ -81,6 +85,10 @@ addIcons({
   'swap-horizontal-outline': swapHorizontalOutline,
   'list-outline': listOutline,
   'person-circle-outline': personCircleOutline,
+  'shield-outline': shieldOutline,
+  'stats-chart-outline': statsChartOutline,
+  'server-outline': serverOutline,
+  'wallet-outline': walletOutline,
 });
 
 @Component({
@@ -295,6 +303,55 @@ addIcons({
                   <ion-label>Activity Log</ion-label>
                 </ion-item>
               </ion-menu-toggle>
+
+              <!-- Super Admin (only visible to super admins) -->
+              @if (auth.isSuperAdmin()) {
+                <ion-item-divider>
+                  <ion-label>Super Admin</ion-label>
+                </ion-item-divider>
+
+                <ion-menu-toggle auto-hide="false">
+                  <ion-item routerLink="/super-admin" routerLinkActive="selected" [routerLinkActiveOptions]="{exact: true}">
+                    <ion-icon name="shield-outline" slot="start"></ion-icon>
+                    <ion-label>Dashboard</ion-label>
+                  </ion-item>
+                </ion-menu-toggle>
+
+                <ion-menu-toggle auto-hide="false">
+                  <ion-item routerLink="/super-admin/organizations" routerLinkActive="selected">
+                    <ion-icon name="globe-outline" slot="start"></ion-icon>
+                    <ion-label>Organizations</ion-label>
+                  </ion-item>
+                </ion-menu-toggle>
+
+                <ion-menu-toggle auto-hide="false">
+                  <ion-item routerLink="/super-admin/users" routerLinkActive="selected">
+                    <ion-icon name="people-outline" slot="start"></ion-icon>
+                    <ion-label>All Users</ion-label>
+                  </ion-item>
+                </ion-menu-toggle>
+
+                <ion-menu-toggle auto-hide="false">
+                  <ion-item routerLink="/super-admin/plans" routerLinkActive="selected">
+                    <ion-icon name="wallet-outline" slot="start"></ion-icon>
+                    <ion-label>Plans</ion-label>
+                  </ion-item>
+                </ion-menu-toggle>
+
+                <ion-menu-toggle auto-hide="false">
+                  <ion-item routerLink="/super-admin/revenue" routerLinkActive="selected">
+                    <ion-icon name="stats-chart-outline" slot="start"></ion-icon>
+                    <ion-label>Revenue</ion-label>
+                  </ion-item>
+                </ion-menu-toggle>
+
+                <ion-menu-toggle auto-hide="false">
+                  <ion-item routerLink="/super-admin/health" routerLinkActive="selected">
+                    <ion-icon name="server-outline" slot="start"></ion-icon>
+                    <ion-label>Health</ion-label>
+                  </ion-item>
+                </ion-menu-toggle>
+              }
             </ion-list>
           </ion-content>
         </ion-menu>
