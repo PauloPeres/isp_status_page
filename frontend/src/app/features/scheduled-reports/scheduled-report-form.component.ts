@@ -1,13 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonBackButton, IonButton,
-  IonList, IonItem, IonInput, IonSelect, IonSelectOption, IonToggle, IonSpinner, IonNote,
+  IonList, IonListHeader, IonItem, IonInput, IonSelect, IonSelectOption, IonToggle, IonSpinner, IonNote, IonCheckbox, IonLabel,
   ToastController,
 } from '@ionic/angular/standalone';
 import { ScheduledReportService } from './scheduled-report.service';
+import { ApiService } from '../../core/services/api.service';
 
 @Component({
   selector: 'app-scheduled-report-form',
@@ -15,7 +16,7 @@ import { ScheduledReportService } from './scheduled-report.service';
   imports: [
     CommonModule, FormsModule, RouterLink,
     IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonBackButton, IonButton,
-    IonList, IonItem, IonInput, IonSelect, IonSelectOption, IonToggle, IonSpinner, IonNote,
+    IonList, IonListHeader, IonItem, IonInput, IonSelect, IonSelectOption, IonToggle, IonSpinner, IonNote, IonCheckbox, IonLabel,
   ],
   template: `
     <ion-header>
@@ -54,10 +55,20 @@ import { ScheduledReportService } from './scheduled-report.service';
             <ion-select-option value="monthly">Monthly</ion-select-option>
           </ion-select>
         </ion-item>
+        <ion-list-header><ion-label>Team Members</ion-label></ion-list-header>
+        @for (member of teamMembers(); track member.id) {
+          <ion-item>
+            <ion-checkbox [(ngModel)]="member.selected" [name]="'member_' + member.id" labelPlacement="end">
+              {{ member.email }}
+              @if (member.name) { <span style="color: var(--ion-color-medium); margin-left: 4px">({{ member.name }})</span> }
+            </ion-checkbox>
+          </ion-item>
+        }
+
         <ion-item>
-          <ion-input label="Recipients (comma-separated)" labelPlacement="floating" [(ngModel)]="form.recipients_text" name="recipients" required></ion-input>
+          <ion-input label="Additional Emails" labelPlacement="stacked" [(ngModel)]="form.recipients_text" name="recipients" placeholder="extra@example.com, another@example.com"></ion-input>
         </ion-item>
-        @if (submitted && !form.recipients_text) {
+        @if (submitted && !form.recipients_text && !hasSelectedMembers()) {
           <ion-note color="danger" class="field-error">At least one recipient is required</ion-note>
         }
         <ion-item>
@@ -88,15 +99,35 @@ export class ScheduledReportFormComponent implements OnInit {
   isEdit = false;
   editId: number | null = null;
   loadingData = false;
+  teamMembers = signal<any[]>([]);
 
   constructor(
     private service: ScheduledReportService,
     private router: Router,
     private route: ActivatedRoute,
     private toastCtrl: ToastController,
+    private api: ApiService,
   ) {}
 
+  hasSelectedMembers(): boolean {
+    return this.teamMembers().some(m => m.selected);
+  }
+
   ngOnInit(): void {
+    // Load team members
+    this.api.get<any>('/users').subscribe((data) => {
+      const members = (data.users || data.items || []).map((u: any) => ({
+        ...u,
+        selected: false,
+      }));
+      this.teamMembers.set(members);
+
+      // If editing, pre-select members after they are loaded
+      if (this.isEdit && this._savedRecipients.length) {
+        this._applyRecipientSelection(this._savedRecipients);
+      }
+    });
+
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
       this.isEdit = true;
@@ -104,13 +135,20 @@ export class ScheduledReportFormComponent implements OnInit {
       this.loadingData = true;
       this.service.get(this.editId).subscribe({
         next: (item) => {
+          const savedRecipients: string[] = Array.isArray(item.recipients) ? item.recipients : [];
+          this._savedRecipients = savedRecipients;
+
           this.form = {
             name: item.name || '',
             report_type: item.report_type || 'uptime',
             frequency: item.frequency || 'weekly',
-            recipients_text: Array.isArray(item.recipients) ? item.recipients.join(', ') : '',
+            recipients_text: '',
             active: item.active ?? true,
           };
+
+          // Pre-select team members and set extra emails
+          this._applyRecipientSelection(savedRecipients);
+
           this.loadingData = false;
         },
         error: () => {
@@ -121,15 +159,33 @@ export class ScheduledReportFormComponent implements OnInit {
     }
   }
 
+  private _savedRecipients: string[] = [];
+
+  private _applyRecipientSelection(savedRecipients: string[]): void {
+    const currentMembers = this.teamMembers();
+    if (currentMembers.length) {
+      this.teamMembers.update(members =>
+        members.map(m => ({ ...m, selected: savedRecipients.includes(m.email) }))
+      );
+      const teamEmails = currentMembers.map(m => m.email);
+      this.form.recipients_text = savedRecipients.filter((r: string) => !teamEmails.includes(r)).join(', ');
+    }
+  }
+
   onSave(): void {
     this.submitted = true;
-    if (!this.form.name || !this.form.recipients_text) return;
+    if (!this.form.name || (!this.form.recipients_text && !this.hasSelectedMembers())) return;
     this.saving = true;
+
+    const selectedEmails = this.teamMembers().filter(m => m.selected).map(m => m.email);
+    const extraEmails = (this.form.recipients_text || '').split(',').map((e: string) => e.trim()).filter((e: string) => e);
+    const allRecipients = [...new Set([...selectedEmails, ...extraEmails])];
+
     const payload = {
       name: this.form.name,
       report_type: this.form.report_type,
       frequency: this.form.frequency,
-      recipients: this.form.recipients_text.split(',').map((e: string) => e.trim()).filter((e: string) => e),
+      recipients: allRecipients,
       active: this.form.active,
     };
 

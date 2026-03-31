@@ -107,6 +107,23 @@ class AuthController extends AppController
         ]);
         $orgUsersTable->save($orgUser);
 
+        // Auto-create weekly status report for new organizations
+        try {
+            $scheduledReportsTable = $this->fetchTable('ScheduledReports');
+            $weeklyReport = $scheduledReportsTable->newEntity([
+                'organization_id' => $org->id,
+                'name' => 'Weekly Status Report',
+                'report_type' => 'uptime',
+                'frequency' => 'weekly',
+                'recipients' => json_encode([$data['email']]),
+                'active' => true,
+            ]);
+            $scheduledReportsTable->save($weeklyReport);
+        } catch (\Exception $e) {
+            // Don't fail registration if report creation fails
+            \Cake\Log\Log::warning('Failed to create weekly report for new org: ' . $e->getMessage());
+        }
+
         // Generate tokens
         $jwtService = new JwtService();
         $accessToken = $jwtService->generateAccessToken(

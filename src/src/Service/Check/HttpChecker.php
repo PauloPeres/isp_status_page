@@ -114,7 +114,7 @@ class HttpChecker extends AbstractChecker
             }
 
             // Success!
-            return $this->buildSuccessResult(
+            $result = $this->buildSuccessResult(
                 $responseTime,
                 $statusCode,
                 [
@@ -123,6 +123,23 @@ class HttpChecker extends AbstractChecker
                     'content_length' => $response->getHeaderLine('Content-Length'),
                 ]
             );
+
+            // Extract SSL certificate info for HTTPS URLs
+            $sslInfo = $this->getSslCertInfo($url);
+            if ($sslInfo) {
+                $result['metadata']['ssl'] = $sslInfo;
+                // If cert is expiring within 30 days, set status to degraded
+                if ($sslInfo['days_remaining'] <= 30 && $sslInfo['days_remaining'] > 0 && $result['status'] === 'up') {
+                    $result['status'] = 'degraded';
+                    $result['metadata']['ssl_warning'] = "SSL certificate expires in {$sslInfo['days_remaining']} days";
+                }
+                if ($sslInfo['expired']) {
+                    $result['status'] = 'down';
+                    $result['metadata']['ssl_warning'] = 'SSL certificate has expired';
+                }
+            }
+
+            return $result;
         } catch (\Exception $e) {
             $responseTime = $this->calculateResponseTime($startTime);
 
@@ -306,6 +323,68 @@ class HttpChecker extends AbstractChecker
         }
 
         return true;
+    }
+
+    /**
+     * Extract SSL certificate info for HTTPS URLs.
+     */
+    protected function getSslCertInfo(string $url): ?array
+    {
+        $parsed = parse_url($url);
+        if (empty($parsed['scheme']) || $parsed['scheme'] !== 'https') {
+            return null;
+        }
+
+        $host = $parsed['host'] ?? '';
+        $port = $parsed['port'] ?? 443;
+
+        try {
+            $context = stream_context_create([
+                'ssl' => [
+                    'capture_peer_cert' => true,
+                    'verify_peer' => false,
+                    'verify_peer_name' => false,
+                ],
+            ]);
+
+            $stream = @stream_socket_client(
+                "ssl://{$host}:{$port}",
+                $errno,
+                $errstr,
+                10,
+                STREAM_CLIENT_CONNECT,
+                $context
+            );
+
+            if (!$stream) {
+                return null;
+            }
+
+            $params = stream_context_get_params($stream);
+            fclose($stream);
+
+            if (empty($params['options']['ssl']['peer_certificate'])) {
+                return null;
+            }
+
+            $cert = openssl_x509_parse($params['options']['ssl']['peer_certificate']);
+            if (!$cert) {
+                return null;
+            }
+
+            $validTo = $cert['validTo_time_t'] ?? 0;
+            $daysRemaining = max(0, (int)floor(($validTo - time()) / 86400));
+
+            return [
+                'issuer' => $cert['issuer']['O'] ?? $cert['issuer']['CN'] ?? 'Unknown',
+                'valid_from' => date('Y-m-d', $cert['validFrom_time_t'] ?? 0),
+                'valid_to' => date('Y-m-d', $validTo),
+                'days_remaining' => $daysRemaining,
+                'expired' => $validTo < time(),
+            ];
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     /**
