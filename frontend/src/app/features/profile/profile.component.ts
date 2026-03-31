@@ -39,6 +39,10 @@ import { ApiService } from '../../core/services/api.service';
             <ion-input label="Email" labelPlacement="stacked" [value]="email" [readonly]="true"></ion-input>
           </ion-item>
           <ion-item>
+            <ion-input label="Phone Number" labelPlacement="stacked" [(ngModel)]="phoneNumber"
+              placeholder="+1 (555) 123-4567" type="tel" inputmode="tel"></ion-input>
+          </ion-item>
+          <ion-item>
             <ion-select label="Language" labelPlacement="stacked" [(ngModel)]="language" interface="popover">
               <ion-select-option value="en">English</ion-select-option>
               <ion-select-option value="pt">Portugu\u00eas</ion-select-option>
@@ -101,6 +105,7 @@ import { ApiService } from '../../core/services/api.service';
 export class ProfileComponent implements OnInit {
   username = '';
   email = '';
+  phoneNumber = '';
   language = 'en';
   timezone = 'UTC';
 
@@ -133,6 +138,7 @@ export class ProfileComponent implements OnInit {
           this.email = u.email || this.email;
           this.language = u.language || this.language;
           this.timezone = u.timezone || this.timezone;
+          this.phoneNumber = u.phone_number || '';
         }
         this.loading.set(false);
       },
@@ -142,7 +148,7 @@ export class ProfileComponent implements OnInit {
 
   onSave(): void {
     this.saving.set(true);
-    const payload = { language: this.language, timezone: this.timezone };
+    const payload = { language: this.language, timezone: this.timezone, phone_number: this.phoneNumber || null };
     this.api.put('/auth/me', payload).subscribe({
       next: async () => {
         this.saving.set(false);

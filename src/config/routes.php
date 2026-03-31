@@ -501,6 +501,8 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/auth/refresh', ['controller' => 'Auth', 'action' => 'refresh', 'prefix' => 'Api/V2', '_method' => 'POST']);
         $builder->connect('/auth/logout', ['controller' => 'Auth', 'action' => 'logout', 'prefix' => 'Api/V2', '_method' => 'POST']);
         $builder->connect('/auth/me', ['controller' => 'Auth', 'action' => 'me', 'prefix' => 'Api/V2', '_method' => 'GET']);
+        $builder->connect('/auth/me', ['controller' => 'Auth', 'action' => 'updateMe', 'prefix' => 'Api/V2', '_method' => 'PUT']);
+        $builder->connect('/auth/me', ['controller' => 'Auth', 'action' => 'updateMe', 'prefix' => 'Api/V2', '_method' => 'PATCH']);
         $builder->connect('/auth/switch-org', ['controller' => 'Auth', 'action' => 'switchOrg', 'prefix' => 'Api/V2', '_method' => 'POST']);
 
         // --- OAuth (no JWT required) ---

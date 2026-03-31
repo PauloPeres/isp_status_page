@@ -399,12 +399,65 @@ class AuthController extends AppController
                 'two_factor_enabled' => (bool)$user->two_factor_enabled,
                 'language' => $user->language ?? 'pt_BR',
                 'timezone' => $user->timezone ?? 'America/Sao_Paulo',
+                'phone_number' => $user->phone_number ?? null,
             ],
             'current_organization' => [
                 'id' => $this->currentOrgId,
                 'role' => $this->currentRole,
             ],
             'organizations' => $organizations,
+        ]);
+    }
+
+    /**
+     * PUT /api/v2/auth/me
+     *
+     * Update the currently authenticated user's profile fields.
+     *
+     * @return void
+     */
+    public function updateMe(): void
+    {
+        $this->request->allowMethod(['put', 'patch']);
+
+        if ($this->currentUserId === 0) {
+            $this->error('Not authenticated', 401);
+
+            return;
+        }
+
+        $usersTable = $this->fetchTable('Users');
+        $user = $usersTable->find()
+            ->where(['Users.id' => $this->currentUserId])
+            ->first();
+
+        if (!$user) {
+            $this->error('User not found', 404);
+
+            return;
+        }
+
+        $data = $this->request->getData();
+        $allowed = ['language', 'timezone', 'phone_number'];
+        $updateData = array_intersect_key($data, array_flip($allowed));
+
+        $user = $usersTable->patchEntity($user, $updateData);
+
+        if (!$usersTable->save($user)) {
+            $this->error('Failed to update profile', 422, $user->getErrors());
+
+            return;
+        }
+
+        $this->success([
+            'user' => [
+                'id' => $user->id,
+                'username' => $user->username,
+                'email' => $user->email,
+                'language' => $user->language ?? 'pt_BR',
+                'timezone' => $user->timezone ?? 'America/Sao_Paulo',
+                'phone_number' => $user->phone_number ?? null,
+            ],
         ]);
     }
 

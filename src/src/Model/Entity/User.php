@@ -42,6 +42,7 @@ class User extends Entity
         'password' => true,
         'language' => true,
         'timezone' => true,
+        'phone_number' => true,
         // All sensitive fields explicitly FALSE:
         'role' => false,
         'active' => false,

@@ -13,6 +13,7 @@ import { closeCircle } from 'ionicons/icons';
 
 addIcons({ closeCircle });
 import { ChannelService } from './channel.service';
+import { ApiService } from '../../core/services/api.service';
 import { FieldErrorComponent } from '../../shared/components/field-error.component';
 import { showApiError } from '../../core/services/plan-error.helper';
 
@@ -130,6 +131,32 @@ const CHANNEL_TYPE_CONFIGS: Record<string, ChannelTypeConfig> = {
           </ion-item>
         </ion-list>
 
+        <!-- Team member selection for email -->
+        @if (form.get('type')?.value === 'email' && teamMembers().length > 0) {
+          <div style="padding: 8px 0">
+            <ion-label style="font-size: 0.85rem; font-weight: 600; padding: 0 0 4px">Team Members</ion-label>
+            @for (member of teamMembers(); track member.id) {
+              <ion-chip [color]="member.selected ? 'primary' : 'medium'" [outline]="!member.selected"
+                (click)="toggleMember(member)" style="height: 32px; cursor: pointer">
+                {{ member.email }}
+              </ion-chip>
+            }
+          </div>
+        }
+
+        <!-- Team member selection for SMS/WhatsApp -->
+        @if ((form.get('type')?.value === 'sms' || form.get('type')?.value === 'whatsapp') && teamMembersWithPhone().length > 0) {
+          <div style="padding: 8px 0">
+            <ion-label style="font-size: 0.85rem; font-weight: 600; padding: 0 0 4px">Team Members</ion-label>
+            @for (member of teamMembersWithPhone(); track member.id) {
+              <ion-chip [color]="member.selected ? 'primary' : 'medium'" [outline]="!member.selected"
+                (click)="toggleMember(member)" style="height: 32px; cursor: pointer">
+                {{ member.username }} ({{ member.phone_number }})
+              </ion-chip>
+            }
+          </div>
+        }
+
         <!-- Dynamic configuration fields -->
         <ion-list>
           @for (field of currentFields(); track field.key) {
@@ -186,6 +213,7 @@ export class ChannelFormComponent implements OnInit {
   saving = signal(false);
   loadingData = signal(false);
   currentFields = signal<{ key: string; label: string; placeholder: string; type?: string; multi?: boolean }[]>([]);
+  teamMembers = signal<any[]>([]);
   form: FormGroup;
   configValues: Record<string, any> = {};
   chipValues: Record<string, string[]> = {};
@@ -208,6 +236,7 @@ export class ChannelFormComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private service: ChannelService,
+    private api: ApiService,
     private toastCtrl: ToastController,
   ) {
     this.form = this.fb.group({
@@ -219,6 +248,11 @@ export class ChannelFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.updateFieldsForType('email');
+
+    // Load team members for recipient selection
+    this.api.get<any>('/users').subscribe(data => {
+      this.teamMembers.set((data.users || data.items || []).map((u: any) => ({...u, selected: false})));
+    });
 
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
@@ -234,6 +268,7 @@ export class ChannelFormComponent implements OnInit {
           });
           this.updateFieldsForType(channel.type);
           this.populateConfig(channel.configuration || {});
+          this.preselectMembers(channel.type, channel.configuration || {});
           this.loadingData.set(false);
         },
         error: () => {
@@ -291,6 +326,50 @@ export class ChannelFormComponent implements OnInit {
   removeChipValue(key: string, value: string): void {
     if (this.chipValues[key]) {
       this.chipValues[key] = this.chipValues[key].filter(v => v !== value);
+    }
+  }
+
+  toggleMember(member: any): void {
+    member.selected = !member.selected;
+    this.syncMembersToConfig();
+  }
+
+  teamMembersWithPhone(): any[] {
+    return this.teamMembers().filter(m => m.phone_number);
+  }
+
+  syncMembersToConfig(): void {
+    const type = this.form.get('type')?.value;
+    if (type === 'email') {
+      const selectedEmails = this.teamMembers().filter(m => m.selected).map(m => m.email);
+      const currentRecipients = this.chipValues['recipients'] || [];
+      // Add selected member emails that aren't already in the list
+      const combined = [...new Set([...currentRecipients, ...selectedEmails])];
+      // Remove unselected member emails
+      const memberEmails = this.teamMembers().map(m => m.email);
+      const final = combined.filter(r => !memberEmails.includes(r) || selectedEmails.includes(r));
+      this.chipValues['recipients'] = final;
+    } else if (type === 'sms' || type === 'whatsapp') {
+      const selectedPhones = this.teamMembers().filter(m => m.selected && m.phone_number).map(m => m.phone_number);
+      const currentPhones = this.chipValues['phone_numbers'] || [];
+      const combined = [...new Set([...currentPhones, ...selectedPhones])];
+      const memberPhones = this.teamMembers().filter(m => m.phone_number).map(m => m.phone_number);
+      const final = combined.filter(p => !memberPhones.includes(p) || selectedPhones.includes(p));
+      this.chipValues['phone_numbers'] = final;
+    }
+  }
+
+  private preselectMembers(type: string, configuration: any): void {
+    if (type === 'email') {
+      const recipients: string[] = Array.isArray(configuration.recipients) ? configuration.recipients : [];
+      this.teamMembers().forEach(m => {
+        m.selected = recipients.includes(m.email);
+      });
+    } else if (type === 'sms' || type === 'whatsapp') {
+      const phones: string[] = Array.isArray(configuration.phone_numbers) ? configuration.phone_numbers : [];
+      this.teamMembers().forEach(m => {
+        m.selected = m.phone_number && phones.includes(m.phone_number);
+      });
     }
   }
 
