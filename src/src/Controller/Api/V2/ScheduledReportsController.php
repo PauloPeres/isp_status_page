@@ -262,11 +262,20 @@ class ScheduledReportsController extends AppController
 
         try {
             $service = new \App\Service\ScheduledReportService();
-            $service->sendReport($report);
+            $result = $service->sendReport($report);
 
-            $this->success(['message' => 'Report sent successfully']);
+            if ($result) {
+                $this->success(['message' => 'Report sent successfully to ' . count($report->getRecipientsArray()) . ' recipient(s)']);
+            } else {
+                $this->error('Report generated but email delivery failed. Please check SMTP settings in Super Admin > Settings.', 422);
+            }
         } catch (\Exception $e) {
-            $this->error('Failed to send report: ' . $e->getMessage(), 500);
+            $msg = $e->getMessage();
+            if (str_contains($msg, 'SMTP') || str_contains($msg, 'smtp') || str_contains($msg, 'mail') || str_contains($msg, 'connect')) {
+                $this->error('Email not configured. Go to Super Admin > Settings to set up SMTP before sending reports.', 422);
+            } else {
+                $this->error('Failed to send report: ' . $msg, 500);
+            }
         }
     }
 }
