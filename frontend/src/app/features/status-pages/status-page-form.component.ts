@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonBackButton, IonButton,
   IonList, IonItem, IonInput, IonTextarea, IonToggle, IonCheckbox, IonSpinner, IonNote,
+  IonSelect, IonSelectOption,
   IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonIcon, IonLabel,
   ToastController,
 } from '@ionic/angular/standalone';
@@ -26,6 +27,7 @@ interface MonitorOption { id: number; name: string; type: string; selected: bool
     CommonModule, FormsModule, RouterLink,
     IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonBackButton, IonButton,
     IonList, IonItem, IonInput, IonTextarea, IonToggle, IonCheckbox, IonSpinner, IonNote,
+    IonSelect, IonSelectOption,
     IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonIcon, IonLabel,
   ],
   template: `
@@ -87,6 +89,14 @@ interface MonitorOption { id: number; name: string; type: string; selected: bool
             <ion-item>
               <ion-toggle [(ngModel)]="form.active" name="active">Active</ion-toggle>
             </ion-item>
+            <ion-item>
+              <ion-select label="Language" labelPlacement="stacked" [(ngModel)]="form.language" name="language" interface="popover"
+                helperText="Language for public status page text">
+                <ion-select-option value="en">English</ion-select-option>
+                <ion-select-option value="pt_BR">Português (Brasil)</ion-select-option>
+                <ion-select-option value="es">Español</ion-select-option>
+              </ion-select>
+            </ion-item>
           </ion-list>
         </ion-card-content>
       </ion-card>
@@ -116,8 +126,13 @@ interface MonitorOption { id: number; name: string; type: string; selected: bool
         <ion-card-content>
           <ion-list>
             <ion-item>
-              <ion-input label="Primary Color" labelPlacement="stacked" [(ngModel)]="form.primary_color" name="primary_color"
-                placeholder="#6366F1" helperText="Header background color (hex code)"></ion-input>
+              <ion-label position="stacked">Primary Color</ion-label>
+              <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0; width: 100%">
+                <input type="color" [value]="form.primary_color || '#6366F1'" (input)="form.primary_color = $any($event).target.value"
+                  style="width: 44px; height: 44px; border: 1px solid var(--ion-color-light-shade); border-radius: 8px; cursor: pointer; padding: 2px;">
+                <ion-input [(ngModel)]="form.primary_color" name="primary_color" placeholder="#6366F1"
+                  style="flex: 1" helperText="Header background color"></ion-input>
+              </div>
             </ion-item>
             <ion-item>
               <ion-input label="Logo URL" labelPlacement="stacked" [(ngModel)]="form.logo_url" name="logo_url"
@@ -220,7 +235,7 @@ export class StatusPageFormComponent implements OnInit {
     header_text: '', footer_text: '',
     show_uptime_chart: true, show_incident_history: true,
     password_protected: false, password: '',
-    primary_color: '', logo_url: '', custom_css: '',
+    primary_color: '', logo_url: '', custom_css: '', language: 'en',
   };
   saving = false;
   submitted = false;
@@ -275,6 +290,7 @@ export class StatusPageFormComponent implements OnInit {
             primary_color: theme.primary_color || '',
             logo_url: theme.logo_url || '',
             custom_css: theme.custom_css || '',
+            language: item.language || 'en',
           };
 
           this.preselectMonitors(item.monitors);
@@ -397,6 +413,7 @@ export class StatusPageFormComponent implements OnInit {
       show_uptime_chart: this.form.show_uptime_chart,
       show_incident_history: this.form.show_incident_history,
       monitors: this.getSelectedMonitorIds(),
+      language: this.form.language || 'en',
       theme: Object.keys(theme).length > 0 ? JSON.stringify(theme) : null,
     };
     if (this.form.password_protected && this.form.password) {

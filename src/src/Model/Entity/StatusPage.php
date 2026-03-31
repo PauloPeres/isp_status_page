@@ -46,6 +46,7 @@ class StatusPage extends Entity
         'show_incident_history' => true,
         'password' => true,
         'active' => true,
+        'language' => true,
         'created' => true,
         'modified' => true,
     ];

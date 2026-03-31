@@ -16,10 +16,83 @@
  * @var bool $showUptimeChart
  * @var bool $showIncidentHistory
  */
+// i18n translations for the status page
+$lang = $statusPage->language ?? 'en';
+$t = [
+    'en' => [
+        'all_operational' => 'All Systems Operational',
+        'some_down' => 'Some Systems Are Down',
+        'some_degraded' => 'Some Systems Are Degraded',
+        'no_monitors' => 'No monitors configured',
+        'subscribe' => 'Subscribe to Updates',
+        'subscribe_placeholder' => 'your@email.com',
+        'subscribe_btn' => 'Subscribe',
+        'subscribed' => 'Subscribed! You will receive incident updates.',
+        'subscribe_fail' => 'Failed to subscribe. Please try again.',
+        'scheduled_maintenance' => 'Scheduled Maintenance',
+        'recent_incidents' => 'Recent Incidents',
+        'past_incidents' => 'Past Incidents',
+        'no_incidents' => 'No incidents reported.',
+        'last_updated' => 'Last updated',
+        'password_title' => 'This status page is password protected',
+        'password_prompt' => 'Please enter the password to view this page.',
+        'password_btn' => 'View Status Page',
+        'powered_by' => 'Powered by',
+    ],
+    'pt_BR' => [
+        'all_operational' => 'Todos os Sistemas Operacionais',
+        'some_down' => 'Alguns Sistemas Estão Fora do Ar',
+        'some_degraded' => 'Alguns Sistemas Estão Degradados',
+        'no_monitors' => 'Nenhum monitor configurado',
+        'subscribe' => 'Inscrever-se para Atualizações',
+        'subscribe_placeholder' => 'seu@email.com',
+        'subscribe_btn' => 'Inscrever',
+        'subscribed' => 'Inscrito! Você receberá atualizações de incidentes.',
+        'subscribe_fail' => 'Falha ao inscrever. Tente novamente.',
+        'scheduled_maintenance' => 'Manutenção Programada',
+        'recent_incidents' => 'Incidentes Recentes',
+        'past_incidents' => 'Incidentes Anteriores',
+        'no_incidents' => 'Nenhum incidente reportado.',
+        'last_updated' => 'Última atualização',
+        'password_title' => 'Esta página de status é protegida por senha',
+        'password_prompt' => 'Por favor, insira a senha para visualizar.',
+        'password_btn' => 'Ver Página de Status',
+        'powered_by' => 'Desenvolvido por',
+    ],
+    'es' => [
+        'all_operational' => 'Todos los Sistemas Operativos',
+        'some_down' => 'Algunos Sistemas Están Caídos',
+        'some_degraded' => 'Algunos Sistemas Están Degradados',
+        'no_monitors' => 'No hay monitores configurados',
+        'subscribe' => 'Suscribirse a Actualizaciones',
+        'subscribe_placeholder' => 'tu@email.com',
+        'subscribe_btn' => 'Suscribirse',
+        'subscribed' => '¡Suscrito! Recibirás actualizaciones de incidentes.',
+        'subscribe_fail' => 'Error al suscribirse. Inténtalo de nuevo.',
+        'scheduled_maintenance' => 'Mantenimiento Programado',
+        'recent_incidents' => 'Incidentes Recientes',
+        'past_incidents' => 'Incidentes Anteriores',
+        'no_incidents' => 'No se reportaron incidentes.',
+        'last_updated' => 'Última actualización',
+        'password_title' => 'Esta página de estado está protegida por contraseña',
+        'password_prompt' => 'Ingrese la contraseña para ver esta página.',
+        'password_btn' => 'Ver Página de Estado',
+        'powered_by' => 'Desarrollado por',
+    ],
+];
+$i = $t[$lang] ?? $t['en'];
+
+// Override overall status text with translation
+if ($overallStatus === 'up') $overallStatusText = $i['all_operational'];
+elseif ($overallStatus === 'down') $overallStatusText = $i['some_down'];
+elseif ($overallStatus === 'degraded') $overallStatusText = $i['some_degraded'];
+elseif ($overallStatus === 'unknown') $overallStatusText = $i['no_monitors'];
+
 $this->assign('title', h($statusPage->name));
 $this->assign('pageTitle', $statusPage->name);
 $this->assign('footerText', $statusPage->footer_text ?? '');
 $this->assign('slug', $statusPage->slug);
+$this->assign('poweredBy', $i['powered_by']);
 
 // Pass theme to layout
 if (!empty($theme['primary_color'])) {
@@ -35,8 +108,8 @@ if (!empty($theme['custom_css'])) {
 
 <?php if ($requirePassword): ?>
     <div class="sp-password-card">
-        <h2><?= __('This status page is password protected') ?></h2>
-        <p><?= __('Please enter the password to view this page.') ?></p>
+        <h2><?= $i['password_title'] ?></h2>
+        <p><?= $i['password_prompt'] ?></p>
         <?= $this->Form->create(null, ['url' => ['action' => 'show', $statusPage->slug]]) ?>
         <div>
             <?= $this->Form->password('password', [
@@ -59,13 +132,13 @@ if (!empty($theme['custom_css'])) {
     <!-- Subscribe Button -->
     <div class="sp-subscribe-row">
         <button class="sp-subscribe-btn" onclick="document.getElementById('sp-subscribe-form').style.display = document.getElementById('sp-subscribe-form').style.display === 'none' ? 'block' : 'none'">
-            Subscribe to Updates
+            <?= $i['subscribe'] ?>
         </button>
     </div>
     <div id="sp-subscribe-form" class="sp-subscribe-form" style="display: none">
         <form onsubmit="return spSubscribe(event)">
-            <input type="email" id="sp-subscribe-email" placeholder="your@email.com" required>
-            <button type="submit">Subscribe</button>
+            <input type="email" id="sp-subscribe-email" placeholder="<?= $i['subscribe_placeholder'] ?>" required>
+            <button type="submit"><?= $i['subscribe_btn'] ?></button>
         </form>
         <p id="sp-subscribe-msg" class="sp-subscribe-msg"></p>
     </div>
@@ -79,7 +152,7 @@ if (!empty($theme['custom_css'])) {
     <!-- Upcoming Maintenance -->
     <?php if (!empty($maintenanceWindows)): ?>
     <div class="sp-maintenance">
-        <h3>Scheduled Maintenance</h3>
+        <h3><?= $i['scheduled_maintenance'] ?></h3>
         <?php foreach ($maintenanceWindows as $mw): ?>
             <div class="sp-maintenance-item">
                 <div class="sp-maintenance-title"><?= h($mw->title) ?></div>
@@ -119,12 +192,12 @@ if (!empty($theme['custom_css'])) {
     <!-- 14-Day Timeline -->
     <?php if ($showIncidentHistory && !empty($timeline)): ?>
     <div class="sp-timeline">
-        <h3>Past Incidents</h3>
+        <h3><?= $i['past_incidents'] ?></h3>
         <?php foreach ($timeline as $date => $entries): ?>
             <div class="sp-timeline-day">
                 <div class="sp-timeline-date"><?= date('l, F j, Y', strtotime($date)) ?></div>
                 <?php if (empty($entries)): ?>
-                    <p class="sp-timeline-none">No incidents reported.</p>
+                    <p class="sp-timeline-none"><?= $i['no_incidents'] ?></p>
                 <?php else: ?>
                     <?php foreach ($entries as $entry): ?>
                         <div class="sp-timeline-entry">
@@ -173,15 +246,15 @@ function spSubscribe(e) {
         body: JSON.stringify({ email: email })
     }).then(r => r.json()).then(d => {
         if (d.success) {
-            msg.textContent = 'Subscribed! You will receive incident updates.';
+            msg.textContent = '<?= addslashes($i['subscribed']) ?>';
             msg.style.color = '#065F46';
             document.getElementById('sp-subscribe-email').value = '';
         } else {
-            msg.textContent = d.message || 'Failed to subscribe.';
+            msg.textContent = d.message || '<?= addslashes($i['subscribe_fail']) ?>';
             msg.style.color = '#991B1B';
         }
     }).catch(() => {
-        msg.textContent = 'Failed to subscribe. Please try again.';
+        msg.textContent = '<?= addslashes($i['subscribe_fail']) ?>';
         msg.style.color = '#991B1B';
     });
     return false;
