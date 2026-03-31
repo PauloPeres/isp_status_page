@@ -217,13 +217,10 @@ interface Check {
               <ion-chip color="medium" style="height: 24px">
                 Every {{ detail()!.monitor.check_interval }}s
               </ion-chip>
-              @if (detail()!.monitor.tags && detail()!.monitor.tags!.length > 0)
-              {
-                @for (tag of detail()!.monitor.tags; track tag) {
-                  <ion-chip color="tertiary" style="height: 24px">
-                    {{ tag }}
-                  </ion-chip>
-                }
+              @for (tag of parseTags(detail()!.monitor.tags); track tag) {
+                <ion-chip color="tertiary" style="height: 24px">
+                  {{ tag }}
+                </ion-chip>
               }
             </div>
           </ion-card-content>
@@ -655,6 +652,19 @@ export class MonitorDetailComponent implements OnInit, ViewWillEnter {
       ],
     });
     await alert.present();
+  }
+
+  parseTags(tags: any): string[] {
+    if (!tags) return [];
+    if (Array.isArray(tags)) return tags;
+    if (typeof tags === 'string') {
+      try {
+        const parsed = JSON.parse(tags);
+        if (Array.isArray(parsed)) return parsed;
+      } catch {}
+      return tags.split(',').map((t: string) => t.trim()).filter((t: string) => t);
+    }
+    return [];
   }
 
   getStatusColor(status: MonitorStatus): string {
