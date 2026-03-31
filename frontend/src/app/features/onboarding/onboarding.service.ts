@@ -53,8 +53,11 @@ export class OnboardingService {
       summary: this.api
         .get<any>('/dashboard/summary')
         .pipe(catchError(() => of(null))),
-      alertRules: this.api
-        .get<any>('/alert-rules', { limit: 1 })
+      channels: this.api
+        .get<any>('/notification-channels', { limit: 1 })
+        .pipe(catchError(() => of(null))),
+      policies: this.api
+        .get<any>('/notification-policies', { limit: 1 })
         .pipe(catchError(() => of(null))),
       users: this.api
         .get<any>('/users', { limit: 1 })
@@ -65,7 +68,8 @@ export class OnboardingService {
     }).subscribe({
       next: (data) => {
         const monitorCount = data.summary?.monitors?.total ?? 0;
-        const alertRuleCount = data.alertRules?.pagination?.total ?? data.alertRules?.items?.length ?? 0;
+        const channelCount = data.channels?.pagination?.total ?? data.channels?.items?.length ?? 0;
+        const policyCount = data.policies?.pagination?.total ?? data.policies?.items?.length ?? 0;
         const userCount = data.users?.pagination?.total ?? data.users?.items?.length ?? 0;
         const statusPageCount = data.statusPages?.pagination?.total ?? data.statusPages?.items?.length ?? 0;
 
@@ -79,12 +83,20 @@ export class OnboardingService {
             route: '/monitors/new',
           },
           {
-            id: 'alert',
-            title: 'Set Up Alerts',
-            description: 'Get notified by email, Slack, Discord, or Telegram when something goes down.',
+            id: 'channel',
+            title: 'Set Up a Notification Channel',
+            description: 'Configure how you want to be notified — email, Slack, Telegram, SMS, or others.',
+            icon: 'megaphone-outline',
+            completed: channelCount > 0,
+            route: '/channels/new',
+          },
+          {
+            id: 'policy',
+            title: 'Create a Notification Policy',
+            description: 'Define your alert chain — who gets notified, when, and how urgently.',
             icon: 'notifications-outline',
-            completed: alertRuleCount > 0,
-            route: '/alert-rules/new',
+            completed: policyCount > 0,
+            route: '/notifications/new',
           },
           {
             id: 'status-page',
