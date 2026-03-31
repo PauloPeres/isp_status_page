@@ -88,7 +88,7 @@ addIcons({ ribbonOutline });
             </ion-item>
 
             <ion-item-options side="end">
-              <ion-item-option color="primary" [routerLink]="['/sla', item.id]">Edit</ion-item-option>
+              <ion-item-option color="primary" [routerLink]="['/sla', item.id, 'edit']">Edit</ion-item-option>
               <ion-item-option color="danger" (click)="onDelete(item)">Delete</ion-item-option>
             </ion-item-options>
           </ion-item-sliding>

@@ -256,10 +256,17 @@ export const routes: Routes = [
           ),
       },
       {
-        path: 'sla/:id',
+        path: 'sla/:id/edit',
         loadComponent: () =>
           import('./features/sla/sla-form.component').then(
             (m) => m.SlaFormComponent,
+          ),
+      },
+      {
+        path: 'sla/:id',
+        loadComponent: () =>
+          import('./features/sla/sla-detail.component').then(
+            (m) => m.SlaDetailComponent,
           ),
       },
       {
