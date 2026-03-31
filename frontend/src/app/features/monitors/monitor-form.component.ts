@@ -24,9 +24,16 @@ import {
   IonToggle,
   IonNote,
   IonSpinner,
+  IonChip,
+  IonLabel,
+  IonIcon,
   ToastController,
 } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { closeCircle } from 'ionicons/icons';
 import { MonitorService } from './monitor.service';
+
+addIcons({ closeCircle });
 import { MonitorType } from '../../core/models/monitor.model';
 import { FieldErrorComponent } from '../../shared/components/field-error.component';
 import { showApiError } from '../../core/services/plan-error.helper';
@@ -53,6 +60,9 @@ import { showApiError } from '../../core/services/plan-error.helper';
     IonToggle,
     IonNote,
     IonSpinner,
+    IonChip,
+    IonLabel,
+    IonIcon,
     FieldErrorComponent,
   ],
   template: `
@@ -367,11 +377,19 @@ import { showApiError } from '../../core/services/plan-error.helper';
               <app-field-error [control]="form.get('timeout')" label="Timeout"></app-field-error>
 
               <ion-item>
+                <ion-label position="stacked">Tags</ion-label>
+                <div class="tag-chips">
+                  @for (tag of getTagsList(); track tag) {
+                    <ion-chip (click)="removeTag(tag)">
+                      <ion-label>{{ tag }}</ion-label>
+                      <ion-icon name="close-circle"></ion-icon>
+                    </ion-chip>
+                  }
+                </div>
                 <ion-input
-                  label="Tags"
-                  labelPlacement="stacked"
-                  formControlName="tags"
-                  placeholder="production, web, critical (comma-separated)"
+                  placeholder="Type a tag and press Enter"
+                  (keyup.enter)="addTag($event)"
+                  [value]="''"
                 ></ion-input>
               </ion-item>
 
@@ -421,6 +439,8 @@ import { showApiError } from '../../core/services/plan-error.helper';
       .form-actions {
         padding: 1rem 0 2rem;
       }
+      .tag-chips { display: flex; flex-wrap: wrap; gap: 4px; padding: 4px 0; }
+      .tag-chips ion-chip { height: 28px; font-size: 0.8rem; }
     `,
   ],
 })
@@ -626,6 +646,27 @@ export class MonitorFormComponent implements OnInit {
         showApiError(err, this.isEdit() ? 'Failed to update monitor' : 'Failed to create monitor', this.toastCtrl, this.router);
       },
     });
+  }
+
+  getTagsList(): string[] {
+    const tags = this.form.get('tags')?.value || '';
+    return tags.split(',').map((t: string) => t.trim()).filter((t: string) => t.length > 0);
+  }
+
+  addTag(event: any): void {
+    const value = (event.target?.value || '').trim();
+    if (!value) return;
+    const current = this.getTagsList();
+    if (!current.includes(value)) {
+      current.push(value);
+      this.form.get('tags')?.setValue(current.join(', '));
+    }
+    event.target.value = '';
+  }
+
+  removeTag(tag: string): void {
+    const current = this.getTagsList().filter(t => t !== tag);
+    this.form.get('tags')?.setValue(current.join(', '));
   }
 
   private filterConfigByType(type: string, config: any): any {

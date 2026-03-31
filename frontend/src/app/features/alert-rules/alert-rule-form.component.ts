@@ -5,8 +5,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonBackButton, IonButton,
   IonList, IonItem, IonInput, IonSelect, IonSelectOption, IonToggle, IonNote, IonSpinner,
+  IonChip, IonLabel, IonIcon,
   ToastController,
 } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { closeCircle } from 'ionicons/icons';
+
+addIcons({ closeCircle });
 import { AlertRuleService } from './alert-rule.service';
 import { MonitorService } from '../monitors/monitor.service';
 import { FieldErrorComponent } from '../../shared/components/field-error.component';
@@ -19,6 +24,7 @@ import { showApiError } from '../../core/services/plan-error.helper';
     CommonModule, ReactiveFormsModule, FieldErrorComponent,
     IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonBackButton, IonButton,
     IonList, IonItem, IonInput, IonSelect, IonSelectOption, IonToggle, IonNote, IonSpinner,
+    IonChip, IonLabel, IonIcon,
   ],
   template: `
     <ion-header>
@@ -78,7 +84,20 @@ import { showApiError } from '../../core/services/plan-error.helper';
           </ion-item>
 
           <ion-item>
-            <ion-input label="Recipients" labelPlacement="stacked" placeholder="email1&#64;example.com, email2&#64;example.com" formControlName="recipients_raw"></ion-input>
+            <ion-label position="stacked">{{ getRecipientsConfig().label }}</ion-label>
+            @if (isMultiRecipient()) {
+              <div class="recipient-chips">
+                @for (r of getRecipientsList(); track r) {
+                  <ion-chip (click)="removeRecipient(r)">
+                    <ion-label>{{ r }}</ion-label>
+                    <ion-icon name="close-circle"></ion-icon>
+                  </ion-chip>
+                }
+              </div>
+              <ion-input [placeholder]="getRecipientsConfig().placeholder" (keyup.enter)="addRecipient($event)" [value]="''"></ion-input>
+            } @else {
+              <ion-input [placeholder]="getRecipientsConfig().placeholder" formControlName="recipients_raw"></ion-input>
+            }
           </ion-item>
           <app-field-error [control]="form.get('recipients_raw')" label="Recipients"></app-field-error>
 
@@ -100,6 +119,10 @@ import { showApiError } from '../../core/services/plan-error.helper';
       </form>
     </ion-content>
   `,
+  styles: [`
+    .recipient-chips { display: flex; flex-wrap: wrap; gap: 4px; padding: 4px 0; }
+    .recipient-chips ion-chip { height: 28px; font-size: 0.8rem; }
+  `],
 })
 export class AlertRuleFormComponent implements OnInit {
   isEdit = signal(false);
@@ -146,6 +169,46 @@ export class AlertRuleFormComponent implements OnInit {
         });
       });
     }
+  }
+
+  getRecipientsConfig(): { label: string; placeholder: string; } {
+    const channel = this.form.get('channel')?.value || 'email';
+    switch (channel) {
+      case 'email': return { label: 'Recipients', placeholder: 'Enter email and press Enter' };
+      case 'slack': case 'discord': return { label: 'Webhook URL', placeholder: 'https://hooks.slack.com/...' };
+      case 'telegram': return { label: 'Telegram Config', placeholder: '{"bot_token": "...", "chat_id": "..."}' };
+      case 'pagerduty': return { label: 'Routing Key', placeholder: 'Enter PagerDuty routing key' };
+      case 'opsgenie': return { label: 'API Key', placeholder: 'Enter OpsGenie API key' };
+      case 'webhook': return { label: 'Webhook URL', placeholder: 'https://your-endpoint.com/webhook' };
+      case 'sms': case 'whatsapp': return { label: 'Phone Numbers', placeholder: '+1234567890' };
+      default: return { label: 'Recipients', placeholder: 'Enter recipient and press Enter' };
+    }
+  }
+
+  isMultiRecipient(): boolean {
+    const channel = this.form.get('channel')?.value || 'email';
+    return ['email', 'sms', 'whatsapp'].includes(channel);
+  }
+
+  getRecipientsList(): string[] {
+    const raw = this.form.get('recipients_raw')?.value || '';
+    return raw.split(',').map((r: string) => r.trim()).filter((r: string) => r.length > 0);
+  }
+
+  addRecipient(event: any): void {
+    const value = (event.target?.value || '').trim();
+    if (!value) return;
+    const current = this.getRecipientsList();
+    if (!current.includes(value)) {
+      current.push(value);
+      this.form.get('recipients_raw')?.setValue(current.join(', '));
+    }
+    event.target.value = '';
+  }
+
+  removeRecipient(recipient: string): void {
+    const current = this.getRecipientsList().filter(r => r !== recipient);
+    this.form.get('recipients_raw')?.setValue(current.join(', '));
   }
 
   onSave(): void {

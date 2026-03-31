@@ -29,7 +29,7 @@ import {
   ToastController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { rocketOutline, closeOutline } from 'ionicons/icons';
+import { rocketOutline, closeOutline, alertCircleOutline, cloudOfflineOutline } from 'ionicons/icons';
 import {
   DashboardService,
   DashboardSummary,
@@ -45,6 +45,8 @@ import { OnboardingService } from '../onboarding/onboarding.service';
 addIcons({
   'rocket-outline': rocketOutline,
   'close-outline': closeOutline,
+  'alert-circle-outline': alertCircleOutline,
+  'cloud-offline-outline': cloudOfflineOutline,
 });
 
 @Component({
@@ -93,6 +95,24 @@ addIcons({
         <ion-refresher-content></ion-refresher-content>
       </ion-refresher>
 
+      <!-- SSE Disconnect Warning -->
+      @if (sseDisconnected()) {
+        <div class="sse-warning">
+          <ion-icon name="cloud-offline-outline"></ion-icon>
+          <span>Live updates disconnected. Data may be stale. Pull to refresh.</span>
+        </div>
+      }
+
+      <!-- Error State -->
+      @if (error()) {
+        <div class="error-state">
+          <ion-icon name="alert-circle-outline" style="font-size: 48px; color: var(--ion-color-danger)"></ion-icon>
+          <h3>Failed to load dashboard</h3>
+          <p>Something went wrong while fetching data.</p>
+          <ion-button fill="outline" (click)="loadData()">Retry</ion-button>
+        </div>
+      }
+
       <!-- Onboarding Banner -->
       @if (onboardingService.shouldShow() && onboardingService.progress()) {
         <ion-card class="onboarding-banner" routerLink="/onboarding">
@@ -118,7 +138,7 @@ addIcons({
       <ion-grid>
         <ion-row>
           <ion-col size="6" sizeMd="3">
-            <ion-card class="summary-card">
+            <ion-card class="summary-card" routerLink="/monitors" style="cursor: pointer">
               <ion-card-content>
                 @if (loading()) {
                   <ion-skeleton-text [animated]="true" style="width: 40%; height: 2rem; margin: 0 auto;"></ion-skeleton-text>
@@ -130,7 +150,7 @@ addIcons({
             </ion-card>
           </ion-col>
           <ion-col size="6" sizeMd="3">
-            <ion-card class="summary-card card-success">
+            <ion-card class="summary-card card-success" routerLink="/monitors" style="cursor: pointer">
               <ion-card-content>
                 @if (loading()) {
                   <ion-skeleton-text [animated]="true" style="width: 40%; height: 2rem; margin: 0 auto;"></ion-skeleton-text>
@@ -142,7 +162,7 @@ addIcons({
             </ion-card>
           </ion-col>
           <ion-col size="6" sizeMd="3">
-            <ion-card class="summary-card card-danger">
+            <ion-card class="summary-card card-danger" routerLink="/monitors" style="cursor: pointer">
               <ion-card-content>
                 @if (loading()) {
                   <ion-skeleton-text [animated]="true" style="width: 40%; height: 2rem; margin: 0 auto;"></ion-skeleton-text>
@@ -154,7 +174,7 @@ addIcons({
             </ion-card>
           </ion-col>
           <ion-col size="6" sizeMd="3">
-            <ion-card class="summary-card card-warning">
+            <ion-card class="summary-card card-warning" routerLink="/monitors" style="cursor: pointer">
               <ion-card-content>
                 @if (loading()) {
                   <ion-skeleton-text [animated]="true" style="width: 40%; height: 2rem; margin: 0 auto;"></ion-skeleton-text>
@@ -168,11 +188,15 @@ addIcons({
         </ion-row>
       </ion-grid>
 
+      @if (lastUpdated()) {
+        <div class="last-updated">Last updated: {{ lastUpdated() | date:'mediumTime' }}</div>
+      }
+
       <!-- Active Incidents + SLA Status -->
       <ion-grid>
         <ion-row>
           <ion-col size="12" sizeMd="6">
-            <ion-card>
+            <ion-card routerLink="/incidents" style="cursor: pointer">
               <ion-card-header>
                 <ion-card-title>Active Incidents</ion-card-title>
               </ion-card-header>
@@ -581,6 +605,39 @@ addIcons({
         height: 4px;
         border-radius: 2px;
       }
+
+      .last-updated {
+        text-align: right;
+        font-size: 0.75rem;
+        color: var(--ion-color-medium);
+        padding: 0 16px 8px;
+      }
+
+      .error-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: var(--ion-color-medium);
+      }
+      .error-state h3 {
+        margin: 1rem 0 0.5rem;
+        color: var(--ion-text-color);
+      }
+
+      .sse-warning {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        margin-bottom: 8px;
+        background: var(--ion-color-warning-tint);
+        color: var(--ion-color-warning-shade);
+        border-radius: 8px;
+        font-size: 0.8rem;
+      }
+      .sse-warning ion-icon {
+        font-size: 1.2rem;
+        flex-shrink: 0;
+      }
     `,
   ],
 })
@@ -591,6 +648,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   recentChecks = signal<RecentCheck[]>([]);
   recentAlerts = signal<RecentAlert[]>([]);
   loading = signal(true);
+  error = signal(false);
+  lastUpdated = signal<Date | null>(null);
+  sseDisconnected = signal(false);
 
   skeletonRows = [1, 2, 3, 4, 5];
 
@@ -639,7 +699,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
         }
       },
       error: () => {
-        // SSE connection failed — silent fallback to manual refresh
+        // SSE connection failed — show warning, fallback to manual refresh
+        this.sseDisconnected.set(true);
       },
     });
   }
@@ -668,9 +729,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
         }
 
         this.loading.set(false);
+        this.error.set(false);
+        this.lastUpdated.set(new Date());
       },
       error: () => {
         this.loading.set(false);
+        this.error.set(true);
       },
     });
   }
@@ -689,6 +753,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.responseTimeData.set(data.responseTimes);
         this.recentChecks.set(data.recentChecks);
         this.recentAlerts.set(data.recentAlerts);
+        this.lastUpdated.set(new Date());
+        this.error.set(false);
+        this.sseDisconnected.set(false);
         event.target.complete();
       },
       error: () => {

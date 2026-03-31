@@ -98,6 +98,14 @@ addIcons({ pulseOutline });
       </ion-toolbar>
     </ion-header>
 
+    <div class="filter-chips" style="padding: 8px 16px; display: flex; gap: 6px; overflow-x: auto;">
+      @for (f of statusFilters; track f.value) {
+        <ion-chip [color]="statusFilter === f.value ? 'primary' : 'medium'" [outline]="statusFilter !== f.value" (click)="filterByStatus(f.value)" style="height: 28px; font-size: 0.75rem">
+          {{ f.label }}
+        </ion-chip>
+      }
+    </div>
+
     <ion-content>
       <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
         <ion-refresher-content></ion-refresher-content>
@@ -207,6 +215,13 @@ export class MonitorListComponent implements ViewWillEnter {
   searchQuery = '';
   page = 1;
   hasMore = true;
+  statusFilter = '';
+  statusFilters = [
+    { label: 'All', value: '' },
+    { label: 'Up', value: 'up' },
+    { label: 'Down', value: 'down' },
+    { label: 'Degraded', value: 'degraded' },
+  ];
 
   constructor(
     private monitorService: MonitorService,
@@ -223,6 +238,7 @@ export class MonitorListComponent implements ViewWillEnter {
         page: this.page,
         limit: 25,
         search: this.searchQuery || undefined,
+        status: this.statusFilter || undefined,
       })
       .subscribe({
         next: (data) => {
@@ -240,6 +256,13 @@ export class MonitorListComponent implements ViewWillEnter {
       });
   }
 
+  filterByStatus(status: string): void {
+    this.statusFilter = status;
+    this.page = 1;
+    this.hasMore = true;
+    this.loadMonitors();
+  }
+
   onSearch(): void {
     this.page = 1;
     this.hasMore = true;
@@ -254,6 +277,7 @@ export class MonitorListComponent implements ViewWillEnter {
         page: this.page,
         limit: 25,
         search: this.searchQuery || undefined,
+        status: this.statusFilter || undefined,
       })
       .subscribe({
         next: (data) => {
@@ -278,6 +302,7 @@ export class MonitorListComponent implements ViewWillEnter {
         page: this.page,
         limit: 25,
         search: this.searchQuery || undefined,
+        status: this.statusFilter || undefined,
       })
       .subscribe({
         next: (data) => {
