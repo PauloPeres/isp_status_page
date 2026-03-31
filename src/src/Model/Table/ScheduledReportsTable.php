@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Model\Table;
 
+use ArrayObject;
+use Cake\Event\EventInterface;
 use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
@@ -72,7 +74,7 @@ class ScheduledReportsTable extends Table
             ->scalar('frequency')
             ->requirePresence('frequency', 'create')
             ->notEmptyString('frequency')
-            ->inList('frequency', ['weekly', 'monthly'], 'Frequency must be weekly or monthly.');
+            ->inList('frequency', ['daily', 'weekly', 'monthly'], 'Frequency must be daily, weekly or monthly.');
 
         $validator
             ->scalar('recipients')
@@ -114,6 +116,35 @@ class ScheduledReportsTable extends Table
         $rules->add($rules->existsIn(['organization_id'], 'Organizations'), ['errorField' => 'organization_id']);
 
         return $rules;
+    }
+
+    /**
+     * Convert incoming data before validation.
+     *
+     * - Serializes recipients array to JSON string so scalar() validation passes.
+     * - Maps report_type shorthand to the include_* boolean fields.
+     *
+     * @param \Cake\Event\EventInterface $event The event.
+     * @param \ArrayObject $data The request data.
+     * @param \ArrayObject $options Options.
+     * @return void
+     */
+    public function beforeMarshal(EventInterface $event, ArrayObject $data, ArrayObject $options): void
+    {
+        // Convert recipients array to JSON string
+        if (isset($data['recipients']) && is_array($data['recipients'])) {
+            $data['recipients'] = json_encode(array_values(array_filter(array_map('trim', $data['recipients']))));
+        }
+
+        // Map report_type to include_* booleans
+        if (isset($data['report_type'])) {
+            $type = $data['report_type'];
+            $data['include_uptime'] = in_array($type, ['uptime', 'sla'], true);
+            $data['include_response_time'] = ($type === 'performance');
+            $data['include_incidents'] = in_array($type, ['incidents', 'sla'], true);
+            $data['include_sla'] = ($type === 'sla');
+            unset($data['report_type']);
+        }
     }
 
     /**

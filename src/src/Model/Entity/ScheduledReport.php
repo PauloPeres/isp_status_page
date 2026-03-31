@@ -32,8 +32,23 @@ class ScheduledReport extends Entity
     /**
      * Frequency constants
      */
+    public const FREQUENCY_DAILY = 'daily';
     public const FREQUENCY_WEEKLY = 'weekly';
     public const FREQUENCY_MONTHLY = 'monthly';
+
+    /**
+     * Virtual fields exposed in JSON/array output.
+     *
+     * @var list<string>
+     */
+    protected array $_virtual = ['report_type'];
+
+    /**
+     * Hidden fields omitted from JSON/array output.
+     *
+     * @var list<string>
+     */
+    protected array $_hidden = ['organization_id'];
 
     /**
      * Fields that can be mass assigned using newEntity() or patchEntity().
@@ -57,23 +72,54 @@ class ScheduledReport extends Entity
     ];
 
     /**
+     * Virtual accessor: auto-decode recipients JSON string to array for API output.
+     *
+     * @return array<string>
+     */
+    protected function _getRecipients(): array
+    {
+        $raw = $this->_fields['recipients'] ?? '';
+        if (empty($raw)) {
+            return [];
+        }
+        if (is_array($raw)) {
+            return $raw;
+        }
+        $decoded = json_decode($raw, true);
+
+        return is_array($decoded) ? $decoded : array_filter(array_map('trim', explode(',', $raw)));
+    }
+
+    /**
+     * Virtual accessor: derive report_type from include_* booleans.
+     *
+     * @return string
+     */
+    protected function _getReportType(): string
+    {
+        if (!empty($this->include_sla)) {
+            return 'sla';
+        }
+        if (!empty($this->include_incidents)) {
+            return 'incidents';
+        }
+        if (!empty($this->include_response_time)) {
+            return 'performance';
+        }
+
+        return 'uptime';
+    }
+
+    /**
      * Get recipients as an array of email addresses.
+     *
+     * Uses the _getRecipients accessor which already handles JSON decoding.
      *
      * @return array<string>
      */
     public function getRecipientsArray(): array
     {
-        if (empty($this->recipients)) {
-            return [];
-        }
-
-        $decoded = json_decode($this->recipients, true);
-        if (is_array($decoded)) {
-            return $decoded;
-        }
-
-        // Fallback: comma-separated string
-        return array_filter(array_map('trim', explode(',', $this->recipients)));
+        return $this->recipients;
     }
 
     /**
