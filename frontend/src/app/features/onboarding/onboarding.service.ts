@@ -68,10 +68,10 @@ export class OnboardingService {
     }).subscribe({
       next: (data) => {
         const monitorCount = data.summary?.monitors?.total ?? 0;
-        const channelCount = data.channels?.pagination?.total ?? data.channels?.items?.length ?? 0;
-        const policyCount = data.policies?.pagination?.total ?? data.policies?.items?.length ?? 0;
-        const userCount = data.users?.pagination?.total ?? data.users?.items?.length ?? 0;
-        const statusPageCount = data.statusPages?.pagination?.total ?? data.statusPages?.items?.length ?? 0;
+        const channelCount = data.channels?.pagination?.total ?? data.channels?.notification_channels?.length ?? data.channels?.items?.length ?? 0;
+        const policyCount = data.policies?.pagination?.total ?? data.policies?.notification_policies?.length ?? data.policies?.items?.length ?? 0;
+        const userCount = data.users?.pagination?.total ?? data.users?.users?.length ?? data.users?.items?.length ?? 0;
+        const statusPageCount = data.statusPages?.pagination?.total ?? data.statusPages?.status_pages?.length ?? data.statusPages?.items?.length ?? 0;
 
         const steps: OnboardingStep[] = [
           {
