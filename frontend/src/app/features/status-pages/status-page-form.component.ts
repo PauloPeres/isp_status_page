@@ -4,8 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonBackButton, IonButton,
-  IonList, IonItem, IonInput, IonToggle, IonSpinner, IonNote, IonTextarea, IonCheckbox,
-  IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonIcon, IonLabel,
+  IonList, IonItem, IonInput, IonTextarea, IonToggle, IonCheckbox, IonSpinner, IonNote,
+  IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonIcon, IonLabel,
   ToastController,
 } from '@ionic/angular/standalone';
 import { StatusPageService } from './status-page.service';
@@ -13,15 +13,11 @@ import { ApiService } from '../../core/services/api.service';
 import { showApiError } from '../../core/services/plan-error.helper';
 import { addIcons } from 'ionicons';
 import { copyOutline } from 'ionicons/icons';
+import { forkJoin, of, catchError } from 'rxjs';
 
 addIcons({ copyOutline });
 
-interface MonitorOption {
-  id: number;
-  name: string;
-  type: string;
-  selected: boolean;
-}
+interface MonitorOption { id: number; name: string; type: string; selected: boolean; }
 
 @Component({
   selector: 'app-status-page-form',
@@ -29,8 +25,8 @@ interface MonitorOption {
   imports: [
     CommonModule, FormsModule, RouterLink,
     IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonBackButton, IonButton,
-    IonList, IonItem, IonInput, IonToggle, IonSpinner, IonNote, IonTextarea, IonCheckbox,
-    IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonIcon, IonLabel,
+    IonList, IonItem, IonInput, IonTextarea, IonToggle, IonCheckbox, IonSpinner, IonNote,
+    IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonIcon, IonLabel,
   ],
   template: `
     <ion-header>
@@ -48,8 +44,8 @@ interface MonitorOption {
         </div>
       } @else {
 
-      <!-- Public URL card (edit mode only) -->
-      @if (isEdit) {
+      <!-- Public URL card (edit mode) -->
+      @if (isEdit && form.slug) {
         <ion-card style="margin-bottom: 16px">
           <ion-card-content>
             <div style="display: flex; justify-content: space-between; align-items: center">
@@ -69,9 +65,7 @@ interface MonitorOption {
 
       <!-- Section 1: Basic Info -->
       <ion-card>
-        <ion-card-header>
-          <ion-card-title>Basic Info</ion-card-title>
-        </ion-card-header>
+        <ion-card-header><ion-card-title>Basic Info</ion-card-title></ion-card-header>
         <ion-card-content>
           <ion-list>
             <ion-item>
@@ -86,9 +80,6 @@ interface MonitorOption {
                 placeholder="my-status-page" [helperText]="'Public URL: ' + getPreviewUrl()"
                 (ionInput)="onSlugChange()"></ion-input>
             </ion-item>
-            @if (submitted && !form.slug) {
-              <ion-note color="danger" class="field-error">Slug is required</ion-note>
-            }
             <ion-item>
               <ion-input label="Custom Domain" labelPlacement="stacked" [(ngModel)]="form.custom_domain" name="custom_domain"
                 placeholder="status.example.com" helperText="Point a CNAME record to our server"></ion-input>
@@ -102,48 +93,70 @@ interface MonitorOption {
 
       <!-- Section 2: Content -->
       <ion-card>
-        <ion-card-header>
-          <ion-card-title>Content</ion-card-title>
-        </ion-card-header>
+        <ion-card-header><ion-card-title>Content</ion-card-title></ion-card-header>
         <ion-card-content>
           <ion-list>
             <ion-item>
               <ion-textarea label="Header Text" labelPlacement="stacked" [(ngModel)]="form.header_text" name="header_text"
                 placeholder="Custom message shown at the top of the status page"
-                helperText="Displayed above the monitor list on the public page"
-                [autoGrow]="true" [rows]="3"></ion-textarea>
+                [autoGrow]="true" [rows]="2"></ion-textarea>
             </ion-item>
             <ion-item>
               <ion-textarea label="Footer Text" labelPlacement="stacked" [(ngModel)]="form.footer_text" name="footer_text"
-                placeholder="Custom message shown at the bottom of the status page"
-                helperText="Displayed below the monitor list on the public page"
+                placeholder="Custom message shown at the bottom"
+                [autoGrow]="true" [rows]="2"></ion-textarea>
+            </ion-item>
+          </ion-list>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Section 3: Branding -->
+      <ion-card>
+        <ion-card-header><ion-card-title>Branding</ion-card-title></ion-card-header>
+        <ion-card-content>
+          <ion-list>
+            <ion-item>
+              <ion-input label="Primary Color" labelPlacement="stacked" [(ngModel)]="form.primary_color" name="primary_color"
+                placeholder="#6366F1" helperText="Header background color (hex code)"></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-input label="Logo URL" labelPlacement="stacked" [(ngModel)]="form.logo_url" name="logo_url"
+                placeholder="https://example.com/logo.png" helperText="Logo displayed in the status page header"></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-textarea label="Custom CSS" labelPlacement="stacked" [(ngModel)]="form.custom_css" name="custom_css"
+                placeholder=".sp-header { ... }" helperText="Advanced: inject custom CSS into the public page"
                 [autoGrow]="true" [rows]="3"></ion-textarea>
             </ion-item>
           </ion-list>
         </ion-card-content>
       </ion-card>
 
-      <!-- Section 3: Monitors -->
+      <!-- Section 4: Monitors -->
       <ion-card>
         <ion-card-header>
-          <ion-card-title>Monitors</ion-card-title>
+          <div style="display: flex; justify-content: space-between; align-items: center">
+            <ion-card-title>Monitors</ion-card-title>
+            @if (monitors.length > 0) {
+              <ion-button fill="clear" size="small" (click)="toggleAllMonitors()">
+                {{ allMonitorsSelected() ? 'Deselect All' : 'Select All' }}
+              </ion-button>
+            }
+          </div>
         </ion-card-header>
         <ion-card-content>
           @if (loadingMonitors) {
-            <div style="text-align: center; padding: 1rem">
-              <ion-spinner name="crescent"></ion-spinner>
-            </div>
+            <div style="text-align: center; padding: 1rem"><ion-spinner name="crescent"></ion-spinner></div>
           } @else if (monitors.length === 0) {
             <ion-note style="display: block; padding: 8px 0">No monitors available. Create monitors first.</ion-note>
           } @else {
             <ion-note style="display: block; padding: 0 0 12px; font-size: 0.85rem">
-              Select which monitors to show on the status page. If none are selected, all monitors will be displayed.
+              Select which monitors to display. If none selected, all monitors will be shown.
             </ion-note>
             <ion-list>
               @for (monitor of monitors; track monitor.id) {
                 <ion-item>
-                  <ion-checkbox [checked]="monitor.selected" (ionChange)="onMonitorToggle(monitor, $event)"
-                    slot="start"></ion-checkbox>
+                  <ion-checkbox [checked]="monitor.selected" (ionChange)="onMonitorToggle(monitor, $event)" slot="start"></ion-checkbox>
                   <ion-label>
                     {{ monitor.name }}
                     <p>{{ monitor.type }}</p>
@@ -155,28 +168,24 @@ interface MonitorOption {
         </ion-card-content>
       </ion-card>
 
-      <!-- Section 4: Display Options -->
+      <!-- Section 5: Display Options -->
       <ion-card>
-        <ion-card-header>
-          <ion-card-title>Display</ion-card-title>
-        </ion-card-header>
+        <ion-card-header><ion-card-title>Display</ion-card-title></ion-card-header>
         <ion-card-content>
           <ion-list>
             <ion-item>
-              <ion-toggle [(ngModel)]="form.show_uptime_chart" name="show_uptime_chart">Show Uptime Chart</ion-toggle>
+              <ion-toggle [(ngModel)]="form.show_uptime_chart" name="show_uptime_chart">Show 90-Day Uptime Chart</ion-toggle>
             </ion-item>
             <ion-item>
-              <ion-toggle [(ngModel)]="form.show_incident_history" name="show_incident_history">Show Incident History</ion-toggle>
+              <ion-toggle [(ngModel)]="form.show_incident_history" name="show_incident_history">Show Incident History & Timeline</ion-toggle>
             </ion-item>
           </ion-list>
         </ion-card-content>
       </ion-card>
 
-      <!-- Section 5: Security -->
+      <!-- Section 6: Security -->
       <ion-card>
-        <ion-card-header>
-          <ion-card-title>Security</ion-card-title>
-        </ion-card-header>
+        <ion-card-header><ion-card-title>Security</ion-card-title></ion-card-header>
         <ion-card-content>
           <ion-list>
             <ion-item>
@@ -184,15 +193,10 @@ interface MonitorOption {
             </ion-item>
             @if (form.password_protected) {
               <ion-item>
-                <ion-input label="Password" labelPlacement="stacked" type="password" [(ngModel)]="form.password" name="password"
-                  placeholder="Enter password"
-                  helperText="Visitors will need this password to view the status page"></ion-input>
+                <ion-input label="Password" labelPlacement="stacked" [(ngModel)]="form.password" name="password"
+                  type="password" placeholder="Enter password for visitors"
+                  [helperText]="isEdit ? 'Leave blank to keep existing password' : ''"></ion-input>
               </ion-item>
-              @if (isEdit) {
-                <ion-note style="display: block; padding: 4px 16px; font-size: 0.75rem; color: var(--ion-color-medium)">
-                  Leave blank to keep the existing password. Enter a new value to change it.
-                </ion-note>
-              }
             }
           </ion-list>
         </ion-card-content>
@@ -205,31 +209,18 @@ interface MonitorOption {
       }
     </ion-content>
   `,
-  styles: [
-    `
-      .field-error {
-        display: block;
-        padding: 4px 16px;
-        font-size: 0.75rem;
-      }
-      ion-card {
-        margin-bottom: 16px;
-      }
-    `,
-  ],
+  styles: [`
+    .field-error { display: block; padding: 4px 16px; font-size: 0.75rem; }
+    ion-card { margin-bottom: 16px; }
+  `],
 })
 export class StatusPageFormComponent implements OnInit {
   form: any = {
-    name: '',
-    slug: '',
-    custom_domain: '',
-    active: true,
-    header_text: '',
-    footer_text: '',
-    show_uptime_chart: true,
-    show_incident_history: true,
-    password_protected: false,
-    password: '',
+    name: '', slug: '', custom_domain: '', active: true,
+    header_text: '', footer_text: '',
+    show_uptime_chart: true, show_incident_history: true,
+    password_protected: false, password: '',
+    primary_color: '', logo_url: '', custom_css: '',
   };
   saving = false;
   submitted = false;
@@ -239,6 +230,7 @@ export class StatusPageFormComponent implements OnInit {
   loadingMonitors = false;
   monitors: MonitorOption[] = [];
   private autoSlug = true;
+  private pendingMonitorIds: any = null;
 
   constructor(
     private service: StatusPageService,
@@ -249,16 +241,26 @@ export class StatusPageFormComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadMonitors();
-
     const idParam = this.route.snapshot.paramMap.get('id');
+
     if (idParam) {
       this.isEdit = true;
       this.editId = +idParam;
       this.autoSlug = false;
       this.loadingData = true;
-      this.service.get(this.editId).subscribe({
-        next: (item: any) => {
+
+      // Load monitors and status page data in parallel, then preselect
+      forkJoin({
+        monitors: this.apiService.get<any>('/monitors', { limit: 500 }).pipe(catchError(() => of({ items: [] }))),
+        statusPage: this.service.get(this.editId),
+      }).subscribe({
+        next: ({ monitors, statusPage }: any) => {
+          const items = monitors.monitors || monitors.items || [];
+          this.monitors = items.map((m: any) => ({ id: m.id, name: m.name, type: m.type || 'http', selected: false }));
+
+          const item = statusPage;
+          const theme = this.parseTheme(item.theme);
+
           this.form = {
             name: item.name || '',
             slug: item.slug || '',
@@ -269,16 +271,23 @@ export class StatusPageFormComponent implements OnInit {
             show_uptime_chart: item.show_uptime_chart ?? true,
             show_incident_history: item.show_incident_history ?? true,
             password_protected: !!item.password,
-            password: '', // don't load existing password, only set new one
+            password: '',
+            primary_color: theme.primary_color || '',
+            logo_url: theme.logo_url || '',
+            custom_css: theme.custom_css || '',
           };
+
           this.preselectMonitors(item.monitors);
           this.loadingData = false;
+          this.loadingMonitors = false;
         },
         error: () => {
           this.loadingData = false;
           this.router.navigate(['/status-pages']);
         },
       });
+    } else {
+      this.loadMonitors();
     }
   }
 
@@ -287,41 +296,54 @@ export class StatusPageFormComponent implements OnInit {
     this.apiService.get<any>('/monitors', { limit: 500 }).subscribe({
       next: (data: any) => {
         const items = data.monitors || data.items || [];
-        this.monitors = items.map((m: any) => ({
-          id: m.id,
-          name: m.name,
-          type: m.type || 'http',
-          selected: false,
-        }));
+        this.monitors = items.map((m: any) => ({ id: m.id, name: m.name, type: m.type || 'http', selected: false }));
         this.loadingMonitors = false;
+        if (this.pendingMonitorIds) {
+          this.preselectMonitors(this.pendingMonitorIds);
+          this.pendingMonitorIds = null;
+        }
       },
-      error: () => {
-        this.loadingMonitors = false;
-      },
+      error: () => { this.loadingMonitors = false; },
     });
   }
 
   preselectMonitors(monitorsField: any): void {
     if (!monitorsField) return;
+    if (this.monitors.length === 0) {
+      this.pendingMonitorIds = monitorsField;
+      return;
+    }
     let ids: number[] = [];
     if (typeof monitorsField === 'string') {
-      try {
-        ids = JSON.parse(monitorsField);
-      } catch {
-        return;
-      }
+      try { ids = JSON.parse(monitorsField); } catch { return; }
     } else if (Array.isArray(monitorsField)) {
       ids = monitorsField;
     }
     if (!Array.isArray(ids)) return;
     const idSet = new Set(ids.map(Number));
-    this.monitors.forEach((m) => {
-      m.selected = idSet.has(m.id);
-    });
+    this.monitors.forEach((m) => { m.selected = idSet.has(m.id); });
+  }
+
+  parseTheme(theme: any): any {
+    if (!theme) return {};
+    if (typeof theme === 'string') {
+      try { return JSON.parse(theme); } catch { return {}; }
+    }
+    if (typeof theme === 'object') return theme;
+    return {};
   }
 
   onMonitorToggle(monitor: MonitorOption, event: any): void {
     monitor.selected = event.detail.checked;
+  }
+
+  toggleAllMonitors(): void {
+    const allSelected = this.allMonitorsSelected();
+    this.monitors.forEach(m => m.selected = !allSelected);
+  }
+
+  allMonitorsSelected(): boolean {
+    return this.monitors.length > 0 && this.monitors.every(m => m.selected);
   }
 
   getSelectedMonitorIds(): string | null {
@@ -336,16 +358,10 @@ export class StatusPageFormComponent implements OnInit {
     }
   }
 
-  onSlugChange(): void {
-    this.autoSlug = false;
-  }
+  onSlugChange(): void { this.autoSlug = false; }
 
   slugify(text: string): string {
-    return text.toLowerCase()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .trim();
+    return text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim();
   }
 
   getPreviewUrl(): string {
@@ -365,6 +381,12 @@ export class StatusPageFormComponent implements OnInit {
     if (!this.form.name || !this.form.slug) return;
     this.saving = true;
 
+    // Build theme JSON
+    const theme: any = {};
+    if (this.form.primary_color) theme.primary_color = this.form.primary_color;
+    if (this.form.logo_url) theme.logo_url = this.form.logo_url;
+    if (this.form.custom_css) theme.custom_css = this.form.custom_css;
+
     const payload: any = {
       name: this.form.name,
       slug: this.form.slug,
@@ -375,15 +397,13 @@ export class StatusPageFormComponent implements OnInit {
       show_uptime_chart: this.form.show_uptime_chart,
       show_incident_history: this.form.show_incident_history,
       monitors: this.getSelectedMonitorIds(),
+      theme: Object.keys(theme).length > 0 ? JSON.stringify(theme) : null,
     };
-
     if (this.form.password_protected && this.form.password) {
       payload.password = this.form.password;
     } else if (!this.form.password_protected) {
-      payload.password = null; // remove password protection
+      payload.password = null;
     }
-    // If password_protected is true but password is empty (edit mode), don't send password field
-    // so the backend keeps the existing one
 
     const request$ = this.isEdit
       ? this.service.update(this.editId!, payload)
@@ -402,7 +422,7 @@ export class StatusPageFormComponent implements OnInit {
       },
       error: async (err: any) => {
         this.saving = false;
-        await showApiError(err, this.isEdit ? 'Failed to update status page' : 'Failed to create status page', this.toastCtrl, this.router);
+        await showApiError(err, this.isEdit ? 'Failed to update' : 'Failed to create', this.toastCtrl, this.router);
       },
     });
   }

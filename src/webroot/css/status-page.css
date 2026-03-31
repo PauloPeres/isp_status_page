@@ -92,13 +92,13 @@ body.status-page-body {
 .sp-update-message { font-size: 0.85rem; color: #334155; line-height: 1.5; }
 
 /* Subscribe */
-.sp-subscribe-row { text-align: right; margin: 16px 0 -8px; }
-.sp-subscribe-btn { background: none; border: 1px solid #E2E8F0; color: #6366F1; padding: 6px 16px; border-radius: 6px; font-size: 0.85rem; font-weight: 500; cursor: pointer; }
+.sp-subscribe-row { text-align: right; margin: 16px 0 12px; }
+.sp-subscribe-btn { background: none; border: 1px solid #E2E8F0; color: #6366F1; padding: 8px 20px; border-radius: 6px; font-size: 0.85rem; font-weight: 500; cursor: pointer; }
 .sp-subscribe-btn:hover { background: #F8FAFC; border-color: #6366F1; }
-.sp-subscribe-form { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
-.sp-subscribe-form form { display: flex; gap: 8px; }
-.sp-subscribe-form input[type="email"] { flex: 1; padding: 8px 12px; border: 1px solid #E2E8F0; border-radius: 6px; font-size: 0.9rem; }
-.sp-subscribe-form button[type="submit"] { background: #6366F1; color: #fff; border: none; padding: 8px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.9rem; }
+.sp-subscribe-form { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 16px; margin: 0 0 16px; }
+.sp-subscribe-form form { display: flex; gap: 8px; align-items: center; }
+.sp-subscribe-form input[type="email"] { flex: 1; padding: 10px 14px; border: 1px solid #E2E8F0; border-radius: 6px; font-size: 0.9rem; min-width: 0; }
+.sp-subscribe-form button[type="submit"] { background: #6366F1; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.9rem; white-space: nowrap; flex-shrink: 0; }
 .sp-subscribe-form button[type="submit"]:hover { background: #4F46E5; }
 .sp-subscribe-msg { margin-top: 8px; font-size: 0.85rem; }
 
