@@ -151,6 +151,48 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'channels',
+        loadComponent: () =>
+          import('./features/channels/channel-list.component').then(
+            (m) => m.ChannelListComponent,
+          ),
+      },
+      {
+        path: 'channels/new',
+        loadComponent: () =>
+          import('./features/channels/channel-form.component').then(
+            (m) => m.ChannelFormComponent,
+          ),
+      },
+      {
+        path: 'channels/:id/edit',
+        loadComponent: () =>
+          import('./features/channels/channel-form.component').then(
+            (m) => m.ChannelFormComponent,
+          ),
+      },
+      {
+        path: 'notifications',
+        loadComponent: () =>
+          import('./features/notifications/notification-policy-list.component').then(
+            (m) => m.NotificationPolicyListComponent,
+          ),
+      },
+      {
+        path: 'notifications/new',
+        loadComponent: () =>
+          import('./features/notifications/notification-policy-form.component').then(
+            (m) => m.NotificationPolicyFormComponent,
+          ),
+      },
+      {
+        path: 'notifications/:id/edit',
+        loadComponent: () =>
+          import('./features/notifications/notification-policy-form.component').then(
+            (m) => m.NotificationPolicyFormComponent,
+          ),
+      },
+      {
         path: 'integrations',
         loadComponent: () =>
           import('./features/integrations/integration-list.component').then(

@@ -54,6 +54,7 @@ import {
   statsChartOutline,
   serverOutline,
   walletOutline,
+  megaphoneOutline,
 } from 'ionicons/icons';
 
 addIcons({
@@ -89,6 +90,7 @@ addIcons({
   'stats-chart-outline': statsChartOutline,
   'server-outline': serverOutline,
   'wallet-outline': walletOutline,
+  'megaphone-outline': megaphoneOutline,
 });
 
 @Component({
@@ -192,6 +194,13 @@ addIcons({
               </ion-menu-toggle>
 
               <ion-menu-toggle auto-hide="false">
+                <ion-item routerLink="/notifications" routerLinkActive="selected">
+                  <ion-icon name="notifications-outline" slot="start"></ion-icon>
+                  <ion-label>Notifications</ion-label>
+                </ion-item>
+              </ion-menu-toggle>
+
+              <ion-menu-toggle auto-hide="false">
                 <ion-item routerLink="/status-pages" routerLinkActive="selected">
                   <ion-icon name="globe-outline" slot="start"></ion-icon>
                   <ion-label>Status Pages</ion-label>
@@ -273,6 +282,13 @@ addIcons({
                 <ion-item routerLink="/invitations" routerLinkActive="selected">
                   <ion-icon name="send-outline" slot="start"></ion-icon>
                   <ion-label>Invitations</ion-label>
+                </ion-item>
+              </ion-menu-toggle>
+
+              <ion-menu-toggle auto-hide="false">
+                <ion-item routerLink="/channels" routerLinkActive="selected">
+                  <ion-icon name="megaphone-outline" slot="start"></ion-icon>
+                  <ion-label>Channels</ion-label>
                 </ion-item>
               </ion-menu-toggle>
 
