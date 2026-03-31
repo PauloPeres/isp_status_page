@@ -5,10 +5,15 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonBackButton, IonButton,
   IonList, IonItem, IonInput, IonToggle, IonSpinner, IonNote,
+  IonCard, IonCardContent, IonIcon,
   ToastController,
 } from '@ionic/angular/standalone';
 import { StatusPageService } from './status-page.service';
 import { showApiError } from '../../core/services/plan-error.helper';
+import { addIcons } from 'ionicons';
+import { copyOutline } from 'ionicons/icons';
+
+addIcons({ copyOutline });
 
 @Component({
   selector: 'app-status-page-form',
@@ -17,6 +22,7 @@ import { showApiError } from '../../core/services/plan-error.helper';
     CommonModule, FormsModule, RouterLink,
     IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonBackButton, IonButton,
     IonList, IonItem, IonInput, IonToggle, IonSpinner, IonNote,
+    IonCard, IonCardContent, IonIcon,
   ],
   template: `
     <ion-header>
@@ -33,27 +39,48 @@ import { showApiError } from '../../core/services/plan-error.helper';
           <ion-spinner name="crescent"></ion-spinner>
         </div>
       } @else {
+      @if (isEdit) {
+        <ion-card style="margin-bottom: 16px">
+          <ion-card-content>
+            <div style="display: flex; justify-content: space-between; align-items: center">
+              <div>
+                <strong>Public URL</strong>
+                <p style="margin: 4px 0 0; font-size: 0.85rem">
+                  <a [href]="getPreviewUrl()" target="_blank" style="color: var(--ion-color-primary)">{{ getPreviewUrl() }}</a>
+                </p>
+              </div>
+              <ion-button fill="clear" size="small" (click)="copyUrl()">
+                <ion-icon name="copy-outline" slot="icon-only"></ion-icon>
+              </ion-button>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      }
       <ion-list>
         <ion-item>
-          <ion-input label="Name" labelPlacement="floating" [(ngModel)]="form.name" name="name" required></ion-input>
+          <ion-input label="Name" labelPlacement="stacked" [(ngModel)]="form.name" name="name" required
+            (ionInput)="onNameChange()"></ion-input>
         </ion-item>
         @if (submitted && !form.name) {
           <ion-note color="danger" class="field-error">Name is required</ion-note>
         }
         <ion-item>
-          <ion-input label="Slug" labelPlacement="floating" [(ngModel)]="form.slug" name="slug" required placeholder="my-status-page"></ion-input>
+          <ion-input label="Slug (URL path)" labelPlacement="stacked" [(ngModel)]="form.slug" name="slug" required
+            placeholder="my-status-page" [helperText]="'Public URL: ' + getPreviewUrl()"
+            (ionInput)="onSlugChange()"></ion-input>
         </ion-item>
         @if (submitted && !form.slug) {
           <ion-note color="danger" class="field-error">Slug is required</ion-note>
         }
         <ion-item>
-          <ion-input label="Custom Domain" labelPlacement="floating" [(ngModel)]="form.custom_domain" name="custom_domain" placeholder="status.example.com"></ion-input>
+          <ion-input label="Custom Domain" labelPlacement="stacked" [(ngModel)]="form.custom_domain" name="custom_domain"
+            placeholder="status.example.com" helperText="Point a CNAME record to our server"></ion-input>
         </ion-item>
         <ion-item>
           <ion-toggle [(ngModel)]="form.is_active" name="is_active">Active</ion-toggle>
         </ion-item>
       </ion-list>
-      <ion-button expand="block" (click)="onSave()" [disabled]="saving">
+      <ion-button expand="block" (click)="onSave()" [disabled]="saving" style="margin-top: 16px">
         @if (saving) { <ion-spinner name="crescent"></ion-spinner> }
         @else { {{ isEdit ? 'Update' : 'Save' }} Status Page }
       </ion-button>
@@ -77,6 +104,7 @@ export class StatusPageFormComponent implements OnInit {
   isEdit = false;
   editId: number | null = null;
   loadingData = false;
+  private autoSlug = true;
 
   constructor(
     private service: StatusPageService,
@@ -90,6 +118,7 @@ export class StatusPageFormComponent implements OnInit {
     if (idParam) {
       this.isEdit = true;
       this.editId = +idParam;
+      this.autoSlug = false;
       this.loadingData = true;
       this.service.get(this.editId).subscribe({
         next: (item) => {
@@ -107,6 +136,36 @@ export class StatusPageFormComponent implements OnInit {
         },
       });
     }
+  }
+
+  onNameChange(): void {
+    if (this.autoSlug && !this.isEdit) {
+      this.form.slug = this.slugify(this.form.name);
+    }
+  }
+
+  onSlugChange(): void {
+    this.autoSlug = false;
+  }
+
+  slugify(text: string): string {
+    return text.toLowerCase()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .trim();
+  }
+
+  getPreviewUrl(): string {
+    if (!this.form.slug) return '';
+    if (this.form.custom_domain) return 'https://' + this.form.custom_domain;
+    return window.location.origin + '/status/' + this.form.slug;
+  }
+
+  async copyUrl(): Promise<void> {
+    await navigator.clipboard.writeText(this.getPreviewUrl());
+    const toast = await this.toastCtrl.create({ message: 'URL copied!', duration: 1500, position: 'bottom', color: 'success' });
+    await toast.present();
   }
 
   onSave(): void {

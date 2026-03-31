@@ -8,14 +8,14 @@ import {
   IonList, IonItem, IonItemSliding, IonItemOptions, IonItemOption,
   IonLabel, IonBadge, IonNote, IonIcon, IonChip,
   IonRefresher, IonRefresherContent, IonSearchbar,
-  AlertController,
+  AlertController, ToastController,
 } from '@ionic/angular/standalone';
 import { StatusPageService, StatusPage } from './status-page.service';
 import { ListSkeletonComponent } from '../../shared/components/list-skeleton.component';
 import { addIcons } from 'ionicons';
-import { globeOutline } from 'ionicons/icons';
+import { globeOutline, copyOutline, openOutline } from 'ionicons/icons';
 
-addIcons({ globeOutline });
+addIcons({ globeOutline, copyOutline, openOutline });
 
 @Component({
   selector: 'app-status-page-list',
@@ -60,22 +60,35 @@ addIcons({ globeOutline });
           <ion-item-sliding>
             <ion-item [routerLink]="['/status-pages', item.id, 'edit']" detail>
               <ion-label>
-                <h2>{{ item.name }}</h2>
+                <h2 style="font-weight: 600">{{ item.name }}</h2>
+                <p style="font-size: 0.75rem; margin: 4px 0 2px">
+                  <a [href]="getStatusPageUrl(item)" target="_blank" (click)="$event.stopPropagation()" style="color: var(--ion-color-primary)">
+                    {{ getStatusPageUrl(item) }}
+                  </a>
+                </p>
                 <p>
-                  <ion-chip size="small" color="medium" style="height: 20px; font-size: 0.7rem">
-                    /s/{{ item.slug }}
-                  </ion-chip>
-                  <span style="margin-left: 8px; font-size: 0.75rem; color: var(--ion-color-medium)">
+                  @if (item.custom_domain) {
+                    <ion-chip size="small" color="tertiary" style="height: 20px; font-size: 0.7rem">
+                      {{ item.custom_domain }}
+                    </ion-chip>
+                  }
+                  <span style="font-size: 0.75rem; color: var(--ion-color-medium)">
                     {{ item.monitor_count }} monitor{{ item.monitor_count !== 1 ? 's' : '' }}
                   </span>
                 </p>
               </ion-label>
-              <ion-badge slot="end" [color]="item.is_active ? 'success' : 'medium'">
-                {{ item.is_active ? 'Active' : 'Inactive' }}
-              </ion-badge>
+              <div slot="end" style="display: flex; align-items: center; gap: 4px">
+                <ion-button fill="clear" size="small" (click)="copyLink(item, $event)" title="Copy link">
+                  <ion-icon name="copy-outline" slot="icon-only"></ion-icon>
+                </ion-button>
+                <ion-badge [color]="item.is_active ? 'success' : 'medium'">
+                  {{ item.is_active ? 'Active' : 'Inactive' }}
+                </ion-badge>
+              </div>
             </ion-item>
 
             <ion-item-options side="end">
+              <ion-item-option color="tertiary" (click)="viewPublicPage(item)">View</ion-item-option>
               <ion-item-option color="primary" [routerLink]="['/status-pages', item.id, 'edit']">Edit</ion-item-option>
               <ion-item-option color="danger" (click)="onDelete(item)">Delete</ion-item-option>
             </ion-item-options>
@@ -102,7 +115,7 @@ export class StatusPageListComponent implements OnInit, ViewWillEnter {
   loading = signal(true);
   searchQuery = '';
 
-  constructor(private service: StatusPageService, private alertCtrl: AlertController) {}
+  constructor(private service: StatusPageService, private alertCtrl: AlertController, private toastCtrl: ToastController) {}
 
   ngOnInit(): void {}
 
@@ -145,6 +158,24 @@ export class StatusPageListComponent implements OnInit, ViewWillEnter {
         item.name.toLowerCase().includes(query)
       )
     );
+  }
+
+  getStatusPageUrl(item: StatusPage): string {
+    if (item.custom_domain) return 'https://' + item.custom_domain;
+    return window.location.origin + '/status/' + item.slug;
+  }
+
+  async copyLink(item: StatusPage, event: Event): Promise<void> {
+    event.stopPropagation();
+    event.preventDefault();
+    const url = this.getStatusPageUrl(item);
+    await navigator.clipboard.writeText(url);
+    const toast = await this.toastCtrl.create({ message: 'URL copied to clipboard!', duration: 1500, position: 'bottom', color: 'success' });
+    await toast.present();
+  }
+
+  viewPublicPage(item: StatusPage): void {
+    window.open(this.getStatusPageUrl(item), '_blank');
   }
 
   async onDelete(item: StatusPage): Promise<void> {
