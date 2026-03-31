@@ -8,12 +8,15 @@ export interface MaintenanceWindow {
   title: string;
   description: string;
   status: 'scheduled' | 'in_progress' | 'completed' | 'cancelled';
-  start_at: string;
-  end_at: string;
-  monitors: { id: number; name: string }[];
-  created_by: string;
-  created_at: string;
-  updated_at: string;
+  starts_at: string;
+  ends_at: string;
+  monitor_ids: string | null;
+  auto_suppress_alerts: boolean;
+  notify_subscribers: boolean;
+  is_recurring: boolean;
+  recurrence_pattern: string | null;
+  created: string;
+  modified: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -21,7 +24,7 @@ export class MaintenanceService {
   constructor(private api: ApiService) {}
 
   getAll(params?: any): Observable<PaginatedResponse<MaintenanceWindow>> {
-    return this.api.get<any>('/maintenance', params).pipe(
+    return this.api.get<any>('/maintenance-windows', params).pipe(
       map(data => ({
         items: data.maintenance_windows || data.items || [],
         pagination: data.pagination || { page: 1, limit: 999, total: (data.maintenance_windows || data.items || []).length, pages: 1 },
@@ -30,18 +33,18 @@ export class MaintenanceService {
   }
 
   get(id: number): Observable<MaintenanceWindow> {
-    return this.api.get<MaintenanceWindow>(`/maintenance/${id}`);
+    return this.api.get<MaintenanceWindow>(`/maintenance-windows/${id}`);
   }
 
-  create(data: Partial<MaintenanceWindow>): Observable<MaintenanceWindow> {
-    return this.api.post<MaintenanceWindow>('/maintenance', data);
+  create(data: any): Observable<MaintenanceWindow> {
+    return this.api.post<MaintenanceWindow>('/maintenance-windows', data);
   }
 
-  update(id: number, data: Partial<MaintenanceWindow>): Observable<MaintenanceWindow> {
-    return this.api.put<MaintenanceWindow>(`/maintenance/${id}`, data);
+  update(id: number, data: any): Observable<MaintenanceWindow> {
+    return this.api.put<MaintenanceWindow>(`/maintenance-windows/${id}`, data);
   }
 
   delete(id: number): Observable<void> {
-    return this.api.delete<void>(`/maintenance/${id}`);
+    return this.api.delete<void>(`/maintenance-windows/${id}`);
   }
 }

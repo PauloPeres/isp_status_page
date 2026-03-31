@@ -4,10 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonBackButton, IonButton,
-  IonList, IonItem, IonInput, IonTextarea, IonSpinner, IonNote,
+  IonList, IonItem, IonInput, IonTextarea, IonToggle, IonSelect, IonSelectOption,
+  IonSpinner, IonNote,
   ToastController,
 } from '@ionic/angular/standalone';
 import { MaintenanceService } from './maintenance.service';
+import { showApiError } from '../../core/services/plan-error.helper';
 
 @Component({
   selector: 'app-maintenance-form',
@@ -15,7 +17,8 @@ import { MaintenanceService } from './maintenance.service';
   imports: [
     CommonModule, FormsModule, RouterLink,
     IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonBackButton, IonButton,
-    IonList, IonItem, IonInput, IonTextarea, IonSpinner, IonNote,
+    IonList, IonItem, IonInput, IonTextarea, IonToggle, IonSelect, IonSelectOption,
+    IonSpinner, IonNote,
   ],
   template: `
     <ion-header>
@@ -29,48 +32,95 @@ import { MaintenanceService } from './maintenance.service';
     <ion-content class="ion-padding">
       <ion-list>
         <ion-item>
-          <ion-input label="Title" labelPlacement="floating" [(ngModel)]="form.title" name="title" required></ion-input>
+          <ion-input label="Title" labelPlacement="stacked" [(ngModel)]="form.title" name="title" required
+            placeholder="e.g. Database maintenance" enterkeyhint="next"></ion-input>
         </ion-item>
         @if (submitted && !form.title) {
           <ion-note color="danger" class="field-error">Title is required</ion-note>
         }
+
         <ion-item>
-          <ion-textarea label="Description" labelPlacement="floating" [(ngModel)]="form.description" name="description" rows="3"></ion-textarea>
+          <ion-textarea label="Description" labelPlacement="stacked" [(ngModel)]="form.description" name="description"
+            rows="3" placeholder="What will be done during this maintenance?"></ion-textarea>
         </ion-item>
+
         <ion-item>
-          <ion-input label="Start At" labelPlacement="floating" [(ngModel)]="form.start_at" name="start_at" type="datetime-local" required></ion-input>
+          <ion-input label="Start Time" labelPlacement="stacked" [(ngModel)]="form.starts_at" name="starts_at"
+            type="datetime-local" required></ion-input>
         </ion-item>
-        @if (submitted && !form.start_at) {
+        @if (submitted && !form.starts_at) {
           <ion-note color="danger" class="field-error">Start time is required</ion-note>
         }
+
         <ion-item>
-          <ion-input label="End At" labelPlacement="floating" [(ngModel)]="form.end_at" name="end_at" type="datetime-local" required></ion-input>
+          <ion-input label="End Time" labelPlacement="stacked" [(ngModel)]="form.ends_at" name="ends_at"
+            type="datetime-local" required></ion-input>
         </ion-item>
-        @if (submitted && !form.end_at) {
+        @if (submitted && !form.ends_at) {
           <ion-note color="danger" class="field-error">End time is required</ion-note>
         }
-        @if (submitted && form.start_at && form.end_at && form.end_at <= form.start_at) {
+        @if (submitted && form.starts_at && form.ends_at && form.ends_at <= form.starts_at) {
           <ion-note color="danger" class="field-error">End time must be after start time</ion-note>
         }
+
+        <ion-item>
+          <ion-toggle [(ngModel)]="form.auto_suppress_alerts" name="auto_suppress_alerts">
+            Suppress alerts during maintenance
+          </ion-toggle>
+        </ion-item>
+
+        <ion-item>
+          <ion-toggle [(ngModel)]="form.notify_subscribers" name="notify_subscribers">
+            Notify subscribers
+          </ion-toggle>
+        </ion-item>
+
+        <!-- Recurring -->
+        <ion-item>
+          <ion-toggle [(ngModel)]="form.is_recurring" name="is_recurring">
+            Recurring maintenance
+          </ion-toggle>
+        </ion-item>
+
+        @if (form.is_recurring) {
+          <ion-item>
+            <ion-select label="Repeat" labelPlacement="stacked" [(ngModel)]="form.recurrence_pattern" name="recurrence_pattern" interface="popover">
+              <ion-select-option value="daily">Daily</ion-select-option>
+              <ion-select-option value="weekly">Weekly</ion-select-option>
+              <ion-select-option value="biweekly">Every 2 weeks</ion-select-option>
+              <ion-select-option value="monthly">Monthly</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <ion-item>
+            <ion-input label="Repeat Until (optional)" labelPlacement="stacked" [(ngModel)]="form.recurrence_end_date"
+              name="recurrence_end_date" type="date" placeholder="Leave empty for no end"></ion-input>
+          </ion-item>
+        }
       </ion-list>
-      <ion-button expand="block" (click)="onSave()" [disabled]="saving">
+
+      <ion-button expand="block" (click)="onSave()" [disabled]="saving" style="margin-top: 16px">
         @if (saving) { <ion-spinner name="crescent"></ion-spinner> }
-        @else { Save Maintenance Window }
+        @else { Create Maintenance Window }
       </ion-button>
     </ion-content>
   `,
-  styles: [
-    `
-      .field-error {
-        display: block;
-        padding: 4px 16px;
-        font-size: 0.75rem;
-      }
-    `,
-  ],
+  styles: [`
+    .field-error { display: block; padding: 4px 16px; font-size: 0.75rem; }
+  `],
 })
 export class MaintenanceFormComponent {
-  form: any = { title: '', description: '', start_at: '', end_at: '' };
+  form: any = {
+    title: '',
+    description: '',
+    starts_at: '',
+    ends_at: '',
+    auto_suppress_alerts: true,
+    notify_subscribers: false,
+    is_recurring: false,
+    recurrence_pattern: 'weekly',
+    recurrence_end_date: '',
+  };
   saving = false;
   submitted = false;
 
@@ -82,10 +132,29 @@ export class MaintenanceFormComponent {
 
   onSave(): void {
     this.submitted = true;
-    if (!this.form.title || !this.form.start_at || !this.form.end_at) return;
-    if (this.form.end_at <= this.form.start_at) return;
+    if (!this.form.title || !this.form.starts_at || !this.form.ends_at) return;
+    if (this.form.ends_at <= this.form.starts_at) return;
     this.saving = true;
-    this.service.create(this.form).subscribe({
+
+    const payload: any = {
+      title: this.form.title,
+      description: this.form.description || null,
+      starts_at: this.form.starts_at,
+      ends_at: this.form.ends_at,
+      auto_suppress_alerts: this.form.auto_suppress_alerts,
+      notify_subscribers: this.form.notify_subscribers,
+      status: 'scheduled',
+    };
+
+    if (this.form.is_recurring) {
+      payload.is_recurring = true;
+      payload.recurrence_pattern = this.form.recurrence_pattern;
+      if (this.form.recurrence_end_date) {
+        payload.recurrence_end_date = this.form.recurrence_end_date;
+      }
+    }
+
+    this.service.create(payload).subscribe({
       next: async () => {
         this.saving = false;
         const toast = await this.toastCtrl.create({ message: 'Maintenance window created', color: 'success', duration: 2000, position: 'bottom' });
@@ -94,8 +163,7 @@ export class MaintenanceFormComponent {
       },
       error: async (err: any) => {
         this.saving = false;
-        const toast = await this.toastCtrl.create({ message: err?.message || 'Failed to create maintenance window', color: 'danger', duration: 4000, position: 'bottom' });
-        await toast.present();
+        await showApiError(err, 'Failed to create maintenance window', this.toastCtrl, this.router);
       },
     });
   }

@@ -69,8 +69,25 @@ class MaintenanceWindowsController extends AppController
         }
 
         $table = $this->fetchTable('MaintenanceWindows');
-        $window = $table->newEntity($this->request->getData());
+        $data = $this->request->getData();
+
+        // Set defaults for optional fields
+        if (!isset($data['status'])) {
+            $data['status'] = 'scheduled';
+        }
+        if (!isset($data['auto_suppress_alerts'])) {
+            $data['auto_suppress_alerts'] = true;
+        }
+        if (!isset($data['notify_subscribers'])) {
+            $data['notify_subscribers'] = false;
+        }
+        if (!isset($data['is_recurring'])) {
+            $data['is_recurring'] = false;
+        }
+
+        $window = $table->newEntity($data);
         $window->set('organization_id', $this->currentOrgId);
+        $window->set('created_by', $this->currentUserId);
 
         if (!$table->save($window)) {
             $this->error('Validation failed', 422, $window->getErrors());

@@ -60,7 +60,7 @@ addIcons({ constructOutline });
             <ion-item>
               <ion-label>
                 <h2>{{ item.title }}</h2>
-                <p>{{ item.start_at | date:'short' }} - {{ item.end_at | date:'short' }}</p>
+                <p>{{ item.starts_at | date:'short' }} - {{ item.ends_at | date:'short' }}</p>
                 @if (item.description) {
                   <p style="font-size: 0.75rem; color: var(--ion-color-medium)">{{ item.description }}</p>
                 }
