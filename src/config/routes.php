@@ -610,6 +610,7 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/invitations', ['controller' => 'Invitations', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
         $builder->connect('/invitations', ['controller' => 'Invitations', 'action' => 'send', 'prefix' => 'Api/V2', '_method' => 'POST']);
         $builder->connect('/invitations/{id}', ['controller' => 'Invitations', 'action' => 'revoke', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/invitations/{id}/resend', ['controller' => 'Invitations', 'action' => 'resend', 'prefix' => 'Api/V2', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
 
         // API Keys
         $builder->connect('/api-keys', ['controller' => 'ApiKeys', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);

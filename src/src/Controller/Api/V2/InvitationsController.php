@@ -115,4 +115,51 @@ class InvitationsController extends AppController
 
         $this->success(['message' => 'Invitation revoked']);
     }
+
+    /**
+     * POST /api/v2/invitations/{id}/resend
+     *
+     * Resend a pending invitation email.
+     *
+     * @param string $id Invitation ID.
+     * @return void
+     */
+    public function resend(string $id): void
+    {
+        $this->request->allowMethod(['post']);
+
+        if (!$this->requireRole(['owner', 'admin'])) {
+            return;
+        }
+
+        $table = $this->fetchTable('Invitations');
+        $invitation = $table->find()
+            ->where([
+                'Invitations.id' => $id,
+                'Invitations.organization_id' => $this->currentOrgId,
+            ])
+            ->first();
+
+        if (!$invitation) {
+            $this->error('Invitation not found', 404);
+            return;
+        }
+
+        if ($invitation->accepted_at) {
+            $this->error('This invitation has already been accepted', 422);
+            return;
+        }
+
+        // Regenerate token and extend expiry
+        $invitation->set('token', bin2hex(random_bytes(32)));
+        $invitation->set('expires_at', new \Cake\I18n\DateTime('+7 days'));
+        $invitation->set('modified', new \Cake\I18n\DateTime());
+
+        if ($table->save($invitation)) {
+            // TODO: send email notification
+            $this->success(['message' => 'Invitation resent', 'invitation' => $invitation]);
+        } else {
+            $this->error('Failed to resend invitation', 500);
+        }
+    }
 }

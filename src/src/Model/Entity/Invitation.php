@@ -26,6 +26,16 @@ use Cake\ORM\Entity;
 class Invitation extends Entity
 {
     /**
+     * Hidden fields — never expose the invitation token in API responses.
+     */
+    protected array $_hidden = ['token'];
+
+    /**
+     * Virtual fields exposed in JSON output.
+     */
+    protected array $_virtual = ['status'];
+
+    /**
      * Fields that can be mass assigned using newEntity() or patchEntity().
      *
      * @var array<string, bool>
@@ -74,5 +84,20 @@ class Invitation extends Entity
     public function isPending(): bool
     {
         return !$this->isAccepted() && !$this->isExpired();
+    }
+
+    /**
+     * Virtual accessor: derive status from accepted_at and expires_at.
+     */
+    protected function _getStatus(): string
+    {
+        if ($this->isAccepted()) {
+            return 'accepted';
+        }
+        if ($this->isExpired()) {
+            return 'expired';
+        }
+
+        return 'pending';
     }
 }
