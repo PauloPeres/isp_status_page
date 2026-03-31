@@ -81,8 +81,30 @@ $this->assign('slug', $statusPage->slug);
                     ?>
                     <span class="sp-badge sp-badge-<?= h($severity) ?>"><?= h($severity) ?></span>
                     <?= h($incident->title) ?>
+                    <span class="sp-incident-status sp-status-<?= h($incidentStatus) ?>"><?= h(ucfirst($incidentStatus)) ?></span>
                 </div>
-                <div class="sp-incident-meta"><?= $incident->created->format('M j, Y H:i') ?> &mdash; <?= h(ucfirst($incidentStatus)) ?></div>
+                <?php if (!empty($incident->description)): ?>
+                    <p class="sp-incident-desc"><?= h($incident->description) ?></p>
+                <?php endif; ?>
+                <div class="sp-incident-meta">
+                    <?= $incident->created->format('M j, Y H:i') ?>
+                    <?php if (!empty($incident->monitor)): ?>
+                        &mdash; <?= h($incident->monitor->name) ?>
+                    <?php endif; ?>
+                </div>
+                <?php if (!empty($incident->incident_updates)): ?>
+                    <div class="sp-incident-updates">
+                        <?php foreach ($incident->incident_updates as $update): ?>
+                            <div class="sp-update">
+                                <div class="sp-update-header">
+                                    <span class="sp-update-status"><?= h(ucfirst($update->status ?? 'update')) ?></span>
+                                    <span class="sp-update-time"><?= $update->created->format('M j, H:i') ?></span>
+                                </div>
+                                <p class="sp-update-message"><?= h($update->message) ?></p>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
             </div>
         <?php endforeach; ?>
     </div>

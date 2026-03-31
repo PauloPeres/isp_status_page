@@ -112,8 +112,15 @@ class StatusPagesController extends AppController
         if ($statusPage->show_incident_history && !empty($monitorIds)) {
             $incidentsTable = $this->fetchTable('Incidents');
             $incidents = $incidentsTable->find()
-                ->where(['monitor_id IN' => $monitorIds])
-                ->orderBy(['created' => 'DESC'])
+                ->contain([
+                    'IncidentUpdates' => function ($q) {
+                        return $q->where(['IncidentUpdates.is_public' => true])
+                            ->orderBy(['IncidentUpdates.created' => 'ASC']);
+                    },
+                    'Monitors' => ['fields' => ['id', 'name']],
+                ])
+                ->where(['Incidents.monitor_id IN' => $monitorIds])
+                ->orderBy(['Incidents.created' => 'DESC'])
                 ->limit(20)
                 ->all()
                 ->toArray();

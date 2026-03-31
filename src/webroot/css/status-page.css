@@ -73,6 +73,24 @@ body.status-page-body {
 .sp-password-card button { background: var(--color-brand-500, #6366F1); color: #fff; border: none; padding: 10px 24px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.95rem; }
 .sp-password-card button:hover { background: var(--color-brand-600, #4F46E5); }
 
+/* Incident details */
+.sp-incident-desc { margin: 8px 0 4px; color: #475569; font-size: 0.9rem; line-height: 1.5; }
+.sp-incident-status { float: right; font-size: 0.75rem; font-weight: 600; padding: 2px 8px; border-radius: 4px; }
+.sp-status-investigating { background: #FEF3C7; color: #92400E; }
+.sp-status-identified { background: #DBEAFE; color: #1E40AF; }
+.sp-status-monitoring { background: #E0F2FE; color: #075985; }
+.sp-status-resolved { background: #ECFDF5; color: #065F46; }
+.sp-status-open { background: #FEE2E2; color: #991B1B; }
+
+/* Incident timeline updates */
+.sp-incident-updates { margin-top: 12px; padding-top: 12px; border-top: 1px solid #F1F5F9; }
+.sp-update { padding: 8px 0 8px 16px; border-left: 2px solid #E2E8F0; margin-bottom: 8px; }
+.sp-update:last-child { margin-bottom: 0; }
+.sp-update-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.sp-update-status { font-weight: 600; font-size: 0.8rem; color: #475569; text-transform: capitalize; }
+.sp-update-time { font-size: 0.75rem; color: #94A3B8; }
+.sp-update-message { font-size: 0.85rem; color: #334155; line-height: 1.5; }
+
 @media (max-width: 640px) {
     .sp-header { padding: 16px 0; }
     .sp-title { font-size: 1.25rem; }
