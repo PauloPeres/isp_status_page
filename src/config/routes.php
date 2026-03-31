@@ -517,6 +517,13 @@ return function (RouteBuilder $routes): void {
             ['pass' => ['provider'], 'provider' => '(google|github|microsoft)']
         );
 
+        // --- Public status page API (no JWT required) ---
+        $builder->connect(
+            '/public/status/{slug}',
+            ['controller' => 'PublicStatus', 'action' => 'status', 'prefix' => 'Api/V2', '_method' => 'GET'],
+            ['pass' => ['slug'], 'slug' => '[a-z0-9][a-z0-9\-]*[a-z0-9]']
+        );
+
         // --- Dashboard (TASK-NG-003) ---
         $builder->connect('/dashboard/summary', ['controller' => 'Dashboard', 'action' => 'summary', 'prefix' => 'Api/V2', '_method' => 'GET']);
         $builder->connect('/dashboard/uptime', ['controller' => 'Dashboard', 'action' => 'uptime', 'prefix' => 'Api/V2', '_method' => 'GET']);

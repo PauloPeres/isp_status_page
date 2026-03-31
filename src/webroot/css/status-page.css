@@ -1,0 +1,82 @@
+/* ==========================================================================
+   ISP Status Page — Public Status Page Styles
+   Clean, modern design using design tokens with fallbacks.
+   ========================================================================== */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body.status-page-body {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    background: #F8FAFC;
+    color: #0F172A;
+    line-height: 1.6;
+}
+.sp-container { max-width: 800px; margin: 0 auto; padding: 0 20px; }
+.sp-header { background: var(--color-brand-500, #6366F1); color: #fff; padding: 24px 0; }
+.sp-title { font-family: 'DM Sans', sans-serif; font-size: 1.5rem; font-weight: 700; }
+.sp-footer { margin-top: 48px; padding: 24px 0; border-top: 1px solid #E2E8F0; text-align: center; color: #94A3B8; font-size: 0.85rem; }
+.sp-powered a { color: #6366F1; text-decoration: none; }
+
+/* Overall Status Banner */
+.sp-overall { padding: 32px; border-radius: 12px; text-align: center; margin: 24px 0; }
+.sp-overall-up { background: #ECFDF5; color: #065F46; }
+.sp-overall-degraded { background: #FFFBEB; color: #92400E; }
+.sp-overall-down { background: #FEF2F2; color: #991B1B; }
+.sp-overall-unknown { background: #F1F5F9; color: #475569; }
+.sp-overall h2 { font-family: 'DM Sans', sans-serif; font-size: 1.75rem; margin-bottom: 4px; }
+.sp-overall p { font-size: 0.9rem; opacity: 0.8; }
+
+/* Monitor Cards */
+.sp-monitors { margin: 24px 0; }
+.sp-monitor { background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; padding: 16px 20px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
+.sp-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+.sp-dot-up { background: #10B981; }
+.sp-dot-down { background: #EF4444; }
+.sp-dot-degraded { background: #F59E0B; }
+.sp-dot-unknown { background: #94A3B8; }
+.sp-monitor-name { flex: 1; font-weight: 500; }
+.sp-monitor-uptime { font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 0.9rem; }
+
+/* Uptime Bar (90 days) */
+.sp-uptime-bar { display: flex; gap: 1px; height: 28px; margin-top: 8px; }
+.sp-uptime-day { flex: 1; border-radius: 2px; min-width: 2px; cursor: pointer; }
+.sp-day-up { background: #10B981; }
+.sp-day-degraded { background: #F59E0B; }
+.sp-day-down { background: #EF4444; }
+.sp-day-empty { background: #E2E8F0; }
+
+/* Incidents */
+.sp-incidents { margin: 32px 0; }
+.sp-incidents h3 { font-size: 1.1rem; margin-bottom: 16px; color: #475569; }
+.sp-incident { background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; padding: 16px 20px; margin-bottom: 8px; }
+.sp-incident-title { font-weight: 600; margin-bottom: 4px; }
+.sp-incident-meta { font-size: 0.8rem; color: #94A3B8; }
+.sp-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
+.sp-badge-critical { background: #FEE2E2; color: #991B1B; }
+.sp-badge-major { background: #FEF3C7; color: #92400E; }
+.sp-badge-minor { background: #E0F2FE; color: #075985; }
+.sp-badge-resolved { background: #D1FAE5; color: #065F46; }
+.sp-badge-investigating { background: #FEF3C7; color: #92400E; }
+.sp-badge-identified { background: #FEF3C7; color: #92400E; }
+.sp-badge-open { background: #FEE2E2; color: #991B1B; }
+
+/* Header text */
+.sp-header-text { text-align: center; margin: 16px 0; color: #64748B; font-size: 0.9rem; }
+
+/* Last updated */
+.sp-last-updated { text-align: center; color: #94A3B8; font-size: 0.8rem; margin: 8px 0 24px; }
+
+/* Password protection form */
+.sp-password-card { max-width: 400px; margin: 40px auto; text-align: center; background: #fff; border: 1px solid #E2E8F0; border-radius: 12px; padding: 32px; }
+.sp-password-card h2 { font-size: 1.2rem; margin-bottom: 8px; color: #0F172A; }
+.sp-password-card p { color: #64748B; margin-bottom: 20px; font-size: 0.9rem; }
+.sp-password-card input[type="password"] { width: 100%; padding: 10px 14px; border: 1px solid #E2E8F0; border-radius: 6px; font-size: 0.95rem; margin-bottom: 12px; }
+.sp-password-card button { background: var(--color-brand-500, #6366F1); color: #fff; border: none; padding: 10px 24px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.95rem; }
+.sp-password-card button:hover { background: var(--color-brand-600, #4F46E5); }
+
+@media (max-width: 640px) {
+    .sp-header { padding: 16px 0; }
+    .sp-title { font-size: 1.25rem; }
+    .sp-overall { padding: 24px 16px; }
+    .sp-overall h2 { font-size: 1.4rem; }
+    .sp-uptime-bar { height: 20px; }
+}
