@@ -69,7 +69,24 @@ class ScheduledReportsController extends AppController
         }
 
         $table = $this->fetchTable('ScheduledReports');
-        $report = $table->newEntity($this->request->getData());
+        $data = $this->request->getData();
+
+        // Convert recipients array to JSON string before entity creation
+        if (isset($data['recipients']) && is_array($data['recipients'])) {
+            $data['recipients'] = json_encode(array_values(array_filter(array_map('trim', $data['recipients']))));
+        }
+
+        // Map report_type to include_* booleans
+        if (isset($data['report_type'])) {
+            $type = $data['report_type'];
+            $data['include_uptime'] = in_array($type, ['uptime', 'sla'], true);
+            $data['include_response_time'] = ($type === 'performance');
+            $data['include_incidents'] = in_array($type, ['incidents', 'sla'], true);
+            $data['include_sla'] = ($type === 'sla');
+            unset($data['report_type']);
+        }
+
+        $report = $table->newEntity($data);
         $report->set('organization_id', $this->currentOrgId);
 
         if (!$table->save($report)) {
@@ -89,7 +106,7 @@ class ScheduledReportsController extends AppController
      */
     public function edit(string $id): void
     {
-        $this->request->allowMethod(['put']);
+        $this->request->allowMethod(['put', 'patch']);
 
         if (!$this->requireRole(['owner', 'admin'])) {
             return;
@@ -109,7 +126,20 @@ class ScheduledReportsController extends AppController
             return;
         }
 
-        $report = $table->patchEntity($report, $this->request->getData());
+        $data = $this->request->getData();
+        if (isset($data['recipients']) && is_array($data['recipients'])) {
+            $data['recipients'] = json_encode(array_values(array_filter(array_map('trim', $data['recipients']))));
+        }
+        if (isset($data['report_type'])) {
+            $type = $data['report_type'];
+            $data['include_uptime'] = in_array($type, ['uptime', 'sla'], true);
+            $data['include_response_time'] = ($type === 'performance');
+            $data['include_incidents'] = in_array($type, ['incidents', 'sla'], true);
+            $data['include_sla'] = ($type === 'sla');
+            unset($data['report_type']);
+        }
+
+        $report = $table->patchEntity($report, $data);
         if (!$table->save($report)) {
             $this->error('Validation failed', 422, $report->getErrors());
 

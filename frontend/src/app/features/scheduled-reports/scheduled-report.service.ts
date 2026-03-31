@@ -8,7 +8,8 @@ export interface ScheduledReport {
   name: string;
   report_type: string;
   frequency: 'daily' | 'weekly' | 'monthly';
-  recipients: string[];
+  recipients: string;
+  recipients_list: string[];
   next_send_at: string;
   last_sent_at: string | null;
   active: boolean;
@@ -35,11 +36,11 @@ export class ScheduledReportService {
     );
   }
 
-  create(data: Partial<ScheduledReport>): Observable<ScheduledReport> {
+  create(data: any): Observable<ScheduledReport> {
     return this.api.post<ScheduledReport>('/scheduled-reports', data);
   }
 
-  update(id: number, data: Partial<ScheduledReport>): Observable<ScheduledReport> {
+  update(id: number, data: any): Observable<ScheduledReport> {
     return this.api.put<ScheduledReport>(`/scheduled-reports/${id}`, data);
   }
 

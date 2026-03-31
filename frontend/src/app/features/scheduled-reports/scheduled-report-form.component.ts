@@ -135,7 +135,7 @@ export class ScheduledReportFormComponent implements OnInit {
       this.loadingData = true;
       this.service.get(this.editId).subscribe({
         next: (item) => {
-          const savedRecipients: string[] = Array.isArray(item.recipients) ? item.recipients : [];
+          const savedRecipients: string[] = Array.isArray(item.recipients_list) ? item.recipients_list : (Array.isArray(item.recipients) ? item.recipients : []);
           this._savedRecipients = savedRecipients;
 
           this.form = {

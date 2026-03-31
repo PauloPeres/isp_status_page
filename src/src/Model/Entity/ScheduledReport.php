@@ -41,7 +41,7 @@ class ScheduledReport extends Entity
      *
      * @var list<string>
      */
-    protected array $_virtual = ['report_type'];
+    protected array $_virtual = ['report_type', 'recipients_list'];
 
     /**
      * Hidden fields omitted from JSON/array output.
@@ -72,11 +72,12 @@ class ScheduledReport extends Entity
     ];
 
     /**
-     * Virtual accessor: auto-decode recipients JSON string to array for API output.
+     * Virtual accessor: decode recipients JSON string to array for API output.
+     * Named recipients_list (not recipients) to avoid interfering with DB save.
      *
      * @return array<string>
      */
-    protected function _getRecipients(): array
+    protected function _getRecipientsList(): array
     {
         $raw = $this->_fields['recipients'] ?? '';
         if (empty($raw)) {
