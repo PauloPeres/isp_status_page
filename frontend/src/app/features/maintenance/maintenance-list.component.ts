@@ -60,8 +60,17 @@ addIcons({ constructOutline });
           <ion-item-sliding>
             <ion-item [routerLink]="['/maintenance', item.id, 'edit']" detail>
               <ion-label>
-                <h2>{{ item.title }}</h2>
-                <p>{{ item.starts_at | date:'short' }} - {{ item.ends_at | date:'short' }}</p>
+                <h2>
+                  {{ item.title }}
+                  @if (item.is_recurring) {
+                    <ion-badge color="tertiary" style="vertical-align: middle; margin-left: 6px; font-size: 0.6rem">Recurring</ion-badge>
+                  }
+                </h2>
+                @if (item.is_recurring && hasRecurringSchedule(item)) {
+                  <p>{{ getRecurringSummary(item) }}</p>
+                } @else {
+                  <p>{{ item.starts_at | date:'short' }} - {{ item.ends_at | date:'short' }}</p>
+                }
                 @if (item.description) {
                   <p style="font-size: 0.75rem; color: var(--ion-color-medium)">{{ item.description }}</p>
                 }
@@ -154,6 +163,30 @@ export class MaintenanceListComponent implements OnInit, ViewWillEnter {
       ],
     });
     await alert.present();
+  }
+
+  hasRecurringSchedule(item: MaintenanceWindow): boolean {
+    return !!(item as any).recurrence_time_start;
+  }
+
+  getRecurringSummary(item: MaintenanceWindow): string {
+    const data = item as any;
+    const pattern = item.recurrence_pattern || 'weekly';
+    const startTime = data.recurrence_time_start || '';
+    const endTime = data.recurrence_time_end || '';
+
+    let days = '';
+    if (pattern !== 'daily' && data.recurrence_days) {
+      try {
+        const dayArr = typeof data.recurrence_days === 'string' ? JSON.parse(data.recurrence_days) : data.recurrence_days;
+        const dayMap: Record<string, string> = { mon: 'Mon', tue: 'Tue', wed: 'Wed', thu: 'Thu', fri: 'Fri', sat: 'Sat', sun: 'Sun' };
+        days = dayArr.map((d: string) => dayMap[d] || d).join(', ');
+      } catch { days = ''; }
+    }
+
+    const freq = pattern === 'daily' ? 'Daily' : pattern === 'biweekly' ? 'Every 2 weeks' : pattern === 'monthly' ? 'Monthly' : 'Weekly';
+    const daysPart = days ? ` on ${days}` : '';
+    return `${freq}${daysPart}, ${startTime} - ${endTime}`;
   }
 
   getStatusColor(status: string): string {
