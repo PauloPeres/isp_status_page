@@ -97,7 +97,7 @@ export class SubscriberListComponent implements OnInit, ViewWillEnter {
 
   constructor(private service: SubscriberService, private alertCtrl: AlertController) {}
 
-  ngOnInit(): void { this.load(); }
+  ngOnInit(): void {}
 
   ionViewWillEnter(): void { this.load(); }
 

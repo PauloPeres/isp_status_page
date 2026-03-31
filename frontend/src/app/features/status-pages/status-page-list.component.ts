@@ -104,15 +104,18 @@ export class StatusPageListComponent implements OnInit, ViewWillEnter {
 
   constructor(private service: StatusPageService, private alertCtrl: AlertController) {}
 
-  ngOnInit(): void { this.load(); }
+  ngOnInit(): void {}
 
   ionViewWillEnter(): void { this.load(); }
 
   load(): void {
-    this.service.getAll().subscribe((data) => {
-      this.allItems.set(data.items);
-      this.applyFilter();
-      this.loading.set(false);
+    this.service.getAll().subscribe({
+      next: (data) => {
+        this.allItems.set(data.items);
+        this.applyFilter();
+        this.loading.set(false);
+      },
+      error: () => { this.loading.set(false); },
     });
   }
 
@@ -152,6 +155,7 @@ export class StatusPageListComponent implements OnInit, ViewWillEnter {
         { text: 'Cancel', role: 'cancel' },
         { text: 'Delete', role: 'destructive', handler: () => {
           this.service.delete(item.id).subscribe(() => {
+            this.allItems.update((list) => list.filter((i) => i.id !== item.id));
             this.items.update((list) => list.filter((i) => i.id !== item.id));
           });
         }},

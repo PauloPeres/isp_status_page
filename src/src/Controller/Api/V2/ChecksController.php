@@ -30,7 +30,7 @@ class ChecksController extends AppController
             ->toArray();
 
         if (empty($monitorIds)) {
-            $this->success(['checks' => [], 'pagination' => ['page' => 1, 'limit' => 50]]);
+            $this->success(['checks' => [], 'pagination' => ['page' => 1, 'limit' => 50, 'total' => 0, 'pages' => 0]]);
 
             return;
         }
@@ -40,23 +40,29 @@ class ChecksController extends AppController
         $page = max((int)($this->request->getQuery('page') ?: 1), 1);
 
         $query = $checksTable->find()
+            ->contain(['Monitors' => ['fields' => ['id', 'name']]])
             ->where(['MonitorChecks.monitor_id IN' => $monitorIds])
-            ->orderBy(['MonitorChecks.created' => 'DESC'])
-            ->limit($limit)
-            ->offset(($page - 1) * $limit);
+            ->orderBy(['MonitorChecks.created' => 'DESC']);
 
         $monitorId = $this->request->getQuery('monitor_id');
         if (!empty($monitorId) && in_array((int)$monitorId, $monitorIds)) {
             $query->where(['MonitorChecks.monitor_id' => (int)$monitorId]);
         }
 
-        $checks = $query->all();
+        $total = (clone $query)->count();
+
+        $checks = $query
+            ->limit($limit)
+            ->offset(($page - 1) * $limit)
+            ->all();
 
         $this->success([
             'checks' => $checks->toArray(),
             'pagination' => [
                 'page' => $page,
                 'limit' => $limit,
+                'total' => $total,
+                'pages' => (int)ceil($total / $limit),
             ],
         ]);
     }

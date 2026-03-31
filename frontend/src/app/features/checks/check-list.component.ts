@@ -217,8 +217,7 @@ export class CheckListComponent implements OnInit, ViewWillEnter {
   ) {}
 
   ngOnInit(): void {
-    this.loadMonitors();
-    this.loadChecks();
+    // Loading is handled by ionViewWillEnter to avoid duplicate calls.
   }
 
   ionViewWillEnter(): void {
@@ -243,15 +242,20 @@ export class CheckListComponent implements OnInit, ViewWillEnter {
       params['monitor_id'] = this.monitorFilter;
     }
 
-    this.checkService.getChecks(params).subscribe((data) => {
-      if (append) {
-        this.allChecks.update((current) => [...current, ...data.items]);
-      } else {
-        this.allChecks.set(data.items);
-      }
-      this.applyFilter();
-      this.hasMore = this.page < data.pagination.pages;
-      this.loading.set(false);
+    this.checkService.getChecks(params).subscribe({
+      next: (data) => {
+        if (append) {
+          this.allChecks.update((current) => [...current, ...data.items]);
+        } else {
+          this.allChecks.set(data.items);
+        }
+        this.applyFilter();
+        this.hasMore = this.page < data.pagination.pages;
+        this.loading.set(false);
+      },
+      error: () => {
+        this.loading.set(false);
+      },
     });
   }
 

@@ -172,7 +172,7 @@ export class IncidentFormComponent {
 
   onSave(): void {
     this.submitted = true;
-    if (!this.form.title) return;
+    if (!this.form.title || !this.form.monitor_id) return;
 
     this.incidentService.createIncident(this.form as any).subscribe({
       next: (incident) => {

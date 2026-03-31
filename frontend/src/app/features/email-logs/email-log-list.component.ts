@@ -89,7 +89,7 @@ export class EmailLogListComponent implements OnInit, ViewWillEnter {
 
   constructor(private service: EmailLogService) {}
 
-  ngOnInit(): void { this.load(); }
+  ngOnInit(): void {}
 
   ionViewWillEnter(): void { this.load(); }
 

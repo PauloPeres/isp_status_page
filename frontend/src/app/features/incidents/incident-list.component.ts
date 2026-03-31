@@ -208,7 +208,7 @@ addIcons({ warningOutline, checkmarkCircleOutline });
       </ion-list>
       }
 
-      <ion-infinite-scroll (ionInfinite)="loadMore($event)">
+      <ion-infinite-scroll [disabled]="!hasMore" (ionInfinite)="loadMore($event)">
         <ion-infinite-scroll-content
           loadingText="Loading..."
         ></ion-infinite-scroll-content>
@@ -266,9 +266,7 @@ export class IncidentListComponent implements OnInit, ViewWillEnter {
     private toastCtrl: ToastController,
   ) {}
 
-  ngOnInit(): void {
-    this.loadIncidents();
-  }
+  ngOnInit(): void {}
 
   ionViewWillEnter(): void {
     this.loadIncidents();
@@ -288,14 +286,19 @@ export class IncidentListComponent implements OnInit, ViewWillEnter {
       params['status'] = 'resolved';
     }
 
-    this.incidentService.getIncidents(params).subscribe((data) => {
-      if (append) {
-        this.incidents.update((current) => [...current, ...data.items]);
-      } else {
-        this.incidents.set(data.items);
-      }
-      this.hasMore = this.page < data.pagination.pages;
-      this.loading.set(false);
+    this.incidentService.getIncidents(params).subscribe({
+      next: (data) => {
+        if (append) {
+          this.incidents.update((current) => [...current, ...data.items]);
+        } else {
+          this.incidents.set(data.items);
+        }
+        this.hasMore = this.page < data.pagination.pages;
+        this.loading.set(false);
+      },
+      error: () => {
+        this.loading.set(false);
+      },
     });
   }
 

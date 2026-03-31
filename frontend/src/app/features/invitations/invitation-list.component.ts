@@ -130,15 +130,18 @@ export class InvitationListComponent implements OnInit, ViewWillEnter {
     private router: Router,
   ) {}
 
-  ngOnInit(): void { this.load(); }
+  ngOnInit(): void {}
 
   ionViewWillEnter(): void { this.load(); }
 
   load(): void {
-    this.service.getInvitations().subscribe((data) => {
-      this.allItems.set(data.items);
-      this.applyFilter();
-      this.loading.set(false);
+    this.service.getInvitations().subscribe({
+      next: (data) => {
+        this.allItems.set(data.items);
+        this.applyFilter();
+        this.loading.set(false);
+      },
+      error: () => { this.loading.set(false); },
     });
   }
 
@@ -205,6 +208,7 @@ export class InvitationListComponent implements OnInit, ViewWillEnter {
         { text: 'Cancel', role: 'cancel' },
         { text: 'Revoke', role: 'destructive', handler: () => {
           this.service.revokeInvitation(item.id).subscribe(() => {
+            this.allItems.update((list) => list.filter((i) => i.id !== item.id));
             this.items.update((list) => list.filter((i) => i.id !== item.id));
           });
         }},

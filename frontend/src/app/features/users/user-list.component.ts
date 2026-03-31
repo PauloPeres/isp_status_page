@@ -103,15 +103,18 @@ export class UserListComponent implements OnInit, ViewWillEnter {
 
   constructor(private service: UserService, private alertCtrl: AlertController) {}
 
-  ngOnInit(): void { this.load(); }
+  ngOnInit(): void {}
 
   ionViewWillEnter(): void { this.load(); }
 
   load(): void {
-    this.service.getAll().subscribe((data) => {
-      this.allItems.set(data.items);
-      this.applyFilter();
-      this.loading.set(false);
+    this.service.getAll().subscribe({
+      next: (data) => {
+        this.allItems.set(data.items);
+        this.applyFilter();
+        this.loading.set(false);
+      },
+      error: () => { this.loading.set(false); },
     });
   }
 
@@ -175,6 +178,7 @@ export class UserListComponent implements OnInit, ViewWillEnter {
         { text: 'Cancel', role: 'cancel' },
         { text: 'Remove', role: 'destructive', handler: () => {
           this.service.remove(user.id).subscribe(() => {
+            this.allItems.update((list) => list.filter((u) => u.id !== user.id));
             this.items.update((list) => list.filter((u) => u.id !== user.id));
           });
         }},

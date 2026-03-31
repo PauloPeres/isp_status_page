@@ -130,15 +130,18 @@ export class ApiKeyListComponent implements OnInit, ViewWillEnter {
     private router: Router,
   ) {}
 
-  ngOnInit(): void { this.load(); }
+  ngOnInit(): void {}
 
   ionViewWillEnter(): void { this.load(); }
 
   load(): void {
-    this.service.getAll().subscribe((data) => {
-      this.allItems.set(data.items);
-      this.applyFilter();
-      this.loading.set(false);
+    this.service.getAll().subscribe({
+      next: (data) => {
+        this.allItems.set(data.items);
+        this.applyFilter();
+        this.loading.set(false);
+      },
+      error: () => { this.loading.set(false); },
     });
   }
 
@@ -214,6 +217,7 @@ export class ApiKeyListComponent implements OnInit, ViewWillEnter {
         { text: 'Cancel', role: 'cancel' },
         { text: 'Delete', role: 'destructive', handler: () => {
           this.service.delete(item.id).subscribe(() => {
+            this.allItems.update((list) => list.filter((k) => k.id !== item.id));
             this.items.update((list) => list.filter((k) => k.id !== item.id));
           });
         }},
