@@ -28,8 +28,13 @@ class JwtService
     public function __construct()
     {
         $secret = env('JWT_SECRET') ?: env('SECURITY_SALT');
-        if (empty($secret) || $secret === 'change-me') {
-            throw new \RuntimeException('JWT_SECRET or SECURITY_SALT must be configured. Do not use default values.');
+        if (empty($secret)) {
+            throw new \RuntimeException('JWT_SECRET or SECURITY_SALT environment variable must be configured.');
+        }
+        // Block default/weak secrets in production
+        $isDebug = (bool)(env('APP_DEBUG') ?: false);
+        if (!$isDebug && in_array($secret, ['change-me', 'secret', 'password', 'jwt-secret'], true)) {
+            throw new \RuntimeException('JWT_SECRET or SECURITY_SALT must not use a default value in production. Set APP_DEBUG=true to bypass in development.');
         }
         $this->secretKey = (string)$secret;
     }

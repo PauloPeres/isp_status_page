@@ -177,6 +177,10 @@ class WebhookEndpointsController extends AppController
     {
         $this->request->allowMethod(['get']);
 
+        if (!$this->requireRole(['owner', 'admin'])) {
+            return;
+        }
+
         $endpointTable = $this->fetchTable('WebhookEndpoints');
 
         try {

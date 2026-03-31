@@ -65,6 +65,20 @@ class WebhookAlertChannel implements ChannelInterface
         $allSuccess = true;
 
         foreach ($recipients as $webhookUrl) {
+            // SSRF protection: block requests to private/internal networks
+            if (!\App\Service\UrlValidator::isUrlSafe($webhookUrl)) {
+                $allSuccess = false;
+
+                $results[] = [
+                    'recipient' => $webhookUrl,
+                    'status' => 'failed',
+                    'error' => 'URL targets a private/internal network address',
+                ];
+
+                Log::warning("Blocked webhook to private/internal address: {$webhookUrl}");
+                continue;
+            }
+
             try {
                 $headers = [
                     'type' => 'application/json',

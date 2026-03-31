@@ -58,8 +58,7 @@ class AuthController extends AppController
             ->first();
 
         if ($existing) {
-            $field = $existing->email === $email ? 'email' : 'username';
-            $this->error("A user with this {$field} already exists", 422);
+            $this->error('Registration failed. Please check your details and try again.', 422);
 
             return;
         }

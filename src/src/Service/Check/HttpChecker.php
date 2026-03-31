@@ -60,6 +60,11 @@ class HttpChecker extends AbstractChecker
             // Prepare request options
             $options = $this->buildRequestOptions($monitor);
 
+            // SSRF protection: block requests to private/internal networks
+            if (!\App\Service\UrlValidator::isUrlSafe($url)) {
+                return $this->buildErrorResult('URL targets a private/internal network address', 0);
+            }
+
             // Execute HTTP request
             Log::debug("Making HTTP request to: {$url}", [
                 'monitor_id' => $monitor->id,

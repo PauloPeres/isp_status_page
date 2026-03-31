@@ -47,7 +47,7 @@ class ApiKey extends Entity
         'key_hash' => true,
         'key_prefix' => true,
         'permissions' => true,
-        'rate_limit' => true,
+        'rate_limit' => false,   // Must be set explicitly — prevents user self-escalation
         'last_used_at' => true,
         'expires_at' => true,
         'active' => true,
