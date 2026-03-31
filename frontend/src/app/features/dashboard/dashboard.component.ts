@@ -230,7 +230,7 @@ addIcons({
             </ion-card>
           </ion-col>
           <ion-col size="12" sizeMd="6">
-            <ion-card>
+            <ion-card routerLink="/sla" style="cursor: pointer">
               <ion-card-header>
                 <ion-card-title>SLA Compliance</ion-card-title>
               </ion-card-header>
@@ -239,18 +239,18 @@ addIcons({
                   <ion-skeleton-text [animated]="true" style="width: 100%; height: 5rem;"></ion-skeleton-text>
                 } @else {
                   <div class="sla-overview">
-                    <div class="sla-stat">
+                    <a class="sla-stat" routerLink="/sla" [queryParams]="{status: 'compliant'}" (click)="$event.stopPropagation()">
                       <div class="sla-stat-value sla-compliant">{{ summary()?.sla?.compliant ?? 0 }}</div>
                       <div class="sla-stat-label">Compliant</div>
-                    </div>
-                    <div class="sla-stat">
+                    </a>
+                    <a class="sla-stat" routerLink="/sla" [queryParams]="{status: 'at_risk'}" (click)="$event.stopPropagation()">
                       <div class="sla-stat-value sla-at-risk">{{ summary()?.sla?.at_risk ?? 0 }}</div>
                       <div class="sla-stat-label">At Risk</div>
-                    </div>
-                    <div class="sla-stat">
+                    </a>
+                    <a class="sla-stat" routerLink="/sla" [queryParams]="{status: 'breached'}" (click)="$event.stopPropagation()">
                       <div class="sla-stat-value sla-breached">{{ summary()?.sla?.breached ?? 0 }}</div>
                       <div class="sla-stat-label">Breached</div>
-                    </div>
+                    </a>
                   </div>
                   @if ((summary()?.sla?.compliant ?? 0) + (summary()?.sla?.at_risk ?? 0) + (summary()?.sla?.breached ?? 0) > 0) {
                     <div class="sla-bar-container">
@@ -480,6 +480,17 @@ addIcons({
         justify-content: space-around;
         text-align: center;
         margin-bottom: 16px;
+      }
+      a.sla-stat {
+        text-decoration: none;
+        color: inherit;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 8px;
+        transition: background 0.15s;
+      }
+      a.sla-stat:hover {
+        background: var(--ion-color-light);
       }
       .sla-stat-value {
         font-family: 'DM Sans', sans-serif;

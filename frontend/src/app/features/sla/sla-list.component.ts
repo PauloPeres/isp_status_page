@@ -1,13 +1,13 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ViewWillEnter } from '@ionic/angular';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonButton,
   IonList, IonItem, IonItemSliding, IonItemOptions, IonItemOption,
   IonLabel, IonBadge, IonNote, IonIcon, IonProgressBar,
-  IonRefresher, IonRefresherContent, IonSearchbar,
+  IonRefresher, IonRefresherContent, IonSearchbar, IonChip,
   AlertController,
 } from '@ionic/angular/standalone';
 import { SlaService, Sla } from './sla.service';
@@ -25,7 +25,7 @@ addIcons({ ribbonOutline });
     IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonButton,
     IonList, IonItem, IonItemSliding, IonItemOptions, IonItemOption,
     IonLabel, IonBadge, IonNote, IonIcon, IonProgressBar,
-    IonRefresher, IonRefresherContent, IonSearchbar,
+    IonRefresher, IonRefresherContent, IonSearchbar, IonChip,
     ListSkeletonComponent,
   ],
   template: `
@@ -51,6 +51,14 @@ addIcons({ ribbonOutline });
       <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
         <ion-refresher-content></ion-refresher-content>
       </ion-refresher>
+
+      <div style="padding: 8px 16px; display: flex; gap: 6px; overflow-x: auto;">
+        @for (f of statusFilters; track f.value) {
+          <ion-chip [color]="statusFilter === f.value ? f.color : 'medium'" [outline]="statusFilter !== f.value" (click)="filterByStatus(f.value)" style="height: 28px; font-size: 0.75rem">
+            {{ f.label }}
+          </ion-chip>
+        }
+      </div>
 
       @if (loading()) {
         <app-list-skeleton></app-list-skeleton>
@@ -106,12 +114,31 @@ export class SlaListComponent implements OnInit, ViewWillEnter {
   allItems = signal<Sla[]>([]);
   loading = signal(true);
   searchQuery = '';
+  statusFilter = '';
 
-  constructor(private service: SlaService, private alertCtrl: AlertController) {}
+  statusFilters = [
+    { label: 'All', value: '', color: 'primary' },
+    { label: 'Compliant', value: 'compliant', color: 'success' },
+    { label: 'At Risk', value: 'at_risk', color: 'warning' },
+    { label: 'Breached', value: 'breached', color: 'danger' },
+  ];
 
-  ngOnInit(): void {}
+  constructor(private service: SlaService, private alertCtrl: AlertController, private route: ActivatedRoute) {}
 
-  ionViewWillEnter(): void { this.load(); }
+  ngOnInit(): void {
+    const status = this.route.snapshot.queryParamMap.get('status');
+    if (status) {
+      this.statusFilter = status;
+    }
+  }
+
+  ionViewWillEnter(): void {
+    const status = this.route.snapshot.queryParamMap.get('status');
+    if (status) {
+      this.statusFilter = status;
+    }
+    this.load();
+  }
 
   load(): void {
     this.service.getAll().subscribe({
@@ -139,17 +166,26 @@ export class SlaListComponent implements OnInit, ViewWillEnter {
     this.applyFilter();
   }
 
+  filterByStatus(status: string): void {
+    this.statusFilter = status;
+    this.applyFilter();
+  }
+
   applyFilter(): void {
-    const query = this.searchQuery.toLowerCase().trim();
-    if (!query) {
-      this.items.set(this.allItems());
-      return;
+    let filtered = this.allItems();
+
+    if (this.statusFilter) {
+      filtered = filtered.filter((item) => item.status === this.statusFilter);
     }
-    this.items.set(
-      this.allItems().filter((item) =>
+
+    const query = this.searchQuery.toLowerCase().trim();
+    if (query) {
+      filtered = filtered.filter((item) =>
         item.name.toLowerCase().includes(query)
-      )
-    );
+      );
+    }
+
+    this.items.set(filtered);
   }
 
   async onDelete(item: Sla): Promise<void> {
