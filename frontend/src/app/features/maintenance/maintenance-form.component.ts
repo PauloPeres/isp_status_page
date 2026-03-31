@@ -328,16 +328,16 @@ export class MaintenanceFormComponent implements OnInit {
             starts_at: isRecurring ? '' : this.toDatetimeLocal(item.starts_at),
             ends_at: isRecurring ? '' : this.toDatetimeLocal(item.ends_at),
             recurrence_pattern: item.recurrence_pattern || 'weekly',
-            recurrence_time_start: (item as any).recurrence_time_start || '',
-            recurrence_time_end: (item as any).recurrence_time_end || '',
-            effective_from: (item as any).effective_from || '',
+            recurrence_time_start: item.recurrence_time_start || '',
+            recurrence_time_end: item.recurrence_time_end || '',
+            effective_from: item.effective_from || '',
             recurrence_end_date: item.recurrence_end_date || '',
             auto_suppress_alerts: item.auto_suppress_alerts ?? true,
             notify_subscribers: item.notify_subscribers ?? false,
           };
 
           // Restore selected days from JSON
-          const savedDays: string[] = this.parseDays((item as any).recurrence_days);
+          const savedDays: string[] = this.parseDays(item.recurrence_days);
           this.days.forEach(d => d.selected = savedDays.includes(d.key));
 
           // Backward compatibility: if recurring but no time fields, extract from starts_at/ends_at
@@ -422,13 +422,20 @@ export class MaintenanceFormComponent implements OnInit {
         : this.days.filter(d => d.selected).map(d => d.key);
       payload.recurrence_days = JSON.stringify(selectedDayKeys);
 
-      if (this.form.recurrence_end_date) {
-        payload.recurrence_end_date = this.form.recurrence_end_date;
-      }
+      payload.recurrence_end_date = this.form.recurrence_end_date || null;
 
       // For recurring, set starts_at/ends_at from effective_from + time for DB compatibility
       payload.starts_at = `${this.form.effective_from}T${this.form.recurrence_time_start}`;
-      payload.ends_at = `${this.form.effective_from}T${this.form.recurrence_time_end}`;
+      // If end time is before start time (overnight window), add one day to ends_at
+      if (this.form.recurrence_time_end < this.form.recurrence_time_start) {
+        const nextDay = new Date(this.form.effective_from);
+        nextDay.setDate(nextDay.getDate() + 1);
+        const pad = (n: number) => n.toString().padStart(2, '0');
+        const nextDayStr = `${nextDay.getFullYear()}-${pad(nextDay.getMonth() + 1)}-${pad(nextDay.getDate())}`;
+        payload.ends_at = `${nextDayStr}T${this.form.recurrence_time_end}`;
+      } else {
+        payload.ends_at = `${this.form.effective_from}T${this.form.recurrence_time_end}`;
+      }
     }
 
     const request$ = this.isEdit

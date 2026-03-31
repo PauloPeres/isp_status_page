@@ -89,6 +89,16 @@ class MaintenanceWindowsTable extends Table
             ->maxLength('status', 20)
             ->inList('status', ['scheduled', 'in_progress', 'completed', 'cancelled']);
 
+        $validator->boolean('is_recurring')->allowEmptyString('is_recurring');
+        $validator->scalar('recurrence_pattern')
+            ->allowEmptyString('recurrence_pattern')
+            ->inList('recurrence_pattern', ['daily', 'weekly', 'biweekly', 'monthly'], 'Invalid recurrence pattern.');
+        $validator->scalar('recurrence_days')->allowEmptyString('recurrence_days');
+        $validator->scalar('recurrence_time_start')->maxLength('recurrence_time_start', 5)->allowEmptyString('recurrence_time_start');
+        $validator->scalar('recurrence_time_end')->maxLength('recurrence_time_end', 5)->allowEmptyString('recurrence_time_end');
+        $validator->date('effective_from')->allowEmptyDate('effective_from');
+        $validator->date('recurrence_end_date')->allowEmptyDate('recurrence_end_date');
+
         return $validator;
     }
 

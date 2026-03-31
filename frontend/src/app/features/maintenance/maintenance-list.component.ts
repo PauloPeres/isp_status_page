@@ -114,10 +114,15 @@ export class MaintenanceListComponent implements OnInit, ViewWillEnter {
   ionViewWillEnter(): void { this.load(); }
 
   load(): void {
-    this.service.getAll().subscribe((data) => {
-      this.allItems.set(data.items);
-      this.applyFilter();
-      this.loading.set(false);
+    this.service.getAll().subscribe({
+      next: (data) => {
+        this.allItems.set(data.items);
+        this.applyFilter();
+        this.loading.set(false);
+      },
+      error: () => {
+        this.loading.set(false);
+      },
     });
   }
 
@@ -145,6 +150,8 @@ export class MaintenanceListComponent implements OnInit, ViewWillEnter {
     this.items.set(
       this.allItems().filter((item) =>
         item.title.toLowerCase().includes(query)
+        || (item.description && item.description.toLowerCase().includes(query))
+        || item.status.toLowerCase().includes(query)
       )
     );
   }
@@ -157,6 +164,7 @@ export class MaintenanceListComponent implements OnInit, ViewWillEnter {
         { text: 'Cancel', role: 'cancel' },
         { text: 'Delete', role: 'destructive', handler: () => {
           this.service.delete(item.id).subscribe(() => {
+            this.allItems.update((list) => list.filter((i) => i.id !== item.id));
             this.items.update((list) => list.filter((i) => i.id !== item.id));
           });
         }},
@@ -166,19 +174,18 @@ export class MaintenanceListComponent implements OnInit, ViewWillEnter {
   }
 
   hasRecurringSchedule(item: MaintenanceWindow): boolean {
-    return !!(item as any).recurrence_time_start;
+    return !!item.recurrence_time_start;
   }
 
   getRecurringSummary(item: MaintenanceWindow): string {
-    const data = item as any;
     const pattern = item.recurrence_pattern || 'weekly';
-    const startTime = data.recurrence_time_start || '';
-    const endTime = data.recurrence_time_end || '';
+    const startTime = item.recurrence_time_start || '';
+    const endTime = item.recurrence_time_end || '';
 
     let days = '';
-    if (pattern !== 'daily' && data.recurrence_days) {
+    if (pattern !== 'daily' && item.recurrence_days) {
       try {
-        const dayArr = typeof data.recurrence_days === 'string' ? JSON.parse(data.recurrence_days) : data.recurrence_days;
+        const dayArr = typeof item.recurrence_days === 'string' ? JSON.parse(item.recurrence_days) : item.recurrence_days;
         const dayMap: Record<string, string> = { mon: 'Mon', tue: 'Tue', wed: 'Wed', thu: 'Thu', fri: 'Fri', sat: 'Sat', sun: 'Sun' };
         days = dayArr.map((d: string) => dayMap[d] || d).join(', ');
       } catch { days = ''; }
