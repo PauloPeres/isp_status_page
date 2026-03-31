@@ -77,7 +77,7 @@ addIcons({ copyOutline });
             placeholder="status.example.com" helperText="Point a CNAME record to our server"></ion-input>
         </ion-item>
         <ion-item>
-          <ion-toggle [(ngModel)]="form.is_active" name="is_active">Active</ion-toggle>
+          <ion-toggle [(ngModel)]="form.active" name="active">Active</ion-toggle>
         </ion-item>
       </ion-list>
       <ion-button expand="block" (click)="onSave()" [disabled]="saving" style="margin-top: 16px">
@@ -98,7 +98,7 @@ addIcons({ copyOutline });
   ],
 })
 export class StatusPageFormComponent implements OnInit {
-  form: any = { name: '', slug: '', custom_domain: '', is_active: true };
+  form: any = { name: '', slug: '', custom_domain: '', active: true };
   saving = false;
   submitted = false;
   isEdit = false;
@@ -126,7 +126,7 @@ export class StatusPageFormComponent implements OnInit {
             name: item.name || '',
             slug: item.slug || '',
             custom_domain: item.custom_domain || '',
-            is_active: item.is_active ?? true,
+            active: item.active ?? true,
           };
           this.loadingData = false;
         },

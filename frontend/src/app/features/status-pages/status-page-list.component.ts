@@ -73,7 +73,7 @@ addIcons({ globeOutline, copyOutline, openOutline });
                     </ion-chip>
                   }
                   <span style="font-size: 0.75rem; color: var(--ion-color-medium)">
-                    {{ item.monitor_count }} monitor{{ item.monitor_count !== 1 ? 's' : '' }}
+                    {{ item.slug }}
                   </span>
                 </p>
               </ion-label>
@@ -81,8 +81,8 @@ addIcons({ globeOutline, copyOutline, openOutline });
                 <ion-button fill="clear" size="small" (click)="copyLink(item, $event)" title="Copy link">
                   <ion-icon name="copy-outline" slot="icon-only"></ion-icon>
                 </ion-button>
-                <ion-badge [color]="item.is_active ? 'success' : 'medium'">
-                  {{ item.is_active ? 'Active' : 'Inactive' }}
+                <ion-badge [color]="item.active ? 'success' : 'medium'">
+                  {{ item.active ? 'Active' : 'Inactive' }}
                 </ion-badge>
               </div>
             </ion-item>
@@ -162,7 +162,9 @@ export class StatusPageListComponent implements OnInit, ViewWillEnter {
 
   getStatusPageUrl(item: StatusPage): string {
     if (item.custom_domain) return 'https://' + item.custom_domain;
-    return window.location.origin + '/status/' + item.slug;
+    // Public status page is served by CakePHP at /status/{slug} (not /app/status/)
+    const origin = window.location.origin;
+    return origin + '/status/' + item.slug;
   }
 
   async copyLink(item: StatusPage, event: Event): Promise<void> {

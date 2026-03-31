@@ -8,12 +8,10 @@ export interface StatusPage {
   name: string;
   slug: string;
   custom_domain: string | null;
-  is_active: boolean;
-  is_public: boolean;
-  monitor_count: number;
-  monitors: { id: number; name: string }[];
-  created_at: string;
-  updated_at: string;
+  active: boolean;
+  monitors: any;
+  created: string;
+  modified: string;
 }
 
 @Injectable({ providedIn: 'root' })
