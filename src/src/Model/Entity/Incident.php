@@ -84,16 +84,25 @@ class Incident extends Entity
         'resolved_at' => true,
         'duration' => true,
         'auto_created' => true,
-        'acknowledged_by_user_id' => true,
-        'acknowledged_at' => true,
-        'acknowledged_via' => true,
-        'acknowledgement_token' => true,
+        'acknowledged_by_user_id' => false,
+        'acknowledged_at' => false,
+        'acknowledged_via' => false,
+        'acknowledgement_token' => false,
         'created' => true,
         'modified' => true,
         'monitor' => true,
         'acknowledged_by_user' => true,
         'alert_logs' => true,
         'incident_updates' => true,
+    ];
+
+    /**
+     * Fields that are excluded from JSON / array representations.
+     *
+     * @var list<string>
+     */
+    protected array $_hidden = [
+        'acknowledgement_token',
     ];
 
     /**

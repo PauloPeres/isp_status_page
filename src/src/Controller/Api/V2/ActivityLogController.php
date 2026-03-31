@@ -146,9 +146,15 @@ class ActivityLogController extends AppController
      */
     private function csvEscape(string $value): string
     {
+        // Prevent formula injection in spreadsheets
+        if (preg_match('/^[=+\-@\t\r]/', $value)) {
+            $value = "'" . $value;
+        }
+
         if (str_contains($value, ',') || str_contains($value, '"') || str_contains($value, "\n")) {
             return '"' . str_replace('"', '""', $value) . '"';
         }
+
         return $value;
     }
 }

@@ -59,6 +59,15 @@ class SettingsController extends AppController
         try {
             $service = new SettingService();
             $data = $this->request->getData();
+
+            // Filter out masked sensitive values to prevent overwriting real secrets with placeholder
+            $sensitiveKeys = ['smtp_password', 'backup_ftp_password', 'telegram_bot_token', 'stripe_secret_key', 'twilio_auth_token'];
+            foreach ($sensitiveKeys as $key) {
+                if (isset($data[$key]) && $data[$key] === '••••••••') {
+                    unset($data[$key]);
+                }
+            }
+
             $service->saveMultiple($data, $this->currentOrgId);
 
             $this->success(['message' => 'Settings saved']);

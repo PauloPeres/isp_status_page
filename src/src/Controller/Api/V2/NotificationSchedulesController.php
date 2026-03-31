@@ -70,9 +70,11 @@ class NotificationSchedulesController extends AppController
 
         $table = $this->fetchTable('NotificationSchedules');
 
-        try {
-            $schedule = $table->get((int)$id);
-        } catch (\Cake\Datasource\Exception\RecordNotFoundException $e) {
+        $schedule = $table->find()
+            ->where(['id' => (int)$id, 'organization_id' => $this->currentOrgId])
+            ->first();
+
+        if (!$schedule) {
             $this->error('Schedule not found', 404);
             return;
         }
@@ -104,9 +106,11 @@ class NotificationSchedulesController extends AppController
 
         $table = $this->fetchTable('NotificationSchedules');
 
-        try {
-            $schedule = $table->get((int)$id);
-        } catch (\Cake\Datasource\Exception\RecordNotFoundException $e) {
+        $schedule = $table->find()
+            ->where(['id' => (int)$id, 'organization_id' => $this->currentOrgId])
+            ->first();
+
+        if (!$schedule) {
             $this->error('Schedule not found', 404);
             return;
         }

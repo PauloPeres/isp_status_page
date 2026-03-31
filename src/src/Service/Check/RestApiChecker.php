@@ -236,7 +236,7 @@ class RestApiChecker extends AbstractChecker
         try {
             $integrationsTable = TableRegistry::getTableLocator()->get('Integrations');
             $integration = $integrationsTable->get($integrationId);
-            $integrationConfig = $integration->getConfiguration();
+            $integrationConfig = $integration->getRawConfiguration();
 
             // Merge base_url from integration if not set in monitor
             if (empty($adapterConfig['base_url']) && !empty($integrationConfig['base_url'])) {

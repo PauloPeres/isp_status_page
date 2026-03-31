@@ -46,6 +46,16 @@ class Organization extends Entity
      *
      * @var array<string, bool>
      */
+    /**
+     * Fields that are excluded from JSON / array representations.
+     *
+     * @var list<string>
+     */
+    protected array $_hidden = [
+        'stripe_customer_id',
+        'stripe_subscription_id',
+    ];
+
     protected array $_accessible = [
         'name' => true,
         'slug' => true,

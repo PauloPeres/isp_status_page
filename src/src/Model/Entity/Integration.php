@@ -59,21 +59,56 @@ class Integration extends Entity
     ];
 
     /**
-     * Get configuration as array
+     * Sensitive keys within the configuration JSON that must be masked in output.
+     */
+    private const SENSITIVE_CONFIG_KEYS = ['password', 'token', 'secret', 'api_key', 'auth_token'];
+
+    /**
+     * Get configuration as array (with sensitive values masked).
      *
      * @return array
      */
     public function getConfiguration(): array
     {
-        if (empty($this->configuration)) {
+        $raw = $this->_fields['configuration'] ?? null;
+        if (empty($raw)) {
             return [];
         }
 
-        if (is_array($this->configuration)) {
-            return $this->configuration;
+        if (is_array($raw)) {
+            $config = $raw;
+        } else {
+            $decoded = json_decode($raw, true);
+            $config = is_array($decoded) ? $decoded : [];
         }
 
-        $decoded = json_decode($this->configuration, true);
+        // Mask sensitive values so they are never leaked via API responses
+        foreach (self::SENSITIVE_CONFIG_KEYS as $sensitiveKey) {
+            if (isset($config[$sensitiveKey]) && !empty($config[$sensitiveKey])) {
+                $config[$sensitiveKey] = '••••••••';
+            }
+        }
+
+        return $config;
+    }
+
+    /**
+     * Get raw configuration as array without masking (for internal use only).
+     *
+     * @return array
+     */
+    public function getRawConfiguration(): array
+    {
+        $raw = $this->_fields['configuration'] ?? null;
+        if (empty($raw)) {
+            return [];
+        }
+
+        if (is_array($raw)) {
+            return $raw;
+        }
+
+        $decoded = json_decode($raw, true);
 
         return is_array($decoded) ? $decoded : [];
     }

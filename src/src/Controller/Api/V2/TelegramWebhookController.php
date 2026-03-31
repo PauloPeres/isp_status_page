@@ -68,7 +68,7 @@ class TelegramWebhookController extends AppController
             Log::error("Telegram webhook: Failed to read settings for org {$orgId}");
         }
 
-        if (empty($storedToken) || $token !== $storedToken) {
+        if (empty($storedToken) || !hash_equals($storedToken, $token)) {
             $this->response = $this->response->withStatus(403);
             $this->set('data', ['error' => 'Invalid webhook token']);
             $this->viewBuilder()->setOption('serialize', 'data');

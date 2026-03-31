@@ -161,7 +161,7 @@ class IncidentsController extends AppController
         }
 
         // Validate token
-        if (empty($token) || $token !== $incident->acknowledgement_token) {
+        if (empty($token) || empty($incident->acknowledgement_token) || !hash_equals($incident->acknowledgement_token, $token)) {
             $this->Flash->error(__d('incidents', 'Invalid acknowledgement token.'));
             $this->set('error', __d('incidents', 'Invalid acknowledgement token.'));
             $this->set('incident', $incident);
