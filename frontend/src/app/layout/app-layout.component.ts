@@ -173,20 +173,6 @@ addIcons({
               </ion-menu-toggle>
 
               <ion-menu-toggle auto-hide="false">
-                <ion-item routerLink="/alert-rules" routerLinkActive="selected">
-                  <ion-icon name="notifications-outline" slot="start"></ion-icon>
-                  <ion-label>Alert Rules</ion-label>
-                </ion-item>
-              </ion-menu-toggle>
-
-              <ion-menu-toggle auto-hide="false">
-                <ion-item routerLink="/escalation" routerLinkActive="selected">
-                  <ion-icon name="flash-outline" slot="start"></ion-icon>
-                  <ion-label>Escalation</ion-label>
-                </ion-item>
-              </ion-menu-toggle>
-
-              <ion-menu-toggle auto-hide="false">
                 <ion-item routerLink="/integrations" routerLinkActive="selected">
                   <ion-icon name="link-outline" slot="start"></ion-icon>
                   <ion-label>Integrations</ion-label>

@@ -108,48 +108,13 @@ export const routes: Routes = [
             (m) => m.IncidentDetailComponent,
           ),
       },
-      {
-        path: 'alert-rules',
-        loadComponent: () =>
-          import('./features/alert-rules/alert-rule-list.component').then(
-            (m) => m.AlertRuleListComponent,
-          ),
-      },
-      {
-        path: 'alert-rules/new',
-        loadComponent: () =>
-          import('./features/alert-rules/alert-rule-form.component').then(
-            (m) => m.AlertRuleFormComponent,
-          ),
-      },
-      {
-        path: 'alert-rules/:id/edit',
-        loadComponent: () =>
-          import('./features/alert-rules/alert-rule-form.component').then(
-            (m) => m.AlertRuleFormComponent,
-          ),
-      },
-      {
-        path: 'escalation',
-        loadComponent: () =>
-          import(
-            './features/escalation/escalation-policy-list.component'
-          ).then((m) => m.EscalationPolicyListComponent),
-      },
-      {
-        path: 'escalation/new',
-        loadComponent: () =>
-          import('./features/escalation/escalation-form.component').then(
-            (m) => m.EscalationFormComponent,
-          ),
-      },
-      {
-        path: 'escalation/:id/edit',
-        loadComponent: () =>
-          import('./features/escalation/escalation-form.component').then(
-            (m) => m.EscalationFormComponent,
-          ),
-      },
+      // Redirects from old routes to new notification system
+      { path: 'alert-rules', redirectTo: 'notifications', pathMatch: 'full' },
+      { path: 'alert-rules/new', redirectTo: 'notifications/new', pathMatch: 'full' },
+      { path: 'alert-rules/:id/edit', redirectTo: 'notifications', pathMatch: 'full' },
+      { path: 'escalation', redirectTo: 'notifications', pathMatch: 'full' },
+      { path: 'escalation/new', redirectTo: 'notifications/new', pathMatch: 'full' },
+      { path: 'escalation/:id/edit', redirectTo: 'notifications', pathMatch: 'full' },
       {
         path: 'channels',
         loadComponent: () =>
