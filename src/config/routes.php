@@ -690,6 +690,23 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/check-regions/{id}', ['controller' => 'CheckRegions', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '\d+']);
         $builder->connect('/check-regions/{id}', ['controller' => 'CheckRegions', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
 
+        // Notification Channels
+        $builder->connect('/notification-channels', ['controller' => 'NotificationChannels', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
+        $builder->connect('/notification-channels', ['controller' => 'NotificationChannels', 'action' => 'add', 'prefix' => 'Api/V2', '_method' => 'POST']);
+        $builder->connect('/notification-channels/{id}', ['controller' => 'NotificationChannels', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/notification-channels/{id}', ['controller' => 'NotificationChannels', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/notification-channels/{id}', ['controller' => 'NotificationChannels', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/notification-channels/{id}', ['controller' => 'NotificationChannels', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/notification-channels/{id}/test', ['controller' => 'NotificationChannels', 'action' => 'test', 'prefix' => 'Api/V2', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
+
+        // Notification Policies
+        $builder->connect('/notification-policies', ['controller' => 'NotificationPolicies', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
+        $builder->connect('/notification-policies', ['controller' => 'NotificationPolicies', 'action' => 'add', 'prefix' => 'Api/V2', '_method' => 'POST']);
+        $builder->connect('/notification-policies/{id}', ['controller' => 'NotificationPolicies', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/notification-policies/{id}', ['controller' => 'NotificationPolicies', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/notification-policies/{id}', ['controller' => 'NotificationPolicies', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/notification-policies/{id}', ['controller' => 'NotificationPolicies', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
+
         // Super Admin
         $builder->connect('/super-admin/dashboard', ['controller' => 'Dashboard', 'action' => 'index', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'GET']);
         $builder->connect('/super-admin/organizations', ['controller' => 'Organizations', 'action' => 'index', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'GET']);
