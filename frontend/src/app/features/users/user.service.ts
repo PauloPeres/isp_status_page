@@ -58,7 +58,9 @@ export class UserService {
   }
 
   sendInvitation(data: { email: string; role: string }): Observable<Invitation> {
-    return this.api.post<Invitation>('/invitations', data);
+    return this.api.post<any>('/invitations', data).pipe(
+      map(d => d.invitation || d)
+    );
   }
 
   revokeInvitation(id: number): Observable<void> {

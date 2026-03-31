@@ -65,6 +65,9 @@ export class OnboardingService {
       statusPages: this.api
         .get<any>('/status-pages', { limit: 1 })
         .pipe(catchError(() => of(null))),
+      invitations: this.api
+        .get<any>('/invitations', { limit: 1 })
+        .pipe(catchError(() => of(null))),
     }).subscribe({
       next: (data) => {
         const monitorCount = data.summary?.monitors?.total ?? 0;
@@ -111,7 +114,7 @@ export class OnboardingService {
             title: 'Invite Your Team',
             description: 'Add team members to collaborate on monitoring and incident management.',
             icon: 'people-outline',
-            completed: userCount > 1,
+            completed: userCount > 1 || (data.invitations?.invitations?.length ?? data.invitations?.items?.length ?? 0) > 0,
             route: '/invitations',
           },
         ];

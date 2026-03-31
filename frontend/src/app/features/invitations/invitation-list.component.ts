@@ -1,7 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ViewWillEnter } from '@ionic/angular';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonBackButton, IonButton,
@@ -76,6 +76,14 @@ addIcons({ mailOutline });
         </ion-button>
       </div>
 
+      @if (fromOnboarding) {
+        <div style="padding: 8px 16px 0">
+          <ion-button expand="block" fill="outline" color="primary" routerLink="/onboarding">
+            Back to Setup Wizard
+          </ion-button>
+        </div>
+      }
+
       <!-- Pending invitations -->
       @if (loading()) {
         <app-list-skeleton></app-list-skeleton>
@@ -86,7 +94,10 @@ addIcons({ mailOutline });
             <ion-item>
               <ion-label>
                 <h2>{{ item.email }}</h2>
-                <p>Invited by {{ item.invited_by }} | Expires {{ item.expires_at | date:'shortDate' }}</p>
+                <p>
+                  Role: {{ item.role | titlecase }}
+                  @if (item.expires_at) { | Expires {{ item.expires_at | date:'shortDate' }} }
+                </p>
               </ion-label>
               <ion-badge slot="end" [color]="getStatusColor(item.status)">{{ item.status }}</ion-badge>
             </ion-item>
@@ -123,14 +134,19 @@ export class InvitationListComponent implements OnInit, ViewWillEnter {
   newRole = 'member';
   sending = signal(false);
 
+  fromOnboarding = false;
+
   constructor(
     private service: UserService,
     private alertCtrl: AlertController,
     private toastCtrl: ToastController,
     private router: Router,
+    private route: ActivatedRoute,
   ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.fromOnboarding = this.route.snapshot.queryParamMap.get('from') === 'onboarding';
+  }
 
   ionViewWillEnter(): void { this.load(); }
 
@@ -180,9 +196,13 @@ export class InvitationListComponent implements OnInit, ViewWillEnter {
       next: async (inv) => {
         this.sending.set(false);
         this.newEmail = '';
-        this.items.update((list) => [inv, ...list]);
+        this.allItems.update((list) => [inv, ...list]);
+        this.applyFilter();
         const toast = await this.toastCtrl.create({ message: 'Invitation sent', color: 'success', duration: 2000, position: 'bottom' });
         await toast.present();
+        if (this.fromOnboarding) {
+          this.router.navigate(['/onboarding']);
+        }
       },
       error: async (err: any) => {
         this.sending.set(false);
