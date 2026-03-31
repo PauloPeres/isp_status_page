@@ -2,6 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { ViewWillEnter } from '@ionic/angular';
 import {
   IonHeader,
   IonToolbar,
@@ -423,7 +424,7 @@ addIcons({
     `,
   ],
 })
-export class IncidentDetailComponent implements OnInit {
+export class IncidentDetailComponent implements OnInit, ViewWillEnter {
   incident = signal<Incident | null>(null);
   loading = signal(true);
 
@@ -444,6 +445,10 @@ export class IncidentDetailComponent implements OnInit {
     this.loadData();
   }
 
+  ionViewWillEnter(): void {
+    this.loadData();
+  }
+
   loadData(): void {
     this.loading.set(true);
     this.incidentService.getIncident(this.incidentId).subscribe({
@@ -454,8 +459,14 @@ export class IncidentDetailComponent implements OnInit {
         }
         this.loading.set(false);
       },
-      error: () => {
+      error: async () => {
         this.loading.set(false);
+        const toast = await this.toastCtrl.create({
+          message: 'Failed to load incident details',
+          duration: 4000,
+          color: 'danger',
+        });
+        await toast.present();
       },
     });
   }
@@ -466,8 +477,14 @@ export class IncidentDetailComponent implements OnInit {
         this.incident.set(data);
         event.target.complete();
       },
-      error: () => {
+      error: async () => {
         event.target.complete();
+        const toast = await this.toastCtrl.create({
+          message: 'Failed to refresh incident details',
+          duration: 4000,
+          color: 'danger',
+        });
+        await toast.present();
       },
     });
   }

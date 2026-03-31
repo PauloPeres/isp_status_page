@@ -277,19 +277,24 @@ export class IncidentListComponent implements OnInit, ViewWillEnter {
     this.loadIncidents();
   }
 
-  loadIncidents(append = false): void {
+  private buildParams(pageOverride?: number): Record<string, any> {
     const params: Record<string, any> = {
-      page: this.page,
+      page: pageOverride ?? this.page,
       limit: 25,
     };
     if (this.searchQuery) {
       params['search'] = this.searchQuery;
     }
     if (this.statusFilter === 'active') {
-      params['status'] = 'investigating,identified,monitoring';
+      params['status'] = 'active';
     } else if (this.statusFilter === 'resolved') {
       params['status'] = 'resolved';
     }
+    return params;
+  }
+
+  loadIncidents(append = false): void {
+    const params = this.buildParams();
 
     this.incidentService.getIncidents(params).subscribe({
       next: (data) => {
@@ -301,8 +306,14 @@ export class IncidentListComponent implements OnInit, ViewWillEnter {
         this.hasMore = this.page < data.pagination.pages;
         this.loading.set(false);
       },
-      error: () => {
+      error: async () => {
         this.loading.set(false);
+        const toast = await this.toastCtrl.create({
+          message: 'Failed to load incidents',
+          duration: 4000,
+          color: 'danger',
+        });
+        await toast.present();
       },
     });
   }
@@ -322,15 +333,7 @@ export class IncidentListComponent implements OnInit, ViewWillEnter {
   onRefresh(event: any): void {
     this.page = 1;
     this.hasMore = true;
-    const params: Record<string, any> = { page: 1, limit: 25 };
-    if (this.searchQuery) {
-      params['search'] = this.searchQuery;
-    }
-    if (this.statusFilter === 'active') {
-      params['status'] = 'investigating,identified,monitoring';
-    } else if (this.statusFilter === 'resolved') {
-      params['status'] = 'resolved';
-    }
+    const params = this.buildParams(1);
 
     this.incidentService.getIncidents(params).subscribe({
       next: (data) => {
@@ -338,8 +341,14 @@ export class IncidentListComponent implements OnInit, ViewWillEnter {
         this.hasMore = this.page < data.pagination.pages;
         event.target.complete();
       },
-      error: () => {
+      error: async () => {
         event.target.complete();
+        const toast = await this.toastCtrl.create({
+          message: 'Failed to refresh incidents',
+          duration: 4000,
+          color: 'danger',
+        });
+        await toast.present();
       },
     });
   }
@@ -350,15 +359,7 @@ export class IncidentListComponent implements OnInit, ViewWillEnter {
       return;
     }
     this.page++;
-    const params: Record<string, any> = { page: this.page, limit: 25 };
-    if (this.searchQuery) {
-      params['search'] = this.searchQuery;
-    }
-    if (this.statusFilter === 'active') {
-      params['status'] = 'investigating,identified,monitoring';
-    } else if (this.statusFilter === 'resolved') {
-      params['status'] = 'resolved';
-    }
+    const params = this.buildParams();
 
     this.incidentService.getIncidents(params).subscribe({
       next: (data) => {
@@ -369,8 +370,14 @@ export class IncidentListComponent implements OnInit, ViewWillEnter {
           event.target.disabled = true;
         }
       },
-      error: () => {
+      error: async () => {
         event.target.complete();
+        const toast = await this.toastCtrl.create({
+          message: 'Failed to load more incidents',
+          duration: 4000,
+          color: 'danger',
+        });
+        await toast.present();
       },
     });
   }

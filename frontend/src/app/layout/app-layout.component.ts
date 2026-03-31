@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import {
   IonApp,
   IonSplitPane,
@@ -13,12 +13,14 @@ import {
   IonItemDivider,
   IonIcon,
   IonLabel,
+  IonBadge,
   IonMenuToggle,
   IonButtons,
   IonButton,
 } from '@ionic/angular/standalone';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../core/services/auth.service';
+import { ApiService } from '../core/services/api.service';
 import { ThemeService } from '../core/services/theme.service';
 import { addIcons } from 'ionicons';
 import {
@@ -110,6 +112,7 @@ addIcons({
     IonItemDivider,
     IonIcon,
     IonLabel,
+    IonBadge,
     IonMenuToggle,
     IonButtons,
     IonButton,
@@ -169,6 +172,9 @@ addIcons({
                 <ion-item routerLink="/incidents" routerLinkActive="selected">
                   <ion-icon name="alert-circle-outline" slot="start"></ion-icon>
                   <ion-label>Incidents</ion-label>
+                  @if (activeIncidentCount() > 0) {
+                    <ion-badge color="danger" slot="end">{{ activeIncidentCount() }}</ion-badge>
+                  }
                 </ion-item>
               </ion-menu-toggle>
 
@@ -388,9 +394,28 @@ addIcons({
     `,
   ],
 })
-export class AppLayoutComponent {
+export class AppLayoutComponent implements OnInit {
+  activeIncidentCount = signal(0);
+
   constructor(
     public auth: AuthService,
     public theme: ThemeService,
+    private api: ApiService,
   ) {}
+
+  ngOnInit(): void {
+    this.loadIncidentCount();
+    // Refresh every 60 seconds
+    setInterval(() => this.loadIncidentCount(), 60000);
+  }
+
+  private loadIncidentCount(): void {
+    if (!this.auth.isAuthenticated()) return;
+    this.api.get<any>('/dashboard/summary').subscribe({
+      next: (data) => {
+        this.activeIncidentCount.set(data?.active_incidents?.total ?? 0);
+      },
+      error: () => {},
+    });
+  }
 }
