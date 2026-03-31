@@ -1,6 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ViewWillEnter } from '@ionic/angular';
 import {
   IonHeader,
   IonToolbar,
@@ -151,6 +152,13 @@ interface Check {
             ></ion-skeleton-text>
           </ion-card-content>
         </ion-card>
+      } @else if (error()) {
+        <ion-card>
+          <ion-card-content class="error-state">
+            <p>Failed to load monitor details.</p>
+            <ion-button fill="outline" (click)="loadData()">Retry</ion-button>
+          </ion-card-content>
+        </ion-card>
       } @else if (detail()) {
         <!-- Status + Info Card -->
         <ion-card>
@@ -227,7 +235,11 @@ interface Check {
             <ion-col size="4">
               <ion-card class="stat-card">
                 <ion-card-content>
-                  <div class="stat-value success">
+                  <div class="stat-value"
+                    [class.success]="detail()!.uptime_24h >= 99"
+                    [class.warning-text]="detail()!.uptime_24h >= 95 && detail()!.uptime_24h < 99"
+                    [class.danger-text]="detail()!.uptime_24h < 95"
+                  >
                     {{ detail()!.uptime_24h | number: '1.1-2' }}%
                   </div>
                   <div class="stat-label">Uptime (24h)</div>
@@ -447,6 +459,17 @@ interface Check {
       .stat-value.success {
         color: var(--ion-color-success);
       }
+      .warning-text {
+        color: var(--ion-color-warning);
+      }
+      .danger-text {
+        color: var(--ion-color-danger);
+      }
+      .error-state {
+        text-align: center;
+        padding: 2rem 1rem;
+        color: var(--ion-color-medium);
+      }
       .stat-label {
         font-size: 0.75rem;
         color: var(--ion-color-medium);
@@ -494,10 +517,11 @@ interface Check {
     `,
   ],
 })
-export class MonitorDetailComponent implements OnInit {
+export class MonitorDetailComponent implements OnInit, ViewWillEnter {
   detail = signal<MonitorDetailData | null>(null);
   checks = signal<Check[]>([]);
   loading = signal(true);
+  error = signal(false);
 
   private monitorId = 0;
   private checksPage = 1;
@@ -512,11 +536,15 @@ export class MonitorDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.monitorId = Number(this.route.snapshot.paramMap.get('id'));
+  }
+
+  ionViewWillEnter(): void {
     this.loadData();
   }
 
   loadData(): void {
     this.loading.set(true);
+    this.error.set(false);
     this.checksPage = 1;
 
     forkJoin({
@@ -533,6 +561,7 @@ export class MonitorDetailComponent implements OnInit {
         this.loading.set(false);
       },
       error: () => {
+        this.error.set(true);
         this.loading.set(false);
       },
     });

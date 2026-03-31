@@ -1,7 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonBackButton, IonButton,
   IonList, IonItem, IonLabel, IonSelect, IonSelectOption, IonTextarea, IonNote,
@@ -29,7 +29,7 @@ interface ImportResult {
   selector: 'app-monitor-import',
   standalone: true,
   imports: [
-    CommonModule, FormsModule,
+    CommonModule, FormsModule, RouterLink,
     IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonBackButton, IonButton,
     IonList, IonItem, IonLabel, IonSelect, IonSelectOption, IonTextarea, IonNote,
     IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonIcon, IonSpinner, IonBadge,

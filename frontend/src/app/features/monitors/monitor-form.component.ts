@@ -635,7 +635,7 @@ export class MonitorFormComponent implements OnInit {
       case 'http':
         if (config.url) filtered.url = config.url;
         if (config.method) filtered.method = config.method;
-        if (config.expected_status_code)
+        if (config.expected_status_code != null)
           filtered.expected_status_code = config.expected_status_code;
         if (config.expected_content)
           filtered.expected_content = config.expected_content;
@@ -645,22 +645,22 @@ export class MonitorFormComponent implements OnInit {
 
       case 'ping':
         if (config.host) filtered.host = config.host;
-        if (config.packet_count) filtered.packet_count = config.packet_count;
+        if (config.packet_count != null) filtered.packet_count = config.packet_count;
         if (config.max_packet_loss != null)
           filtered.max_packet_loss = config.max_packet_loss;
-        if (config.max_latency) filtered.max_latency = config.max_latency;
+        if (config.max_latency != null) filtered.max_latency = config.max_latency;
         break;
 
       case 'port':
         if (config.host) filtered.host = config.host;
-        if (config.port) filtered.port = config.port;
+        if (config.port != null) filtered.port = config.port;
         if (config.protocol) filtered.protocol = config.protocol;
         break;
 
       case 'api':
         if (config.url) filtered.url = config.url;
         if (config.method) filtered.method = config.method;
-        if (config.expected_status_code)
+        if (config.expected_status_code != null)
           filtered.expected_status_code = config.expected_status_code;
         if (config.json_path) filtered.json_path = config.json_path;
         if (config.expected_value)

@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -201,7 +201,7 @@ addIcons({ pulseOutline });
     `,
   ],
 })
-export class MonitorListComponent implements OnInit, ViewWillEnter {
+export class MonitorListComponent implements ViewWillEnter {
   monitors = signal<Monitor[]>([]);
   loading = signal(true);
   searchQuery = '';
@@ -212,10 +212,6 @@ export class MonitorListComponent implements OnInit, ViewWillEnter {
     private monitorService: MonitorService,
     private alertCtrl: AlertController,
   ) {}
-
-  ngOnInit(): void {
-    this.loadMonitors();
-  }
 
   ionViewWillEnter(): void {
     this.loadMonitors();
@@ -228,14 +224,19 @@ export class MonitorListComponent implements OnInit, ViewWillEnter {
         limit: 25,
         search: this.searchQuery || undefined,
       })
-      .subscribe((data) => {
-        if (append) {
-          this.monitors.update((current) => [...current, ...data.items]);
-        } else {
-          this.monitors.set(data.items);
-        }
-        this.hasMore = this.page < data.pagination.pages;
-        this.loading.set(false);
+      .subscribe({
+        next: (data) => {
+          if (append) {
+            this.monitors.update((current) => [...current, ...data.items]);
+          } else {
+            this.monitors.set(data.items);
+          }
+          this.hasMore = this.page < data.pagination.pages;
+          this.loading.set(false);
+        },
+        error: () => {
+          this.loading.set(false);
+        },
       });
   }
 
