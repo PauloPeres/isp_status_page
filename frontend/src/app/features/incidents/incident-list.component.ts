@@ -1,6 +1,6 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ViewWillEnter } from '@ionic/angular';
 import {
@@ -264,11 +264,16 @@ export class IncidentListComponent implements OnInit, ViewWillEnter {
   constructor(
     private incidentService: IncidentService,
     private toastCtrl: ToastController,
+    private route: ActivatedRoute,
   ) {}
 
   ngOnInit(): void {}
 
   ionViewWillEnter(): void {
+    const status = this.route.snapshot.queryParamMap.get('status');
+    if (status) {
+      this.statusFilter = status;
+    }
     this.loadIncidents();
   }
 

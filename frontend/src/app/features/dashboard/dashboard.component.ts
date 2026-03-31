@@ -196,7 +196,7 @@ addIcons({
       <ion-grid>
         <ion-row>
           <ion-col size="12" sizeMd="6">
-            <ion-card routerLink="/incidents" style="cursor: pointer">
+            <ion-card routerLink="/incidents" [queryParams]="{status: 'active'}" style="cursor: pointer">
               <ion-card-header>
                 <ion-card-title>Active Incidents</ion-card-title>
               </ion-card-header>
