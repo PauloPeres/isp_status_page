@@ -603,7 +603,8 @@ export class MonitorFormComponent implements OnInit {
         next: () => {
           this.saving.set(false);
           this.showToast('Monitor created successfully', 'success');
-          this.router.navigate(['/monitors']);
+          const from = this.route.snapshot.queryParamMap.get('from');
+          this.router.navigate([from === 'onboarding' ? '/onboarding' : '/monitors']);
         },
         error: (err: any) => {
           this.saving.set(false);
@@ -660,7 +661,8 @@ export class MonitorFormComponent implements OnInit {
             : 'Monitor created successfully',
           'success',
         );
-        this.router.navigate(['/monitors']);
+        const from = this.route.snapshot.queryParamMap.get('from');
+        this.router.navigate([from === 'onboarding' ? '/onboarding' : '/monitors']);
       },
       error: (err: any) => {
         this.saving.set(false);

@@ -411,7 +411,8 @@ export class ChannelFormComponent implements OnInit {
           color: 'success', duration: 2000, position: 'bottom',
         });
         await toast.present();
-        this.router.navigate(['/channels']);
+        const from = this.route.snapshot.queryParamMap.get('from');
+        this.router.navigate([from === 'onboarding' ? '/onboarding' : '/channels']);
       },
       error: async (err: any) => {
         this.saving.set(false);

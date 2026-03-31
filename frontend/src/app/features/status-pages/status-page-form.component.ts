@@ -126,7 +126,8 @@ export class StatusPageFormComponent implements OnInit {
           color: 'success', duration: 2000, position: 'bottom',
         });
         await toast.present();
-        this.router.navigate(['/status-pages']);
+        const from = this.route.snapshot.queryParamMap.get('from');
+        this.router.navigate([from === 'onboarding' ? '/onboarding' : '/status-pages']);
       },
       error: async (err: any) => {
         this.saving = false;

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { ViewWillEnter } from '@ionic/angular';
 import {
   IonHeader,
   IonToolbar,
@@ -275,7 +276,7 @@ addIcons({
     `,
   ],
 })
-export class OnboardingComponent implements OnInit {
+export class OnboardingComponent implements OnInit, ViewWillEnter {
   constructor(
     public onboardingService: OnboardingService,
     private router: Router,
@@ -285,9 +286,13 @@ export class OnboardingComponent implements OnInit {
     this.onboardingService.loadProgress();
   }
 
+  ionViewWillEnter(): void {
+    this.onboardingService.loadProgress();
+  }
+
   goToStep(step: OnboardingStep): void {
     if (!step.completed) {
-      this.router.navigate([step.route]);
+      this.router.navigate([step.route], { queryParams: { from: 'onboarding' } });
     }
   }
 

@@ -276,7 +276,8 @@ export class NotificationPolicyFormComponent implements OnInit {
           color: 'success', duration: 2000, position: 'bottom',
         });
         await toast.present();
-        this.router.navigate(['/notifications']);
+        const from = this.route.snapshot.queryParamMap.get('from');
+        this.router.navigate([from === 'onboarding' ? '/onboarding' : '/notifications']);
       },
       error: async (err: any) => {
         this.saving.set(false);
