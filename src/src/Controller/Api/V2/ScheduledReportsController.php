@@ -89,6 +89,14 @@ class ScheduledReportsController extends AppController
         $report = $table->newEntity($data);
         $report->set('organization_id', $this->currentOrgId);
 
+        // Calculate next_send_at based on frequency
+        try {
+            $service = new \App\Service\ScheduledReportService();
+            $report->set('next_send_at', $service->calculateNextSendAt($data['frequency'] ?? 'weekly'));
+        } catch (\Exception $e) {
+            // Non-critical
+        }
+
         if (!$table->save($report)) {
             $this->error('Validation failed', 422, $report->getErrors());
 
@@ -254,7 +262,7 @@ class ScheduledReportsController extends AppController
 
         try {
             $service = new \App\Service\ScheduledReportService();
-            $service->sendNow($report);
+            $service->sendReport($report);
 
             $this->success(['message' => 'Report sent successfully']);
         } catch (\Exception $e) {

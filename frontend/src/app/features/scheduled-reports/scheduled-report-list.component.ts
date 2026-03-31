@@ -68,13 +68,13 @@ addIcons({ calendarOutline, sendOutline });
                   <span>{{ item.report_type }}</span>
                 </p>
                 <p style="font-size: 0.75rem; color: var(--ion-color-medium)">
-                  Next: {{ item.next_send_at | date:'medium' }}
+                  Next: {{ item.next_send_at ? (item.next_send_at | date:'medium') : 'Not scheduled' }}
                   @if (item.last_sent_at) {
                     &middot; Last: {{ item.last_sent_at | date:'medium' }}
                   }
                 </p>
               </ion-label>
-              <ion-button slot="end" fill="clear" size="small" (click)="onSendNow(item)" [disabled]="sending() === item.id">
+              <ion-button slot="end" fill="clear" size="small" (click)="onSendNow(item); $event.stopPropagation(); $event.preventDefault()" [disabled]="sending() === item.id">
                 @if (sending() === item.id) {
                   <ion-spinner name="crescent" style="width: 16px; height: 16px"></ion-spinner>
                 } @else {
