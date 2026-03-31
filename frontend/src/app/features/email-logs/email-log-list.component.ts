@@ -1,6 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ViewWillEnter } from '@ionic/angular';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons,
   IonList, IonItem, IonLabel, IonBadge, IonNote, IonIcon,
@@ -80,7 +81,7 @@ addIcons({ mailOutline });
     .empty-state h3 { margin: 1rem 0 0.5rem; color: var(--ion-text-color); }
   `],
 })
-export class EmailLogListComponent implements OnInit {
+export class EmailLogListComponent implements OnInit, ViewWillEnter {
   items = signal<EmailLog[]>([]);
   allItems = signal<EmailLog[]>([]);
   loading = signal(true);
@@ -89,6 +90,8 @@ export class EmailLogListComponent implements OnInit {
   constructor(private service: EmailLogService) {}
 
   ngOnInit(): void { this.load(); }
+
+  ionViewWillEnter(): void { this.load(); }
 
   load(): void {
     this.service.getAll().subscribe({

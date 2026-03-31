@@ -2,6 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { ViewWillEnter } from '@ionic/angular';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonButton,
   IonList, IonItem, IonItemSliding, IonItemOptions, IonItemOption,
@@ -57,7 +58,7 @@ addIcons({ constructOutline });
       <ion-list>
         @for (item of items(); track item.id) {
           <ion-item-sliding>
-            <ion-item>
+            <ion-item [routerLink]="['/maintenance', item.id, 'edit']" detail>
               <ion-label>
                 <h2>{{ item.title }}</h2>
                 <p>{{ item.starts_at | date:'short' }} - {{ item.ends_at | date:'short' }}</p>
@@ -71,6 +72,7 @@ addIcons({ constructOutline });
             </ion-item>
 
             <ion-item-options side="end">
+              <ion-item-option color="primary" [routerLink]="['/maintenance', item.id, 'edit']">Edit</ion-item-option>
               <ion-item-option color="danger" (click)="onDelete(item)">Delete</ion-item-option>
             </ion-item-options>
           </ion-item-sliding>
@@ -90,7 +92,7 @@ addIcons({ constructOutline });
     .empty-state h3 { margin: 1rem 0 0.5rem; color: var(--ion-text-color); }
   `],
 })
-export class MaintenanceListComponent implements OnInit {
+export class MaintenanceListComponent implements OnInit, ViewWillEnter {
   items = signal<MaintenanceWindow[]>([]);
   allItems = signal<MaintenanceWindow[]>([]);
   loading = signal(true);
@@ -99,6 +101,8 @@ export class MaintenanceListComponent implements OnInit {
   constructor(private service: MaintenanceService, private alertCtrl: AlertController) {}
 
   ngOnInit(): void { this.load(); }
+
+  ionViewWillEnter(): void { this.load(); }
 
   load(): void {
     this.service.getAll().subscribe((data) => {

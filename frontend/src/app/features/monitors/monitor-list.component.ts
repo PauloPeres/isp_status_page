@@ -2,6 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { ViewWillEnter } from '@ionic/angular';
 import {
   IonHeader,
   IonToolbar,
@@ -200,7 +201,7 @@ addIcons({ pulseOutline });
     `,
   ],
 })
-export class MonitorListComponent implements OnInit {
+export class MonitorListComponent implements OnInit, ViewWillEnter {
   monitors = signal<Monitor[]>([]);
   loading = signal(true);
   searchQuery = '';
@@ -213,6 +214,10 @@ export class MonitorListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.loadMonitors();
+  }
+
+  ionViewWillEnter(): void {
     this.loadMonitors();
   }
 

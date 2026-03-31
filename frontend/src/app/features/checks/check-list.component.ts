@@ -1,6 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ViewWillEnter } from '@ionic/angular';
 import {
   IonHeader,
   IonToolbar,
@@ -200,7 +201,7 @@ addIcons({ pulseOutline });
     `,
   ],
 })
-export class CheckListComponent implements OnInit {
+export class CheckListComponent implements OnInit, ViewWillEnter {
   checks = signal<CheckWithMonitor[]>([]);
   allChecks = signal<CheckWithMonitor[]>([]);
   monitors = signal<Monitor[]>([]);
@@ -216,6 +217,11 @@ export class CheckListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.loadMonitors();
+    this.loadChecks();
+  }
+
+  ionViewWillEnter(): void {
     this.loadMonitors();
     this.loadChecks();
   }

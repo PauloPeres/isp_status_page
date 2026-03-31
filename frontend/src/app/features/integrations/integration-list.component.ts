@@ -2,6 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { ViewWillEnter } from '@ionic/angular';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonButton,
   IonList, IonItem, IonItemSliding, IonItemOptions, IonItemOption,
@@ -57,7 +58,7 @@ addIcons({ extensionPuzzleOutline });
       <ion-list>
         @for (item of items(); track item.id) {
           <ion-item-sliding>
-            <ion-item>
+            <ion-item [routerLink]="['/integrations', item.id, 'edit']" detail>
               <ion-label>
                 <h2>{{ item.name }}</h2>
                 <p>
@@ -81,6 +82,7 @@ addIcons({ extensionPuzzleOutline });
             </ion-item>
 
             <ion-item-options side="end">
+              <ion-item-option color="primary" [routerLink]="['/integrations', item.id, 'edit']">Edit</ion-item-option>
               <ion-item-option color="danger" (click)="onDelete(item)">Delete</ion-item-option>
             </ion-item-options>
           </ion-item-sliding>
@@ -100,7 +102,7 @@ addIcons({ extensionPuzzleOutline });
     .empty-state h3 { margin: 1rem 0 0.5rem; color: var(--ion-text-color); }
   `],
 })
-export class IntegrationListComponent implements OnInit {
+export class IntegrationListComponent implements OnInit, ViewWillEnter {
   items = signal<Integration[]>([]);
   allItems = signal<Integration[]>([]);
   loading = signal(true);
@@ -114,6 +116,8 @@ export class IntegrationListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void { this.load(); }
+
+  ionViewWillEnter(): void { this.load(); }
 
   load(): void {
     this.service.getAll().subscribe((data) => {

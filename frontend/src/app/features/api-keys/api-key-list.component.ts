@@ -2,6 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ViewWillEnter } from '@ionic/angular';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonButton,
   IonList, IonItem, IonItemSliding, IonItemOptions, IonItemOption,
@@ -115,7 +116,7 @@ addIcons({ keyOutline, copyOutline });
     .empty-state h3 { margin: 1rem 0 0.5rem; color: var(--ion-text-color); }
   `],
 })
-export class ApiKeyListComponent implements OnInit {
+export class ApiKeyListComponent implements OnInit, ViewWillEnter {
   items = signal<ApiKey[]>([]);
   allItems = signal<ApiKey[]>([]);
   loading = signal(true);
@@ -130,6 +131,8 @@ export class ApiKeyListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void { this.load(); }
+
+  ionViewWillEnter(): void { this.load(); }
 
   load(): void {
     this.service.getAll().subscribe((data) => {

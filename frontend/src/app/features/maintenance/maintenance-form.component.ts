@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonBackButton, IonButton,
   IonList, IonItem, IonInput, IonTextarea, IonToggle, IonSelect, IonSelectOption,
@@ -26,10 +26,15 @@ import { showApiError } from '../../core/services/plan-error.helper';
         <ion-buttons slot="start">
           <ion-back-button defaultHref="/maintenance"></ion-back-button>
         </ion-buttons>
-        <ion-title>New Maintenance Window</ion-title>
+        <ion-title>{{ isEdit ? 'Edit' : 'New' }} Maintenance Window</ion-title>
       </ion-toolbar>
     </ion-header>
     <ion-content class="ion-padding">
+      @if (loadingData) {
+        <div style="text-align: center; padding: 2rem">
+          <ion-spinner name="crescent"></ion-spinner>
+        </div>
+      } @else {
       <ion-list>
         <ion-item>
           <ion-input label="Title" labelPlacement="stacked" [(ngModel)]="form.title" name="title" required
@@ -101,15 +106,16 @@ import { showApiError } from '../../core/services/plan-error.helper';
 
       <ion-button expand="block" (click)="onSave()" [disabled]="saving" style="margin-top: 16px">
         @if (saving) { <ion-spinner name="crescent"></ion-spinner> }
-        @else { Create Maintenance Window }
+        @else { {{ isEdit ? 'Update' : 'Create' }} Maintenance Window }
       </ion-button>
+      }
     </ion-content>
   `,
   styles: [`
     .field-error { display: block; padding: 4px 16px; font-size: 0.75rem; }
   `],
 })
-export class MaintenanceFormComponent {
+export class MaintenanceFormComponent implements OnInit {
   form: any = {
     title: '',
     description: '',
@@ -123,12 +129,53 @@ export class MaintenanceFormComponent {
   };
   saving = false;
   submitted = false;
+  isEdit = false;
+  editId: number | null = null;
+  loadingData = false;
 
   constructor(
     private service: MaintenanceService,
     private router: Router,
+    private route: ActivatedRoute,
     private toastCtrl: ToastController,
   ) {}
+
+  ngOnInit(): void {
+    const idParam = this.route.snapshot.paramMap.get('id');
+    if (idParam) {
+      this.isEdit = true;
+      this.editId = +idParam;
+      this.loadingData = true;
+      this.service.get(this.editId).subscribe({
+        next: (item) => {
+          this.form = {
+            title: item.title || '',
+            description: item.description || '',
+            starts_at: this.toDatetimeLocal(item.starts_at),
+            ends_at: this.toDatetimeLocal(item.ends_at),
+            auto_suppress_alerts: item.auto_suppress_alerts ?? true,
+            notify_subscribers: item.notify_subscribers ?? false,
+            is_recurring: item.is_recurring ?? false,
+            recurrence_pattern: item.recurrence_pattern || 'weekly',
+            recurrence_end_date: item.recurrence_end_date || '',
+          };
+          this.loadingData = false;
+        },
+        error: () => {
+          this.loadingData = false;
+          this.router.navigate(['/maintenance']);
+        },
+      });
+    }
+  }
+
+  private toDatetimeLocal(dateStr: string): string {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return dateStr;
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
 
   onSave(): void {
     this.submitted = true;
@@ -143,8 +190,11 @@ export class MaintenanceFormComponent {
       ends_at: this.form.ends_at,
       auto_suppress_alerts: this.form.auto_suppress_alerts,
       notify_subscribers: this.form.notify_subscribers,
-      status: 'scheduled',
     };
+
+    if (!this.isEdit) {
+      payload.status = 'scheduled';
+    }
 
     if (this.form.is_recurring) {
       payload.is_recurring = true;
@@ -154,16 +204,23 @@ export class MaintenanceFormComponent {
       }
     }
 
-    this.service.create(payload).subscribe({
+    const request$ = this.isEdit
+      ? this.service.update(this.editId!, payload)
+      : this.service.create(payload);
+
+    request$.subscribe({
       next: async () => {
         this.saving = false;
-        const toast = await this.toastCtrl.create({ message: 'Maintenance window created', color: 'success', duration: 2000, position: 'bottom' });
+        const toast = await this.toastCtrl.create({
+          message: this.isEdit ? 'Maintenance window updated' : 'Maintenance window created',
+          color: 'success', duration: 2000, position: 'bottom',
+        });
         await toast.present();
         this.router.navigate(['/maintenance']);
       },
       error: async (err: any) => {
         this.saving = false;
-        await showApiError(err, 'Failed to create maintenance window', this.toastCtrl, this.router);
+        await showApiError(err, this.isEdit ? 'Failed to update maintenance window' : 'Failed to create maintenance window', this.toastCtrl, this.router);
       },
     });
   }

@@ -15,6 +15,7 @@ export interface MaintenanceWindow {
   notify_subscribers: boolean;
   is_recurring: boolean;
   recurrence_pattern: string | null;
+  recurrence_end_date: string | null;
   created: string;
   modified: string;
 }

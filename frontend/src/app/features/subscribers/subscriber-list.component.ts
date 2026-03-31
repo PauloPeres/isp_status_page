@@ -1,6 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ViewWillEnter } from '@ionic/angular';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons,
   IonList, IonItem, IonItemSliding, IonItemOptions, IonItemOption,
@@ -88,7 +89,7 @@ addIcons({ peopleOutline });
     .empty-state h3 { margin: 1rem 0 0.5rem; color: var(--ion-text-color); }
   `],
 })
-export class SubscriberListComponent implements OnInit {
+export class SubscriberListComponent implements OnInit, ViewWillEnter {
   items = signal<Subscriber[]>([]);
   allItems = signal<Subscriber[]>([]);
   loading = signal(true);
@@ -97,6 +98,8 @@ export class SubscriberListComponent implements OnInit {
   constructor(private service: SubscriberService, private alertCtrl: AlertController) {}
 
   ngOnInit(): void { this.load(); }
+
+  ionViewWillEnter(): void { this.load(); }
 
   load(): void {
     this.service.getAll().subscribe({

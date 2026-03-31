@@ -2,6 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { ViewWillEnter } from '@ionic/angular';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonButton,
   IonList, IonItem, IonItemSliding, IonItemOptions, IonItemOption,
@@ -57,7 +58,7 @@ addIcons({ ribbonOutline });
       <ion-list>
         @for (item of items(); track item.id) {
           <ion-item-sliding>
-            <ion-item [routerLink]="['/sla', item.id]">
+            <ion-item [routerLink]="['/sla', item.id]" detail>
               <ion-label>
                 <h2>{{ item.name }}</h2>
                 <p>
@@ -79,6 +80,7 @@ addIcons({ ribbonOutline });
             </ion-item>
 
             <ion-item-options side="end">
+              <ion-item-option color="primary" [routerLink]="['/sla', item.id]">Edit</ion-item-option>
               <ion-item-option color="danger" (click)="onDelete(item)">Delete</ion-item-option>
             </ion-item-options>
           </ion-item-sliding>
@@ -99,7 +101,7 @@ addIcons({ ribbonOutline });
     .empty-state h3 { margin: 1rem 0 0.5rem; color: var(--ion-text-color); }
   `],
 })
-export class SlaListComponent implements OnInit {
+export class SlaListComponent implements OnInit, ViewWillEnter {
   items = signal<Sla[]>([]);
   allItems = signal<Sla[]>([]);
   loading = signal(true);
@@ -108,6 +110,8 @@ export class SlaListComponent implements OnInit {
   constructor(private service: SlaService, private alertCtrl: AlertController) {}
 
   ngOnInit(): void { this.load(); }
+
+  ionViewWillEnter(): void { this.load(); }
 
   load(): void {
     this.service.getAll().subscribe((data) => {

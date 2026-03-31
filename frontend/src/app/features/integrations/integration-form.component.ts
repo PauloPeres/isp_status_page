@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonBackButton, IonButton,
   IonList, IonItem, IonInput, IonSelect, IonSelectOption, IonToggle, IonSpinner, IonNote,
@@ -24,10 +24,15 @@ import { showApiError } from '../../core/services/plan-error.helper';
         <ion-buttons slot="start">
           <ion-back-button defaultHref="/integrations"></ion-back-button>
         </ion-buttons>
-        <ion-title>New Integration</ion-title>
+        <ion-title>{{ isEdit ? 'Edit' : 'New' }} Integration</ion-title>
       </ion-toolbar>
     </ion-header>
     <ion-content class="ion-padding">
+      @if (loadingData) {
+        <div style="text-align: center; padding: 2rem">
+          <ion-spinner name="crescent"></ion-spinner>
+        </div>
+      } @else {
       <ion-list>
         <ion-item>
           <ion-input label="Name" labelPlacement="floating" [(ngModel)]="form.name" name="name" required></ion-input>
@@ -60,8 +65,9 @@ import { showApiError } from '../../core/services/plan-error.helper';
       </ion-list>
       <ion-button expand="block" (click)="onSave()" [disabled]="saving">
         @if (saving) { <ion-spinner name="crescent"></ion-spinner> }
-        @else { Save Integration }
+        @else { {{ isEdit ? 'Update' : 'Save' }} Integration }
       </ion-button>
+      }
     </ion-content>
   `,
   styles: [
@@ -74,16 +80,46 @@ import { showApiError } from '../../core/services/plan-error.helper';
     `,
   ],
 })
-export class IntegrationFormComponent {
+export class IntegrationFormComponent implements OnInit {
   form: any = { name: '', type: 'rest_api', base_url: '', username: '', password: '', active: true };
   saving = false;
   submitted = false;
+  isEdit = false;
+  editId: number | null = null;
+  loadingData = false;
 
   constructor(
     private service: IntegrationService,
     private router: Router,
+    private route: ActivatedRoute,
     private toastCtrl: ToastController,
   ) {}
+
+  ngOnInit(): void {
+    const idParam = this.route.snapshot.paramMap.get('id');
+    if (idParam) {
+      this.isEdit = true;
+      this.editId = +idParam;
+      this.loadingData = true;
+      this.service.get(this.editId).subscribe({
+        next: (item: any) => {
+          this.form = {
+            name: item.name || '',
+            type: item.type || 'rest_api',
+            base_url: item.configuration?.base_url || '',
+            username: item.configuration?.username || '',
+            password: item.configuration?.password || '',
+            active: item.active ?? true,
+          };
+          this.loadingData = false;
+        },
+        error: () => {
+          this.loadingData = false;
+          this.router.navigate(['/integrations']);
+        },
+      });
+    }
+  }
 
   onSave(): void {
     this.submitted = true;
@@ -99,16 +135,24 @@ export class IntegrationFormComponent {
         password: this.form.password,
       },
     };
-    this.service.create(payload).subscribe({
+
+    const request$ = this.isEdit
+      ? this.service.update(this.editId!, payload)
+      : this.service.create(payload);
+
+    request$.subscribe({
       next: async () => {
         this.saving = false;
-        const toast = await this.toastCtrl.create({ message: 'Integration created', color: 'success', duration: 2000, position: 'bottom' });
+        const toast = await this.toastCtrl.create({
+          message: this.isEdit ? 'Integration updated' : 'Integration created',
+          color: 'success', duration: 2000, position: 'bottom',
+        });
         await toast.present();
         this.router.navigate(['/integrations']);
       },
       error: async (err: any) => {
         this.saving = false;
-        await showApiError(err, 'Failed to create integration', this.toastCtrl, this.router);
+        await showApiError(err, this.isEdit ? 'Failed to update integration' : 'Failed to create integration', this.toastCtrl, this.router);
       },
     });
   }

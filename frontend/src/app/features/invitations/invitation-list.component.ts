@@ -2,6 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ViewWillEnter } from '@ionic/angular';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonBackButton, IonButton,
   IonList, IonItem, IonItemSliding, IonItemOptions, IonItemOption,
@@ -113,7 +114,7 @@ addIcons({ mailOutline });
     .empty-state h3 { margin: 1rem 0 0.5rem; color: var(--ion-text-color); }
   `],
 })
-export class InvitationListComponent implements OnInit {
+export class InvitationListComponent implements OnInit, ViewWillEnter {
   items = signal<Invitation[]>([]);
   allItems = signal<Invitation[]>([]);
   loading = signal(true);
@@ -130,6 +131,8 @@ export class InvitationListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void { this.load(); }
+
+  ionViewWillEnter(): void { this.load(); }
 
   load(): void {
     this.service.getInvitations().subscribe((data) => {

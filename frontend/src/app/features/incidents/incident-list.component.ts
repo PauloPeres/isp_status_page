@@ -2,6 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { ViewWillEnter } from '@ionic/angular';
 import {
   IonHeader,
   IonToolbar,
@@ -252,7 +253,7 @@ addIcons({ warningOutline, checkmarkCircleOutline });
     `,
   ],
 })
-export class IncidentListComponent implements OnInit {
+export class IncidentListComponent implements OnInit, ViewWillEnter {
   incidents = signal<Incident[]>([]);
   loading = signal(true);
   searchQuery = '';
@@ -266,6 +267,10 @@ export class IncidentListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.loadIncidents();
+  }
+
+  ionViewWillEnter(): void {
     this.loadIncidents();
   }
 
