@@ -529,7 +529,7 @@ export class MonitorFormComponent implements OnInit {
           type: monitor.type,
           check_interval: monitor.check_interval,
           timeout: monitor.timeout,
-          tags: Array.isArray(monitor.tags) ? monitor.tags.join(', ') : '',
+          tags: this.parseTags(monitor.tags),
           active: monitor.active,
         });
 
@@ -646,6 +646,21 @@ export class MonitorFormComponent implements OnInit {
         showApiError(err, this.isEdit() ? 'Failed to update monitor' : 'Failed to create monitor', this.toastCtrl, this.router);
       },
     });
+  }
+
+  private parseTags(tags: any): string {
+    if (!tags) return '';
+    if (Array.isArray(tags)) return tags.join(', ');
+    if (typeof tags === 'string') {
+      try {
+        const parsed = JSON.parse(tags);
+        if (Array.isArray(parsed)) return parsed.join(', ');
+      } catch {
+        // Not JSON, treat as comma-separated string
+      }
+      return tags;
+    }
+    return '';
   }
 
   getTagsList(): string[] {
