@@ -107,6 +107,12 @@ class MonitorsController extends AppController
                 'Incidents' => function ($q) {
                     return $q->orderBy(['created' => 'DESC'])->limit(10);
                 },
+                'NotificationPolicies' => [
+                    'NotificationPolicySteps' => [
+                        'sort' => ['NotificationPolicySteps.step_order' => 'ASC'],
+                        'NotificationChannels',
+                    ],
+                ],
             ]);
         } catch (\Cake\Datasource\Exception\RecordNotFoundException $e) {
             $this->error('Monitor not found', 404);

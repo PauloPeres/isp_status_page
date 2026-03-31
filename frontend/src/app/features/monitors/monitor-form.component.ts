@@ -32,6 +32,7 @@ import {
 import { addIcons } from 'ionicons';
 import { closeCircle } from 'ionicons/icons';
 import { MonitorService } from './monitor.service';
+import { ApiService } from '../../core/services/api.service';
 
 addIcons({ closeCircle });
 import { MonitorType } from '../../core/models/monitor.model';
@@ -394,6 +395,15 @@ import { showApiError } from '../../core/services/plan-error.helper';
               </ion-item>
 
               <ion-item>
+                <ion-select label="Notification Policy" labelPlacement="stacked" formControlName="notification_policy_id" interface="popover" placeholder="None (no notifications)">
+                  <ion-select-option [value]="null">None</ion-select-option>
+                  @for (policy of notificationPolicies(); track policy.id) {
+                    <ion-select-option [value]="policy.id">{{ policy.name }} ({{ policy.trigger_type }})</ion-select-option>
+                  }
+                </ion-select>
+              </ion-item>
+
+              <ion-item>
                 <ion-toggle formControlName="active">Active</ion-toggle>
               </ion-item>
             </ion-list>
@@ -449,6 +459,7 @@ export class MonitorFormComponent implements OnInit {
   loading = signal(false);
   saving = signal(false);
   advancedMode = signal(false);
+  notificationPolicies = signal<any[]>([]);
   quickUrl = '';
 
   monitorTypes: { value: MonitorType; label: string }[] = [
@@ -475,6 +486,7 @@ export class MonitorFormComponent implements OnInit {
     private router: Router,
     private monitorService: MonitorService,
     private toastCtrl: ToastController,
+    private api: ApiService,
   ) {
     this.form = this.fb.group({
       name: ['', Validators.required],
@@ -484,6 +496,7 @@ export class MonitorFormComponent implements OnInit {
       timeout: [30, [Validators.required, Validators.min(1)]],
       tags: [''],
       active: [true],
+      notification_policy_id: [null],
       configuration: this.fb.group({
         // HTTP / API fields
         url: [''],
@@ -508,6 +521,12 @@ export class MonitorFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Load notification policies for the selector
+    this.api.get<any>('/notification-policies').subscribe({
+      next: (data) => this.notificationPolicies.set(data.items || data.notification_policies || []),
+      error: () => this.notificationPolicies.set([]),
+    });
+
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
       this.monitorId = Number(idParam);
@@ -531,6 +550,7 @@ export class MonitorFormComponent implements OnInit {
           timeout: monitor.timeout,
           tags: this.parseTags(monitor.tags),
           active: monitor.active,
+          notification_policy_id: monitor.notification_policy_id ?? null,
         });
 
         // Patch configuration
@@ -620,6 +640,7 @@ export class MonitorFormComponent implements OnInit {
       check_interval: formValue.check_interval,
       timeout: formValue.timeout,
       active: formValue.active,
+      notification_policy_id: formValue.notification_policy_id || null,
       configuration: config,
       tags,
     };

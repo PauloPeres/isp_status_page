@@ -28,6 +28,8 @@ export interface Monitor {
   last_check_at?: string;
   organization_id: number;
   escalation_policy_id?: number;
+  notification_policy_id?: number;
+  notification_policy?: any;
   badge_token?: string;
   created: string;
   modified: string;

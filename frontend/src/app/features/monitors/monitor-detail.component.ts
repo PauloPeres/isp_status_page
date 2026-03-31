@@ -39,9 +39,10 @@ import {
   trashOutline,
   pauseOutline,
   playOutline,
+  arrowForwardOutline,
 } from 'ionicons/icons';
 
-addIcons({ createOutline, trashOutline, pauseOutline, playOutline });
+addIcons({ createOutline, trashOutline, pauseOutline, playOutline, arrowForwardOutline });
 
 interface UptimeHistoryEntry {
   date: string;
@@ -221,6 +222,47 @@ interface Check {
             </div>
           </ion-card-content>
         </ion-card>
+
+        <!-- Who Gets Notified -->
+        @if (detail()?.monitor?.notification_policy) {
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>Who Gets Notified</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <div style="margin-bottom: 8px">
+                <strong>{{ detail()!.monitor.notification_policy.name }}</strong>
+                <ion-badge [color]="getTriggerColor(detail()!.monitor.notification_policy.trigger_type)" style="margin-left: 8px">
+                  {{ detail()!.monitor.notification_policy.trigger_type }}
+                </ion-badge>
+              </div>
+              @if (detail()!.monitor.notification_policy.notification_policy_steps) {
+                @for (step of detail()!.monitor.notification_policy.notification_policy_steps; track step.id) {
+                  <div style="display: flex; align-items: center; gap: 8px; padding: 4px 0; font-size: 0.85rem">
+                    <ion-badge color="medium" style="min-width: 24px; text-align: center">{{ step.step_order }}</ion-badge>
+                    <span>{{ step.delay_minutes === 0 ? 'Immediately' : 'After ' + step.delay_minutes + ' min' }}</span>
+                    <ion-icon name="arrow-forward-outline" style="font-size: 0.8rem"></ion-icon>
+                    <span>{{ step.notification_channel?.name ?? 'Channel #' + step.notification_channel_id }}</span>
+                  </div>
+                }
+              }
+              @if (detail()!.monitor.notification_policy.repeat_interval_minutes > 0) {
+                <p style="font-size: 0.75rem; color: var(--ion-color-medium); margin-top: 8px">
+                  Repeats every {{ detail()!.monitor.notification_policy.repeat_interval_minutes }} min until resolved
+                </p>
+              }
+            </ion-card-content>
+          </ion-card>
+        } @else {
+          <ion-card>
+            <ion-card-content style="text-align: center; color: var(--ion-color-medium); padding: 16px">
+              <p>No notification policy assigned</p>
+              <ion-button fill="outline" size="small" [routerLink]="['/monitors', detail()!.monitor.id, 'edit']">
+                Add Notifications
+              </ion-button>
+            </ion-card-content>
+          </ion-card>
+        }
 
         <!-- Stats Cards -->
         <ion-grid>
@@ -750,6 +792,15 @@ export class MonitorDetailComponent implements OnInit, ViewWillEnter {
         return 'warning';
       default:
         return 'medium';
+    }
+  }
+
+  getTriggerColor(type: string): string {
+    switch (type) {
+      case 'down': return 'danger';
+      case 'up': return 'success';
+      case 'degraded': return 'warning';
+      default: return 'medium';
     }
   }
 }
