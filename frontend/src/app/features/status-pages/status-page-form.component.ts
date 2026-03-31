@@ -159,7 +159,7 @@ export class StatusPageFormComponent implements OnInit {
   getPreviewUrl(): string {
     if (!this.form.slug) return '';
     if (this.form.custom_domain) return 'https://' + this.form.custom_domain;
-    return window.location.origin + '/status/' + this.form.slug;
+    return window.location.origin + '/s/' + this.form.slug;
   }
 
   async copyUrl(): Promise<void> {

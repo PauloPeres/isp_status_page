@@ -162,9 +162,7 @@ export class StatusPageListComponent implements OnInit, ViewWillEnter {
 
   getStatusPageUrl(item: StatusPage): string {
     if (item.custom_domain) return 'https://' + item.custom_domain;
-    // Public status page is served by CakePHP at /status/{slug} (not /app/status/)
-    const origin = window.location.origin;
-    return origin + '/status/' + item.slug;
+    return window.location.origin + '/s/' + item.slug;
   }
 
   async copyLink(item: StatusPage, event: Event): Promise<void> {
