@@ -31,7 +31,9 @@ export class AlertRuleService {
   }
 
   get(id: number): Observable<AlertRule> {
-    return this.api.get<AlertRule>(`/alert-rules/${id}`);
+    return this.api.get<any>(`/alert-rules/${id}`).pipe(
+      map(data => data.alert_rule || data)
+    );
   }
 
   create(data: Partial<AlertRule>): Observable<AlertRule> {

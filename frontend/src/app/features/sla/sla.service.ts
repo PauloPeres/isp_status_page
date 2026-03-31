@@ -34,7 +34,9 @@ export class SlaService {
   }
 
   get(id: number): Observable<Sla> {
-    return this.api.get<Sla>(`/sla/${id}`);
+    return this.api.get<any>(`/sla/${id}`).pipe(
+      map(data => data.sla || data)
+    );
   }
 
   create(data: Partial<Sla>): Observable<Sla> {

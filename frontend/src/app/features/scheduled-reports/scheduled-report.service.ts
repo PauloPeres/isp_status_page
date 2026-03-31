@@ -30,7 +30,9 @@ export class ScheduledReportService {
   }
 
   get(id: number): Observable<ScheduledReport> {
-    return this.api.get<ScheduledReport>(`/scheduled-reports/${id}`);
+    return this.api.get<any>(`/scheduled-reports/${id}`).pipe(
+      map(data => data.scheduled_report || data)
+    );
   }
 
   create(data: Partial<ScheduledReport>): Observable<ScheduledReport> {

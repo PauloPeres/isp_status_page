@@ -29,7 +29,9 @@ export class IntegrationService {
   }
 
   get(id: number): Observable<Integration> {
-    return this.api.get<Integration>(`/integrations/${id}`);
+    return this.api.get<any>(`/integrations/${id}`).pipe(
+      map(data => data.integration || data)
+    );
   }
 
   create(data: Partial<Integration>): Observable<Integration> {

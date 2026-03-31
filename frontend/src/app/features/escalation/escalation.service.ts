@@ -35,7 +35,9 @@ export class EscalationService {
   }
 
   get(id: number): Observable<EscalationPolicy> {
-    return this.api.get<EscalationPolicy>(`/escalation-policies/${id}`);
+    return this.api.get<any>(`/escalation-policies/${id}`).pipe(
+      map(data => data.escalation_policy || data)
+    );
   }
 
   create(data: Partial<EscalationPolicy>): Observable<EscalationPolicy> {

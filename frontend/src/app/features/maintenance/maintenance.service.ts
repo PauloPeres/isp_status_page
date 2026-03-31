@@ -34,7 +34,9 @@ export class MaintenanceService {
   }
 
   get(id: number): Observable<MaintenanceWindow> {
-    return this.api.get<MaintenanceWindow>(`/maintenance-windows/${id}`);
+    return this.api.get<any>(`/maintenance-windows/${id}`).pipe(
+      map(data => data.maintenance_window || data)
+    );
   }
 
   create(data: any): Observable<MaintenanceWindow> {

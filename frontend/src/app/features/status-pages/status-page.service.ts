@@ -30,7 +30,9 @@ export class StatusPageService {
   }
 
   get(id: number): Observable<StatusPage> {
-    return this.api.get<StatusPage>(`/status-pages/${id}`);
+    return this.api.get<any>(`/status-pages/${id}`).pipe(
+      map(data => data.status_page || data)
+    );
   }
 
   create(data: Partial<StatusPage>): Observable<StatusPage> {
