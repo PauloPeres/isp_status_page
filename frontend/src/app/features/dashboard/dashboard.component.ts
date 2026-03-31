@@ -150,7 +150,7 @@ addIcons({
             </ion-card>
           </ion-col>
           <ion-col size="6" sizeMd="3">
-            <ion-card class="summary-card card-success" routerLink="/monitors" style="cursor: pointer">
+            <ion-card class="summary-card card-success" routerLink="/monitors" [queryParams]="{status: 'up'}" style="cursor: pointer">
               <ion-card-content>
                 @if (loading()) {
                   <ion-skeleton-text [animated]="true" style="width: 40%; height: 2rem; margin: 0 auto;"></ion-skeleton-text>
@@ -162,7 +162,7 @@ addIcons({
             </ion-card>
           </ion-col>
           <ion-col size="6" sizeMd="3">
-            <ion-card class="summary-card card-danger" routerLink="/monitors" style="cursor: pointer">
+            <ion-card class="summary-card card-danger" routerLink="/monitors" [queryParams]="{status: 'down'}" style="cursor: pointer">
               <ion-card-content>
                 @if (loading()) {
                   <ion-skeleton-text [animated]="true" style="width: 40%; height: 2rem; margin: 0 auto;"></ion-skeleton-text>
@@ -174,7 +174,7 @@ addIcons({
             </ion-card>
           </ion-col>
           <ion-col size="6" sizeMd="3">
-            <ion-card class="summary-card card-warning" routerLink="/monitors" style="cursor: pointer">
+            <ion-card class="summary-card card-warning" routerLink="/monitors" [queryParams]="{status: 'degraded'}" style="cursor: pointer">
               <ion-card-content>
                 @if (loading()) {
                   <ion-skeleton-text [animated]="true" style="width: 40%; height: 2rem; margin: 0 auto;"></ion-skeleton-text>

@@ -1,6 +1,6 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ViewWillEnter } from '@ionic/angular';
 import {
@@ -226,9 +226,14 @@ export class MonitorListComponent implements ViewWillEnter {
   constructor(
     private monitorService: MonitorService,
     private alertCtrl: AlertController,
+    private route: ActivatedRoute,
   ) {}
 
   ionViewWillEnter(): void {
+    const status = this.route.snapshot.queryParamMap.get('status');
+    if (status) {
+      this.statusFilter = status;
+    }
     this.loadMonitors();
   }
 

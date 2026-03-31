@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ViewWillEnter } from '@ionic/angular';
@@ -27,8 +27,6 @@ import {
   IonRefresher,
   IonRefresherContent,
   IonSkeletonText,
-  IonInfiniteScroll,
-  IonInfiniteScrollContent,
   AlertController,
 } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
@@ -109,8 +107,6 @@ interface Check {
     IonRefresher,
     IonRefresherContent,
     IonSkeletonText,
-    IonInfiniteScroll,
-    IonInfiniteScrollContent,
   ],
   template: `
     <ion-header>
@@ -367,54 +363,71 @@ interface Check {
           </ion-card>
         }
 
-        <!-- Recent Checks -->
+        <!-- Response Time Chart -->
+        @if (recentChecks().length) {
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>Response Times</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <div class="response-chart">
+                @for (check of recentChecks(); track check.id) {
+                  <div class="chart-bar-wrap" [title]="check.checked_at + ': ' + (check.response_time ?? 0) + 'ms'">
+                    <div class="chart-bar"
+                      [style.height.%]="getBarHeight(check.response_time)"
+                      [class.bar-good]="check.response_time !== null && check.response_time < 300"
+                      [class.bar-warn]="check.response_time !== null && check.response_time >= 300 && check.response_time < 1000"
+                      [class.bar-bad]="check.response_time === null || check.response_time >= 1000"
+                    ></div>
+                  </div>
+                }
+              </div>
+
+              <!-- Quick Stats -->
+              <div class="check-stats">
+                <div class="check-stat">
+                  <span class="check-stat-value" [class.success-text]="getSuccessRate() >= 99">{{ getSuccessRate() | number:'1.0-0' }}%</span>
+                  <span class="check-stat-label">Success Rate</span>
+                </div>
+                <div class="check-stat">
+                  <span class="check-stat-value">{{ getAvgResponseTime() | number:'1.0-0' }}ms</span>
+                  <span class="check-stat-label">Avg Response</span>
+                </div>
+                <div class="check-stat">
+                  <span class="check-stat-value">{{ getLastCheckTime() }}</span>
+                  <span class="check-stat-label">Last Check</span>
+                </div>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        }
+
+        <!-- Recent Failures -->
         <ion-card>
           <ion-card-header>
-            <ion-card-title>Recent Checks</ion-card-title>
+            <ion-card-title>Recent Failures</ion-card-title>
           </ion-card-header>
           <ion-card-content class="list-card-content">
             <ion-list>
-              @for (check of checks(); track check.id) {
+              @for (check of getRecentFailures(); track check.id) {
                 <ion-item>
-                  <ion-badge
-                    [color]="
-                      check.status === 'success' ? 'success' : 'danger'
-                    "
-                    slot="start"
-                  >
-                    {{ check.status }}
-                  </ion-badge>
+                  <ion-badge color="danger" slot="start">{{ check.status }}</ion-badge>
                   <ion-label>
-                    <h3>
-                      {{
-                        check.response_time !== null
-                          ? check.response_time + 'ms'
-                          : 'N/A'
-                      }}
-                    </h3>
+                    <h3>{{ check.response_time ? check.response_time + 'ms' : 'Timeout' }}</h3>
                     <p>{{ check.checked_at | date: 'medium' }}</p>
                     @if (check.error_message) {
                       <p class="error-text">{{ check.error_message }}</p>
                     }
                   </ion-label>
-                  @if (check.status_code) {
-                    <ion-note slot="end">{{ check.status_code }}</ion-note>
-                  }
                 </ion-item>
               } @empty {
                 <ion-item>
-                  <ion-label>No checks recorded yet</ion-label>
+                  <ion-label style="text-align: center; color: var(--ion-color-success)">No failures in recent checks</ion-label>
                 </ion-item>
               }
             </ion-list>
           </ion-card-content>
         </ion-card>
-
-        <ion-infinite-scroll (ionInfinite)="loadMoreChecks($event)">
-          <ion-infinite-scroll-content
-            loadingText="Loading checks..."
-          ></ion-infinite-scroll-content>
-        </ion-infinite-scroll>
       }
     </ion-content>
   `,
@@ -511,6 +524,58 @@ interface Check {
       ion-badge {
         text-transform: capitalize;
       }
+
+      .response-chart {
+        display: flex;
+        align-items: flex-end;
+        gap: 2px;
+        height: 80px;
+        padding: 0 4px;
+      }
+      .chart-bar-wrap {
+        flex: 1;
+        height: 100%;
+        display: flex;
+        align-items: flex-end;
+        cursor: pointer;
+      }
+      .chart-bar {
+        width: 100%;
+        border-radius: 2px 2px 0 0;
+        min-height: 4px;
+        transition: height 0.2s;
+      }
+      .bar-good { background: var(--ion-color-success); }
+      .bar-warn { background: var(--ion-color-warning); }
+      .bar-bad { background: var(--ion-color-danger); }
+
+      .check-stats {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 16px;
+        padding-top: 12px;
+        border-top: 1px solid var(--ion-color-light);
+      }
+      .check-stat {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+      }
+      .check-stat-value {
+        font-family: 'DM Sans', sans-serif;
+        font-size: 1.1rem;
+        font-weight: 700;
+      }
+      .check-stat-label {
+        font-size: 0.7rem;
+        color: var(--ion-color-medium);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .success-text {
+        color: var(--ion-color-success);
+      }
     `,
   ],
 })
@@ -521,8 +586,8 @@ export class MonitorDetailComponent implements OnInit, ViewWillEnter {
   error = signal(false);
 
   private monitorId = 0;
-  private checksPage = 1;
-  private checksHasMore = true;
+
+  recentChecks = computed(() => this.checks().slice(0, 20));
 
   constructor(
     private route: ActivatedRoute,
@@ -542,7 +607,6 @@ export class MonitorDetailComponent implements OnInit, ViewWillEnter {
   loadData(): void {
     this.loading.set(true);
     this.error.set(false);
-    this.checksPage = 1;
 
     forkJoin({
       detail: this.monitorService.getMonitor(this.monitorId),
@@ -554,7 +618,6 @@ export class MonitorDetailComponent implements OnInit, ViewWillEnter {
       next: (data) => {
         this.detail.set(data.detail as MonitorDetailData);
         this.checks.set(data.checks.items as Check[]);
-        this.checksHasMore = this.checksPage < data.checks.pagination.pages;
         this.loading.set(false);
       },
       error: () => {
@@ -565,7 +628,6 @@ export class MonitorDetailComponent implements OnInit, ViewWillEnter {
   }
 
   onRefresh(event: any): void {
-    this.checksPage = 1;
     forkJoin({
       detail: this.monitorService.getMonitor(this.monitorId),
       checks: this.monitorService.getChecks(this.monitorId, {
@@ -576,7 +638,6 @@ export class MonitorDetailComponent implements OnInit, ViewWillEnter {
       next: (data) => {
         this.detail.set(data.detail as MonitorDetailData);
         this.checks.set(data.checks.items as Check[]);
-        this.checksHasMore = this.checksPage < data.checks.pagination.pages;
         event.target.complete();
       },
       error: () => {
@@ -585,30 +646,42 @@ export class MonitorDetailComponent implements OnInit, ViewWillEnter {
     });
   }
 
-  loadMoreChecks(event: any): void {
-    if (!this.checksHasMore) {
-      event.target.complete();
-      return;
-    }
-    this.checksPage++;
-    this.monitorService
-      .getChecks(this.monitorId, { page: this.checksPage, limit: 25 })
-      .subscribe({
-        next: (data) => {
-          this.checks.update((current) => [
-            ...current,
-            ...(data.items as Check[]),
-          ]);
-          this.checksHasMore = this.checksPage < data.pagination.pages;
-          event.target.complete();
-          if (!this.checksHasMore) {
-            event.target.disabled = true;
-          }
-        },
-        error: () => {
-          event.target.complete();
-        },
-      });
+  getBarHeight(ms: number | null): number {
+    if (ms === null || ms === 0) return 5;
+    const checks = this.recentChecks();
+    const maxMs = Math.max(...checks.map(c => c.response_time ?? 0), 1);
+    return Math.max(5, (ms / maxMs) * 100);
+  }
+
+  getSuccessRate(): number {
+    const checks = this.checks();
+    if (!checks.length) return 0;
+    const successes = checks.filter(c => c.status === 'success').length;
+    return (successes / checks.length) * 100;
+  }
+
+  getAvgResponseTime(): number {
+    const checks = this.checks().filter(c => c.response_time !== null);
+    if (!checks.length) return 0;
+    const sum = checks.reduce((acc, c) => acc + (c.response_time ?? 0), 0);
+    return sum / checks.length;
+  }
+
+  getLastCheckTime(): string {
+    const checks = this.checks();
+    if (!checks.length) return 'Never';
+    const last = new Date(checks[0].checked_at);
+    const diff = Math.floor((Date.now() - last.getTime()) / 1000);
+    if (diff < 60) return diff + 's ago';
+    if (diff < 3600) return Math.floor(diff / 60) + 'min ago';
+    if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+    return Math.floor(diff / 86400) + 'd ago';
+  }
+
+  getRecentFailures(): Check[] {
+    return this.checks()
+      .filter(c => c.status !== 'success')
+      .slice(0, 10);
   }
 
   onPause(): void {
