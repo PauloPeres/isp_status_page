@@ -85,6 +85,11 @@ class MaintenanceWindowsController extends AppController
             $data['is_recurring'] = false;
         }
 
+        // Cast boolean fields properly (JSON booleans come as true/false, form data may be strings)
+        $data['is_recurring'] = filter_var($data['is_recurring'], FILTER_VALIDATE_BOOLEAN);
+        $data['auto_suppress_alerts'] = filter_var($data['auto_suppress_alerts'] ?? true, FILTER_VALIDATE_BOOLEAN);
+        $data['notify_subscribers'] = filter_var($data['notify_subscribers'] ?? false, FILTER_VALIDATE_BOOLEAN);
+
         $window = $table->newEntity($data);
         $window->set('organization_id', $this->currentOrgId);
         $window->set('created_by', $this->currentUserId);
@@ -106,7 +111,7 @@ class MaintenanceWindowsController extends AppController
      */
     public function edit(string $id): void
     {
-        $this->request->allowMethod(['put']);
+        $this->request->allowMethod(['put', 'patch']);
 
         if (!$this->requireRole(['owner', 'admin'])) {
             return;
@@ -126,7 +131,20 @@ class MaintenanceWindowsController extends AppController
             return;
         }
 
-        $window = $table->patchEntity($window, $this->request->getData());
+        $data = $this->request->getData();
+
+        // Ensure boolean fields are properly cast
+        if (isset($data['is_recurring'])) {
+            $data['is_recurring'] = filter_var($data['is_recurring'], FILTER_VALIDATE_BOOLEAN);
+        }
+        if (isset($data['auto_suppress_alerts'])) {
+            $data['auto_suppress_alerts'] = filter_var($data['auto_suppress_alerts'], FILTER_VALIDATE_BOOLEAN);
+        }
+        if (isset($data['notify_subscribers'])) {
+            $data['notify_subscribers'] = filter_var($data['notify_subscribers'], FILTER_VALIDATE_BOOLEAN);
+        }
+
+        $window = $table->patchEntity($window, $data);
         if (!$table->save($window)) {
             $this->error('Validation failed', 422, $window->getErrors());
 

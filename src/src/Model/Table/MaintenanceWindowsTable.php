@@ -78,11 +78,11 @@ class MaintenanceWindowsTable extends Table
 
         $validator
             ->boolean('auto_suppress_alerts')
-            ->notEmptyString('auto_suppress_alerts');
+            ->allowEmptyString('auto_suppress_alerts');
 
         $validator
             ->boolean('notify_subscribers')
-            ->notEmptyString('notify_subscribers');
+            ->allowEmptyString('notify_subscribers');
 
         $validator
             ->scalar('status')
