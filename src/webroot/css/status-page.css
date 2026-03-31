@@ -91,7 +91,43 @@ body.status-page-body {
 .sp-update-time { font-size: 0.75rem; color: #94A3B8; }
 .sp-update-message { font-size: 0.85rem; color: #334155; line-height: 1.5; }
 
+/* Subscribe */
+.sp-subscribe-row { text-align: right; margin: 16px 0 -8px; }
+.sp-subscribe-btn { background: none; border: 1px solid #E2E8F0; color: #6366F1; padding: 6px 16px; border-radius: 6px; font-size: 0.85rem; font-weight: 500; cursor: pointer; }
+.sp-subscribe-btn:hover { background: #F8FAFC; border-color: #6366F1; }
+.sp-subscribe-form { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+.sp-subscribe-form form { display: flex; gap: 8px; }
+.sp-subscribe-form input[type="email"] { flex: 1; padding: 8px 12px; border: 1px solid #E2E8F0; border-radius: 6px; font-size: 0.9rem; }
+.sp-subscribe-form button[type="submit"] { background: #6366F1; color: #fff; border: none; padding: 8px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.9rem; }
+.sp-subscribe-form button[type="submit"]:hover { background: #4F46E5; }
+.sp-subscribe-msg { margin-top: 8px; font-size: 0.85rem; }
+
+/* Maintenance */
+.sp-maintenance { background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 8px; padding: 20px; margin: 16px 0; }
+.sp-maintenance h3 { color: #92400E; font-size: 1rem; margin-bottom: 12px; }
+.sp-maintenance-item { padding: 8px 0; border-bottom: 1px solid #FDE68A; }
+.sp-maintenance-item:last-child { border-bottom: none; }
+.sp-maintenance-title { font-weight: 600; color: #0F172A; }
+.sp-maintenance-desc { color: #64748B; font-size: 0.85rem; margin: 4px 0; }
+.sp-maintenance-time { font-size: 0.8rem; color: #92400E; }
+
+/* Timeline */
+.sp-timeline { margin: 32px 0; }
+.sp-timeline h3 { font-size: 1.1rem; color: #475569; margin-bottom: 16px; }
+.sp-timeline-day { margin-bottom: 24px; }
+.sp-timeline-date { font-weight: 600; font-size: 0.9rem; color: #0F172A; padding-bottom: 8px; border-bottom: 1px solid #E2E8F0; margin-bottom: 8px; }
+.sp-timeline-none { color: #94A3B8; font-size: 0.85rem; font-style: italic; padding: 4px 0; }
+.sp-timeline-entry { background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; padding: 16px; margin-bottom: 8px; }
+.sp-timeline-entry-header { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
+.sp-timeline-desc { color: #475569; font-size: 0.85rem; margin: 8px 0 4px; line-height: 1.5; }
+.sp-timeline-monitor { font-size: 0.75rem; color: #94A3B8; }
+
+/* Logo */
+.sp-header-inner { display: flex; align-items: center; gap: 12px; }
+.sp-logo { height: 36px; width: auto; }
+
 @media (max-width: 640px) {
+    .sp-subscribe-form form { flex-direction: column; }
     .sp-header { padding: 16px 0; }
     .sp-title { font-size: 1.25rem; }
     .sp-overall { padding: 24px 16px; }

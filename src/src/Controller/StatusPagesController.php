@@ -201,6 +201,62 @@ class StatusPagesController extends AppController
 
         $showIncidentHistory = (bool)$statusPage->show_incident_history;
 
+        // Load upcoming + active maintenance windows
+        $maintenanceWindows = [];
+        try {
+            $mwTable = $this->fetchTable('MaintenanceWindows');
+            $now = new \Cake\I18n\DateTime();
+            $query = $mwTable->find()
+                ->where([
+                    'MaintenanceWindows.organization_id' => $statusPage->organization_id,
+                    'OR' => [
+                        ['MaintenanceWindows.ends_at >=' => $now], // upcoming or active
+                        ['MaintenanceWindows.is_recurring' => true, 'MaintenanceWindows.status' => 'scheduled'],
+                    ],
+                ])
+                ->orderBy(['MaintenanceWindows.starts_at' => 'ASC'])
+                ->limit(10);
+            $maintenanceWindows = $query->all()->toArray();
+        } catch (\Exception $e) {
+            // Maintenance table may not exist
+        }
+
+        // Build 14-day timeline from incidents
+        $timeline = [];
+        foreach ($incidents as $incident) {
+            $date = $incident->created->format('Y-m-d');
+            if (!isset($timeline[$date])) {
+                $timeline[$date] = [];
+            }
+            $timeline[$date][] = [
+                'type' => 'incident',
+                'time' => $incident->created->format('H:i'),
+                'title' => $incident->title,
+                'severity' => $incident->severity ?? 'minor',
+                'status' => $incident->status ?? 'investigating',
+                'description' => $incident->description,
+                'updates' => $incident->incident_updates ?? [],
+                'monitor_name' => $incident->monitor->name ?? '',
+            ];
+        }
+        // Pad timeline to 14 days
+        for ($i = 0; $i < 14; $i++) {
+            $date = date('Y-m-d', strtotime("-{$i} days"));
+            if (!isset($timeline[$date])) {
+                $timeline[$date] = [];
+            }
+        }
+        krsort($timeline); // newest first
+
+        // Theme/branding
+        $theme = [];
+        if (!empty($statusPage->theme)) {
+            $decoded = is_string($statusPage->theme) ? json_decode($statusPage->theme, true) : $statusPage->theme;
+            if (is_array($decoded)) {
+                $theme = $decoded;
+            }
+        }
+
         $this->set(compact(
             'statusPage',
             'monitors',
@@ -209,7 +265,10 @@ class StatusPagesController extends AppController
             'overallStatusText',
             'uptimeHistory',
             'showUptimeChart',
-            'showIncidentHistory'
+            'showIncidentHistory',
+            'maintenanceWindows',
+            'timeline',
+            'theme'
         ));
         $this->set('requirePassword', false);
     }

@@ -524,6 +524,12 @@ return function (RouteBuilder $routes): void {
             ['pass' => ['slug'], 'slug' => '[a-z0-9][a-z0-9\-]*[a-z0-9]']
         );
 
+        $builder->connect(
+            '/public/status/{slug}/subscribe',
+            ['controller' => 'PublicStatus', 'action' => 'subscribe', 'prefix' => 'Api/V2', '_method' => 'POST'],
+            ['pass' => ['slug'], 'slug' => '[a-z0-9][a-z0-9\-]*[a-z0-9]']
+        );
+
         // --- Dashboard (TASK-NG-003) ---
         $builder->connect('/dashboard/summary', ['controller' => 'Dashboard', 'action' => 'summary', 'prefix' => 'Api/V2', '_method' => 'GET']);
         $builder->connect('/dashboard/uptime', ['controller' => 'Dashboard', 'action' => 'uptime', 'prefix' => 'Api/V2', '_method' => 'GET']);

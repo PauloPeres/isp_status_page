@@ -116,4 +116,62 @@ class PublicStatusController extends AppController
             'incidents' => $incidents,
         ]);
     }
+
+    /**
+     * POST /api/v2/public/status/{slug}/subscribe
+     *
+     * Subscribe an email to incident updates for this status page.
+     */
+    public function subscribe(string $slug): void
+    {
+        $this->request->allowMethod(['post']);
+
+        $statusPagesTable = $this->fetchTable('StatusPages');
+        $statusPage = $statusPagesTable->find()
+            ->where(['StatusPages.slug' => $slug, 'StatusPages.active' => true])
+            ->first();
+
+        if (!$statusPage) {
+            $this->error('Status page not found', 404);
+            return;
+        }
+
+        $email = $this->request->getData('email');
+        if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $this->error('Valid email is required', 400);
+            return;
+        }
+
+        try {
+            $subscribersTable = $this->fetchTable('Subscribers');
+
+            // Check if already subscribed
+            $existing = $subscribersTable->find()
+                ->where([
+                    'Subscribers.email' => $email,
+                    'Subscribers.organization_id' => $statusPage->organization_id,
+                ])
+                ->first();
+
+            if ($existing) {
+                $this->success(['message' => 'You are already subscribed to updates.']);
+                return;
+            }
+
+            $subscriber = $subscribersTable->newEntity([
+                'organization_id' => $statusPage->organization_id,
+                'email' => $email,
+                'verified' => false,
+                'active' => true,
+            ]);
+
+            if ($subscribersTable->save($subscriber)) {
+                $this->success(['message' => 'Subscribed successfully! You will receive incident updates.'], 201);
+            } else {
+                $this->error('Failed to subscribe. Please try again.', 422);
+            }
+        } catch (\Exception $e) {
+            $this->error('Failed to subscribe. Please try again.', 500);
+        }
+    }
 }
