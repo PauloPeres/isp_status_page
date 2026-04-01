@@ -9,6 +9,7 @@ import {
   IonSpinner,
   IonText,
   IonIcon,
+  IonCheckbox,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { logoGoogle, logoMicrosoft, eyeOutline, eyeOffOutline } from 'ionicons/icons';
@@ -25,6 +26,7 @@ import { AuthService } from '../../core/services/auth.service';
     IonSpinner,
     IonText,
     IonIcon,
+    IonCheckbox,
     FormsModule,
     RouterLink,
   ],
@@ -99,6 +101,12 @@ import { AuthService } from '../../core/services/auth.service';
                 ></ion-input>
               </ion-item>
             }
+
+            <ion-item lines="none" style="--min-height: 36px; margin-bottom: 0;">
+              <ion-checkbox [(ngModel)]="rememberMe" name="rememberMe" labelPlacement="end" style="--size: 18px; font-size: 0.85rem">
+                Remember me
+              </ion-checkbox>
+            </ion-item>
 
             @if (infoMessage) {
               <ion-text color="primary">
@@ -216,6 +224,7 @@ export class LoginComponent {
   email = '';
   password = '';
   twoFactorCode = '';
+  rememberMe = true;
   loading = false;
   errorMessage = '';
   infoMessage = '';
@@ -254,6 +263,7 @@ export class LoginComponent {
         this.email,
         this.password,
         this.twoFactorCode || undefined,
+        this.rememberMe,
       );
       if (response.success) {
         this.router.navigate(['/dashboard']);

@@ -18,6 +18,11 @@ export const jwtInterceptor: HttpInterceptorFn = (
   const auth = inject(AuthService);
   const token = auth.getAccessToken();
 
+  // Include credentials (cookies) for auth endpoints that need refresh token cookie
+  if (req.url.includes('/auth/refresh') || req.url.includes('/auth/logout')) {
+    req = req.clone({ withCredentials: true });
+  }
+
   if (
     token &&
     !req.url.includes('/auth/login') &&

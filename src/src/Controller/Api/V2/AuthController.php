@@ -6,6 +6,7 @@ namespace App\Controller\Api\V2;
 use App\Service\JwtService;
 use App\Service\LoginThrottleService;
 use App\Service\TwoFactorService;
+use Cake\Http\Cookie\Cookie;
 use Cake\I18n\DateTime;
 use Cake\Validation\Validator;
 
@@ -145,6 +146,20 @@ class AuthController extends AppController
             $this->request->getHeaderLine('User-Agent')
         );
 
+        // Set refresh token as HttpOnly cookie
+        $this->response = $this->response->withCookie(
+            new Cookie(
+                'refresh_token',
+                $refreshToken,
+                new \DateTime('+7 days'),
+                '/',
+                '',
+                (bool)env('HTTPS_ONLY', false),
+                true,
+                'Lax'
+            )
+        );
+
         $this->success([
             'access_token' => $accessToken,
             'refresh_token' => $refreshToken,
@@ -233,6 +248,10 @@ class AuthController extends AppController
         $orgId = $orgUser ? $orgUser->organization_id : 0;
         $role = $orgUser ? $orgUser->role : 'viewer';
 
+        // Remember me: shorter refresh token TTL if not checked
+        $rememberMe = (bool)$this->request->getData('remember_me', true);
+        $refreshTtl = $rememberMe ? 604800 : 7200; // 7 days vs 2 hours
+
         // Generate tokens
         $jwtService = new JwtService();
         $accessToken = $jwtService->generateAccessToken(
@@ -244,12 +263,28 @@ class AuthController extends AppController
         $refreshToken = $jwtService->generateRefreshToken(
             $user->id,
             $this->request->clientIp(),
-            $this->request->getHeaderLine('User-Agent')
+            $this->request->getHeaderLine('User-Agent'),
+            $refreshTtl
         );
 
         // Update last_login timestamp
         $user->set('last_login', DateTime::now());
         $usersTable->save($user);
+
+        // Set refresh token as HttpOnly cookie
+        $cookieExpiry = $rememberMe ? '+7 days' : '+2 hours';
+        $this->response = $this->response->withCookie(
+            new Cookie(
+                'refresh_token',
+                $refreshToken,
+                new \DateTime($cookieExpiry),
+                '/',
+                '',
+                (bool)env('HTTPS_ONLY', false),
+                true,
+                'Lax'
+            )
+        );
 
         $this->success([
             'access_token' => $accessToken,
@@ -281,7 +316,9 @@ class AuthController extends AppController
     {
         $this->request->allowMethod(['post']);
 
-        $refreshToken = $this->request->getData('refresh_token');
+        // Accept refresh token from body (backwards compat) or HttpOnly cookie
+        $refreshToken = $this->request->getData('refresh_token')
+            ?? $this->request->getCookie('refresh_token');
         if (empty($refreshToken)) {
             $this->error('Refresh token is required', 400);
 
@@ -332,6 +369,20 @@ class AuthController extends AppController
             $this->request->getHeaderLine('User-Agent')
         );
 
+        // Set new refresh token as HttpOnly cookie
+        $this->response = $this->response->withCookie(
+            new Cookie(
+                'refresh_token',
+                $newRefreshToken,
+                new \DateTime('+7 days'),
+                '/',
+                '',
+                (bool)env('HTTPS_ONLY', false),
+                true,
+                'Lax'
+            )
+        );
+
         $this->success([
             'access_token' => $newAccessToken,
             'refresh_token' => $newRefreshToken,
@@ -353,7 +404,9 @@ class AuthController extends AppController
 
         $jwtService = new JwtService();
 
-        $refreshToken = $this->request->getData('refresh_token');
+        // Accept refresh token from body (backwards compat) or HttpOnly cookie
+        $refreshToken = $this->request->getData('refresh_token')
+            ?? $this->request->getCookie('refresh_token');
         $revokeAll = (bool)$this->request->getData('revoke_all', false);
 
         if ($revokeAll && $this->currentUserId > 0) {
@@ -361,6 +414,11 @@ class AuthController extends AppController
         } elseif (!empty($refreshToken)) {
             $jwtService->revokeRefreshToken($refreshToken);
         }
+
+        // Clear the refresh token cookie
+        $this->response = $this->response->withExpiredCookie(
+            new Cookie('refresh_token', '', null, '/')
+        );
 
         $this->success(['message' => 'Logged out successfully']);
     }

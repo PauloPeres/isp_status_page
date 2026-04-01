@@ -86,16 +86,18 @@ class JwtService
      * @param string $userAgent Client User-Agent header.
      * @return string The plain refresh token (64 hex characters).
      */
-    public function generateRefreshToken(int $userId, string $ipAddress = '', string $userAgent = ''): string
+    public function generateRefreshToken(int $userId, string $ipAddress = '', string $userAgent = '', ?int $ttl = null): string
     {
         $plainToken = bin2hex(random_bytes(32));
         $hash = hash('sha256', $plainToken);
+
+        $effectiveTtl = $ttl ?? $this->refreshTokenTtl;
 
         $table = $this->fetchTable('RefreshTokens');
         $entity = $table->newEntity([
             'user_id' => $userId,
             'token_hash' => $hash,
-            'expires_at' => DateTime::now()->modify('+' . $this->refreshTokenTtl . ' seconds'),
+            'expires_at' => DateTime::now()->modify('+' . $effectiveTtl . ' seconds'),
             'ip_address' => $ipAddress,
             'user_agent' => $userAgent,
         ]);

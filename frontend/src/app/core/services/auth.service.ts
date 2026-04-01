@@ -40,11 +40,12 @@ export class AuthService {
   constructor(private http: HttpClient, private router: Router) {
     // Restore from localStorage on init
     const token = localStorage.getItem('access_token');
-    const refresh = localStorage.getItem('refresh_token');
     const user = localStorage.getItem('user');
     const org = localStorage.getItem('organization');
     if (token) this.accessToken.set(token);
-    if (refresh) this.refreshTokenValue.set(refresh);
+    // Backwards compat: if refresh_token is still in localStorage (old sessions), load it
+    const legacyRefresh = localStorage.getItem('refresh_token');
+    if (legacyRefresh) this.refreshTokenValue.set(legacyRefresh);
     if (user) {
       try { this.currentUser.set(JSON.parse(user)); } catch { localStorage.removeItem('user'); }
     }
@@ -57,12 +58,12 @@ export class AuthService {
     return this.accessToken();
   }
 
-  async login(email: string, password: string, twoFactorCode?: string): Promise<LoginResponse> {
-    const body: Record<string, string> = { email, password };
+  async login(email: string, password: string, twoFactorCode?: string, rememberMe: boolean = true): Promise<LoginResponse> {
+    const body: Record<string, string | boolean> = { email, password, remember_me: rememberMe };
     if (twoFactorCode) body['two_factor_code'] = twoFactorCode;
 
     const response = await firstValueFrom(
-      this.http.post<LoginResponse>(`${environment.apiUrl}/auth/login`, body)
+      this.http.post<LoginResponse>(`${environment.apiUrl}/auth/login`, body, { withCredentials: true })
     );
     if (response?.success && response.data) {
       this.setTokens(response.data.access_token, response.data.refresh_token);
@@ -78,10 +79,16 @@ export class AuthService {
 
   async refresh(): Promise<boolean> {
     try {
+      // Send refresh_token in body only for backwards compat (old sessions with localStorage token)
+      // New sessions rely on HttpOnly cookie sent automatically with withCredentials
+      const body: Record<string, string> = {};
+      const legacyToken = this.refreshTokenValue();
+      if (legacyToken) {
+        body['refresh_token'] = legacyToken;
+      }
+
       const response = await firstValueFrom(
-        this.http.post<LoginResponse>(`${environment.apiUrl}/auth/refresh`, {
-          refresh_token: this.refreshTokenValue(),
-        })
+        this.http.post<LoginResponse>(`${environment.apiUrl}/auth/refresh`, body, { withCredentials: true })
       );
       if (response?.success && response.data) {
         this.setTokens(response.data.access_token, response.data.refresh_token);
@@ -125,20 +132,26 @@ export class AuthService {
   }
 
   logout(): void {
+    // Send refresh_token in body for backwards compat; cookie sent via withCredentials
+    const body: Record<string, string> = {};
+    const legacyToken = this.refreshTokenValue();
+    if (legacyToken) {
+      body['refresh_token'] = legacyToken;
+    }
     this.http
-      .post(`${environment.apiUrl}/auth/logout`, {
-        refresh_token: this.refreshTokenValue(),
-      })
+      .post(`${environment.apiUrl}/auth/logout`, body, { withCredentials: true })
       .subscribe({ error: () => {} });
     this.clearTokens();
     this.router.navigate(['/login']);
   }
 
-  private setTokens(access: string, refresh: string): void {
+  private setTokens(access: string, _refresh: string): void {
     this.accessToken.set(access);
-    this.refreshTokenValue.set(refresh);
+    // Do NOT store refresh_token in localStorage — it is now in an HttpOnly cookie.
+    // Clear any legacy refresh_token from localStorage.
     localStorage.setItem('access_token', access);
-    localStorage.setItem('refresh_token', refresh);
+    localStorage.removeItem('refresh_token');
+    this.refreshTokenValue.set(null);
   }
 
   private clearTokens(): void {
@@ -147,7 +160,7 @@ export class AuthService {
     this.currentUser.set(null);
     this.currentOrg.set(null);
     localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('refresh_token'); // Clean up any legacy token
     localStorage.removeItem('user');
     localStorage.removeItem('organization');
   }

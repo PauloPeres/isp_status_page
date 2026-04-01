@@ -27,5 +27,15 @@ class AppController extends V2AppController
         if (!$this->isSuperAdmin) {
             throw new ForbiddenException('Super admin access required');
         }
+
+        // Re-verify super admin status from DB (guards against stale JWT after demotion)
+        if ($this->currentUserId) {
+            $user = $this->fetchTable('Users')->find()
+                ->where(['id' => $this->currentUserId])
+                ->first();
+            if (!$user || !$user->is_super_admin) {
+                throw new ForbiddenException('Super admin access required');
+            }
+        }
     }
 }

@@ -516,6 +516,7 @@ return function (RouteBuilder $routes): void {
             ['controller' => 'OAuth', 'action' => 'callback', 'prefix' => 'Api/V2'],
             ['pass' => ['provider'], 'provider' => '(google|github|microsoft)']
         );
+        $builder->connect('/auth/oauth/exchange', ['controller' => 'OAuth', 'action' => 'exchangeOAuthCode', 'prefix' => 'Api/V2', '_method' => 'POST']);
 
         // --- Public status page API (no JWT required) ---
         $builder->connect(
