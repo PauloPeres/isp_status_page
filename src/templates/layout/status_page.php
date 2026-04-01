@@ -14,14 +14,26 @@
     </style>
     <?php endif; ?>
     <?php if ($this->fetch('customCss')): ?>
-    <style><?= $this->fetch('customCss') ?></style>
+    <?php
+    $css = $this->fetch('customCss');
+    // Prevent style tag breakout and script injection
+    $css = str_ireplace('</style', '', $css);
+    $css = str_ireplace('<script', '', $css);
+    $css = str_ireplace('javascript:', '', $css);
+    $css = str_ireplace('expression(', '', $css);
+    $css = preg_replace('/@import\s/i', '/* blocked-import */', $css);
+    ?>
+    <style><?= $css ?></style>
     <?php endif; ?>
 </head>
 <body class="status-page-body" data-slug="<?= h($this->fetch('slug', '')) ?>">
     <header class="sp-header">
         <div class="sp-container sp-header-inner">
-            <?php if ($this->fetch('logoUrl')): ?>
-                <img src="<?= h($this->fetch('logoUrl')) ?>" alt="" class="sp-logo">
+            <?php
+            $logoUrl = $this->fetch('logoUrl');
+            if ($logoUrl && preg_match('#^https?://#i', $logoUrl)):
+            ?>
+                <img src="<?= h($logoUrl) ?>" alt="" class="sp-logo">
             <?php endif; ?>
             <h1 class="sp-title"><?= h($this->fetch('pageTitle', 'System Status')) ?></h1>
         </div>

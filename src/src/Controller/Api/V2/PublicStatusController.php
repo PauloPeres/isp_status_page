@@ -24,6 +24,16 @@ class PublicStatusController extends AppController
     {
         $this->request->allowMethod(['get']);
 
+        // Rate limiting
+        $ip = $this->request->clientIp();
+        $cacheKey = 'public_api_rate_' . md5($ip);
+        $requests = (int)\Cake\Cache\Cache::read($cacheKey, '_cake_core_') ?: 0;
+        if ($requests > 120) {
+            $this->error('Rate limit exceeded', 429);
+            return;
+        }
+        \Cake\Cache\Cache::write($cacheKey, $requests + 1, '_cake_core_');
+
         $statusPagesTable = $this->fetchTable('StatusPages');
         $statusPage = $statusPagesTable->find()
             ->where(['slug' => $slug, 'active' => true])
@@ -38,7 +48,7 @@ class PublicStatusController extends AppController
         // Password protection: require password header
         if ($statusPage->isPasswordProtected()) {
             $password = $this->request->getHeaderLine('X-Status-Password');
-            if ($password !== $statusPage->password) {
+            if (!(new \Authentication\PasswordHasher\DefaultPasswordHasher())->check($password, $statusPage->password)) {
                 $this->error('Password required', 401);
 
                 return;
@@ -126,6 +136,16 @@ class PublicStatusController extends AppController
     {
         $this->request->allowMethod(['post']);
 
+        // Rate limiting
+        $ip = $this->request->clientIp();
+        $cacheKey = 'public_api_rate_' . md5($ip);
+        $requests = (int)\Cake\Cache\Cache::read($cacheKey, '_cake_core_') ?: 0;
+        if ($requests > 120) {
+            $this->error('Rate limit exceeded', 429);
+            return;
+        }
+        \Cake\Cache\Cache::write($cacheKey, $requests + 1, '_cake_core_');
+
         $statusPagesTable = $this->fetchTable('StatusPages');
         $statusPage = $statusPagesTable->find()
             ->where(['StatusPages.slug' => $slug, 'StatusPages.active' => true])
@@ -154,7 +174,7 @@ class PublicStatusController extends AppController
                 ->first();
 
             if ($existing) {
-                $this->success(['message' => 'You are already subscribed to updates.']);
+                $this->success(['message' => 'Subscribed! You will receive incident updates.']);
                 return;
             }
 

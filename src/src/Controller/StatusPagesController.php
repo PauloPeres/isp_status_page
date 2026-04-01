@@ -77,7 +77,7 @@ class StatusPagesController extends AppController
             if (!$session->read($sessionKey)) {
                 if ($this->request->is('post')) {
                     $password = $this->request->getData('password');
-                    if ($password === $statusPage->password) {
+                    if ((new \Authentication\PasswordHasher\DefaultPasswordHasher())->check($password, $statusPage->password)) {
                         $session->write($sessionKey, true);
                     } else {
                         $this->Flash->error(__('Invalid password.'));

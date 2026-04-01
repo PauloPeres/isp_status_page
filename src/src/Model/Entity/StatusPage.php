@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Model\Entity;
 
+use Authentication\PasswordHasher\DefaultPasswordHasher;
 use Cake\ORM\Entity;
 
 /**
@@ -33,6 +34,8 @@ class StatusPage extends Entity
      *
      * @var array<string, bool>
      */
+    protected array $_hidden = ['password'];
+
     protected array $_accessible = [
         'organization_id' => true,
         'name' => true,
@@ -50,6 +53,15 @@ class StatusPage extends Entity
         'created' => true,
         'modified' => true,
     ];
+
+    protected function _setPassword(?string $password): ?string
+    {
+        if ($password === null || $password === '') {
+            return null;
+        }
+
+        return (new DefaultPasswordHasher())->hash($password);
+    }
 
     /**
      * Get monitors as array of IDs

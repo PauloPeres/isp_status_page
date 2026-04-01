@@ -145,7 +145,7 @@ if (!empty($theme['custom_css'])) {
 
     <!-- Overall Status Banner -->
     <div class="sp-overall sp-overall-<?= h($overallStatus) ?>">
-        <h2><?= $overallStatusText ?></h2>
+        <h2><?= h($overallStatusText) ?></h2>
         <p class="sp-last-updated">Last updated: <?= date('H:i:s') ?></p>
     </div>
 
