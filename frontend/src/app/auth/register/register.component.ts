@@ -12,7 +12,7 @@ import {
   IonIcon,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { logoGoogle, logoMicrosoft } from 'ionicons/icons';
+import { logoGoogle, logoMicrosoft, eyeOutline, eyeOffOutline } from 'ionicons/icons';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../core/services/auth.service';
 import { environment } from '../../../environments/environment';
@@ -92,14 +92,24 @@ import { environment } from '../../../environments/environment';
                 labelPlacement="floating"
                 [(ngModel)]="password"
                 name="password"
-                type="password"
+                [type]="showPassword ? 'text' : 'password'"
                 required
                 minlength="8"
                 autocomplete="new-password"
                 enterkeyhint="next"
                 (keyup.enter)="confirmInput.setFocus()"
               ></ion-input>
+              <ion-button fill="clear" slot="end" (click)="showPassword = !showPassword" style="margin: 0;">
+                <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'" slot="icon-only" style="font-size: 1.2rem; color: var(--ion-color-medium)"></ion-icon>
+              </ion-button>
             </ion-item>
+
+            @if (password.length > 0) {
+              <div class="strength-bar">
+                <div class="strength-fill" [style.width.%]="getPasswordStrength()" [style.background]="getStrengthColor()"></div>
+              </div>
+              <p class="strength-text" [style.color]="getStrengthColor()">{{ getStrengthLabel() }}</p>
+            }
 
             <ion-item>
               <ion-input
@@ -108,11 +118,15 @@ import { environment } from '../../../environments/environment';
                 labelPlacement="floating"
                 [(ngModel)]="confirmPassword"
                 name="confirmPassword"
-                type="password"
+                [type]="showConfirmPassword ? 'text' : 'password'"
                 required
                 autocomplete="new-password"
                 enterkeyhint="done"
+                (keyup.enter)="onRegister()"
               ></ion-input>
+              <ion-button fill="clear" slot="end" (click)="showConfirmPassword = !showConfirmPassword" style="margin: 0;">
+                <ion-icon [name]="showConfirmPassword ? 'eye-off-outline' : 'eye-outline'" slot="icon-only" style="font-size: 1.2rem; color: var(--ion-color-medium)"></ion-icon>
+              </ion-button>
             </ion-item>
 
             <div class="terms-row">
@@ -261,6 +275,21 @@ import { environment } from '../../../environments/environment';
         color: var(--ion-color-medium);
         font-size: 0.85rem;
       }
+      .strength-bar {
+        height: 4px;
+        background: var(--ion-color-light);
+        border-radius: 2px;
+        margin: 4px 12px 0;
+      }
+      .strength-fill {
+        height: 100%;
+        border-radius: 2px;
+        transition: width 0.3s, background 0.3s;
+      }
+      .strength-text {
+        font-size: 0.75rem;
+        margin: 2px 12px 0;
+      }
     `,
   ],
 })
@@ -273,13 +302,40 @@ export class RegisterComponent {
   loading = false;
   errorMessage = '';
   successMessage = '';
+  showPassword = false;
+  showConfirmPassword = false;
 
   constructor(
     private http: HttpClient,
     private auth: AuthService,
     private router: Router,
   ) {
-    addIcons({ logoGoogle, logoMicrosoft });
+    addIcons({ logoGoogle, logoMicrosoft, eyeOutline, eyeOffOutline });
+  }
+
+  getPasswordStrength(): number {
+    let score = 0;
+    if (this.password.length >= 8) score += 25;
+    if (this.password.length >= 12) score += 15;
+    if (/[A-Z]/.test(this.password)) score += 20;
+    if (/[a-z]/.test(this.password)) score += 10;
+    if (/[0-9]/.test(this.password)) score += 15;
+    if (/[^A-Za-z0-9]/.test(this.password)) score += 15;
+    return Math.min(score, 100);
+  }
+
+  getStrengthColor(): string {
+    const s = this.getPasswordStrength();
+    if (s < 40) return 'var(--ion-color-danger)';
+    if (s < 70) return 'var(--ion-color-warning)';
+    return 'var(--ion-color-success)';
+  }
+
+  getStrengthLabel(): string {
+    const s = this.getPasswordStrength();
+    if (s < 40) return 'Weak';
+    if (s < 70) return 'Fair';
+    return 'Strong';
   }
 
   async onOAuth(provider: string) {
@@ -344,8 +400,8 @@ export class RegisterComponent {
           );
         }
 
-        // Reload the page to pick up new tokens in AuthService
-        window.location.href = '/app/onboarding';
+        // Navigate via Angular router instead of full page reload
+        this.router.navigate(['/onboarding']);
       }
     } catch (error: any) {
       this.errorMessage =

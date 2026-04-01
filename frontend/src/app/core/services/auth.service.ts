@@ -44,8 +44,12 @@ export class AuthService {
     const org = localStorage.getItem('organization');
     if (token) this.accessToken.set(token);
     if (refresh) this.refreshTokenValue.set(refresh);
-    if (user) this.currentUser.set(JSON.parse(user));
-    if (org) this.currentOrg.set(JSON.parse(org));
+    if (user) {
+      try { this.currentUser.set(JSON.parse(user)); } catch { localStorage.removeItem('user'); }
+    }
+    if (org) {
+      try { this.currentOrg.set(JSON.parse(org)); } catch { localStorage.removeItem('organization'); }
+    }
   }
 
   getAccessToken(): string | null {

@@ -8,6 +8,9 @@ import { inject } from '@angular/core';
 import { AuthService } from '../services/auth.service';
 import { Observable, catchError, throwError } from 'rxjs';
 
+let isRefreshing = false;
+let refreshPromise: Promise<boolean> | null = null;
+
 export const jwtInterceptor: HttpInterceptorFn = (
   req: HttpRequest<unknown>,
   next: HttpHandlerFn,
@@ -28,9 +31,17 @@ export const jwtInterceptor: HttpInterceptorFn = (
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
       if (error.status === 401 && !req.url.includes('/auth/')) {
-        // Try refresh then retry the original request
+        // Use shared refresh promise to prevent race condition
+        if (!isRefreshing) {
+          isRefreshing = true;
+          refreshPromise = auth.refresh().finally(() => {
+            isRefreshing = false;
+            refreshPromise = null;
+          });
+        }
+
         return new Observable<any>((subscriber) => {
-          auth.refresh().then((success) => {
+          (refreshPromise || auth.refresh()).then((success) => {
             if (success) {
               const newReq = req.clone({
                 setHeaders: {

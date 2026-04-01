@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild, ElementRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import {
   IonContent,
@@ -12,7 +12,7 @@ import {
   IonIcon,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { logoGoogle, logoMicrosoft } from 'ionicons/icons';
+import { logoGoogle, logoMicrosoft, eyeOutline, eyeOffOutline } from 'ionicons/icons';
 import { AuthService } from '../../core/services/auth.service';
 import { environment } from '../../../environments/environment';
 
@@ -74,12 +74,15 @@ import { environment } from '../../../environments/environment';
                 labelPlacement="floating"
                 [(ngModel)]="password"
                 name="password"
-                type="password"
+                [type]="showPassword ? 'text' : 'password'"
                 required
                 autocomplete="current-password"
                 enterkeyhint="go"
                 (keyup.enter)="onLogin()"
               ></ion-input>
+              <ion-button fill="clear" slot="end" (click)="showPassword = !showPassword" style="margin: 0;">
+                <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'" slot="icon-only" style="font-size: 1.2rem; color: var(--ion-color-medium)"></ion-icon>
+              </ion-button>
             </ion-item>
 
             @if (requires2fa) {
@@ -97,6 +100,12 @@ import { environment } from '../../../environments/environment';
                   (keyup.enter)="onLogin()"
                 ></ion-input>
               </ion-item>
+            }
+
+            @if (infoMessage) {
+              <ion-text color="primary">
+                <p class="info-text">{{ infoMessage }}</p>
+              </ion-text>
             }
 
             @if (errorMessage) {
@@ -148,6 +157,10 @@ import { environment } from '../../../environments/environment';
         color: var(--ion-color-medium);
       }
       .error-text {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+      }
+      .info-text {
         padding: 0.5rem 1rem;
         font-size: 0.875rem;
       }
@@ -207,14 +220,23 @@ export class LoginComponent {
   twoFactorCode = '';
   loading = false;
   errorMessage = '';
+  infoMessage = '';
   requires2fa = false;
+  showPassword = false;
 
   constructor(
     private auth: AuthService,
     private router: Router,
     private http: HttpClient,
+    private route: ActivatedRoute,
   ) {
-    addIcons({ logoGoogle, logoMicrosoft });
+    addIcons({ logoGoogle, logoMicrosoft, eyeOutline, eyeOffOutline });
+
+    // Check for OAuth error
+    const error = this.route.snapshot.queryParamMap.get('error');
+    if (error === 'oauth_failed') {
+      this.errorMessage = 'Sign-in with the provider failed. Please try again or use email/password.';
+    }
   }
 
   async onOAuth(provider: string) {
@@ -235,6 +257,7 @@ export class LoginComponent {
   async onLogin() {
     this.loading = true;
     this.errorMessage = '';
+    this.infoMessage = '';
     try {
       const response = await this.auth.login(
         this.email,
@@ -247,7 +270,11 @@ export class LoginComponent {
     } catch (error: any) {
       if (error.error?.errors?.requires_2fa) {
         this.requires2fa = true;
-        this.errorMessage = 'Enter your 2FA code';
+        this.infoMessage = 'Enter your 2FA code';
+        setTimeout(() => {
+          const tfaEl = document.querySelector<HTMLIonInputElement>('ion-input[name="twoFactorCode"]');
+          tfaEl?.setFocus();
+        }, 200);
       } else {
         this.errorMessage = error.error?.message || 'Login failed';
       }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Controller\Api\V2;
 
 use App\Service\JwtService;
+use App\Service\LoginThrottleService;
 use App\Service\TwoFactorService;
 use Cake\I18n\DateTime;
 use Cake\Validation\Validator;
@@ -41,6 +42,12 @@ class AuthController extends AppController
 
         if (strlen($password) < 8) {
             $this->error('Password must be at least 8 characters', 422);
+
+            return;
+        }
+
+        if (!preg_match('/[A-Z]/', $password) || !preg_match('/[a-z]/', $password) || !preg_match('/[0-9]/', $password)) {
+            $this->error('Password must contain at least one uppercase letter, one lowercase letter, and one number', 422);
 
             return;
         }
@@ -168,7 +175,14 @@ class AuthController extends AppController
     {
         $this->request->allowMethod(['post']);
 
-        $email = $this->request->getData('email');
+        $email = $this->request->getData('email') ?? '';
+        $throttle = new LoginThrottleService();
+        if ($throttle->isLocked($email)) {
+            $this->error('Too many failed attempts. Please try again in 15 minutes.', 429);
+
+            return;
+        }
+
         $password = $this->request->getData('password');
 
         if (empty($email) || empty($password)) {
@@ -185,6 +199,7 @@ class AuthController extends AppController
             ->first();
 
         if (!$user || !password_verify($password, $user->password)) {
+            $throttle->recordFailure($email);
             $this->error('Invalid credentials', 401);
 
             return;
@@ -200,11 +215,15 @@ class AuthController extends AppController
             }
             $tfService = new TwoFactorService();
             if (!$tfService->verifyCode($user->two_factor_secret, $code)) {
+                $throttle->recordFailure($email);
                 $this->error('Invalid two-factor code', 401);
 
                 return;
             }
         }
+
+        // Successful authentication — clear throttle
+        $throttle->clearAttempts($email);
 
         // Get user's organization and role
         $orgUser = $this->fetchTable('OrganizationUsers')->find()
