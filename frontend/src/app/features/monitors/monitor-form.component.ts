@@ -356,13 +356,16 @@ import { showApiError } from '../../core/services/plan-error.helper';
             <!-- Monitoring Settings -->
             <ion-list>
               <ion-item>
-                <ion-input
-                  label="Check Interval (seconds)"
-                  labelPlacement="stacked"
-                  formControlName="check_interval"
-                  type="number"
-                  placeholder="300"
-                ></ion-input>
+                <ion-select label="Check Interval" labelPlacement="stacked" formControlName="check_interval" interface="popover">
+                  <ion-select-option [value]="30">30 seconds</ion-select-option>
+                  <ion-select-option [value]="60">1 minute</ion-select-option>
+                  <ion-select-option [value]="120">2 minutes</ion-select-option>
+                  <ion-select-option [value]="300">5 minutes (default)</ion-select-option>
+                  <ion-select-option [value]="600">10 minutes</ion-select-option>
+                  <ion-select-option [value]="900">15 minutes</ion-select-option>
+                  <ion-select-option [value]="1800">30 minutes</ion-select-option>
+                  <ion-select-option [value]="3600">1 hour</ion-select-option>
+                </ion-select>
               </ion-item>
               <app-field-error [control]="form.get('check_interval')" label="Check interval"></app-field-error>
 

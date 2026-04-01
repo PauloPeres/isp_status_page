@@ -1,7 +1,6 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 import {
   IonContent,
   IonItem,
@@ -14,7 +13,6 @@ import {
 import { addIcons } from 'ionicons';
 import { logoGoogle, logoMicrosoft, eyeOutline, eyeOffOutline } from 'ionicons/icons';
 import { AuthService } from '../../core/services/auth.service';
-import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -227,7 +225,6 @@ export class LoginComponent {
   constructor(
     private auth: AuthService,
     private router: Router,
-    private http: HttpClient,
     private route: ActivatedRoute,
   ) {
     addIcons({ logoGoogle, logoMicrosoft, eyeOutline, eyeOffOutline });
@@ -240,17 +237,11 @@ export class LoginComponent {
   }
 
   async onOAuth(provider: string) {
-    try {
-      const response = await this.http
-        .get<any>(`${environment.apiUrl}/auth/oauth/${provider}/redirect`)
-        .toPromise();
-      if (response?.success && response.data?.authorization_url) {
-        window.location.href = response.data.authorization_url;
-      } else {
-        this.errorMessage = `${provider} login is not configured`;
-      }
-    } catch {
-      this.errorMessage = `Unable to connect to ${provider}`;
+    const url = await this.auth.startOAuth(provider);
+    if (url) {
+      window.location.href = url;
+    } else {
+      this.errorMessage = `${provider} login is not configured`;
     }
   }
 
@@ -275,8 +266,14 @@ export class LoginComponent {
           const tfaEl = document.querySelector<HTMLIonInputElement>('ion-input[name="twoFactorCode"]');
           tfaEl?.setFocus();
         }, 200);
+      } else if (error.status === 0) {
+        this.errorMessage = 'Unable to connect. Check your internet connection.';
+      } else if (error.status === 429) {
+        this.errorMessage = 'Too many failed attempts. Please try again later.';
+      } else if (error.status >= 500) {
+        this.errorMessage = 'Server error. Please try again later.';
       } else {
-        this.errorMessage = error.error?.message || 'Login failed';
+        this.errorMessage = error.error?.message || 'Invalid email or password.';
       }
     }
     this.loading = false;

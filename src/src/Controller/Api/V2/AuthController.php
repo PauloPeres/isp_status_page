@@ -78,7 +78,7 @@ class AuthController extends AppController
         ]);
         $user->set('role', 'admin');
         $user->set('active', true);
-        $user->set('email_verified', true);
+        $user->set('email_verified', false);
 
         if (!$usersTable->save($user)) {
             $this->error('Registration failed', 422, $user->getErrors());
@@ -195,7 +195,7 @@ class AuthController extends AppController
         $usersTable = $this->fetchTable('Users');
         $user = $usersTable->find()
             ->where(['OR' => ['Users.email' => $email, 'Users.username' => $email]])
-            ->where(['Users.active' => true, 'Users.email_verified' => true])
+            ->where(['Users.active' => true])
             ->first();
 
         if (!$user || !password_verify($password, $user->password)) {

@@ -207,49 +207,53 @@ addIcons({
               </ion-menu-toggle>
 
               <!-- Reports -->
-              <ion-item-divider>
-                <ion-label>Reports</ion-label>
+              <ion-item-divider (click)="reportsExpanded = !reportsExpanded" style="cursor: pointer">
+                <ion-label>Reports {{ reportsExpanded ? '&#9662;' : '&#9656;' }}</ion-label>
               </ion-item-divider>
 
-              <ion-menu-toggle auto-hide="false">
-                <ion-item routerLink="/reports" routerLinkActive="selected">
-                  <ion-icon name="bar-chart-outline" slot="start"></ion-icon>
-                  <ion-label>Reports</ion-label>
-                </ion-item>
-              </ion-menu-toggle>
+              @if (reportsExpanded) {
+                <ion-menu-toggle auto-hide="false">
+                  <ion-item routerLink="/reports" routerLinkActive="selected">
+                    <ion-icon name="bar-chart-outline" slot="start"></ion-icon>
+                    <ion-label>Reports</ion-label>
+                  </ion-item>
+                </ion-menu-toggle>
 
-              <ion-menu-toggle auto-hide="false">
-                <ion-item routerLink="/scheduled-reports" routerLinkActive="selected">
-                  <ion-icon name="calendar-outline" slot="start"></ion-icon>
-                  <ion-label>Scheduled Reports</ion-label>
-                </ion-item>
-              </ion-menu-toggle>
+                <ion-menu-toggle auto-hide="false">
+                  <ion-item routerLink="/scheduled-reports" routerLinkActive="selected">
+                    <ion-icon name="calendar-outline" slot="start"></ion-icon>
+                    <ion-label>Scheduled Reports</ion-label>
+                  </ion-item>
+                </ion-menu-toggle>
 
-              <ion-menu-toggle auto-hide="false">
-                <ion-item routerLink="/sla" routerLinkActive="selected">
-                  <ion-icon name="shield-checkmark-outline" slot="start"></ion-icon>
-                  <ion-label>SLA</ion-label>
-                </ion-item>
-              </ion-menu-toggle>
+                <ion-menu-toggle auto-hide="false">
+                  <ion-item routerLink="/sla" routerLinkActive="selected">
+                    <ion-icon name="shield-checkmark-outline" slot="start"></ion-icon>
+                    <ion-label>SLA</ion-label>
+                  </ion-item>
+                </ion-menu-toggle>
+              }
 
               <!-- Subscribers -->
-              <ion-item-divider>
-                <ion-label>Subscribers</ion-label>
+              <ion-item-divider (click)="subscribersExpanded = !subscribersExpanded" style="cursor: pointer">
+                <ion-label>Subscribers {{ subscribersExpanded ? '&#9662;' : '&#9656;' }}</ion-label>
               </ion-item-divider>
 
-              <ion-menu-toggle auto-hide="false">
-                <ion-item routerLink="/subscribers" routerLinkActive="selected">
-                  <ion-icon name="people-outline" slot="start"></ion-icon>
-                  <ion-label>Subscribers</ion-label>
-                </ion-item>
-              </ion-menu-toggle>
+              @if (subscribersExpanded) {
+                <ion-menu-toggle auto-hide="false">
+                  <ion-item routerLink="/subscribers" routerLinkActive="selected">
+                    <ion-icon name="people-outline" slot="start"></ion-icon>
+                    <ion-label>Subscribers</ion-label>
+                  </ion-item>
+                </ion-menu-toggle>
 
-              <ion-menu-toggle auto-hide="false">
-                <ion-item routerLink="/email-logs" routerLinkActive="selected">
-                  <ion-icon name="mail-outline" slot="start"></ion-icon>
-                  <ion-label>Email Logs</ion-label>
-                </ion-item>
-              </ion-menu-toggle>
+                <ion-menu-toggle auto-hide="false">
+                  <ion-item routerLink="/email-logs" routerLinkActive="selected">
+                    <ion-icon name="mail-outline" slot="start"></ion-icon>
+                    <ion-label>Email Logs</ion-label>
+                  </ion-item>
+                </ion-menu-toggle>
+              }
 
               <!-- Administration -->
               <ion-item-divider>
@@ -396,6 +400,8 @@ addIcons({
 })
 export class AppLayoutComponent implements OnInit {
   activeIncidentCount = signal(0);
+  reportsExpanded = false;
+  subscribersExpanded = false;
 
   constructor(
     public auth: AuthService,

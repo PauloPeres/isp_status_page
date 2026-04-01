@@ -14,6 +14,7 @@ import {
 import { addIcons } from 'ionicons';
 import { logoGoogle, logoMicrosoft, eyeOutline, eyeOffOutline } from 'ionicons/icons';
 import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { environment } from '../../../environments/environment';
 
@@ -339,17 +340,11 @@ export class RegisterComponent {
   }
 
   async onOAuth(provider: string) {
-    try {
-      const response = await this.http
-        .get<any>(`${environment.apiUrl}/auth/oauth/${provider}/redirect`)
-        .toPromise();
-      if (response?.success && response.data?.authorization_url) {
-        window.location.href = response.data.authorization_url;
-      } else {
-        this.errorMessage = `${provider} login is not configured`;
-      }
-    } catch {
-      this.errorMessage = `Unable to connect to ${provider}`;
+    const url = await this.auth.startOAuth(provider);
+    if (url) {
+      window.location.href = url;
+    } else {
+      this.errorMessage = `${provider} login is not configured`;
     }
   }
 
@@ -380,13 +375,13 @@ export class RegisterComponent {
     this.loading = true;
 
     try {
-      const response: any = await this.http
-        .post(`${environment.apiUrl}/auth/register`, {
+      const response: any = await firstValueFrom(
+        this.http.post(`${environment.apiUrl}/auth/register`, {
           username: this.username,
           email: this.email,
           password: this.password,
         })
-        .toPromise();
+      );
 
       if (response?.success && response.data) {
         // Store tokens and user data (same as login)

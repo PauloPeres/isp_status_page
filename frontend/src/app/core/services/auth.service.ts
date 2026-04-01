@@ -1,6 +1,7 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 export interface AuthUser {
@@ -60,9 +61,9 @@ export class AuthService {
     const body: Record<string, string> = { email, password };
     if (twoFactorCode) body['two_factor_code'] = twoFactorCode;
 
-    const response = await this.http
-      .post<LoginResponse>(`${environment.apiUrl}/auth/login`, body)
-      .toPromise();
+    const response = await firstValueFrom(
+      this.http.post<LoginResponse>(`${environment.apiUrl}/auth/login`, body)
+    );
     if (response?.success && response.data) {
       this.setTokens(response.data.access_token, response.data.refresh_token);
       this.currentUser.set(response.data.user);
@@ -77,11 +78,11 @@ export class AuthService {
 
   async refresh(): Promise<boolean> {
     try {
-      const response = await this.http
-        .post<LoginResponse>(`${environment.apiUrl}/auth/refresh`, {
+      const response = await firstValueFrom(
+        this.http.post<LoginResponse>(`${environment.apiUrl}/auth/refresh`, {
           refresh_token: this.refreshTokenValue(),
         })
-        .toPromise();
+      );
       if (response?.success && response.data) {
         this.setTokens(response.data.access_token, response.data.refresh_token);
         return true;
@@ -92,10 +93,24 @@ export class AuthService {
     return false;
   }
 
+  async startOAuth(provider: string): Promise<string | null> {
+    try {
+      const response = await firstValueFrom(
+        this.http.get<any>(`${environment.apiUrl}/auth/oauth/${provider}/redirect`)
+      );
+      if (response?.success && response.data?.authorization_url) {
+        return response.data.authorization_url;
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  }
+
   async fetchMe(): Promise<void> {
-    const response = await this.http
-      .get<any>(`${environment.apiUrl}/auth/me`)
-      .toPromise();
+    const response = await firstValueFrom(
+      this.http.get<any>(`${environment.apiUrl}/auth/me`)
+    );
     if (response?.success) {
       this.currentUser.set(response.data.user);
       this.currentOrg.set(response.data.organizations?.[0] || null);
