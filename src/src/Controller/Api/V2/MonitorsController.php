@@ -727,10 +727,17 @@ class MonitorsController extends AppController
                        'verify_ssl', 'follow_redirects', 'expected_content'],
             'ping' => ['host', 'packet_count', 'max_packet_loss', 'max_latency'],
             'port' => ['host', 'port', 'protocol', 'send_data', 'expected_response'],
+            'keyword' => ['url', 'keyword', 'method', 'headers', 'case_sensitive'],
+            'ssl' => ['host', 'port', 'warning_days', 'critical_days'],
+            'api' => ['url', 'method', 'headers', 'body', 'expected_status_code',
+                      'json_path', 'expected_value', 'content_contains'],
+            'heartbeat' => ['grace_period', 'expected_interval'],
             default => null,
         };
 
         if ($allowedKeys === null) {
+            // Unknown type — still JSON-encode the configuration as-is
+            $data['configuration'] = json_encode($data['configuration']);
             return $data;
         }
 

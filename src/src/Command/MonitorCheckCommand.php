@@ -19,6 +19,7 @@ use App\Service\Check\HttpChecker;
 use App\Service\Check\KeywordChecker;
 use App\Service\Check\PingChecker;
 use App\Service\Check\PortChecker;
+use App\Service\Check\RestApiChecker;
 use App\Service\Check\SslCertChecker;
 use App\Service\IncidentService;
 use App\Service\MonitorCacheService;
@@ -85,6 +86,7 @@ class MonitorCheckCommand extends Command
         $this->checkService->registerChecker(new HeartbeatChecker());
         $this->checkService->registerChecker(new KeywordChecker());
         $this->checkService->registerChecker(new SslCertChecker());
+        $this->checkService->registerChecker(new RestApiChecker());
 
         // Initialize alert service and register channels
         $this->alertService = new AlertService();
