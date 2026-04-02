@@ -5,8 +5,6 @@ namespace App\Controller;
 
 use App\Service\TwoFactorService;
 use Authentication\PasswordHasher\DefaultPasswordHasher;
-use Cake\ORM\TableRegistry;
-
 /**
  * TwoFactorController
  *
@@ -86,7 +84,7 @@ class TwoFactorController extends AppController
             $code = trim((string)$this->request->getData('code'));
             $useRecovery = (bool)$this->request->getData('use_recovery');
 
-            $usersTable = TableRegistry::getTableLocator()->get('Users');
+            $usersTable = $this->fetchTable('Users');
 
             try {
                 $user = $usersTable->get($pendingUserId);
@@ -149,7 +147,7 @@ class TwoFactorController extends AppController
             return $this->redirect(['controller' => 'Users', 'action' => 'login']);
         }
 
-        $usersTable = TableRegistry::getTableLocator()->get('Users');
+        $usersTable = $this->fetchTable('Users');
         $user = $usersTable->get($identity->getIdentifier());
 
         if (!$user->two_factor_enabled) {

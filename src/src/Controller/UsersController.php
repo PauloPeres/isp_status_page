@@ -113,7 +113,7 @@ class UsersController extends AppController
             // TASK-AUTH-MFA: Check if user has 2FA enabled
             if ($user) {
                 try {
-                    $usersTable = \Cake\ORM\TableRegistry::getTableLocator()->get('Users');
+                    $usersTable = $this->fetchTable('Users');
                     $userEntity = $usersTable->find()
                         ->select(['id', 'two_factor_enabled'])
                         ->where(['id' => $user->getIdentifier()])

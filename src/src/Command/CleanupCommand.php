@@ -8,6 +8,7 @@ use Cake\Command\Command;
 use Cake\Console\Arguments;
 use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
+use Cake\I18n\DateTime;
 use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\Database\Exception\DatabaseException;
 
@@ -213,7 +214,7 @@ class CleanupCommand extends Command
         $io->out("<info>Cleaning integration logs older than {$days} days...</info>");
 
         $table = $this->fetchTable('IntegrationLogs');
-        $cutoffDate = date('Y-m-d H:i:s', strtotime("-{$days} days"));
+        $cutoffDate = (new DateTime())->modify("-{$days} days")->format('Y-m-d H:i:s');
 
         $query = $table->find()
             ->where(['created <' => $cutoffDate]);
@@ -257,7 +258,7 @@ class CleanupCommand extends Command
         $io->out("<info>Cleaning alert logs older than {$days} days...</info>");
 
         $table = $this->fetchTable('AlertLogs');
-        $cutoffDate = date('Y-m-d H:i:s', strtotime("-{$days} days"));
+        $cutoffDate = (new DateTime())->modify("-{$days} days")->format('Y-m-d H:i:s');
 
         $query = $table->find()
             ->where(['created <' => $cutoffDate]);

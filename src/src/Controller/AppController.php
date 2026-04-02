@@ -106,7 +106,7 @@ class AppController extends Controller
 
                 // Per-user language and timezone override (TASK-1100)
                 try {
-                    $usersTable = \Cake\ORM\TableRegistry::getTableLocator()->get('Users');
+                    $usersTable = $this->fetchTable('Users');
                     $user = $usersTable->find()
                         ->select(['language', 'timezone', 'is_super_admin'])
                         ->where(['id' => $userId])

@@ -5,6 +5,7 @@ namespace App\Middleware;
 
 use App\Tenant\TenantContext;
 use Cake\Http\Response;
+use Cake\ORM\Locator\LocatorAwareTrait;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -19,6 +20,8 @@ use Psr\Http\Server\RequestHandlerInterface;
  */
 class SuperAdminMiddleware implements MiddlewareInterface
 {
+    use LocatorAwareTrait;
+
     /**
      * Process the incoming request.
      *
@@ -66,7 +69,7 @@ class SuperAdminMiddleware implements MiddlewareInterface
             }
 
             if ($userId) {
-                $usersTable = \Cake\ORM\TableRegistry::getTableLocator()->get('Users');
+                $usersTable = $this->fetchTable('Users');
                 $user = $usersTable->find()
                     ->select(['is_super_admin'])
                     ->where(['id' => $userId])

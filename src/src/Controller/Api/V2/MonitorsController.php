@@ -19,11 +19,13 @@ use Cake\I18n\DateTime;
 class MonitorsController extends AppController
 {
     protected AuditLogService $auditLogService;
+    protected MonitorStatsService $monitorStatsService;
 
     public function initialize(): void
     {
         parent::initialize();
         $this->auditLogService = new AuditLogService();
+        $this->monitorStatsService = new MonitorStatsService();
     }
 
     /**
@@ -107,8 +109,7 @@ class MonitorsController extends AppController
     {
         $this->request->allowMethod(['get']);
 
-        $statsService = new MonitorStatsService();
-        $result = $statsService->getMonitorDetail((int)$id, $this->currentOrgId);
+        $result = $this->monitorStatsService->getMonitorDetail((int)$id, $this->currentOrgId);
 
         if ($result === null) {
             $this->error('Monitor not found', 404);

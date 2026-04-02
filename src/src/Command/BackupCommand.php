@@ -11,6 +11,7 @@ use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
 use Cake\Core\Configure;
 use Cake\Filesystem\Folder;
+use Cake\I18n\DateTime;
 
 /**
  * Backup Command
@@ -195,7 +196,7 @@ class BackupCommand extends Command
         ConsoleIo $io
     ): ?string {
         // Generate backup filename with timestamp
-        $timestamp = date('Y-m-d_H-i-s');
+        $timestamp = (new DateTime())->format('Y-m-d_H-i-s');
         $filename = "{$prefix}_{$timestamp}.db";
 
         if ($compress) {

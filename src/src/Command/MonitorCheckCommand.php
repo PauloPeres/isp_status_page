@@ -154,7 +154,7 @@ class MonitorCheckCommand extends Command
         $regionId = null;
 
         $io->out('<info>Monitor Check Command Started</info>');
-        $io->out('Time: ' . date('Y-m-d H:i:s'));
+        $io->out('Time: ' . (new DateTime())->format('Y-m-d H:i:s'));
 
         // Resolve region if specified
         if ($regionCode) {
@@ -280,8 +280,8 @@ class MonitorCheckCommand extends Command
                     'status_code' => $checkResult['status_code'] ?? null,
                     'error_message' => $checkResult['error_message'] ?? null,
                     'details' => json_encode($checkResult['metadata'] ?? []),
-                    'checked_at' => $checkResult['checked_at'] ?? date('Y-m-d H:i:s'),
-                    'created' => date('Y-m-d H:i:s'),
+                    'checked_at' => $checkResult['checked_at'] ?? (new DateTime())->format('Y-m-d H:i:s'),
+                    'created' => (new DateTime())->format('Y-m-d H:i:s'),
                 ];
 
                 // Invalidate cached data for this monitor after check
@@ -451,7 +451,7 @@ class MonitorCheckCommand extends Command
                     'check_id' => $entity->id,
                     'error_message' => $errorMessage,
                     'details' => $details,
-                    'created' => date('Y-m-d H:i:s'),
+                    'created' => (new DateTime())->format('Y-m-d H:i:s'),
                 ];
             }
         }
