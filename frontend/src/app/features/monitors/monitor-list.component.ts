@@ -117,44 +117,39 @@ addIcons({ pulseOutline });
       <ion-list>
         @for (monitor of monitors(); track monitor.id) {
           <ion-item-sliding>
-            <ion-item [routerLink]="['/monitors', monitor.id]" detail>
-              <ion-badge
-                [color]="getStatusColor(monitor.status)"
-                slot="start"
-                style="
-                  width: 12px;
-                  height: 12px;
-                  border-radius: 50%;
-                  --padding-start: 0;
-                  --padding-end: 0;
-                  min-width: 12px;
-                "
-              ></ion-badge>
+            <ion-item [routerLink]="['/monitors', monitor.id]" detail class="monitor-item">
+              <div slot="start" class="status-dot" [style.background]="getStatusDotColor(monitor.status)"></div>
               <ion-label>
-                <h2>{{ monitor.name }}</h2>
-                <p>
-                  <ion-chip
-                    size="small"
-                    color="medium"
-                    style="height: 20px; font-size: 0.7rem"
-                    >{{ monitor.type }}</ion-chip
-                  >
-                  @if (monitor.uptime_percentage) {
-                    <span
-                      style="
-                        margin-left: 8px;
-                        font-size: 0.8rem;
-                        color: var(--ion-color-medium);
-                      "
-                    >
-                      {{ monitor.uptime_percentage }}% uptime
+                <div class="monitor-header">
+                  <h2>{{ monitor.name }}</h2>
+                  <div class="monitor-tags">
+                    <ion-badge [color]="getStatusColor(monitor.status)" class="status-badge">
+                      {{ monitor.status | uppercase }}
+                    </ion-badge>
+                    <ion-chip size="small" color="medium" class="type-chip">{{ monitor.type }}</ion-chip>
+                    @if (!monitor.active) {
+                      <ion-chip size="small" color="warning" class="type-chip">PAUSED</ion-chip>
+                    }
+                  </div>
+                </div>
+                <div class="monitor-meta">
+                  @if (monitor.uptime_percentage !== undefined && monitor.uptime_percentage !== null) {
+                    <span class="meta-item" [class.uptime-good]="monitor.uptime_percentage >= 99" [class.uptime-warn]="monitor.uptime_percentage >= 95 && monitor.uptime_percentage < 99" [class.uptime-bad]="monitor.uptime_percentage < 95">
+                      {{ monitor.uptime_percentage | number: '1.1-2' }}% uptime
                     </span>
                   }
-                </p>
+                  @if (monitor.last_check_at) {
+                    <span class="meta-item meta-time">
+                      Last check: {{ monitor.last_check_at | date: 'MMM d, h:mm a' }}
+                    </span>
+                  }
+                  @if (monitor.check_interval) {
+                    <span class="meta-item meta-interval">
+                      Every {{ monitor.check_interval >= 60 ? (monitor.check_interval / 60 | number: '1.0-0') + 'min' : monitor.check_interval + 's' }}
+                    </span>
+                  }
+                </div>
               </ion-label>
-              <ion-note slot="end" style="font-size: 0.75rem">
-                {{ monitor.last_check_at | date: 'shortTime' }}
-              </ion-note>
             </ion-item>
 
             <ion-item-options side="end">
@@ -206,6 +201,64 @@ addIcons({ pulseOutline });
         margin: 1rem 0 0.5rem;
         color: var(--ion-text-color);
       }
+      .status-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        margin-right: 4px;
+      }
+      .monitor-header {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .monitor-header h2 {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 600;
+      }
+      .monitor-tags {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+      .status-badge {
+        font-size: 0.6rem;
+        letter-spacing: 0.5px;
+        font-weight: 700;
+        padding: 2px 8px;
+        text-transform: uppercase;
+      }
+      .type-chip {
+        height: 20px;
+        font-size: 0.65rem;
+        --padding-start: 6px;
+        --padding-end: 6px;
+        margin: 0;
+      }
+      .monitor-meta {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 4px;
+        flex-wrap: wrap;
+      }
+      .meta-item {
+        font-size: 0.78rem;
+        color: var(--ion-color-medium);
+      }
+      .meta-time {
+        color: var(--ion-color-medium-shade);
+      }
+      .meta-interval {
+        color: var(--ion-color-medium-tint);
+      }
+      .uptime-good { color: var(--ion-color-success); font-weight: 600; }
+      .uptime-warn { color: var(--ion-color-warning-shade); font-weight: 600; }
+      .uptime-bad { color: var(--ion-color-danger); font-weight: 600; }
     `,
   ],
 })
@@ -372,6 +425,19 @@ export class MonitorListComponent implements ViewWillEnter {
         return 'warning';
       default:
         return 'medium';
+    }
+  }
+
+  getStatusDotColor(status: MonitorStatus): string {
+    switch (status) {
+      case 'up':
+        return 'var(--ion-color-success)';
+      case 'down':
+        return 'var(--ion-color-danger)';
+      case 'degraded':
+        return 'var(--ion-color-warning)';
+      default:
+        return 'var(--ion-color-medium)';
     }
   }
 }
