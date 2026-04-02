@@ -745,6 +745,14 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/notification-policies/{id}', ['controller' => 'NotificationPolicies', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '\d+']);
         $builder->connect('/notification-policies/{id}', ['controller' => 'NotificationPolicies', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
 
+        // Subscribers
+        $builder->connect('/subscribers', ['controller' => 'Subscribers', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
+        $builder->connect('/subscribers/{id}', ['controller' => 'Subscribers', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/subscribers/{id}/toggle', ['controller' => 'Subscribers', 'action' => 'toggle', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
+
+        // Email Logs (reads from alert_logs)
+        $builder->connect('/email-logs', ['controller' => 'EmailLogs', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
+
         // Super Admin
         $builder->connect('/super-admin/dashboard', ['controller' => 'Dashboard', 'action' => 'index', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'GET']);
         $builder->connect('/super-admin/organizations', ['controller' => 'Organizations', 'action' => 'index', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'GET']);
