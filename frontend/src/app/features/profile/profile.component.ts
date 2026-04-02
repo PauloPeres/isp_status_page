@@ -427,6 +427,15 @@ export class ProfileComponent implements OnInit {
     this.visibleTimezones = this.filteredTimezones.slice(0, 50);
   }
 
+  private ensureCurrentTimezoneVisible(): void {
+    if (this.timezone && !this.visibleTimezones.find(tz => tz.value === this.timezone)) {
+      const match = this.filteredTimezones.find(tz => tz.value === this.timezone);
+      if (match) {
+        this.visibleTimezones = [match, ...this.visibleTimezones];
+      }
+    }
+  }
+
   onTimezoneSearch(): void {
     const q = this.timezoneSearch.toLowerCase().trim();
     if (!q) {
@@ -436,6 +445,7 @@ export class ProfileComponent implements OnInit {
         .filter(tz => tz.value.toLowerCase().includes(q) || tz.label.toLowerCase().includes(q))
         .slice(0, 50);
     }
+    this.ensureCurrentTimezoneVisible();
   }
 
   ngOnInit(): void {
@@ -453,6 +463,7 @@ export class ProfileComponent implements OnInit {
           this.language = u.language || this.language;
           this.timezone = u.timezone || this.timezone;
           this.parsePhoneNumber(u.phone_number || '');
+          this.ensureCurrentTimezoneVisible();
         }
         this.loading.set(false);
       },
