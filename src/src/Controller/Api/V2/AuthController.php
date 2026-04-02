@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Api\V2;
 
+use App\Service\AuditLogService;
 use App\Service\JwtService;
 use App\Service\LoginThrottleService;
 use App\Service\TwoFactorService;
@@ -418,6 +419,15 @@ class AuthController extends AppController
         // Clear the refresh token cookie
         $this->response = $this->response->withExpiredCookie(
             new Cookie('refresh_token', '', null, '/')
+        );
+
+        $audit = new AuditLogService();
+        $audit->log(
+            'logout',
+            $this->currentUserId > 0 ? $this->currentUserId : null,
+            $this->request->clientIp(),
+            $this->request->getHeaderLine('User-Agent'),
+            ['revoke_all' => $revokeAll]
         );
 
         $this->success(['message' => 'Logged out successfully']);

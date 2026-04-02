@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Api\V2;
 
+use App\Service\AuditLogService;
 use App\Service\PlanService;
 
 /**
@@ -70,6 +71,15 @@ class InvitationsController extends AppController
         try {
             $service = new \App\Service\InvitationService();
             $invitation = $service->send($this->currentOrgId, $email, $role, $this->currentUserId);
+
+            $audit = new AuditLogService();
+            $audit->log(
+                'user_invited',
+                $this->currentUserId,
+                $this->request->clientIp(),
+                $this->request->getHeaderLine('User-Agent'),
+                ['email' => $email, 'role' => $role, 'invitation_id' => $invitation->id ?? null]
+            );
 
             $this->success(['invitation' => $invitation], 201);
         } catch (\Exception $e) {

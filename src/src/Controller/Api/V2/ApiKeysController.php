@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Api\V2;
 
+use App\Service\AuditLogService;
 use App\Service\PlanService;
 
 /**
@@ -70,6 +71,15 @@ class ApiKeysController extends AppController
             return;
         }
 
+        $audit = new AuditLogService();
+        $audit->log(
+            'api_key_created',
+            $this->currentUserId,
+            $this->request->clientIp(),
+            $this->request->getHeaderLine('User-Agent'),
+            ['api_key_id' => $key->id, 'name' => $key->name ?? null]
+        );
+
         $this->success(['api_key' => $key], 201);
     }
 
@@ -108,6 +118,15 @@ class ApiKeysController extends AppController
 
             return;
         }
+
+        $audit = new AuditLogService();
+        $audit->log(
+            'api_key_deleted',
+            $this->currentUserId,
+            $this->request->clientIp(),
+            $this->request->getHeaderLine('User-Agent'),
+            ['api_key_id' => (int)$id, 'name' => $key->name ?? null]
+        );
 
         $this->success(['message' => 'API key deleted']);
     }

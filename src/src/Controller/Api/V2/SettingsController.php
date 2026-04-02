@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Api\V2;
 
+use App\Service\AuditLogService;
 use App\Service\SettingService;
 
 /**
@@ -77,6 +78,15 @@ class SettingsController extends AppController
             }
 
             $service->saveMultiple($data, $this->currentOrgId);
+
+            $audit = new AuditLogService();
+            $audit->log(
+                'settings_change',
+                $this->currentUserId,
+                $this->request->clientIp(),
+                $this->request->getHeaderLine('User-Agent'),
+                ['keys_changed' => array_keys($data)]
+            );
 
             $this->success(['message' => 'Settings saved']);
         } catch (\Exception $e) {

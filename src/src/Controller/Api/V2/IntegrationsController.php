@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Api\V2;
 
+use App\Service\AuditLogService;
 use App\Service\PlanService;
 
 /**
@@ -93,6 +94,15 @@ class IntegrationsController extends AppController
             return;
         }
 
+        $audit = new AuditLogService();
+        $audit->log(
+            'integration_created',
+            $this->currentUserId,
+            $this->request->clientIp(),
+            $this->request->getHeaderLine('User-Agent'),
+            ['integration_id' => $integration->id, 'name' => $integration->name, 'type' => $integration->type ?? null]
+        );
+
         $this->success(['integration' => $integration], 201);
     }
 
@@ -171,6 +181,15 @@ class IntegrationsController extends AppController
 
             return;
         }
+
+        $audit = new AuditLogService();
+        $audit->log(
+            'integration_deleted',
+            $this->currentUserId,
+            $this->request->clientIp(),
+            $this->request->getHeaderLine('User-Agent'),
+            ['integration_id' => (int)$id, 'name' => $integration->name, 'type' => $integration->type ?? null]
+        );
 
         $this->success(['message' => 'Integration deleted']);
     }

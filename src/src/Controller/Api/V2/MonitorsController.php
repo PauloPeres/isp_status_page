@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Api\V2;
 
+use App\Service\AuditLogService;
 use App\Service\PlanService;
 use Cake\I18n\DateTime;
 
@@ -284,6 +285,15 @@ class MonitorsController extends AppController
         $monitor = $monitorsTable->newEntity($data);
 
         if ($monitorsTable->save($monitor)) {
+            $audit = new AuditLogService();
+            $audit->log(
+                'monitor_created',
+                $this->currentUserId,
+                $this->request->clientIp(),
+                $this->request->getHeaderLine('User-Agent'),
+                ['monitor_id' => $monitor->id, 'name' => $monitor->name, 'type' => $monitor->type]
+            );
+
             $this->success(['monitor' => $monitor], 201);
         } else {
             $this->error('Unable to create monitor', 422, $monitor->getErrors());
@@ -323,6 +333,15 @@ class MonitorsController extends AppController
         $monitor = $monitorsTable->patchEntity($monitor, $data);
 
         if ($monitorsTable->save($monitor)) {
+            $audit = new AuditLogService();
+            $audit->log(
+                'monitor_updated',
+                $this->currentUserId,
+                $this->request->clientIp(),
+                $this->request->getHeaderLine('User-Agent'),
+                ['monitor_id' => $monitor->id, 'name' => $monitor->name, 'type' => $monitor->type]
+            );
+
             $this->success(['monitor' => $monitor]);
         } else {
             $this->error('Unable to update monitor', 422, $monitor->getErrors());
@@ -356,6 +375,15 @@ class MonitorsController extends AppController
         }
 
         if ($monitorsTable->delete($monitor)) {
+            $audit = new AuditLogService();
+            $audit->log(
+                'monitor_deleted',
+                $this->currentUserId,
+                $this->request->clientIp(),
+                $this->request->getHeaderLine('User-Agent'),
+                ['monitor_id' => (int)$id, 'name' => $monitor->name, 'type' => $monitor->type]
+            );
+
             $this->success(['message' => 'Monitor deleted']);
         } else {
             $this->error('Unable to delete monitor', 500);
