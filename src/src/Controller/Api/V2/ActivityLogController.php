@@ -101,7 +101,7 @@ class ActivityLogController extends AppController
                     'email' => $entry->user->email ?? null,
                     'ip_address' => $entry->ip_address,
                     'user_agent' => $entry->user_agent,
-                    'details' => $entry->details,
+                    'details' => $entry->details ? json_decode($entry->details, true) : null,
                     'created' => $entry->created ? $entry->created->format('Y-m-d H:i:s') : null,
                 ];
             }
