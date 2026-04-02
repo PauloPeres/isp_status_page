@@ -75,3 +75,32 @@ code, pre {
     size: A4 portrait;
   }
 }
+
+/* ===== Dark Mode: Ionic Overlay Fixes ===== */
+/* Ensure action sheets, alerts, and popovers are readable in dark mode */
+@media (prefers-color-scheme: dark) {
+  ion-action-sheet {
+    --background: var(--ion-color-step-50, #1a1a1a);
+    --button-background: var(--ion-color-step-50, #1a1a1a);
+    --button-color: var(--ion-text-color, #fff);
+    --color: var(--ion-text-color, #fff);
+  }
+
+  ion-alert {
+    --background: var(--ion-color-step-50, #1a1a1a);
+
+    .alert-button {
+      color: var(--ion-color-primary, #2979ff);
+    }
+  }
+}
+
+/* Also support Ionic's .dark class-based theme */
+body.dark, .ios body.dark, .md body.dark {
+  ion-action-sheet {
+    --background: var(--ion-color-step-50, #1a1a1a);
+    --button-background: var(--ion-color-step-50, #1a1a1a);
+    --button-color: var(--ion-text-color, #fff);
+    --color: var(--ion-text-color, #fff);
+  }
+}

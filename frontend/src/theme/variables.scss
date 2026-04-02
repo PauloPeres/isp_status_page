@@ -161,4 +161,24 @@ body.dark {
   .summary-label, .stat-label, .empty-state p, .help-text {
     color: var(--ion-color-medium) !important;
   }
+  ion-action-sheet {
+    --background: #1A2332;
+    --button-background: #1A2332;
+    --button-background-hover: #2C3E50;
+    --button-background-activated: #2C3E50;
+    --button-color: #E8EDF2;
+    --color: #E8EDF2;
+    .action-sheet-group-cancel {
+      background: #0F1923;
+    }
+  }
+  ion-alert {
+    --background: #1A2332;
+    .alert-title, .alert-message {
+      color: #E8EDF2;
+    }
+    .alert-button {
+      color: var(--ion-color-primary);
+    }
+  }
 }
