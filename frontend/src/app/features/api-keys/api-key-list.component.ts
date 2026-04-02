@@ -55,11 +55,11 @@ addIcons({ keyOutline, copyOutline });
 
       <!-- Show newly created key -->
       @if (newKey()) {
-        <div style="padding: 16px; background: var(--ion-color-success-tint); border-radius: 8px; margin: 16px">
-          <h3 style="margin: 0 0 4px; color: var(--ion-color-success-shade)">Key Created - Copy Now!</h3>
-          <p style="font-size: 0.8rem; color: var(--ion-color-medium); margin: 0 0 8px">This key will not be shown again.</p>
-          <div style="display: flex; align-items: center; gap: 8px">
-            <code style="flex: 1; padding: 8px; background: white; border-radius: 4px; font-size: 0.8rem; word-break: break-all">{{ newKey() }}</code>
+        <div class="new-key-banner">
+          <h3>Key Created - Copy Now!</h3>
+          <p class="new-key-hint">This key will not be shown again.</p>
+          <div class="new-key-value">
+            <code>{{ newKey() }}</code>
             <ion-button fill="clear" size="small" (click)="copyKey()">
               <ion-icon name="copy-outline"></ion-icon>
             </ion-button>
@@ -73,26 +73,31 @@ addIcons({ keyOutline, copyOutline });
       <ion-list>
         @for (item of items(); track item.id) {
           <ion-item-sliding>
-            <ion-item>
+            <ion-item class="key-item">
               <ion-icon name="key-outline" slot="start" color="medium"></ion-icon>
               <ion-label>
-                <h2>{{ item.name }}</h2>
-                <p>
-                  <code style="font-size: 0.75rem">{{ item.prefix }}...</code>
-                  @for (perm of item.permissions; track perm) {
-                    <ion-chip size="small" color="tertiary" style="height: 18px; font-size: 0.65rem; margin-left: 4px">
-                      {{ perm }}
-                    </ion-chip>
-                  }
-                </p>
+                <div class="key-header">
+                  <h2>{{ item.name }}</h2>
+                  <div class="key-permissions">
+                    @for (perm of item.permissions; track perm) {
+                      <ion-badge [color]="getPermissionColor(perm)" class="perm-badge">{{ perm }}</ion-badge>
+                    }
+                  </div>
+                </div>
+                <div class="key-meta">
+                  <code class="key-prefix">{{ maskPrefix(item.prefix) }}</code>
+                  <span class="meta-separator">|</span>
+                  <span class="meta-date">
+                    @if (item.last_used_at) {
+                      Last used {{ item.last_used_at | date:'MMM d, y' }}
+                    } @else {
+                      Never used
+                    }
+                  </span>
+                  <span class="meta-separator">|</span>
+                  <span class="meta-date">Created {{ item.created_at | date:'MMM d, y' }}</span>
+                </div>
               </ion-label>
-              <ion-note slot="end" style="font-size: 0.7rem">
-                @if (item.last_used_at) {
-                  Used {{ item.last_used_at | date:'shortDate' }}
-                } @else {
-                  Never used
-                }
-              </ion-note>
             </ion-item>
 
             <ion-item-options side="end">
@@ -112,8 +117,91 @@ addIcons({ keyOutline, copyOutline });
     </ion-content>
   `,
   styles: [`
-    .empty-state { text-align: center; padding: 3rem 1rem; color: var(--ion-color-medium); }
-    .empty-state h3 { margin: 1rem 0 0.5rem; color: var(--ion-text-color); }
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--ion-color-medium);
+    }
+    .empty-state h3 {
+      margin: 1rem 0 0.5rem;
+      color: var(--ion-text-color);
+    }
+    .new-key-banner {
+      padding: 16px;
+      background: var(--ion-color-success-tint);
+      border-radius: 8px;
+      margin: 16px;
+    }
+    .new-key-banner h3 {
+      margin: 0 0 4px;
+      color: var(--ion-color-success-shade);
+    }
+    .new-key-hint {
+      font-size: 0.8rem;
+      color: var(--ion-color-medium);
+      margin: 0 0 8px;
+    }
+    .new-key-value {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .new-key-value code {
+      flex: 1;
+      padding: 8px;
+      background: white;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      word-break: break-all;
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    }
+    .key-header {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .key-header h2 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    .key-permissions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .perm-badge {
+      font-size: 0.6rem;
+      letter-spacing: 0.5px;
+      font-weight: 700;
+      padding: 2px 8px;
+      text-transform: uppercase;
+    }
+    .key-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+      flex-wrap: wrap;
+    }
+    .key-prefix {
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 0.78rem;
+      color: var(--ion-color-medium-shade);
+      background: var(--ion-color-light);
+      padding: 1px 6px;
+      border-radius: 4px;
+      letter-spacing: 0.3px;
+    }
+    .meta-separator {
+      color: var(--ion-color-light-shade);
+      font-size: 0.75rem;
+    }
+    .meta-date {
+      font-size: 0.78rem;
+      color: var(--ion-color-medium);
+    }
   `],
 })
 export class ApiKeyListComponent implements OnInit, ViewWillEnter {
@@ -206,6 +294,22 @@ export class ApiKeyListComponent implements OnInit, ViewWillEnter {
       await navigator.clipboard.writeText(key);
       const toast = await this.toastCtrl.create({ message: 'Copied to clipboard', color: 'success', duration: 2000, position: 'bottom' });
       await toast.present();
+    }
+  }
+
+  maskPrefix(prefix: string): string {
+    if (!prefix) return '••••••••';
+    const suffix = prefix.length > 4 ? prefix.slice(-4) : prefix;
+    const prefixPart = prefix.length > 4 ? prefix.slice(0, prefix.indexOf('_') + 1) || '' : '';
+    return `${prefixPart}${'••••••••'}${suffix}`;
+  }
+
+  getPermissionColor(perm: string): string {
+    switch (perm) {
+      case 'admin': return 'danger';
+      case 'write': return 'warning';
+      case 'read': return 'tertiary';
+      default: return 'medium';
     }
   }
 
