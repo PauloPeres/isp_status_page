@@ -5,6 +5,7 @@ namespace App\Controller\Api\V2;
 
 use App\Service\AuditLogService;
 use App\Service\SettingService;
+use Cake\Log\Log;
 
 /**
  * SettingsController (TASK-NG-009)
@@ -101,7 +102,8 @@ class SettingsController extends AppController
 
             $this->success(['message' => 'Settings saved']);
         } catch (\Exception $e) {
-            $this->error('Failed to save settings: ' . $e->getMessage(), 422);
+            Log::error('Failed to save settings: ' . $e->getMessage());
+            $this->error('Failed to save settings. Please try again.', 422);
         }
     }
 }

@@ -7,6 +7,7 @@ use App\Service\AuditLogService;
 use App\Service\JwtService;
 use App\Service\LoginThrottleService;
 use App\Service\TwoFactorService;
+use Cake\Cache\Cache;
 use Cake\Http\Cookie\Cookie;
 use Cake\I18n\DateTime;
 use Cake\Validation\Validator;
@@ -38,6 +39,25 @@ class AuthController extends AppController
     public function register(): void
     {
         $this->request->allowMethod(['post']);
+
+        // IP-based rate limiting: max 5 registrations per IP per hour
+        $ip = $this->request->clientIp();
+        $cacheKey = 'register_attempts_' . md5($ip);
+        $regData = Cache::read($cacheKey, 'default');
+        if (!$regData || !is_array($regData)) {
+            $regData = ['count' => 0, 'window_start' => time()];
+        }
+        // Reset window if more than 1 hour has passed
+        if ((time() - (int)($regData['window_start'] ?? time())) > 3600) {
+            $regData = ['count' => 0, 'window_start' => time()];
+        }
+        if ((int)($regData['count'] ?? 0) >= 5) {
+            $this->error('Too many registration attempts. Please try again later.', 429);
+
+            return;
+        }
+        $regData['count'] = ((int)($regData['count'] ?? 0)) + 1;
+        Cache::write($cacheKey, $regData, 'default');
 
         $data = $this->request->getData();
         $username = trim((string)($data['username'] ?? ''));

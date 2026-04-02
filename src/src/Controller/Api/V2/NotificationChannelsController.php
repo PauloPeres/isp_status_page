@@ -262,7 +262,7 @@ class NotificationChannelsController extends AppController
             }
         } catch (\Exception $e) {
             Log::error("Test notification failed for channel {$id}: {$e->getMessage()}");
-            $this->error('Test notification failed: ' . $e->getMessage(), 500);
+            $this->error('Test notification failed. Check logs for details.', 500);
         }
     }
 

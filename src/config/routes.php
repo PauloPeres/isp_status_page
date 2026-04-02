@@ -534,7 +534,6 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/settings/save', ['controller' => 'Settings', 'action' => 'save']);
         $builder->connect('/settings/test-email', ['controller' => 'Settings', 'action' => 'testEmail']);
         $builder->connect('/settings/test-ftp', ['controller' => 'Settings', 'action' => 'testFtp']);
-        $builder->fallbacks();
     });
 
     /*
@@ -855,7 +854,5 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/super-admin/blog-posts/{id}', ['controller' => 'BlogPosts', 'action' => 'delete', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
         $builder->connect('/super-admin/blog-posts/{id}/publish', ['controller' => 'BlogPosts', 'action' => 'publish', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
         $builder->connect('/super-admin/blog-posts/{id}/unpublish', ['controller' => 'BlogPosts', 'action' => 'unpublish', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
-
-        $builder->fallbacks();
     });
 };

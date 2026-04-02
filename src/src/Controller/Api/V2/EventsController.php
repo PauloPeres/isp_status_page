@@ -81,45 +81,50 @@ class EventsController extends AppController
     {
         $events = [];
 
-        // Check for new monitor status changes
+        // Require a valid org ID — refuse to serve events without tenant context
+        if ($orgId <= 0) {
+            return $events;
+        }
+
+        // Check for new monitor status changes (uses normal tenant scoping)
         $monitors = $this->fetchTable('Monitors')->find()
-            ->select(['id', 'name', 'status', 'organization_id', 'modified'])
-            ->where(['modified >' => $since->format('Y-m-d H:i:s')])
-            ->applyOptions(['skipTenantScope' => true])
+            ->select(['id', 'name', 'status', 'modified'])
+            ->where([
+                'Monitors.organization_id' => $orgId,
+                'modified >' => $since->format('Y-m-d H:i:s'),
+            ])
             ->all();
 
         foreach ($monitors as $monitor) {
-            if ($monitor->organization_id == $orgId || !$orgId) {
-                $events[] = [
-                    'type' => 'monitor_status',
-                    'data' => [
-                        'id' => $monitor->id,
-                        'name' => $monitor->name,
-                        'status' => $monitor->status,
-                    ],
-                ];
-            }
+            $events[] = [
+                'type' => 'monitor_status',
+                'data' => [
+                    'id' => $monitor->id,
+                    'name' => $monitor->name,
+                    'status' => $monitor->status,
+                ],
+            ];
         }
 
-        // Check for new incidents
+        // Check for new incidents (uses normal tenant scoping)
         $incidents = $this->fetchTable('Incidents')->find()
-            ->select(['id', 'title', 'severity', 'status', 'organization_id', 'created'])
-            ->where(['created >' => $since->format('Y-m-d H:i:s')])
-            ->applyOptions(['skipTenantScope' => true])
+            ->select(['id', 'title', 'severity', 'status', 'created'])
+            ->where([
+                'Incidents.organization_id' => $orgId,
+                'created >' => $since->format('Y-m-d H:i:s'),
+            ])
             ->all();
 
         foreach ($incidents as $incident) {
-            if ($incident->organization_id == $orgId || !$orgId) {
-                $events[] = [
-                    'type' => 'incident_created',
-                    'data' => [
-                        'id' => $incident->id,
-                        'title' => $incident->title,
-                        'severity' => $incident->severity,
-                        'status' => $incident->status,
-                    ],
-                ];
-            }
+            $events[] = [
+                'type' => 'incident_created',
+                'data' => [
+                    'id' => $incident->id,
+                    'title' => $incident->title,
+                    'severity' => $incident->severity,
+                    'status' => $incident->status,
+                ],
+            ];
         }
 
         return $events;
