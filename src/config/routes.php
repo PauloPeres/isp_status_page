@@ -423,6 +423,83 @@ return function (RouteBuilder $routes): void {
         );
 
         /*
+         * Legacy controller routes — explicit routes for controllers that
+         * redirect to the Angular SPA (replaces removed $builder->fallbacks()).
+         */
+
+        // StatusController (public pages — renders views, NOT redirects)
+        $builder->connect('/status', ['controller' => 'Status', 'action' => 'index']);
+        $builder->connect('/status/history', ['controller' => 'Status', 'action' => 'history']);
+
+        // AdminController
+        $builder->connect('/admin', ['controller' => 'Admin', 'action' => 'index']);
+
+        // MonitorsController
+        $builder->connect('/monitors', ['controller' => 'Monitors', 'action' => 'index']);
+        $builder->connect('/monitors/view/*', ['controller' => 'Monitors', 'action' => 'view']);
+        $builder->connect('/monitors/add', ['controller' => 'Monitors', 'action' => 'add']);
+        $builder->connect('/monitors/edit/*', ['controller' => 'Monitors', 'action' => 'edit']);
+        $builder->connect('/monitors/delete/*', ['controller' => 'Monitors', 'action' => 'delete']);
+        $builder->connect('/monitors/toggle/*', ['controller' => 'Monitors', 'action' => 'toggle']);
+
+        // IncidentsController
+        $builder->connect('/incidents', ['controller' => 'Incidents', 'action' => 'index']);
+        $builder->connect('/incidents/view/*', ['controller' => 'Incidents', 'action' => 'view']);
+        $builder->connect('/incidents/add', ['controller' => 'Incidents', 'action' => 'add']);
+
+        // SettingsController
+        $builder->connect('/settings', ['controller' => 'Settings', 'action' => 'index']);
+        $builder->connect('/settings/save', ['controller' => 'Settings', 'action' => 'save']);
+
+        // SubscribersController
+        $builder->connect('/subscribers', ['controller' => 'Subscribers', 'action' => 'index']);
+        $builder->connect('/subscribers/view/*', ['controller' => 'Subscribers', 'action' => 'view']);
+        $builder->connect('/subscribers/delete/*', ['controller' => 'Subscribers', 'action' => 'delete']);
+        $builder->connect('/subscribers/toggle/*', ['controller' => 'Subscribers', 'action' => 'toggle']);
+        $builder->connect('/subscribers/verify/*', ['controller' => 'Subscribers', 'action' => 'verify']);
+        $builder->connect('/subscribers/unsubscribe/*', ['controller' => 'Subscribers', 'action' => 'unsubscribe']);
+
+        // UsersController
+        $builder->connect('/users/index', ['controller' => 'Users', 'action' => 'index']);
+        $builder->connect('/users/add', ['controller' => 'Users', 'action' => 'add']);
+        $builder->connect('/users/edit/*', ['controller' => 'Users', 'action' => 'edit']);
+        $builder->connect('/users/login', ['controller' => 'Users', 'action' => 'login']);
+        $builder->connect('/users/logout', ['controller' => 'Users', 'action' => 'logout']);
+
+        // AlertRulesController
+        $builder->connect('/alert-rules', ['controller' => 'AlertRules', 'action' => 'index']);
+        $builder->connect('/alert-rules/add', ['controller' => 'AlertRules', 'action' => 'add']);
+
+        // ApiKeysController
+        $builder->connect('/api-keys', ['controller' => 'ApiKeys', 'action' => 'index']);
+        $builder->connect('/api-keys/add', ['controller' => 'ApiKeys', 'action' => 'add']);
+
+        // EmailLogsController
+        $builder->connect('/email-logs', ['controller' => 'EmailLogs', 'action' => 'index']);
+        $builder->connect('/email-logs/view/*', ['controller' => 'EmailLogs', 'action' => 'view']);
+
+        // IntegrationsController
+        $builder->connect('/integrations', ['controller' => 'Integrations', 'action' => 'index']);
+        $builder->connect('/integrations/add', ['controller' => 'Integrations', 'action' => 'add']);
+        $builder->connect('/integrations/view/*', ['controller' => 'Integrations', 'action' => 'view']);
+        $builder->connect('/integrations/edit/*', ['controller' => 'Integrations', 'action' => 'edit']);
+
+        // ReportsController
+        $builder->connect('/reports', ['controller' => 'Reports', 'action' => 'index']);
+
+        // ActivityLogController
+        $builder->connect('/activity-log', ['controller' => 'ActivityLog', 'action' => 'index']);
+
+        // MaintenanceWindowsController
+        $builder->connect('/maintenance-windows', ['controller' => 'MaintenanceWindows', 'action' => 'index']);
+        $builder->connect('/maintenance-windows/add', ['controller' => 'MaintenanceWindows', 'action' => 'add']);
+
+        // StatusPagesController
+        $builder->connect('/status-pages', ['controller' => 'StatusPages', 'action' => 'index']);
+        $builder->connect('/status-pages/add', ['controller' => 'StatusPages', 'action' => 'add']);
+        $builder->connect('/status-pages/delete/*', ['controller' => 'StatusPages', 'action' => 'delete']);
+
+        /*
          * SPA catch-all — Angular app served at /app/* (TASK-NG-050)
          * Must be BEFORE the fallbacks so /app/* doesn't hit CakePHP controllers.
          */

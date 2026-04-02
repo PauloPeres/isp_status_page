@@ -52,7 +52,7 @@ class TwoFactorServiceTest extends TestCase
         $this->assertStringStartsWith('otpauth://totp/', $url);
         $this->assertStringContainsString('user%40example.com', $url);
         $this->assertStringContainsString('secret=' . $secret, $url);
-        $this->assertStringContainsString('issuer=ISP+Status+Page', $url);
+        $this->assertStringContainsString('issuer=KeepUp', $url);
         $this->assertStringContainsString('algorithm=SHA1', $url);
         $this->assertStringContainsString('digits=6', $url);
         $this->assertStringContainsString('period=30', $url);

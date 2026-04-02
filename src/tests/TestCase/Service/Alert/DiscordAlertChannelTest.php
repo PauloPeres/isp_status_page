@@ -79,7 +79,7 @@ class DiscordAlertChannelTest extends TestCase
         $this->assertStringContainsString('DOWN', $embed['title']);
         $this->assertStringContainsString('Test Monitor', $embed['title']);
         $this->assertEquals(0xE53935, $embed['color']);
-        $this->assertEquals('ISP Status Monitor', $payload['username']);
+        $this->assertEquals('KeepUp Monitor', $payload['username']);
     }
 
     /**
