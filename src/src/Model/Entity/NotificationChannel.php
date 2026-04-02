@@ -127,16 +127,18 @@ class NotificationChannel extends Entity
      * Set configuration from array
      *
      * @param array|string|null $value Configuration array or JSON string
-     * @return string
+     * @return array
      */
-    protected function _setConfiguration(array|string|null $value): string
+    protected function _setConfiguration(array|string|null $value): array
     {
         if ($value === null) {
-            return '{}';
+            return [];
         }
 
-        if (is_array($value)) {
-            return json_encode($value);
+        if (is_string($value)) {
+            $decoded = json_decode($value, true);
+
+            return is_array($decoded) ? $decoded : [];
         }
 
         return $value;

@@ -46,6 +46,9 @@ class NotificationChannelsTable extends Table
         $this->addBehavior('Timestamp');
         $this->addBehavior('TenantScope');
 
+        // Override schema type so CakePHP marshaller properly handles array <-> JSON
+        $this->getSchema()->setColumnType('configuration', 'json');
+
         $this->belongsTo('Organizations', [
             'foreignKey' => 'organization_id',
             'joinType' => 'INNER',
@@ -79,7 +82,7 @@ class NotificationChannelsTable extends Table
 
         $validator
             ->requirePresence('configuration', 'create')
-            ->notEmptyString('configuration');
+            ->notEmptyArray('configuration');
 
         $validator
             ->boolean('active')

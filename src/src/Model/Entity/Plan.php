@@ -142,6 +142,24 @@ class Plan extends Entity
     {
         $features = $this->getFeatures();
 
+        // Support both indexed arrays (["feature1", "feature2"])
+        // and associative arrays ({"feature1": true, "feature2": true})
+        if (array_is_list($features)) {
+            if (in_array($feature, $features, true)) {
+                return true;
+            }
+
+            // "all_alert_channels" is a superset that implies all specific alert features
+            if (in_array('all_alert_channels', $features, true)) {
+                $impliedByAll = ['email_alerts', 'slack_alerts', 'webhook_alerts'];
+                if (in_array($feature, $impliedByAll, true)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         return !empty($features[$feature]);
     }
 
