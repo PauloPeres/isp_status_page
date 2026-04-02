@@ -6,6 +6,7 @@ namespace App\Service;
 use App\Model\Table\SettingsTable;
 use App\Tenant\TenantContext;
 use Cake\Cache\Cache;
+use Cake\Log\Log;
 use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\ORM\TableRegistry;
 
@@ -372,5 +373,98 @@ class SettingService
         $this->clearCache();
 
         return $this->getAll();
+    }
+
+    /**
+     * Save multiple settings at once.
+     *
+     * System-only keys (smtp_*, backup_ftp_*, default_language) are saved to
+     * the settings table via set(). All other keys are saved to the
+     * organization's settings JSON column when an orgId is provided.
+     *
+     * @param array $data Key-value pairs to save
+     * @param int|null $orgId Organization ID (null = system-level only)
+     * @return bool True on success
+     * @throws \RuntimeException If saving fails
+     */
+    public function saveMultiple(array $data, ?int $orgId = null): bool
+    {
+        $systemData = [];
+        $orgData = [];
+
+        // Separate system-only keys from org-level keys
+        foreach ($data as $key => $value) {
+            if ($this->isSystemOnlyKey($key)) {
+                $systemData[$key] = $value;
+            } else {
+                $orgData[$key] = $value;
+            }
+        }
+
+        // Save system-level settings to the settings table
+        foreach ($systemData as $key => $value) {
+            if (!$this->set($key, $value)) {
+                Log::error("Failed to save system setting: {$key}");
+                throw new \RuntimeException("Failed to save setting: {$key}");
+            }
+        }
+
+        // Save org-level settings to Organization.settings JSON column
+        if (!empty($orgData) && $orgId !== null) {
+            $orgsTable = TableRegistry::getTableLocator()->get('Organizations');
+            $org = $orgsTable->find()
+                ->where(['id' => $orgId])
+                ->first();
+
+            if ($org === null) {
+                throw new \RuntimeException("Organization not found: {$orgId}");
+            }
+
+            // Merge with existing org settings
+            $existingSettings = json_decode($org->settings ?? '{}', true) ?: [];
+            $mergedSettings = array_merge($existingSettings, $orgData);
+
+            $org->settings = json_encode($mergedSettings);
+
+            if (!$orgsTable->save($org)) {
+                Log::error("Failed to save organization settings for org #{$orgId}");
+                throw new \RuntimeException('Failed to save organization settings');
+            }
+
+            // Update TenantContext if this is the current org
+            if (TenantContext::isSet() && TenantContext::getCurrentOrgId() === $orgId) {
+                $orgArray = TenantContext::getCurrentOrganization();
+                if ($orgArray !== null) {
+                    $orgArray['settings'] = $org->settings;
+                    TenantContext::setCurrentOrganization($orgArray);
+                }
+            }
+        } elseif (!empty($orgData) && $orgId === null) {
+            // No orgId provided — save org-level keys as system settings (SuperAdmin context)
+            foreach ($orgData as $key => $value) {
+                if (!$this->set($key, $value)) {
+                    Log::error("Failed to save system setting: {$key}");
+                    throw new \RuntimeException("Failed to save setting: {$key}");
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Send a test email using the current SMTP settings.
+     *
+     * Delegates to EmailService::sendTestEmail().
+     *
+     * @param string $to Recipient email address
+     * @return bool True if the test email was sent
+     * @throws \Exception If the email fails to send
+     */
+    public function testEmail(string $to): bool
+    {
+        $emailService = new EmailService();
+
+        return $emailService->sendTestEmail($to);
     }
 }
