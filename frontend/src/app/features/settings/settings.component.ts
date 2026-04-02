@@ -359,7 +359,7 @@ export class SettingsComponent implements OnInit {
   loadSettings(): void {
     this.loading.set(true);
     this.service.get().subscribe({
-      next: (data) => { this.settings = data || {}; this.initDefaults(); this.loading.set(false); },
+      next: (data) => { this.settings = data || {}; this.initDefaults(); this.ensureCurrentTimezoneVisible(); this.loading.set(false); },
       error: () => this.loading.set(false),
     });
   }
@@ -374,7 +374,7 @@ export class SettingsComponent implements OnInit {
 
   onRefresh(event: any): void {
     this.service.get().subscribe({
-      next: (data) => { this.settings = data || {}; this.initDefaults(); event.target.complete(); },
+      next: (data) => { this.settings = data || {}; this.initDefaults(); this.ensureCurrentTimezoneVisible(); event.target.complete(); },
       error: () => event.target.complete(),
     });
   }
@@ -431,6 +431,16 @@ export class SettingsComponent implements OnInit {
     });
   }
 
+  ensureCurrentTimezoneVisible(): void {
+    const currentTz = this.settings['timezone'];
+    if (currentTz && !this.visibleTimezones.find(tz => tz.value === currentTz)) {
+      const match = this.filteredTimezones.find(tz => tz.value === currentTz);
+      if (match) {
+        this.visibleTimezones = [match, ...this.visibleTimezones];
+      }
+    }
+  }
+
   onTimezoneSearch(): void {
     const q = this.timezoneSearch.toLowerCase().trim();
     if (!q) {
@@ -440,6 +450,7 @@ export class SettingsComponent implements OnInit {
         .filter(tz => tz.value.toLowerCase().includes(q) || tz.label.toLowerCase().includes(q))
         .slice(0, 50);
     }
+    this.ensureCurrentTimezoneVisible();
   }
 
   // --- Save ---
