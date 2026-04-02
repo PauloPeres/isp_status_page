@@ -137,8 +137,7 @@ class ActivityLogController extends AppController
             ->withType('text/csv')
             ->withHeader('Content-Disposition', 'attachment; filename="audit_log_export.csv"')
             ->withStringBody($csvContent);
-        $this->set('data', null);
-        $this->viewBuilder()->setClassName('Json');
+        $this->autoRender = false;
     }
 
     /**
