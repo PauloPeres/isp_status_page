@@ -36,7 +36,13 @@ class JwtService
         if (!$isDebug && in_array($secret, ['change-me', 'secret', 'password', 'jwt-secret'], true)) {
             throw new \RuntimeException('JWT_SECRET or SECURITY_SALT must not use a default value in production. Set APP_DEBUG=true to bypass in development.');
         }
-        $this->secretKey = (string)$secret;
+        // Ensure key meets HS256 minimum length (32 bytes / 256 bits)
+        // by hashing short keys with SHA-256
+        if (strlen((string)$secret) < 32) {
+            $this->secretKey = hash('sha256', (string)$secret);
+        } else {
+            $this->secretKey = (string)$secret;
+        }
     }
 
     /**
