@@ -6,8 +6,8 @@
  */
 
 // Fallback values if variables are not set
-$siteName = $siteName ?? 'ISP Status';
-$supportEmail = $supportEmail ?? 'support@example.com';
+$siteName = $siteName ?? \Cake\Core\Configure::read('Brand.name', 'ISP Status');
+$supportEmail = $supportEmail ?? \Cake\Core\Configure::read('Brand.supportEmail', 'support@usekeeup.com');
 ?>
 
 <footer class="public-footer">
@@ -53,7 +53,7 @@ $supportEmail = $supportEmail ?? 'support@example.com';
         <div class="footer-bottom">
             <p>&copy; <?= date('Y') ?> <?= h($siteName) ?>. <?= __('All rights reserved.') ?></p>
             <p class="footer-powered">
-                <?= __('Powered by') ?> <a href="https://github.com/PauloPeres/isp_status_page" target="_blank">ISP Status Page</a>
+                <?= __('Powered by') ?> <a href="https://github.com/PauloPeres/isp_status_page" target="_blank"><?= \Cake\Core\Configure::read('Brand.fullName', 'ISP Status Page') ?></a>
             </p>
         </div>
     </div>

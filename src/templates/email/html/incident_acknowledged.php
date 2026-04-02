@@ -14,7 +14,7 @@
  */
 ?>
 <div style="font-family: Arial, Helvetica, sans-serif; max-width: 600px; margin: 0 auto;">
-    <div style="background-color: #1E88E5; color: #ffffff; padding: 20px; text-align: center; border-radius: 4px 4px 0 0;">
+    <div style="background-color: #2979FF; color: #ffffff; padding: 20px; text-align: center; border-radius: 4px 4px 0 0;">
         <h1 style="margin: 0; font-size: 24px;"><?= __d('emails', 'Incident Acknowledged') ?></h1>
     </div>
 

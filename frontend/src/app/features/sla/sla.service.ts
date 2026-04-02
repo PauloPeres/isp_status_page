@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { ApiService, PaginatedResponse } from '../../core/services/api.service';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 
 export interface Sla {
   id: number;
@@ -22,7 +24,7 @@ export interface Sla {
 
 @Injectable({ providedIn: 'root' })
 export class SlaService {
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService, private http: HttpClient) {}
 
   getAll(params?: any): Observable<PaginatedResponse<Sla>> {
     return this.api.get<any>('/sla', params).pipe(
@@ -55,7 +57,14 @@ export class SlaService {
     return this.api.get(`/sla/${id}/report`, params);
   }
 
-  exportReport(id: number, format: 'pdf' | 'csv' = 'csv'): Observable<Blob> {
-    return this.api.get(`/sla/${id}/export`, { format });
+  /**
+   * Download SLA report as PDF or CSV blob (bypasses JSON ApiService).
+   */
+  exportReport(id: number, format: 'pdf' | 'csv' = 'pdf'): Observable<Blob> {
+    const params = new HttpParams().set('format', format);
+    return this.http.get(`${environment.apiUrl}/sla/${id}/export`, {
+      params,
+      responseType: 'blob',
+    });
   }
 }

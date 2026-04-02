@@ -20,7 +20,7 @@ $frequencyLabel = ($period['frequency'] ?? 'weekly') === 'monthly' ? __('Monthly
 <div style="font-family: Arial, Helvetica, sans-serif; max-width: 700px; margin: 0 auto; background-color: #f5f5f5; padding: 20px;">
 
     <!-- Header -->
-    <div style="background-color: #1E88E5; color: #ffffff; padding: 24px 30px; text-align: center; border-radius: 8px 8px 0 0;">
+    <div style="background-color: #2979FF; color: #ffffff; padding: 24px 30px; text-align: center; border-radius: 8px 8px 0 0;">
         <h1 style="margin: 0; font-size: 22px; font-weight: 600;"><?= h($frequencyLabel) ?> <?= __('Uptime Report') ?></h1>
         <p style="margin: 8px 0 0 0; font-size: 14px; opacity: 0.9;"><?= h($orgName) ?> &mdash; <?= h($periodLabel) ?></p>
     </div>
@@ -31,7 +31,7 @@ $frequencyLabel = ($period['frequency'] ?? 'weekly') === 'monthly' ? __('Monthly
         <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px;">
             <tr>
                 <td style="width: 25%; text-align: center; padding: 16px 8px; background-color: #f8f9fa; border-radius: 6px;">
-                    <div style="font-size: 28px; font-weight: bold; color: #1E88E5;"><?= (int)($summary['total_monitors'] ?? 0) ?></div>
+                    <div style="font-size: 28px; font-weight: bold; color: #2979FF;"><?= (int)($summary['total_monitors'] ?? 0) ?></div>
                     <div style="font-size: 12px; color: #666; margin-top: 4px;"><?= __('Monitors') ?></div>
                 </td>
                 <td style="width: 25%; text-align: center; padding: 16px 8px; background-color: #f8f9fa; border-radius: 6px;">
@@ -41,7 +41,7 @@ $frequencyLabel = ($period['frequency'] ?? 'weekly') === 'monthly' ? __('Monthly
                     <div style="font-size: 12px; color: #666; margin-top: 4px;"><?= __('Avg Uptime') ?></div>
                 </td>
                 <td style="width: 25%; text-align: center; padding: 16px 8px; background-color: #f8f9fa; border-radius: 6px;">
-                    <div style="font-size: 28px; font-weight: bold; color: #1E88E5;"><?= number_format($summary['avg_response_time'] ?? 0, 0) ?> ms</div>
+                    <div style="font-size: 28px; font-weight: bold; color: #2979FF;"><?= number_format($summary['avg_response_time'] ?? 0, 0) ?> ms</div>
                     <div style="font-size: 12px; color: #666; margin-top: 4px;"><?= __('Avg Response') ?></div>
                 </td>
                 <td style="width: 25%; text-align: center; padding: 16px 8px; background-color: #f8f9fa; border-radius: 6px;">
@@ -53,7 +53,7 @@ $frequencyLabel = ($period['frequency'] ?? 'weekly') === 'monthly' ? __('Monthly
 
         <!-- Per-Monitor Table -->
         <?php if (!empty($monitors)): ?>
-        <h2 style="font-size: 16px; color: #333; margin: 24px 0 12px 0; border-bottom: 2px solid #1E88E5; padding-bottom: 8px;">
+        <h2 style="font-size: 16px; color: #333; margin: 24px 0 12px 0; border-bottom: 2px solid #2979FF; padding-bottom: 8px;">
             <?= __('Monitor Details') ?>
         </h2>
         <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
@@ -129,7 +129,7 @@ $frequencyLabel = ($period['frequency'] ?? 'weekly') === 'monthly' ? __('Monthly
 
         <!-- SLA Section -->
         <?php if ($report->include_sla && !empty($slaStatus)): ?>
-        <h2 style="font-size: 16px; color: #333; margin: 28px 0 12px 0; border-bottom: 2px solid #1E88E5; padding-bottom: 8px;">
+        <h2 style="font-size: 16px; color: #333; margin: 28px 0 12px 0; border-bottom: 2px solid #2979FF; padding-bottom: 8px;">
             <?= __('SLA Status') ?>
         </h2>
         <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
@@ -178,7 +178,7 @@ $frequencyLabel = ($period['frequency'] ?? 'weekly') === 'monthly' ? __('Monthly
         </p>
         <?php if (!empty($manageUrl)): ?>
         <p style="font-size: 12px; margin: 8px 0 0 0;">
-            <a href="<?= h($manageUrl) ?>" style="color: #1E88E5; text-decoration: none;"><?= __('Manage report settings') ?></a>
+            <a href="<?= h($manageUrl) ?>" style="color: #2979FF; text-decoration: none;"><?= __('Manage report settings') ?></a>
         </p>
         <?php endif; ?>
     </div>

@@ -7,6 +7,7 @@ use App\Model\Entity\Subscriber;
 use App\Model\Entity\Incident;
 use Cake\Mailer\Mailer;
 use Cake\Mailer\TransportFactory;
+use Cake\Core\Configure;
 use Cake\Routing\Router;
 
 /**
@@ -103,7 +104,7 @@ class EmailService
             $this->configureSMTP($mailer);
 
             // Get site settings
-            $siteName = $this->settingService->get('site_name', 'ISP Status');
+            $siteName = $this->settingService->get('site_name', Configure::read('Brand.name', 'ISP Status'));
             $fromEmail = $this->settingService->get('email_from', 'noreply@localhost');
             $fromName = $this->settingService->get('email_from_name', $siteName);
 
@@ -172,7 +173,7 @@ class EmailService
             $this->configureSMTP($mailer);
 
             // Get site settings
-            $siteName = $this->settingService->get('site_name', 'ISP Status');
+            $siteName = $this->settingService->get('site_name', Configure::read('Brand.name', 'ISP Status'));
             $fromEmail = $this->settingService->get('email_from', 'noreply@localhost');
             $fromName = $this->settingService->get('email_from_name', $siteName);
 
@@ -230,7 +231,7 @@ class EmailService
             $this->configureSMTP($mailer);
 
             // Get site settings
-            $siteName = $this->settingService->get('site_name', 'ISP Status');
+            $siteName = $this->settingService->get('site_name', Configure::read('Brand.name', 'ISP Status'));
             $fromEmail = $this->settingService->get('email_from', 'noreply@localhost');
             $fromName = $this->settingService->get('email_from_name', $siteName);
 
@@ -289,7 +290,7 @@ class EmailService
             $this->configureSMTP($mailer);
 
             // Get site settings
-            $siteName = $this->settingService->get('site_name', 'ISP Status');
+            $siteName = $this->settingService->get('site_name', Configure::read('Brand.name', 'ISP Status'));
             $fromEmail = $this->settingService->get('email_from', 'noreply@localhost');
             $fromName = $this->settingService->get('email_from_name', $siteName);
 
@@ -348,7 +349,7 @@ class EmailService
             $this->configureSMTP($mailer);
 
             // Get site settings
-            $siteName = $this->settingService->get('site_name', 'ISP Status');
+            $siteName = $this->settingService->get('site_name', Configure::read('Brand.name', 'ISP Status'));
             $fromEmail = $this->settingService->get('email_from', 'noreply@localhost');
             $fromName = $this->settingService->get('email_from_name', $siteName);
 
@@ -398,7 +399,7 @@ class EmailService
      */
     public function sendTestEmail(string $toEmail): bool
     {
-        $siteName = $this->settingService->get('site_name', 'ISP Status');
+        $siteName = $this->settingService->get('site_name', Configure::read('Brand.name', 'ISP Status'));
         $fromEmail = $this->settingService->get('email_from', 'noreply@localhost');
         $fromName = $this->settingService->get('email_from_name', $siteName);
 

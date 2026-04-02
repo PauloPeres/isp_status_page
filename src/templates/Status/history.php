@@ -5,7 +5,7 @@
  */
 use Cake\Core\Configure;
 
-$siteName = Configure::read('Settings.site_name', 'ISP Status');
+$siteName = Configure::read('Settings.site_name', Configure::read('Brand.name', 'ISP Status'));
 $this->assign('title', __('Incident History'));
 ?>
 

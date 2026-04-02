@@ -9,6 +9,7 @@ use Cake\I18n\DateTime;
 use Cake\Log\LogTrait;
 use Cake\Mailer\Mailer;
 use Cake\Mailer\TransportFactory;
+use Cake\Core\Configure;
 use Cake\ORM\Locator\LocatorAwareTrait;
 
 /**
@@ -204,7 +205,8 @@ class ScheduledReportService
                     $slaDef->monitor_id,
                     $slaDef->measurement_period,
                     (float)$slaDef->target_uptime,
-                    $slaDef->warning_threshold !== null ? (float)$slaDef->warning_threshold : null
+                    $slaDef->warning_threshold !== null ? (float)$slaDef->warning_threshold : null,
+                    false
                 );
 
                 $slaData[] = [
@@ -305,7 +307,7 @@ class ScheduledReportService
             $mailer = new Mailer();
             $this->configureSMTP($mailer);
 
-            $siteName = $this->settingService->get('site_name', 'ISP Status');
+            $siteName = $this->settingService->get('site_name', Configure::read('Brand.name', 'ISP Status'));
             $fromEmail = $this->settingService->get('email_from', 'noreply@localhost');
             $fromName = $this->settingService->get('email_from_name', $siteName);
 

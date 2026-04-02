@@ -90,6 +90,41 @@ h1, h2, h3, h4 {
     color: var(--color-gray-medium) !important;
 }
 
+/* Nav dropdown */
+.nav-dropdown {
+    position: relative;
+}
+.nav-dropdown-trigger {
+    cursor: pointer;
+}
+.nav-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: var(--color-white);
+    border: 1px solid var(--color-gray-200);
+    border-radius: 8px;
+    padding: 8px 0;
+    min-width: 180px;
+    box-shadow: var(--shadow-lg);
+    z-index: 100;
+}
+.nav-dropdown:hover .nav-dropdown-menu {
+    display: block;
+}
+.nav-dropdown-menu a {
+    display: block;
+    padding: 8px 16px;
+    color: var(--color-gray-600);
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+.nav-dropdown-menu a:hover {
+    background: var(--color-gray-50);
+    color: var(--color-primary);
+}
+
 .nav-btn {
     padding: 8px 20px !important;
     border-radius: var(--radius-md) !important;

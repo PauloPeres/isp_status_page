@@ -7,6 +7,7 @@ use App\Model\Entity\AlertRule;
 use App\Model\Entity\Incident;
 use App\Model\Entity\Monitor;
 use Cake\Http\Client;
+use Cake\Core\Configure;
 use Cake\Log\Log;
 
 /**
@@ -98,7 +99,7 @@ class OpsGenieAlertChannel implements ChannelInterface
             'alias' => "isp-status-incident-{$incident->id}",
             'description' => $incident->description ?? "Monitor {$monitor->name} is {$monitor->status}",
             'priority' => $priority,
-            'source' => 'ISP Status Page',
+            'source' => Configure::read('Brand.fullName', 'ISP Status Page'),
             'entity' => $monitor->name,
             'tags' => ['isp-status', $monitor->type, $monitor->status],
             'details' => [
@@ -151,7 +152,7 @@ class OpsGenieAlertChannel implements ChannelInterface
 
         $payload = [
             'note' => "Resolved: {$monitor->name} is back up",
-            'source' => 'ISP Status Page',
+            'source' => Configure::read('Brand.fullName', 'ISP Status Page'),
         ];
 
         $response = $this->httpClient->post(

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   ISP Status Page — Public Status Page Styles
+   KeepUp — Public Status Page Styles
    Clean, modern design using design tokens with fallbacks.
    ========================================================================== */
 
@@ -11,10 +11,10 @@ body.status-page-body {
     line-height: 1.6;
 }
 .sp-container { max-width: 800px; margin: 0 auto; padding: 0 20px; }
-.sp-header { background: var(--color-brand-500, #6366F1); color: #fff; padding: 24px 0; }
+.sp-header { background: var(--color-brand-500, #2979FF); color: #fff; padding: 24px 0; }
 .sp-title { font-family: 'DM Sans', sans-serif; font-size: 1.5rem; font-weight: 700; }
 .sp-footer { margin-top: 48px; padding: 24px 0; border-top: 1px solid #E2E8F0; text-align: center; color: #94A3B8; font-size: 0.85rem; }
-.sp-powered a { color: #6366F1; text-decoration: none; }
+.sp-powered a { color: #2979FF; text-decoration: none; }
 
 /* Overall Status Banner */
 .sp-overall { padding: 32px; border-radius: 12px; text-align: center; margin: 24px 0; }
@@ -70,8 +70,8 @@ body.status-page-body {
 .sp-password-card h2 { font-size: 1.2rem; margin-bottom: 8px; color: #0F172A; }
 .sp-password-card p { color: #64748B; margin-bottom: 20px; font-size: 0.9rem; }
 .sp-password-card input[type="password"] { width: 100%; padding: 10px 14px; border: 1px solid #E2E8F0; border-radius: 6px; font-size: 0.95rem; margin-bottom: 12px; }
-.sp-password-card button { background: var(--color-brand-500, #6366F1); color: #fff; border: none; padding: 10px 24px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.95rem; }
-.sp-password-card button:hover { background: var(--color-brand-600, #4F46E5); }
+.sp-password-card button { background: var(--color-brand-500, #2979FF); color: #fff; border: none; padding: 10px 24px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.95rem; }
+.sp-password-card button:hover { background: var(--color-brand-600, #2962FF); }
 
 /* Incident details */
 .sp-incident-desc { margin: 8px 0 4px; color: #475569; font-size: 0.9rem; line-height: 1.5; }
@@ -93,13 +93,13 @@ body.status-page-body {
 
 /* Subscribe */
 .sp-subscribe-row { text-align: right; margin: 16px 0 12px; }
-.sp-subscribe-btn { background: none; border: 1px solid #E2E8F0; color: #6366F1; padding: 8px 20px; border-radius: 6px; font-size: 0.85rem; font-weight: 500; cursor: pointer; }
-.sp-subscribe-btn:hover { background: #F8FAFC; border-color: #6366F1; }
+.sp-subscribe-btn { background: none; border: 1px solid #E2E8F0; color: #2979FF; padding: 8px 20px; border-radius: 6px; font-size: 0.85rem; font-weight: 500; cursor: pointer; }
+.sp-subscribe-btn:hover { background: #F8FAFC; border-color: #2979FF; }
 .sp-subscribe-form { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 16px; margin: 0 0 16px; }
 .sp-subscribe-form form { display: flex; gap: 8px; align-items: center; }
 .sp-subscribe-form input[type="email"] { flex: 1; padding: 10px 14px; border: 1px solid #E2E8F0; border-radius: 6px; font-size: 0.9rem; min-width: 0; }
-.sp-subscribe-form button[type="submit"] { background: #6366F1; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.9rem; white-space: nowrap; flex-shrink: 0; }
-.sp-subscribe-form button[type="submit"]:hover { background: #4F46E5; }
+.sp-subscribe-form button[type="submit"] { background: #2979FF; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.9rem; white-space: nowrap; flex-shrink: 0; }
+.sp-subscribe-form button[type="submit"]:hover { background: #2962FF; }
 .sp-subscribe-msg { margin-top: 8px; font-size: 0.85rem; }
 
 /* Maintenance */

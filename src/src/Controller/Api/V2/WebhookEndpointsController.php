@@ -158,7 +158,7 @@ class WebhookEndpointsController extends AppController
 
         try {
             $service->dispatch('test', [
-                'message' => 'This is a test webhook from ISP Status Page',
+                'message' => 'This is a test webhook from ' . \Cake\Core\Configure::read('Brand.fullName', 'ISP Status Page'),
                 'timestamp' => date('c'),
             ], $this->currentOrgId);
 

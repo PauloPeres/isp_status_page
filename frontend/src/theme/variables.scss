@@ -1,84 +1,87 @@
-// ISP Status Page — Ionic Theme
-// Ported from design-tokens.css
+// KeepUp — Ionic Theme
+// Option C: Bold Navy + Electric Blue (Premium/Authority)
+// Philosophy: Dark-first, command-center feel. Navy = institutional reliability,
+// Electric Blue = cutting-edge technology. Status colors pop with maximum clarity.
 
 :root {
-  // Brand (Indigo)
-  --ion-color-primary: #6366F1;
-  --ion-color-primary-rgb: 99, 102, 241;
+  // Brand (Electric Blue — primary interactive color)
+  --ion-color-primary: #2979FF;
+  --ion-color-primary-rgb: 41, 121, 255;
   --ion-color-primary-contrast: #ffffff;
   --ion-color-primary-contrast-rgb: 255, 255, 255;
-  --ion-color-primary-shade: #4F46E5;
-  --ion-color-primary-tint: #818CF8;
+  --ion-color-primary-shade: #2962FF;
+  --ion-color-primary-tint: #448AFF;
 
-  // Secondary (Slate)
-  --ion-color-secondary: #475569;
-  --ion-color-secondary-rgb: 71, 85, 105;
+  // Secondary (Command Navy — surfaces, sidebar, headers)
+  --ion-color-secondary: #1A2332;
+  --ion-color-secondary-rgb: 26, 35, 50;
   --ion-color-secondary-contrast: #ffffff;
   --ion-color-secondary-contrast-rgb: 255, 255, 255;
-  --ion-color-secondary-shade: #334155;
-  --ion-color-secondary-tint: #64748B;
+  --ion-color-secondary-shade: #0F1923;
+  --ion-color-secondary-tint: #2C3E50;
 
-  // Tertiary (Info Blue)
-  --ion-color-tertiary: #3B82F6;
-  --ion-color-tertiary-rgb: 59, 130, 246;
-  --ion-color-tertiary-contrast: #ffffff;
-  --ion-color-tertiary-contrast-rgb: 255, 255, 255;
-  --ion-color-tertiary-shade: #2563EB;
-  --ion-color-tertiary-tint: #60A5FA;
+  // Tertiary (Spark — highlights, hover states)
+  --ion-color-tertiary: #82B1FF;
+  --ion-color-tertiary-rgb: 130, 177, 255;
+  --ion-color-tertiary-contrast: #0F1923;
+  --ion-color-tertiary-contrast-rgb: 15, 25, 35;
+  --ion-color-tertiary-shade: #448AFF;
+  --ion-color-tertiary-tint: #B3D4FF;
 
-  // Success (Emerald)
-  --ion-color-success: #10B981;
-  --ion-color-success-rgb: 16, 185, 129;
+  // Success (Sentinel Green — up/operational)
+  // Toned down for light mode readability; vivid variant used in dark mode
+  --ion-color-success: #00C853;
+  --ion-color-success-rgb: 0, 200, 83;
   --ion-color-success-contrast: #ffffff;
   --ion-color-success-contrast-rgb: 255, 255, 255;
-  --ion-color-success-shade: #059669;
-  --ion-color-success-tint: #34D399;
+  --ion-color-success-shade: #00A844;
+  --ion-color-success-tint: #69F0AE;
 
-  // Warning (Amber)
-  --ion-color-warning: #F59E0B;
-  --ion-color-warning-rgb: 245, 158, 11;
+  // Warning (Flux Yellow — degraded performance)
+  --ion-color-warning: #FFEA00;
+  --ion-color-warning-rgb: 255, 234, 0;
   --ion-color-warning-contrast: #000000;
   --ion-color-warning-contrast-rgb: 0, 0, 0;
-  --ion-color-warning-shade: #D97706;
-  --ion-color-warning-tint: #FBBF24;
+  --ion-color-warning-shade: #FFD600;
+  --ion-color-warning-tint: #FFFF00;
 
-  // Danger (Red)
-  --ion-color-danger: #EF4444;
-  --ion-color-danger-rgb: 239, 68, 68;
+  // Danger (Breach Red — downtime, critical)
+  --ion-color-danger: #FF1744;
+  --ion-color-danger-rgb: 255, 23, 68;
   --ion-color-danger-contrast: #ffffff;
   --ion-color-danger-contrast-rgb: 255, 255, 255;
-  --ion-color-danger-shade: #DC2626;
-  --ion-color-danger-tint: #F87171;
+  --ion-color-danger-shade: #D50000;
+  --ion-color-danger-tint: #FF5252;
 
   // Light
   --ion-color-light: #F1F5F9;
   --ion-color-light-rgb: 241, 245, 249;
-  --ion-color-light-contrast: #0F172A;
-  --ion-color-light-contrast-rgb: 15, 23, 42;
+  --ion-color-light-contrast: #1A1A2E;
+  --ion-color-light-contrast-rgb: 26, 26, 46;
   --ion-color-light-shade: #E2E8F0;
-  --ion-color-light-tint: #F8FAFC;
+  --ion-color-light-tint: #F8F9FB;
 
   // Medium
-  --ion-color-medium: #94A3B8;
-  --ion-color-medium-rgb: 148, 163, 184;
-  --ion-color-medium-contrast: #000000;
-  --ion-color-medium-contrast-rgb: 0, 0, 0;
-  --ion-color-medium-shade: #64748B;
-  --ion-color-medium-tint: #CBD5E1;
+  --ion-color-medium: #6B7280;
+  --ion-color-medium-rgb: 107, 114, 128;
+  --ion-color-medium-contrast: #ffffff;
+  --ion-color-medium-contrast-rgb: 255, 255, 255;
+  --ion-color-medium-shade: #4B5563;
+  --ion-color-medium-tint: #9CA3AF;
 
   // Dark
-  --ion-color-dark: #0F172A;
-  --ion-color-dark-rgb: 15, 23, 42;
+  --ion-color-dark: #1A1A2E;
+  --ion-color-dark-rgb: 26, 26, 46;
   --ion-color-dark-contrast: #ffffff;
   --ion-color-dark-contrast-rgb: 255, 255, 255;
-  --ion-color-dark-shade: #1E293B;
-  --ion-color-dark-tint: #334155;
+  --ion-color-dark-shade: #0F1923;
+  --ion-color-dark-tint: #2C3E50;
 
   // Neutrals
-  --ion-background-color: #F8FAFC;
-  --ion-background-color-rgb: 248, 250, 252;
-  --ion-text-color: #0F172A;
-  --ion-text-color-rgb: 15, 23, 42;
+  --ion-background-color: #F8F9FB;
+  --ion-background-color-rgb: 248, 249, 251;
+  --ion-text-color: #1A1A2E;
+  --ion-text-color-rgb: 26, 26, 46;
   --ion-toolbar-background: rgba(255, 255, 255, 0.85);
   --ion-item-background: #ffffff;
   --ion-card-background: #ffffff;
@@ -90,44 +93,45 @@
   --ion-border-radius: 8px;
 }
 
-// Dark mode — triggered by .dark class on body (set by ThemeService)
+// Dark mode — the "natural" mode for a monitoring command center
+// Triggered by .dark class on body (set by ThemeService)
 // or by system preference when no class is set
 @mixin dark-theme {
-  --ion-background-color: #0F172A;
-  --ion-background-color-rgb: 15, 23, 42;
-  --ion-text-color: #F8FAFC;
-  --ion-text-color-rgb: 248, 250, 252;
-  --ion-toolbar-background: rgba(15, 23, 42, 0.85);
-  --ion-item-background: #1E293B;
-  --ion-card-background: #1E293B;
+  --ion-background-color: #0F1923;
+  --ion-background-color-rgb: 15, 25, 35;
+  --ion-text-color: #E8EDF2;
+  --ion-text-color-rgb: 232, 237, 242;
+  --ion-toolbar-background: rgba(26, 35, 50, 0.90);
+  --ion-item-background: #1A2332;
+  --ion-card-background: #1A2332;
 
-  --ion-color-primary: #818CF8;
-  --ion-color-primary-rgb: 129, 140, 248;
-  --ion-color-primary-shade: #6366F1;
-  --ion-color-primary-tint: #A5B4FC;
+  --ion-color-primary: #448AFF;
+  --ion-color-primary-rgb: 68, 138, 255;
+  --ion-color-primary-shade: #2979FF;
+  --ion-color-primary-tint: #82B1FF;
 
-  --ion-color-light: #1E293B;
-  --ion-color-light-rgb: 30, 41, 59;
-  --ion-color-light-contrast: #F8FAFC;
-  --ion-color-light-contrast-rgb: 248, 250, 252;
-  --ion-color-light-shade: #0F172A;
-  --ion-color-light-tint: #334155;
+  --ion-color-light: #1E2A3A;
+  --ion-color-light-rgb: 30, 42, 58;
+  --ion-color-light-contrast: #E8EDF2;
+  --ion-color-light-contrast-rgb: 232, 237, 242;
+  --ion-color-light-shade: #0F1923;
+  --ion-color-light-tint: #2C3E50;
 
-  --ion-color-dark: #F8FAFC;
-  --ion-color-dark-rgb: 248, 250, 252;
-  --ion-color-dark-contrast: #0F172A;
-  --ion-color-dark-contrast-rgb: 15, 23, 42;
-  --ion-color-dark-shade: #E2E8F0;
-  --ion-color-dark-tint: #F8FAFC;
+  --ion-color-dark: #E8EDF2;
+  --ion-color-dark-rgb: 232, 237, 242;
+  --ion-color-dark-contrast: #0F1923;
+  --ion-color-dark-contrast-rgb: 15, 25, 35;
+  --ion-color-dark-shade: #CBD5E1;
+  --ion-color-dark-tint: #F8F9FB;
 
-  --ion-color-secondary: #94A3B8;
-  --ion-color-secondary-rgb: 148, 163, 184;
-  --ion-color-secondary-contrast: #0F172A;
-  --ion-color-secondary-contrast-rgb: 15, 23, 42;
-  --ion-color-secondary-shade: #64748B;
-  --ion-color-secondary-tint: #CBD5E1;
+  --ion-color-secondary: #2C3E50;
+  --ion-color-secondary-rgb: 44, 62, 80;
+  --ion-color-secondary-contrast: #E8EDF2;
+  --ion-color-secondary-contrast-rgb: 232, 237, 242;
+  --ion-color-secondary-shade: #1A2332;
+  --ion-color-secondary-tint: #34495E;
 
-  --ion-toolbar-color: #F8FAFC;
+  --ion-toolbar-color: #E8EDF2;
 }
 
 // Manual toggle via ThemeService

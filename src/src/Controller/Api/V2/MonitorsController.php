@@ -197,7 +197,8 @@ class MonitorsController extends AppController
                     (int)$id,
                     $slaDef->measurement_period,
                     (float)$slaDef->target_uptime,
-                    $slaDef->warning_threshold !== null ? (float)$slaDef->warning_threshold : null
+                    $slaDef->warning_threshold !== null ? (float)$slaDef->warning_threshold : null,
+                    false
                 );
                 $slaData['sla_id'] = $slaDef->id;
                 $slaData['sla_name'] = $slaDef->name;

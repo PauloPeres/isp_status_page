@@ -120,7 +120,7 @@ class ScheduledReport extends Entity
      */
     public function getRecipientsArray(): array
     {
-        return $this->recipients;
+        return $this->_getRecipientsList();
     }
 
     /**

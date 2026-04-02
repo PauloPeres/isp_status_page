@@ -539,6 +539,91 @@ class AuthController extends AppController
     }
 
     /**
+     * POST /api/v2/auth/change-password
+     *
+     * Change the currently authenticated user's password.
+     * Requires current_password and new_password.
+     *
+     * @return void
+     */
+    public function changePassword(): void
+    {
+        $this->request->allowMethod(['post']);
+
+        if ($this->currentUserId === 0) {
+            $this->error('Not authenticated', 401);
+
+            return;
+        }
+
+        $currentPassword = (string)($this->request->getData('current_password') ?? '');
+        $newPassword = (string)($this->request->getData('new_password') ?? '');
+
+        if (empty($currentPassword) || empty($newPassword)) {
+            $this->error('Current password and new password are required', 422);
+
+            return;
+        }
+
+        if (strlen($newPassword) < 8) {
+            $this->error('Password must be at least 8 characters', 422);
+
+            return;
+        }
+
+        if (!preg_match('/[A-Z]/', $newPassword)) {
+            $this->error('Password must contain at least one uppercase letter', 422);
+
+            return;
+        }
+
+        if (!preg_match('/[a-z]/', $newPassword)) {
+            $this->error('Password must contain at least one lowercase letter', 422);
+
+            return;
+        }
+
+        if (!preg_match('/[0-9]/', $newPassword)) {
+            $this->error('Password must contain at least one number', 422);
+
+            return;
+        }
+
+        if (!preg_match('/[^A-Za-z0-9]/', $newPassword)) {
+            $this->error('Password must contain at least one special character', 422);
+
+            return;
+        }
+
+        $usersTable = $this->fetchTable('Users');
+        $user = $usersTable->find()
+            ->where(['Users.id' => $this->currentUserId])
+            ->first();
+
+        if (!$user) {
+            $this->error('User not found', 404);
+
+            return;
+        }
+
+        if (!password_verify($currentPassword, $user->password)) {
+            $this->error('Current password is incorrect', 422);
+
+            return;
+        }
+
+        $user = $usersTable->patchEntity($user, ['password' => $newPassword]);
+
+        if (!$usersTable->save($user)) {
+            $this->error('Failed to change password', 500);
+
+            return;
+        }
+
+        $this->success(['message' => 'Password changed successfully']);
+    }
+
+    /**
      * POST /api/v2/auth/switch-org
      *
      * Switch the user's active organization. Returns a new access token

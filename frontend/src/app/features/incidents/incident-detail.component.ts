@@ -347,8 +347,9 @@ addIcons({
       .ack-badge {
         margin-top: 12px;
         padding: 8px 12px;
-        background: var(--ion-color-success-tint);
+        background: rgba(0, 200, 83, 0.1);
         color: var(--ion-color-success-shade);
+        border: 1px solid rgba(0, 200, 83, 0.2);
         border-radius: 8px;
         font-size: 0.85rem;
         font-weight: 500;

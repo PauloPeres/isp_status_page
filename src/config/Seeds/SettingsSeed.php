@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 
+use Cake\Core\Configure;
 use Migrations\AbstractSeed;
 
 /**
@@ -24,7 +25,7 @@ class SettingsSeed extends AbstractSeed
             // Site Settings
             [
                 'key' => 'site_name',
-                'value' => 'ISP Status',
+                'value' => Configure::read('Brand.name', 'ISP Status'),
                 'type' => 'string',
                 'description' => 'Site name displayed on status page',
                 'modified' => $now,
@@ -66,7 +67,7 @@ class SettingsSeed extends AbstractSeed
             ],
             [
                 'key' => 'support_email',
-                'value' => 'support@example.com',
+                'value' => Configure::read('Brand.supportEmail', 'support@usekeeup.com'),
                 'type' => 'string',
                 'description' => 'Support email displayed on public status page',
                 'modified' => $now,
@@ -75,14 +76,14 @@ class SettingsSeed extends AbstractSeed
             // Email Settings
             [
                 'key' => 'email_from',
-                'value' => 'noreply@example.com',
+                'value' => Configure::read('Brand.noreplyEmail', 'noreply@usekeeup.com'),
                 'type' => 'string',
                 'description' => 'Email from address',
                 'modified' => $now,
             ],
             [
                 'key' => 'email_from_name',
-                'value' => 'ISP Status',
+                'value' => Configure::read('Brand.emailFromName', 'ISP Status'),
                 'type' => 'string',
                 'description' => 'Email from name',
                 'modified' => $now,

@@ -7,6 +7,7 @@ use App\Model\Entity\AlertRule;
 use App\Model\Entity\Incident;
 use App\Model\Entity\Monitor;
 use Cake\Http\Client;
+use Cake\Core\Configure;
 use Cake\Log\Log;
 
 /**
@@ -57,7 +58,7 @@ class PagerDutyAlertChannel implements ChannelInterface
                         'source' => $monitor->name,
                         'severity' => $severity,
                         'component' => $monitor->type,
-                        'group' => 'ISP Status Page',
+                        'group' => Configure::read('Brand.fullName', 'ISP Status Page'),
                         'custom_details' => [
                             'monitor_id' => $monitor->id,
                             'monitor_type' => $monitor->type,

@@ -399,6 +399,27 @@ export const routes: Routes = [
             (m) => m.SuperAdminHealthComponent,
           ),
       },
+      {
+        path: 'blog-posts',
+        loadComponent: () =>
+          import('./features/super-admin/blog/blog-post-list.component').then(
+            (m) => m.BlogPostListComponent,
+          ),
+      },
+      {
+        path: 'blog-posts/new',
+        loadComponent: () =>
+          import('./features/super-admin/blog/blog-post-form.component').then(
+            (m) => m.BlogPostFormComponent,
+          ),
+      },
+      {
+        path: 'blog-posts/:id/edit',
+        loadComponent: () =>
+          import('./features/super-admin/blog/blog-post-form.component').then(
+            (m) => m.BlogPostFormComponent,
+          ),
+      },
     ],
   },
 

@@ -46,7 +46,7 @@
             <?php if ($this->fetch('footerText')): ?>
                 <p><?= h($this->fetch('footerText')) ?></p>
             <?php endif; ?>
-            <p class="sp-powered"><?= h($this->fetch('poweredBy', 'Powered by')) ?> <a href="/">ISP Status Page</a></p>
+            <p class="sp-powered"><?= h($this->fetch('poweredBy', 'Powered by')) ?> <a href="/"><?= \Cake\Core\Configure::read('Brand.fullName', 'ISP Status Page') ?></a></p>
         </div>
     </footer>
     <script src="/js/status-page-live.js"></script>

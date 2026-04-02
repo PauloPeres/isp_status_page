@@ -3,11 +3,11 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Terms of Service - ISP Status Page</title>
-    <meta name="description" content="Terms of Service for ISP Status Page, a SaaS uptime monitoring platform by IuriLabs.">
+    <title>Terms of Service - <?= \Cake\Core\Configure::read('Brand.fullName', 'ISP Status Page') ?></title>
+    <meta name="description" content="Terms of Service for <?= \Cake\Core\Configure::read('Brand.fullName', 'ISP Status Page') ?>, a SaaS uptime monitoring platform by <?= \Cake\Core\Configure::read('Brand.company', 'IuriLabs') ?>.">
     <link rel="icon" type="image/png" href="/img/icon_isp_status_page.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/img/icon_isp_status_page.png">
-    <meta name="theme-color" content="#6366F1">
+    <meta name="theme-color" content="#1A2332">
     <link rel="stylesheet" href="/css/design-tokens.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -139,8 +139,8 @@
 <header class="legal-header">
     <div class="legal-header-inner">
         <a href="/" class="legal-brand">
-            <img src="/img/icon_isp_status_page.png" alt="ISP Status">
-            <span>ISP Status</span>
+            <img src="/img/icon_isp_status_page.png" alt="<?= \Cake\Core\Configure::read('Brand.name', 'ISP Status') ?>">
+            <span><?= \Cake\Core\Configure::read('Brand.name', 'ISP Status') ?></span>
         </a>
         <nav class="legal-nav">
             <a href="/">Home</a>
@@ -155,11 +155,11 @@
     <p class="legal-meta">Effective Date: March 30, 2026 &middot; Last Updated: March 30, 2026</p>
 
     <h2>1. Acceptance of Terms</h2>
-    <p>By accessing or using ISP Status Page ("Service"), operated by IuriLabs Limited Company ("IuriLabs," "we," "us," or "our"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, you may not use the Service.</p>
+    <p>By accessing or using <?= \Cake\Core\Configure::read('Brand.fullName', 'ISP Status Page') ?> ("Service"), operated by <?= \Cake\Core\Configure::read('Brand.company', 'IuriLabs') ?> Limited Company ("<?= \Cake\Core\Configure::read('Brand.company', 'IuriLabs') ?>," "we," "us," or "our"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, you may not use the Service.</p>
     <p>By creating an account, subscribing to a plan, or otherwise using the Service, you represent that you are at least 18 years of age and have the legal capacity to enter into these Terms.</p>
 
     <h2>2. Description of Service</h2>
-    <p>ISP Status Page is a software-as-a-service (SaaS) platform that provides:</p>
+    <p><?= \Cake\Core\Configure::read('Brand.fullName', 'ISP Status Page') ?> is a software-as-a-service (SaaS) platform that provides:</p>
     <ul>
         <li><strong>Uptime Monitoring:</strong> Automated checks of your infrastructure via HTTP, Ping, Port, SSL Certificate, and Heartbeat monitors.</li>
         <li><strong>Public Status Pages:</strong> Customizable, branded status pages you can share with your customers and stakeholders.</li>
@@ -236,7 +236,7 @@
     </ul>
 
     <h2>10. Intellectual Property</h2>
-    <p>The Service, including its software, design, documentation, logos, and trademarks, is the intellectual property of IuriLabs and is protected by copyright, trademark, and other intellectual property laws.</p>
+    <p>The Service, including its software, design, documentation, logos, and trademarks, is the intellectual property of <?= \Cake\Core\Configure::read('Brand.company', 'IuriLabs') ?> and is protected by copyright, trademark, and other intellectual property laws.</p>
     <p>You are granted a limited, non-exclusive, non-transferable, revocable license to use the Service in accordance with these Terms. This license does not grant you any rights to our intellectual property beyond what is necessary to use the Service.</p>
     <p>Any feedback, suggestions, or ideas you provide about the Service may be used by us without obligation or compensation to you.</p>
 
@@ -254,12 +254,12 @@
     <p>TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW:</p>
     <ul>
         <li>THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, INCLUDING IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.</li>
-        <li>IN NO EVENT SHALL IURILABS, ITS OFFICERS, DIRECTORS, EMPLOYEES, OR AGENTS BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING BUT NOT LIMITED TO LOSS OF PROFITS, DATA, USE, OR GOODWILL, ARISING OUT OF OR IN CONNECTION WITH YOUR USE OF THE SERVICE.</li>
+        <li>IN NO EVENT SHALL <?= strtoupper(\Cake\Core\Configure::read('Brand.company', 'IuriLabs')) ?>, ITS OFFICERS, DIRECTORS, EMPLOYEES, OR AGENTS BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING BUT NOT LIMITED TO LOSS OF PROFITS, DATA, USE, OR GOODWILL, ARISING OUT OF OR IN CONNECTION WITH YOUR USE OF THE SERVICE.</li>
         <li>OUR TOTAL AGGREGATE LIABILITY FOR ALL CLAIMS ARISING OUT OF OR RELATING TO THESE TERMS OR THE SERVICE SHALL NOT EXCEED THE AMOUNT YOU PAID US IN THE TWELVE (12) MONTHS PRECEDING THE CLAIM, OR ONE HUNDRED U.S. DOLLARS ($100), WHICHEVER IS GREATER.</li>
     </ul>
 
     <h2>13. Indemnification</h2>
-    <p>You agree to indemnify, defend, and hold harmless IuriLabs and its officers, directors, employees, and agents from and against any claims, liabilities, damages, losses, costs, and expenses (including reasonable attorneys' fees) arising out of or in connection with:</p>
+    <p>You agree to indemnify, defend, and hold harmless <?= \Cake\Core\Configure::read('Brand.company', 'IuriLabs') ?> and its officers, directors, employees, and agents from and against any claims, liabilities, damages, losses, costs, and expenses (including reasonable attorneys' fees) arising out of or in connection with:</p>
     <ul>
         <li>Your use of the Service.</li>
         <li>Your violation of these Terms.</li>
@@ -302,7 +302,7 @@
 
 <footer class="legal-footer">
     <div class="legal-footer-inner">
-        <span>&copy; <?= date('Y') ?> IuriLabs Limited Company. All rights reserved.</span>
+        <span>&copy; <?= date('Y') ?> <?= \Cake\Core\Configure::read('Brand.company', 'IuriLabs') ?> Limited Company. All rights reserved.</span>
         <div class="legal-footer-links">
             <a href="/">Home</a>
             <a href="/terms">Terms of Service</a>

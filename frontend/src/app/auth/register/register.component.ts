@@ -12,11 +12,12 @@ import {
   IonIcon,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { logoGoogle, logoMicrosoft, eyeOutline, eyeOffOutline } from 'ionicons/icons';
+import { logoGoogle, logoMicrosoft, eyeOutline, eyeOffOutline, checkmarkCircleOutline, closeCircleOutline } from 'ionicons/icons';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { environment } from '../../../environments/environment';
+import { BRAND } from '../../core/config/brand.config';
 
 @Component({
   selector: 'app-register',
@@ -38,7 +39,7 @@ import { environment } from '../../../environments/environment';
       <div class="register-container">
         <div class="register-card">
           <div class="register-header">
-            <h1>ISP Status</h1>
+            <h1>{{ brand.name }}</h1>
             <p>Create your free account</p>
           </div>
 
@@ -106,6 +107,28 @@ import { environment } from '../../../environments/environment';
             </ion-item>
 
             @if (password.length > 0) {
+              <div class="password-requirements">
+                <div class="req-item" [class.met]="password.length >= 8">
+                  <ion-icon [name]="password.length >= 8 ? 'checkmark-circle-outline' : 'close-circle-outline'"></ion-icon>
+                  8+ characters
+                </div>
+                <div class="req-item" [class.met]="hasUppercase()">
+                  <ion-icon [name]="hasUppercase() ? 'checkmark-circle-outline' : 'close-circle-outline'"></ion-icon>
+                  1 uppercase letter
+                </div>
+                <div class="req-item" [class.met]="hasLowercase()">
+                  <ion-icon [name]="hasLowercase() ? 'checkmark-circle-outline' : 'close-circle-outline'"></ion-icon>
+                  1 lowercase letter
+                </div>
+                <div class="req-item" [class.met]="hasNumber()">
+                  <ion-icon [name]="hasNumber() ? 'checkmark-circle-outline' : 'close-circle-outline'"></ion-icon>
+                  1 number
+                </div>
+                <div class="req-item" [class.met]="hasSpecial()">
+                  <ion-icon [name]="hasSpecial() ? 'checkmark-circle-outline' : 'close-circle-outline'"></ion-icon>
+                  1 special character
+                </div>
+              </div>
               <div class="strength-bar">
                 <div class="strength-fill" [style.width.%]="getPasswordStrength()" [style.background]="getStrengthColor()"></div>
               </div>
@@ -129,6 +152,13 @@ import { environment } from '../../../environments/environment';
                 <ion-icon [name]="showConfirmPassword ? 'eye-off-outline' : 'eye-outline'" slot="icon-only" style="font-size: 1.2rem; color: var(--ion-color-medium)"></ion-icon>
               </ion-button>
             </ion-item>
+
+            @if (confirmPassword.length > 0) {
+              <div class="match-indicator" [class.match]="confirmPassword === password" [class.no-match]="confirmPassword !== password" style="display: flex; align-items: center; gap: 6px; font-size: 0.82rem; padding: 4px 12px;">
+                <ion-icon [name]="confirmPassword === password ? 'checkmark-circle-outline' : 'close-circle-outline'" [style.color]="confirmPassword === password ? 'var(--ion-color-success)' : 'var(--ion-color-danger)'" style="font-size: 1rem;"></ion-icon>
+                <span [style.color]="confirmPassword === password ? 'var(--ion-color-success)' : 'var(--ion-color-danger)'">{{ confirmPassword === password ? 'Passwords match' : 'Passwords do not match' }}</span>
+              </div>
+            }
 
             <div class="terms-row">
               <ion-checkbox
@@ -276,6 +306,25 @@ import { environment } from '../../../environments/environment';
         color: var(--ion-color-medium);
         font-size: 0.85rem;
       }
+      .password-requirements {
+        padding: 8px 12px;
+        margin-bottom: 4px;
+      }
+      .req-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.78rem;
+        color: var(--ion-color-danger);
+        margin-bottom: 2px;
+      }
+      .req-item ion-icon {
+        font-size: 0.9rem;
+        flex-shrink: 0;
+      }
+      .req-item.met {
+        color: var(--ion-color-success);
+      }
       .strength-bar {
         height: 4px;
         background: var(--ion-color-light);
@@ -295,6 +344,7 @@ import { environment } from '../../../environments/environment';
   ],
 })
 export class RegisterComponent {
+  brand = BRAND;
   username = '';
   email = '';
   password = '';
@@ -311,8 +361,13 @@ export class RegisterComponent {
     private auth: AuthService,
     private router: Router,
   ) {
-    addIcons({ logoGoogle, logoMicrosoft, eyeOutline, eyeOffOutline });
+    addIcons({ logoGoogle, logoMicrosoft, eyeOutline, eyeOffOutline, checkmarkCircleOutline, closeCircleOutline });
   }
+
+  hasUppercase(): boolean { return /[A-Z]/.test(this.password); }
+  hasLowercase(): boolean { return /[a-z]/.test(this.password); }
+  hasNumber(): boolean { return /[0-9]/.test(this.password); }
+  hasSpecial(): boolean { return /[^A-Za-z0-9]/.test(this.password); }
 
   getPasswordStrength(): number {
     let score = 0;

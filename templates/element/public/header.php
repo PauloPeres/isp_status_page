@@ -2,7 +2,7 @@
 use Cake\Core\Configure;
 
 // Get site name from settings (with fallback)
-$siteName = Configure::read('Settings.site_name', 'ISP Status');
+$siteName = Configure::read('Settings.site_name', Configure::read('Brand.name', 'ISP Status'));
 ?>
 
 <header class="public-header">

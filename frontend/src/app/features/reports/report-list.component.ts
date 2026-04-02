@@ -4,14 +4,22 @@ import { FormsModule } from '@angular/forms';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonButton,
   IonCard, IonCardHeader, IonCardTitle, IonCardContent,
-  IonItem, IonLabel, IonInput, IonIcon, IonSpinner,
+  IonItem, IonLabel, IonIcon, IonSpinner, IonChip,
   ToastController,
 } from '@ionic/angular/standalone';
 import { ReportService } from './report.service';
 import { addIcons } from 'ionicons';
-import { downloadOutline, statsChartOutline, alertCircleOutline, timerOutline } from 'ionicons/icons';
+import {
+  downloadOutline, statsChartOutline, alertCircleOutline, timerOutline, calendarOutline,
+} from 'ionicons/icons';
 
-addIcons({ downloadOutline, statsChartOutline, alertCircleOutline, timerOutline });
+addIcons({ downloadOutline, statsChartOutline, alertCircleOutline, timerOutline, calendarOutline });
+
+interface DatePreset {
+  label: string;
+  start: string;
+  end: string;
+}
 
 @Component({
   selector: 'app-report-list',
@@ -20,7 +28,7 @@ addIcons({ downloadOutline, statsChartOutline, alertCircleOutline, timerOutline 
     CommonModule, FormsModule,
     IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonButton,
     IonCard, IonCardHeader, IonCardTitle, IonCardContent,
-    IonItem, IonLabel, IonInput, IonIcon, IonSpinner,
+    IonItem, IonLabel, IonIcon, IonSpinner, IonChip,
   ],
   template: `
     <ion-header>
@@ -31,6 +39,38 @@ addIcons({ downloadOutline, statsChartOutline, alertCircleOutline, timerOutline 
     </ion-header>
 
     <ion-content class="ion-padding">
+      <!-- Shared Date Range -->
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title style="font-size: 1rem">
+            <ion-icon name="calendar-outline" style="vertical-align: middle; margin-right: 8px"></ion-icon>
+            Date Range
+          </ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <div class="presets">
+            @for (preset of presets; track preset.label) {
+              <ion-chip
+                [outline]="activePreset !== preset.label"
+                [color]="activePreset === preset.label ? 'primary' : 'medium'"
+                (click)="applyPreset(preset)"
+              >{{ preset.label }}</ion-chip>
+            }
+          </div>
+          <div class="date-row">
+            <div class="date-field">
+              <label class="date-label">From</label>
+              <input type="date" [(ngModel)]="startDate" (change)="activePreset = 'Custom'" class="date-input" />
+            </div>
+            <div class="date-field">
+              <label class="date-label">To</label>
+              <input type="date" [(ngModel)]="endDate" (change)="activePreset = 'Custom'" class="date-input" />
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Report Cards -->
       <ion-card>
         <ion-card-header>
           <ion-card-title>
@@ -39,15 +79,8 @@ addIcons({ downloadOutline, statsChartOutline, alertCircleOutline, timerOutline 
           </ion-card-title>
         </ion-card-header>
         <ion-card-content>
-          <ion-item>
-            <ion-label position="stacked">Start Date</ion-label>
-            <ion-input type="date" [(ngModel)]="uptimeStart"></ion-input>
-          </ion-item>
-          <ion-item>
-            <ion-label position="stacked">End Date</ion-label>
-            <ion-input type="date" [(ngModel)]="uptimeEnd"></ion-input>
-          </ion-item>
-          <ion-button expand="block" fill="outline" style="margin-top: 12px" (click)="download('uptime')" [disabled]="downloading() === 'uptime'">
+          <p class="report-desc">Uptime percentage, total checks, success/failure counts per monitor.</p>
+          <ion-button expand="block" fill="outline" (click)="download('uptime')" [disabled]="downloading() === 'uptime'">
             @if (downloading() === 'uptime') {
               <ion-spinner name="crescent" style="width: 16px; height: 16px; margin-right: 8px"></ion-spinner>
             } @else {
@@ -66,15 +99,8 @@ addIcons({ downloadOutline, statsChartOutline, alertCircleOutline, timerOutline 
           </ion-card-title>
         </ion-card-header>
         <ion-card-content>
-          <ion-item>
-            <ion-label position="stacked">Start Date</ion-label>
-            <ion-input type="date" [(ngModel)]="incidentsStart"></ion-input>
-          </ion-item>
-          <ion-item>
-            <ion-label position="stacked">End Date</ion-label>
-            <ion-input type="date" [(ngModel)]="incidentsEnd"></ion-input>
-          </ion-item>
-          <ion-button expand="block" fill="outline" style="margin-top: 12px" (click)="download('incidents')" [disabled]="downloading() === 'incidents'">
+          <p class="report-desc">All incidents with severity, status, duration, and resolution times.</p>
+          <ion-button expand="block" fill="outline" (click)="download('incidents')" [disabled]="downloading() === 'incidents'">
             @if (downloading() === 'incidents') {
               <ion-spinner name="crescent" style="width: 16px; height: 16px; margin-right: 8px"></ion-spinner>
             } @else {
@@ -93,15 +119,8 @@ addIcons({ downloadOutline, statsChartOutline, alertCircleOutline, timerOutline 
           </ion-card-title>
         </ion-card-header>
         <ion-card-content>
-          <ion-item>
-            <ion-label position="stacked">Start Date</ion-label>
-            <ion-input type="date" [(ngModel)]="responseStart"></ion-input>
-          </ion-item>
-          <ion-item>
-            <ion-label position="stacked">End Date</ion-label>
-            <ion-input type="date" [(ngModel)]="responseEnd"></ion-input>
-          </ion-item>
-          <ion-button expand="block" fill="outline" style="margin-top: 12px" (click)="download('response-times')" [disabled]="downloading() === 'response-times'">
+          <p class="report-desc">Average, minimum, and maximum response times per monitor.</p>
+          <ion-button expand="block" fill="outline" (click)="download('response-times')" [disabled]="downloading() === 'response-times'">
             @if (downloading() === 'response-times') {
               <ion-spinner name="crescent" style="width: 16px; height: 16px; margin-right: 8px"></ion-spinner>
             } @else {
@@ -113,57 +132,144 @@ addIcons({ downloadOutline, statsChartOutline, alertCircleOutline, timerOutline 
       </ion-card>
     </ion-content>
   `,
+  styles: [`
+    .presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: 12px;
+    }
+    .presets ion-chip {
+      cursor: pointer;
+      height: 30px;
+      font-size: 0.8rem;
+    }
+    .date-row {
+      display: flex;
+      gap: 12px;
+    }
+    .date-field {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .date-label {
+      font-size: 0.7rem;
+      color: var(--ion-color-medium);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+    }
+    .date-input {
+      padding: 8px 10px;
+      border: 1px solid var(--ion-color-light-shade);
+      border-radius: 6px;
+      font-size: 0.9rem;
+      background: var(--ion-item-background);
+      color: var(--ion-text-color);
+      font-family: inherit;
+      width: 100%;
+    }
+    .date-input:focus {
+      outline: none;
+      border-color: var(--ion-color-primary);
+    }
+    .report-desc {
+      color: var(--ion-color-medium);
+      font-size: 0.85rem;
+      margin-bottom: 12px;
+    }
+    ion-button {
+      --border-radius: 8px;
+    }
+    @media (max-width: 480px) {
+      .date-row {
+        flex-direction: column;
+      }
+    }
+  `],
 })
 export class ReportListComponent {
-  uptimeStart = '';
-  uptimeEnd = '';
-  incidentsStart = '';
-  incidentsEnd = '';
-  responseStart = '';
-  responseEnd = '';
+  startDate = '';
+  endDate = '';
+  activePreset = 'Last 30 days';
   downloading = signal<string | null>(null);
 
+  presets: DatePreset[] = [];
+
   constructor(private service: ReportService, private toastCtrl: ToastController) {
+    this.buildPresets();
+    this.applyPreset(this.presets.find(p => p.label === 'Last 30 days')!);
+  }
+
+  private buildPresets(): void {
     const now = new Date();
-    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-    const end = now.toISOString().slice(0, 10);
-    const start = thirtyDaysAgo.toISOString().slice(0, 10);
-    this.uptimeStart = this.incidentsStart = this.responseStart = start;
-    this.uptimeEnd = this.incidentsEnd = this.responseEnd = end;
+    const fmt = (d: Date) => d.toISOString().slice(0, 10);
+
+    const daysAgo = (n: number) => {
+      const d = new Date(now);
+      d.setDate(d.getDate() - n);
+      return d;
+    };
+
+    const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0);
+    const thisQuarterMonth = Math.floor(now.getMonth() / 3) * 3;
+    const thisQuarterStart = new Date(now.getFullYear(), thisQuarterMonth, 1);
+    const yearStart = new Date(now.getFullYear(), 0, 1);
+
+    this.presets = [
+      { label: 'Last 7 days', start: fmt(daysAgo(7)), end: fmt(now) },
+      { label: 'Last 30 days', start: fmt(daysAgo(30)), end: fmt(now) },
+      { label: 'This month', start: fmt(thisMonthStart), end: fmt(now) },
+      { label: 'Last month', start: fmt(lastMonthStart), end: fmt(lastMonthEnd) },
+      { label: 'This quarter', start: fmt(thisQuarterStart), end: fmt(now) },
+      { label: 'Year to date', start: fmt(yearStart), end: fmt(now) },
+    ];
+  }
+
+  applyPreset(preset: DatePreset): void {
+    this.startDate = preset.start;
+    this.endDate = preset.end;
+    this.activePreset = preset.label;
   }
 
   download(type: 'uptime' | 'incidents' | 'response-times'): void {
+    if (this.startDate > this.endDate) {
+      this.showToast('Start date must be before end date', 'warning');
+      return;
+    }
+
     this.downloading.set(type);
-    const params = this.getParams(type);
+    const params = { start: this.startDate, end: this.endDate };
     const method = type === 'uptime' ? this.service.downloadUptime(params)
       : type === 'incidents' ? this.service.downloadIncidents(params)
       : this.service.downloadResponseTimes(params);
 
     method.subscribe({
-      next: async (blob) => {
+      next: (blob) => {
         this.downloading.set(null);
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `${type}-report.csv`;
+        a.download = `${type}-report-${this.startDate}-to-${this.endDate}.csv`;
         a.click();
         URL.revokeObjectURL(url);
+        this.showToast('Report downloaded successfully', 'success');
       },
-      error: async (err: any) => {
+      error: (err: any) => {
         this.downloading.set(null);
-        const toast = await this.toastCtrl.create({
-          message: err?.message || 'Failed to download report', color: 'danger', duration: 4000, position: 'bottom',
-        });
-        await toast.present();
+        this.showToast(err?.message || 'Failed to download report', 'danger');
       },
     });
   }
 
-  private getParams(type: string): { start: string; end: string } {
-    switch (type) {
-      case 'uptime': return { start: this.uptimeStart, end: this.uptimeEnd };
-      case 'incidents': return { start: this.incidentsStart, end: this.incidentsEnd };
-      default: return { start: this.responseStart, end: this.responseEnd };
-    }
+  private async showToast(message: string, color: string): Promise<void> {
+    const toast = await this.toastCtrl.create({
+      message, color, duration: 3000, position: 'bottom',
+    });
+    await toast.present();
   }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Service\Telegram;
 
 use Cake\Http\Client;
+use Cake\Core\Configure;
 use Cake\Log\Log;
 use Cake\ORM\Locator\LocatorAwareTrait;
 
@@ -318,7 +319,7 @@ class TelegramBotService
     protected function cmdHelp(): string
     {
         return implode("\n", [
-            "\xF0\x9F\xA4\x96 <b>ISP Status Bot Commands</b>",
+            "\xF0\x9F\xA4\x96 <b>" . Configure::read('Brand.name', 'ISP Status') . " Bot Commands</b>",
             '',
             '/status — Overview (up/down/degraded counts)',
             '/monitors — List all active monitors',

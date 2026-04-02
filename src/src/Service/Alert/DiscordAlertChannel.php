@@ -7,6 +7,7 @@ use App\Model\Entity\AlertRule;
 use App\Model\Entity\Incident;
 use App\Model\Entity\Monitor;
 use Cake\Http\Client;
+use Cake\Core\Configure;
 use Cake\Log\Log;
 
 /**
@@ -142,7 +143,7 @@ class DiscordAlertChannel implements ChannelInterface
         $timestamp = $incident->started_at ? $incident->started_at->format('c') : null;
 
         return [
-            'username' => 'ISP Status Monitor',
+            'username' => Configure::read('Brand.name', 'ISP Status') . ' Monitor',
             'embeds' => [
                 [
                     'title' => "Monitor {$statusText}: {$monitor->name}",
@@ -172,7 +173,7 @@ class DiscordAlertChannel implements ChannelInterface
                     ],
                     'timestamp' => $timestamp,
                     'footer' => [
-                        'text' => 'ISP Status Page',
+                        'text' => Configure::read('Brand.fullName', 'ISP Status Page'),
                     ],
                 ],
             ],

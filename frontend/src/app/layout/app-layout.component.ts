@@ -20,6 +20,7 @@ import {
 } from '@ionic/angular/standalone';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../core/services/auth.service';
+import { BRAND } from '../core/config/brand.config';
 import { ApiService } from '../core/services/api.service';
 import { ThemeService } from '../core/services/theme.service';
 import { addIcons } from 'ionicons';
@@ -124,8 +125,8 @@ addIcons({
       <ion-split-pane contentId="main-content">
         <ion-menu contentId="main-content" type="overlay">
           <ion-header>
-            <ion-toolbar color="primary">
-              <ion-title>ISP Status</ion-title>
+            <ion-toolbar color="secondary">
+              <ion-title>{{ brand.name }}</ion-title>
               <ion-buttons slot="end">
                 <ion-button (click)="theme.toggle()" [title]="'Theme: ' + theme.mode()">
                   <ion-icon
@@ -363,6 +364,13 @@ addIcons({
                     <ion-label>Health</ion-label>
                   </ion-item>
                 </ion-menu-toggle>
+
+                <ion-menu-toggle auto-hide="false">
+                  <ion-item routerLink="/super-admin/blog-posts" routerLinkActive="selected">
+                    <ion-icon name="document-text-outline" slot="start"></ion-icon>
+                    <ion-label>Blog Posts</ion-label>
+                  </ion-item>
+                </ion-menu-toggle>
               }
             </ion-list>
           </ion-content>
@@ -375,7 +383,7 @@ addIcons({
   styles: [
     `
       .selected {
-        --background: var(--ion-color-primary-tint);
+        --background: rgba(41, 121, 255, 0.12);
         --color: var(--ion-color-primary);
         font-weight: 600;
       }
@@ -399,6 +407,7 @@ addIcons({
   ],
 })
 export class AppLayoutComponent implements OnInit {
+  brand = BRAND;
   activeIncidentCount = signal(0);
   reportsExpanded = false;
   subscribersExpanded = false;

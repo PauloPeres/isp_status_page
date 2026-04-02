@@ -4,7 +4,7 @@ use App\Service\SettingService;
 
 // Get settings
 $settingService = new SettingService();
-$siteName = $settingService->get('site_name', 'ISP Status');
+$siteName = $settingService->get('site_name', Configure::read('Brand.name', 'ISP Status'));
 
 ?>
 
@@ -13,7 +13,7 @@ $siteName = $settingService->get('site_name', 'ISP Status');
         <div class="header-content">
             <div class="header-brand">
                 <?= $this->Html->image('icon_isp_status_page.png', [
-                    'alt' => 'ISP Status',
+                    'alt' => Configure::read('Brand.name', 'ISP Status'),
                     'class' => 'header-logo'
                 ]) ?>
                 <div class="header-title">

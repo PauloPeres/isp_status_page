@@ -32,7 +32,7 @@ $this->assign('title', 'Verify Your Email');
 
 <!-- Verify Button -->
 <p style="text-align: center; margin: 30px 0;">
-    <a href="<?= $verifyLink ?>" class="button" style="display: inline-block; padding: 14px 32px; background-color: #1E88E5; color: #FFFFFF; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">
+    <a href="<?= $verifyLink ?>" class="button" style="display: inline-block; padding: 14px 32px; background-color: #2979FF; color: #FFFFFF; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">
         Verify My Email
     </a>
 </p>

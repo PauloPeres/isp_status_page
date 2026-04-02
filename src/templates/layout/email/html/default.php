@@ -157,7 +157,7 @@
     <div class="email-wrapper">
         <div class="email-container">
             <div class="email-header">
-                <h1><?= isset($siteName) ? h($siteName) : 'ISP Status' ?></h1>
+                <h1><?= isset($siteName) ? h($siteName) : \Cake\Core\Configure::read('Brand.name', 'ISP Status') ?></h1>
             </div>
 
             <div class="email-body">
@@ -169,7 +169,7 @@
                     <?= __d('emails', 'This is an automatic email. Please do not reply.') ?>
                 </p>
                 <p>
-                    &copy; <?= date('Y') ?> <?= isset($siteName) ? h($siteName) : 'ISP Status' ?>
+                    &copy; <?= date('Y') ?> <?= isset($siteName) ? h($siteName) : \Cake\Core\Configure::read('Brand.name', 'ISP Status') ?>
                 </p>
             </div>
         </div>

@@ -7,6 +7,7 @@ use App\Service\Alert\AlertService;
 use App\Service\IncidentService;
 use App\Service\SettingService;
 use Cake\I18n\DateTime;
+use Cake\Core\Configure;
 use Cake\Log\Log;
 
 /**
@@ -267,7 +268,7 @@ class IncidentsController extends AppController
     {
         try {
             $settingService = new SettingService();
-            $siteName = $settingService->get('site_name', 'ISP Status');
+            $siteName = $settingService->get('site_name', Configure::read('Brand.name', 'ISP Status'));
             $siteUrl = $settingService->get('site_url', '');
 
             // Load monitor if not already loaded
@@ -297,7 +298,7 @@ class IncidentsController extends AppController
                         $mailer = new \Cake\Mailer\Mailer('default');
                         $mailer
                             ->setFrom(
-                                $settingService->get('email_from', 'noreply@example.com'),
+                                $settingService->get('email_from', Configure::read('Brand.noreplyEmail', 'noreply@usekeeup.com')),
                                 $settingService->get('email_from_name', $siteName)
                             )
                             ->setTo($email)

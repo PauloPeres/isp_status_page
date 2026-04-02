@@ -6,6 +6,7 @@ namespace App\Controller\SuperAdmin;
 use App\Service\BackupUploaderService;
 use App\Service\EmailService;
 use App\Service\SettingService;
+use Cake\Core\Configure;
 
 /**
  * Super Admin Settings Controller
@@ -50,8 +51,8 @@ class SettingsController extends AppController
             'smtp_username' => $this->settingService->get('smtp_username', ''),
             'smtp_password' => $this->settingService->get('smtp_password', ''),
             'smtp_encryption' => $this->settingService->get('smtp_encryption', 'tls'),
-            'email_from_name' => $this->settingService->get('email_from_name', 'ISP Status'),
-            'email_from_address' => $this->settingService->get('email_from', 'noreply@example.com'),
+            'email_from_name' => $this->settingService->get('email_from_name', Configure::read('Brand.emailFromName', 'KeepUp')),
+            'email_from_address' => $this->settingService->get('email_from', Configure::read('Brand.noreplyEmail', 'noreply@usekeeup.com')),
             // Backup / FTP
             'backup_ftp_enabled' => $this->settingService->get('backup_ftp_enabled', false),
             'backup_ftp_type' => $this->settingService->get('backup_ftp_type', 'ftp'),
@@ -61,7 +62,7 @@ class SettingsController extends AppController
             'backup_ftp_password' => $this->settingService->get('backup_ftp_password', ''),
             'backup_ftp_path' => $this->settingService->get('backup_ftp_path', '/backups'),
             // System
-            'site_name' => $this->settingService->get('site_name', 'ISP Status Page'),
+            'site_name' => $this->settingService->get('site_name', Configure::read('Brand.fullName', 'ISP Status Page')),
             'default_language' => $this->settingService->get('site_language', 'en'),
             'system_announcement' => $this->settingService->get('system_announcement', ''),
         ];

@@ -128,9 +128,9 @@ class MonitorCheckCommand extends Command
                 'help' => 'Run checks as a specific region (code, e.g. us-east-1). Tags results with region_id.',
                 'required' => false,
             ])
-            ->addOption('verbose', [
-                'short' => 'v',
-                'help' => 'Enable verbose output',
+            ->addOption('debug', [
+                'short' => 'd',
+                'help' => 'Enable debug output',
                 'boolean' => true,
             ]);
 
@@ -194,7 +194,7 @@ class MonitorCheckCommand extends Command
             $io->hr();
 
             // Execute checks
-            $results = $this->executeChecks($monitors, $io, $args->getOption('verbose'), $regionId);
+            $results = $this->executeChecks($monitors, $io, $args->getOption('debug'), $regionId);
 
             // Display summary
             $this->displaySummary($io, $results, microtime(true) - $startTime);

@@ -3,10 +3,10 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Login - ISP Status</title>
+    <title>Login - <?= \Cake\Core\Configure::read('Brand.name', 'ISP Status') ?></title>
     <style>
         :root {
-            --color-primary: #1E88E5;
+            --color-primary: #2979FF;
             --color-success: #43A047;
             --color-dark: #263238;
             --color-white: #FFFFFF;
@@ -189,8 +189,8 @@
 <body>
     <div class="login-box">
         <div class="logo-container">
-            <img src="/img/icon_isp_status_page.png" alt="ISP Status" class="logo">
-            <h1>ISP Status</h1>
+            <img src="/img/icon_isp_status_page.png" alt="<?= \Cake\Core\Configure::read('Brand.name', 'ISP Status') ?>" class="logo">
+            <h1><?= \Cake\Core\Configure::read('Brand.name', 'ISP Status') ?></h1>
             <p class="subtitle"><?= __('Sign in to your account') ?></p>
         </div>
 

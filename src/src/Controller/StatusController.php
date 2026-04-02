@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Service\SettingService;
+use Cake\Core\Configure;
 use Cake\I18n\DateTime;
 
 /**
@@ -132,10 +133,10 @@ class StatusController extends AppController
             ->all();
 
         // Load settings
-        $siteName = $this->settingService->get('site_name', 'ISP Status');
+        $siteName = $this->settingService->get('site_name', Configure::read('Brand.name', 'ISP Status'));
         $statusPageTitle = $this->settingService->get('status_page_title', 'Service Status');
         $logoUrl = $this->settingService->get('site_logo_url', null);
-        $supportEmail = $this->settingService->get('support_email', 'support@example.com');
+        $supportEmail = $this->settingService->get('support_email', Configure::read('Brand.supportEmail', 'support@usekeeup.com'));
 
         // Set HTTP status code based on system status
         if ($systemStatus === 'major-outage') {
@@ -265,8 +266,8 @@ class StatusController extends AppController
         }
 
         // Load settings for footer
-        $siteName = $this->settingService->get('site_name', 'ISP Status');
-        $supportEmail = $this->settingService->get('support_email', 'support@example.com');
+        $siteName = $this->settingService->get('site_name', Configure::read('Brand.name', 'ISP Status'));
+        $supportEmail = $this->settingService->get('support_email', Configure::read('Brand.supportEmail', 'support@usekeeup.com'));
 
         $this->set(compact('groupedIncidents', 'siteName', 'supportEmail'));
     }

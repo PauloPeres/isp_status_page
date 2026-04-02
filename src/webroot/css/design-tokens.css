@@ -1,49 +1,54 @@
 /* ==========================================================================
-   ISP Status Page — Design Tokens
+   KeepUp — Design Tokens
+   Option C: Bold Navy + Electric Blue (Premium/Authority)
    Single source of truth for all design variables.
+
+   Philosophy: Dark-first command-center feel.
+   Navy = institutional reliability. Electric Blue = cutting-edge technology.
+   Status colors (green/red/yellow) pop with maximum semantic clarity.
    ========================================================================== */
 
 /* Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
-    /* ── Brand Colors ── */
-    --color-brand-50: #EEF2FF;
-    --color-brand-100: #E0E7FF;
-    --color-brand-200: #C7D2FE;
-    --color-brand-300: #A5B4FC;
-    --color-brand-400: #818CF8;
-    --color-brand-500: #6366F1;
-    --color-brand-600: #4F46E5;
-    --color-brand-700: #4338CA;
-    --color-brand-800: #3730A3;
-    --color-brand-900: #312E81;
+    /* ── Brand Colors (Navy + Electric Blue) ── */
+    --color-brand-50: #E3F2FD;
+    --color-brand-100: #BBDEFB;
+    --color-brand-200: #90CAF9;
+    --color-brand-300: #82B1FF;
+    --color-brand-400: #448AFF;
+    --color-brand-500: #2979FF;      /* Primary — buttons, links, CTAs */
+    --color-brand-600: #2962FF;      /* Hover */
+    --color-brand-700: #1A2332;      /* Command Navy — sidebar, headers */
+    --color-brand-800: #0F1923;      /* Abyss — deep backgrounds */
+    --color-brand-900: #0A1118;
 
     /* ── Semantic Colors ── */
-    --color-success: #10B981;
-    --color-success-light: #D1FAE5;
-    --color-success-dark: #059669;
-    --color-warning: #F59E0B;
-    --color-warning-light: #FEF3C7;
-    --color-warning-dark: #D97706;
-    --color-error: #EF4444;
-    --color-error-light: #FEE2E2;
-    --color-error-dark: #DC2626;
-    --color-info: #3B82F6;
-    --color-info-light: #DBEAFE;
-    --color-info-dark: #2563EB;
+    --color-success: #00E676;         /* Sentinel Green — up/operational */
+    --color-success-light: #E8F5E9;
+    --color-success-dark: #00C853;
+    --color-warning: #FFEA00;         /* Flux Yellow — degraded */
+    --color-warning-light: #FFFDE7;
+    --color-warning-dark: #FFD600;
+    --color-error: #FF1744;           /* Breach Red — down/critical */
+    --color-error-light: #FFEBEE;
+    --color-error-dark: #D50000;
+    --color-info: #448AFF;            /* Electric Blue Light — informational */
+    --color-info-light: #E3F2FD;
+    --color-info-dark: #2962FF;
 
     /* ── Neutrals (Slate) ── */
-    --color-gray-50: #F8FAFC;
+    --color-gray-50: #F8F9FB;
     --color-gray-100: #F1F5F9;
     --color-gray-200: #E2E8F0;
     --color-gray-300: #CBD5E1;
-    --color-gray-400: #94A3B8;
-    --color-gray-500: #64748B;
-    --color-gray-600: #475569;
-    --color-gray-700: #334155;
-    --color-gray-800: #1E293B;
-    --color-gray-900: #0F172A;
+    --color-gray-400: #6B7280;
+    --color-gray-500: #4B5563;
+    --color-gray-600: #374151;
+    --color-gray-700: #2C3E50;
+    --color-gray-800: #1A2332;
+    --color-gray-900: #0F1923;
 
     /* ── Backward-compatible aliases ── */
     --color-primary: var(--color-brand-500);
@@ -112,9 +117,9 @@
     --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.06);
     --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
     --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
-    --shadow-brand: 0 4px 14px rgba(99, 102, 241, 0.25);
-    --shadow-success: 0 4px 14px rgba(16, 185, 129, 0.25);
-    --shadow-error: 0 4px 14px rgba(239, 68, 68, 0.25);
+    --shadow-brand: 0 4px 14px rgba(41, 121, 255, 0.25);
+    --shadow-success: 0 4px 14px rgba(0, 230, 118, 0.25);
+    --shadow-error: 0 4px 14px rgba(255, 23, 68, 0.25);
 
     /* ── Layout ── */
     --sidebar-width: 260px;
@@ -128,30 +133,30 @@
 
 /* ── Dark Mode Overrides ── */
 [data-theme="dark"] {
-    --color-brand-50: #1E1B4B;
-    --color-brand-100: #312E81;
-    --color-primary: #818CF8;
-    --color-primary-hover: #A5B4FC;
-    --color-primary-light: #312E81;
+    --color-brand-50: #0A1118;
+    --color-brand-100: #0F1923;
+    --color-primary: #448AFF;
+    --color-primary-hover: #82B1FF;
+    --color-primary-light: #1A2332;
 
-    --color-gray-50: #0F172A;
-    --color-gray-100: #1E293B;
-    --color-gray-200: #334155;
-    --color-gray-300: #475569;
-    --color-gray-400: #64748B;
-    --color-gray-500: #94A3B8;
+    --color-gray-50: #0F1923;
+    --color-gray-100: #1A2332;
+    --color-gray-200: #2C3E50;
+    --color-gray-300: #374151;
+    --color-gray-400: #6B7280;
+    --color-gray-500: #9CA3AF;
     --color-gray-600: #CBD5E1;
     --color-gray-700: #E2E8F0;
     --color-gray-800: #F1F5F9;
-    --color-gray-900: #F8FAFC;
+    --color-gray-900: #F8F9FB;
 
-    --color-dark: #F8FAFC;
-    --color-white: #0F172A;
-    --color-gray-light: #1E293B;
-    --color-gray-medium: #64748B;
+    --color-dark: #F8F9FB;
+    --color-white: #0F1923;
+    --color-gray-light: #1A2332;
+    --color-gray-medium: #6B7280;
 
-    --color-success-light: #064E3B;
-    --color-warning-light: #78350F;
-    --color-error-light: #7F1D1D;
-    --color-info-light: #1E3A5F;
+    --color-success-light: #0A2E1A;
+    --color-warning-light: #2E2A00;
+    --color-error-light: #2E0A0A;
+    --color-info-light: #0A1A2E;
 }

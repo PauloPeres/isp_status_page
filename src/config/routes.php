@@ -249,6 +249,26 @@ return function (RouteBuilder $routes): void {
         );
 
         /*
+         * Marketing pages
+         */
+        $builder->connect('/about', ['controller' => 'Pages', 'action' => 'about']);
+        $builder->connect('/changelog', ['controller' => 'Pages', 'action' => 'changelog']);
+        $builder->connect('/blog', ['controller' => 'Blog', 'action' => 'index']);
+        $builder->connect('/blog/{slug}', ['controller' => 'Blog', 'action' => 'view'], ['pass' => ['slug']]);
+        // Portuguese blog
+        $builder->connect('/pt/blog', ['controller' => 'Blog', 'action' => 'index', 'lang' => 'pt'], ['pass' => ['lang']]);
+        $builder->connect('/pt/blog/{slug}', ['controller' => 'Blog', 'action' => 'view'], ['pass' => ['slug']]);
+        // Spanish blog
+        $builder->connect('/es/blog', ['controller' => 'Blog', 'action' => 'index', 'lang' => 'es'], ['pass' => ['lang']]);
+        $builder->connect('/es/blog/{slug}', ['controller' => 'Blog', 'action' => 'view'], ['pass' => ['slug']]);
+        $builder->connect('/alternatives/{competitor}', ['controller' => 'Pages', 'action' => 'alternatives'], ['pass' => ['competitor']]);
+        $builder->connect('/use-cases/{useCase}', ['controller' => 'Pages', 'action' => 'useCases'], ['pass' => ['useCase']]);
+        $builder->connect('/features/{feature}', ['controller' => 'Pages', 'action' => 'featurePage'], ['pass' => ['feature']]);
+        $builder->connect('/pt/{page}', ['controller' => 'Pages', 'action' => 'pt'], ['pass' => ['page']]);
+        $builder->connect('/sitemap.xml', ['controller' => 'Pages', 'action' => 'sitemap']);
+        $builder->connect('/robots.txt', ['controller' => 'Pages', 'action' => 'robots']);
+
+        /*
          * Stripe webhook route (TASK-803)
          */
         $builder->connect(
@@ -503,6 +523,7 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/auth/me', ['controller' => 'Auth', 'action' => 'me', 'prefix' => 'Api/V2', '_method' => 'GET']);
         $builder->connect('/auth/me', ['controller' => 'Auth', 'action' => 'updateMe', 'prefix' => 'Api/V2', '_method' => 'PUT']);
         $builder->connect('/auth/me', ['controller' => 'Auth', 'action' => 'updateMe', 'prefix' => 'Api/V2', '_method' => 'PATCH']);
+        $builder->connect('/auth/change-password', ['controller' => 'Auth', 'action' => 'changePassword', 'prefix' => 'Api/V2', '_method' => 'POST']);
         $builder->connect('/auth/switch-org', ['controller' => 'Auth', 'action' => 'switchOrg', 'prefix' => 'Api/V2', '_method' => 'POST']);
 
         // --- OAuth (no JWT required) ---
@@ -749,6 +770,16 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/super-admin/plans/{id}', ['controller' => 'Plans', 'action' => 'edit', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '\d+']);
         $builder->connect('/super-admin/plans/{id}', ['controller' => 'Plans', 'action' => 'delete', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
         $builder->connect('/super-admin/plans/{id}/duplicate', ['controller' => 'Plans', 'action' => 'duplicate', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
+
+        // Super Admin — Blog Posts
+        $builder->connect('/super-admin/blog-posts', ['controller' => 'BlogPosts', 'action' => 'index', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'GET']);
+        $builder->connect('/super-admin/blog-posts', ['controller' => 'BlogPosts', 'action' => 'add', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'POST']);
+        $builder->connect('/super-admin/blog-posts/{id}', ['controller' => 'BlogPosts', 'action' => 'view', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/super-admin/blog-posts/{id}', ['controller' => 'BlogPosts', 'action' => 'edit', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/super-admin/blog-posts/{id}', ['controller' => 'BlogPosts', 'action' => 'edit', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/super-admin/blog-posts/{id}', ['controller' => 'BlogPosts', 'action' => 'delete', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/super-admin/blog-posts/{id}/publish', ['controller' => 'BlogPosts', 'action' => 'publish', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/super-admin/blog-posts/{id}/unpublish', ['controller' => 'BlogPosts', 'action' => 'unpublish', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
 
         $builder->fallbacks();
     });

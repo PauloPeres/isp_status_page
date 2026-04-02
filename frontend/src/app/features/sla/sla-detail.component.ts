@@ -13,8 +13,9 @@ import {
   ToastController,
 } from '@ionic/angular/standalone';
 import { ApiService } from '../../core/services/api.service';
+import { SlaService } from './sla.service';
 import { addIcons } from 'ionicons';
-import { printOutline, createOutline, downloadOutline, shieldCheckmarkOutline, warningOutline, closeCircleOutline } from 'ionicons/icons';
+import { printOutline, createOutline, downloadOutline, shieldCheckmarkOutline, warningOutline, closeCircleOutline, alertCircleOutline } from 'ionicons/icons';
 
 addIcons({
   'print-outline': printOutline,
@@ -23,6 +24,7 @@ addIcons({
   'shield-checkmark-outline': shieldCheckmarkOutline,
   'warning-outline': warningOutline,
   'close-circle-outline': closeCircleOutline,
+  'alert-circle-outline': alertCircleOutline,
 });
 
 @Component({
@@ -38,7 +40,7 @@ addIcons({
     IonProgressBar,
   ],
   template: `
-    <ion-header>
+    <ion-header class="no-print">
       <ion-toolbar>
         <ion-buttons slot="start">
           <ion-back-button defaultHref="/sla"></ion-back-button>
@@ -46,10 +48,10 @@ addIcons({
         <ion-title>{{ sla()?.name ?? 'SLA Report' }}</ion-title>
         <ion-buttons slot="end">
           @if (sla()) {
-            <ion-button (click)="onPrint()" class="no-print">
-              <ion-icon name="print-outline" slot="icon-only"></ion-icon>
+            <ion-button (click)="onDownloadPdf()">
+              <ion-icon name="download-outline" slot="icon-only"></ion-icon>
             </ion-button>
-            <ion-button [routerLink]="['/sla', sla()!.id, 'edit']" class="no-print">
+            <ion-button [routerLink]="['/sla', sla()!.id, 'edit']">
               <ion-icon name="create-outline" slot="icon-only"></ion-icon>
             </ion-button>
           }
@@ -58,7 +60,7 @@ addIcons({
     </ion-header>
 
     <ion-content class="ion-padding" id="sla-report-content">
-      <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+      <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)" class="no-print">
         <ion-refresher-content></ion-refresher-content>
       </ion-refresher>
 
@@ -81,31 +83,53 @@ addIcons({
           <div class="period-dates">{{ periodLabel() }}</div>
         </div>
 
-        <!-- Print Header (visible only in print) -->
-        <div class="print-header">
-          <h1>{{ sla()!.name }} &mdash; SLA Report</h1>
-          <p>{{ periodLabel() }} &bull; Generated {{ today | date:'mediumDate' }}</p>
+        <!-- ===== PRINT HEADER (visible only in print) ===== -->
+        <div class="print-only print-header">
+          <div class="print-brand">KeepUp</div>
+          <h1 class="print-title">{{ sla()!.name }} &mdash; SLA Compliance Report</h1>
+          <p class="print-meta">Period: {{ periodLabel() }}</p>
+          <p class="print-meta">Generated: {{ today | date:'longDate' }}</p>
         </div>
 
         <!-- ===== 1. EXECUTIVE SUMMARY (HERO) ===== -->
         <ion-card class="hero-card">
           <ion-card-content>
-            <div class="hero-grid">
-              <!-- Status Badge -->
-              <div class="hero-block hero-status-block">
-                <ion-badge [color]="getStatusColor()" class="status-badge">
-                  @if (getStatus() === 'compliant') {
-                    <ion-icon name="shield-checkmark-outline"></ion-icon>
-                  } @else if (getStatus() === 'at_risk') {
-                    <ion-icon name="warning-outline"></ion-icon>
-                  } @else {
-                    <ion-icon name="close-circle-outline"></ion-icon>
-                  }
-                  {{ getStatus() | uppercase }}
-                </ion-badge>
-                <div class="hero-label">SLA Status</div>
+            <!-- Status Hero -->
+            <div class="status-hero">
+              <div class="status-icon-circle"
+                   [class.circle-success]="getStatus() === 'compliant'"
+                   [class.circle-warning]="getStatus() === 'at_risk'"
+                   [class.circle-danger]="getStatus() === 'breached'">
+                @if (getStatus() === 'compliant') {
+                  <ion-icon name="shield-checkmark-outline"></ion-icon>
+                } @else if (getStatus() === 'at_risk') {
+                  <ion-icon name="warning-outline"></ion-icon>
+                } @else {
+                  <ion-icon name="alert-circle-outline"></ion-icon>
+                }
               </div>
+              <div class="status-hero-text">
+                <div class="status-hero-label"
+                     [class.text-success]="getStatus() === 'compliant'"
+                     [class.text-warning]="getStatus() === 'at_risk'"
+                     [class.text-danger]="getStatus() === 'breached'">
+                  @if (getStatus() === 'compliant') { Compliant }
+                  @else if (getStatus() === 'at_risk') { At Risk }
+                  @else { Breached }
+                </div>
+                <div class="status-hero-desc">
+                  @if (getStatus() === 'compliant') {
+                    Your service met its uptime target this period
+                  } @else if (getStatus() === 'at_risk') {
+                    Your service is close to missing its uptime target
+                  } @else {
+                    Your service missed its uptime target this period
+                  }
+                </div>
+              </div>
+            </div>
 
+            <div class="hero-grid">
               <!-- Actual Uptime -->
               <div class="hero-block">
                 <div class="hero-value" [class]="getUptimeClass()">
@@ -153,12 +177,19 @@ addIcons({
               <div class="budget-bar-container">
                 <div class="budget-bar-used"
                      [style.width.%]="getBudgetUsedPct()"
-                     [class.bar-warning]="getBudgetUsedPct() > 50 && getBudgetUsedPct() <= 80"
-                     [class.bar-danger]="getBudgetUsedPct() > 80">
+                     [class.bar-green]="getBudgetUsedPct() <= 50"
+                     [class.bar-gradient-mid]="getBudgetUsedPct() > 50 && getBudgetUsedPct() <= 80"
+                     [class.bar-gradient-high]="getBudgetUsedPct() > 80">
+                  @if (getBudgetUsedPct() >= 15) {
+                    <span class="budget-bar-pct">{{ getBudgetUsedPct() | number:'1.0-0' }}%</span>
+                  }
                 </div>
               </div>
               <div class="budget-footer">
                 <span>{{ getBudgetUsedPct() | number:'1.1-1' }}% consumed</span>
+                <span class="budget-remaining">
+                  {{ formatDuration(report()?.total_downtime_minutes ?? 0) }} min used of {{ formatDuration(getAllowedDowntime()) }} min budget
+                </span>
                 <span>{{ formatDuration(getRemainingBudget()) }} remaining</span>
               </div>
             </div>
@@ -204,20 +235,43 @@ addIcons({
         </ion-grid>
 
         <!-- ===== 3. DAILY AVAILABILITY CALENDAR ===== -->
-        <ion-card>
+        <ion-card class="daily-card">
           <ion-card-header>
             <ion-card-title>Daily Availability</ion-card-title>
             <ion-card-subtitle>Day-by-day breakdown for the selected period</ion-card-subtitle>
           </ion-card-header>
           <ion-card-content>
             @if (getDailyBreakdown().length > 0) {
-              <div class="daily-list">
+              <!-- Mini heatmap -->
+              <div class="heatmap-row">
                 @for (day of getDailyBreakdown(); track day.date) {
-                  <div class="daily-row" [class.daily-perfect]="day.uptime >= 100"
+                  <div class="heatmap-cell"
+                       [class.heatmap-green]="day.uptime >= (sla()?.target_uptime ?? 99.9)"
+                       [class.heatmap-amber]="day.uptime < (sla()?.target_uptime ?? 99.9) && day.uptime >= 98"
+                       [class.heatmap-red]="day.uptime < 98"
+                       [title]="(day.date | date:'MMM d') + ': ' + (day.uptime | number:'1.2-2') + '%'">
+                  </div>
+                }
+              </div>
+
+              <!-- Table header -->
+              <div class="daily-header">
+                <div class="daily-hdr-dot"></div>
+                <div class="daily-hdr-date">Date</div>
+                <div class="daily-hdr-uptime">Uptime</div>
+                <div class="daily-hdr-downtime">Downtime</div>
+                <div class="daily-hdr-incidents">Incidents</div>
+              </div>
+
+              <div class="daily-list">
+                @for (day of getDailyBreakdown(); track day.date; let idx = $index) {
+                  <div class="daily-row"
+                       [class.daily-perfect]="day.uptime >= 100"
                        [class.daily-amber]="day.uptime < (sla()?.target_uptime ?? 99.9) && day.uptime >= 98"
-                       [class.daily-red]="day.uptime < 98">
+                       [class.daily-red]="day.uptime < 98"
+                       [class.daily-row-alt]="idx % 2 === 1">
                     <div class="daily-dot"
-                         [class.dot-green]="day.uptime >= 100"
+                         [class.dot-green]="day.uptime >= (sla()?.target_uptime ?? 99.9)"
                          [class.dot-amber]="day.uptime < (sla()?.target_uptime ?? 99.9) && day.uptime >= 98"
                          [class.dot-red]="day.uptime < 98"></div>
                     <div class="daily-date">{{ day.date | date:'EEE, MMM d' }}</div>
@@ -226,14 +280,16 @@ addIcons({
                     </div>
                     <div class="daily-downtime">
                       @if (day.downtime_minutes > 0) {
-                        {{ formatDuration(day.downtime_minutes) }} down
+                        {{ formatDuration(day.downtime_minutes) }}
                       } @else {
                         &mdash;
                       }
                     </div>
                     <div class="daily-incidents">
                       @if (day.incidents > 0) {
-                        {{ day.incidents }} incident{{ day.incidents > 1 ? 's' : '' }}
+                        {{ day.incidents }}
+                      } @else {
+                        &mdash;
                       }
                     </div>
                   </div>
@@ -242,6 +298,44 @@ addIcons({
             } @else {
               <div class="empty-state">
                 <p>Daily breakdown not available for this period.</p>
+              </div>
+            }
+          </ion-card-content>
+        </ion-card>
+
+        <!-- ===== INCIDENTS IN PERIOD ===== -->
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Incidents in Period</ion-card-title>
+            <ion-card-subtitle>Incidents that occurred during the selected period</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            @if (getIncidents().length === 0) {
+              <p style="color: var(--ion-color-success); text-align: center; padding: 16px;">No incidents during this period</p>
+            } @else {
+              <div class="incidents-table">
+                <div class="incidents-header">
+                  <div class="inc-col-title">Title</div>
+                  <div class="inc-col-severity">Severity</div>
+                  <div class="inc-col-status">Status</div>
+                  <div class="inc-col-started">Started</div>
+                  <div class="inc-col-resolved">Resolved</div>
+                  <div class="inc-col-duration">Duration</div>
+                </div>
+                @for (inc of getIncidents(); track inc.id; let idx = $index) {
+                  <div class="incidents-row" [class.incidents-row-alt]="idx % 2 === 1">
+                    <div class="inc-col-title">{{ inc.title }}</div>
+                    <div class="inc-col-severity">
+                      <ion-badge [color]="getSeverityColor(inc.severity)">{{ inc.severity }}</ion-badge>
+                    </div>
+                    <div class="inc-col-status">
+                      <ion-badge [color]="getIncidentStatusColor(inc.status)">{{ inc.status }}</ion-badge>
+                    </div>
+                    <div class="inc-col-started">{{ inc.started_at }}</div>
+                    <div class="inc-col-resolved">{{ inc.resolved_at ?? 'Ongoing' }}</div>
+                    <div class="inc-col-duration">{{ formatDuration(inc.duration_minutes) }}</div>
+                  </div>
+                }
               </div>
             }
           </ion-card-content>
@@ -260,18 +354,42 @@ addIcons({
                   {{ getResponseAvg() > 0 ? (getResponseAvg() | number:'1.0-0') + 'ms' : 'N/A' }}
                 </div>
                 <div class="stat-label">Average</div>
+                <div class="response-bar-wrapper">
+                  <div class="response-bar"
+                       [style.width.%]="getResponseBarWidth(getResponseAvg())"
+                       [class.rbar-green]="getResponseAvg() > 0 && getResponseAvg() < 200"
+                       [class.rbar-amber]="getResponseAvg() >= 200 && getResponseAvg() < 500"
+                       [class.rbar-red]="getResponseAvg() >= 500">
+                  </div>
+                </div>
               </div>
               <div class="response-stat">
                 <div class="stat-value" [class]="getResponseClass(getResponseP95())">
                   {{ getResponseP95() > 0 ? (getResponseP95() | number:'1.0-0') + 'ms' : 'N/A' }}
                 </div>
                 <div class="stat-label">P95</div>
+                <div class="response-bar-wrapper">
+                  <div class="response-bar"
+                       [style.width.%]="getResponseBarWidth(getResponseP95())"
+                       [class.rbar-green]="getResponseP95() > 0 && getResponseP95() < 200"
+                       [class.rbar-amber]="getResponseP95() >= 200 && getResponseP95() < 500"
+                       [class.rbar-red]="getResponseP95() >= 500">
+                  </div>
+                </div>
               </div>
               <div class="response-stat">
                 <div class="stat-value" [class]="getResponseClass(getResponseMax())">
                   {{ getResponseMax() > 0 ? (getResponseMax() | number:'1.0-0') + 'ms' : 'N/A' }}
                 </div>
                 <div class="stat-label">Max</div>
+                <div class="response-bar-wrapper">
+                  <div class="response-bar"
+                       [style.width.%]="getResponseBarWidth(getResponseMax())"
+                       [class.rbar-green]="getResponseMax() > 0 && getResponseMax() < 200"
+                       [class.rbar-amber]="getResponseMax() >= 200 && getResponseMax() < 500"
+                       [class.rbar-red]="getResponseMax() >= 500">
+                  </div>
+                </div>
               </div>
             </div>
           </ion-card-content>
@@ -291,6 +409,11 @@ addIcons({
             </ion-list>
           </ion-card-content>
         </ion-card>
+
+        <!-- ===== PRINT FOOTER ===== -->
+        <div class="print-only print-footer">
+          Generated by KeepUp (usekeeup.com) on {{ today | date:'longDate' }}
+        </div>
       }
     </ion-content>
   `,
@@ -306,8 +429,27 @@ addIcons({
       letter-spacing: 0.02em;
     }
 
-    /* ===== PRINT HEADER (hidden on screen) ===== */
-    .print-header { display: none; }
+    .print-only { display: none; }
+
+    /* ===== STATUS HERO ===== */
+    .status-hero { display: flex; align-items: center; gap: 16px; padding-bottom: 20px; margin-bottom: 16px; border-bottom: 1px solid var(--ion-color-light-shade); }
+
+    .status-icon-circle {
+      width: 56px; height: 56px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .status-icon-circle ion-icon { font-size: 28px; color: #fff; }
+    .circle-success { background: #00C853; }
+    .circle-warning { background: #F9A825; }
+    .circle-danger { background: #FF1744; }
+
+    .status-hero-text { flex: 1; }
+
+    .status-hero-label { font-size: 1.4rem; font-weight: 800; letter-spacing: 0.02em; }
+    .text-success { color: #00C853; }
+    .text-warning { color: #F9A825; }
+    .text-danger { color: #FF1744; }
+    .status-hero-desc { font-size: 0.85rem; color: var(--ion-color-medium); margin-top: 2px; }
 
     /* ===== HERO CARD ===== */
     .hero-card { margin-top: 0; }
@@ -324,20 +466,6 @@ addIcons({
 
     .hero-block { display: flex; flex-direction: column; align-items: center; justify-content: center; }
 
-    .hero-status-block { grid-column: 1 / -1; margin-bottom: 4px; }
-
-    .status-badge {
-      font-size: 1.1rem;
-      padding: 10px 24px;
-      border-radius: 8px;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .status-badge ion-icon { font-size: 1.2rem; }
-
     .hero-value {
       font-family: 'DM Sans', monospace;
       font-size: 1.6rem;
@@ -353,9 +481,9 @@ addIcons({
       font-weight: 600;
     }
 
-    .success-text { color: var(--ion-color-success); }
-    .warning-text { color: var(--ion-color-warning-shade); }
-    .danger-text { color: var(--ion-color-danger); }
+    .success-text { color: #00C853; }
+    .warning-text { color: #F9A825; }
+    .danger-text { color: #FF1744; }
 
     /* ===== BUDGET SECTION ===== */
     .budget-section { margin-top: 20px; }
@@ -376,27 +504,14 @@ addIcons({
       font-size: 0.75rem;
       color: var(--ion-color-medium);
     }
-    .budget-bar-container {
-      height: 14px;
-      background: var(--ion-color-light);
-      border-radius: 7px;
-      overflow: hidden;
-    }
-    .budget-bar-used {
-      height: 100%;
-      background: var(--ion-color-success);
-      border-radius: 7px;
-      transition: width 0.4s ease;
-    }
-    .budget-bar-used.bar-warning { background: var(--ion-color-warning); }
-    .budget-bar-used.bar-danger { background: var(--ion-color-danger); }
-    .budget-footer {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.72rem;
-      color: var(--ion-color-medium);
-      margin-top: 6px;
-    }
+    .budget-bar-container { height: 20px; background: var(--ion-color-light); border-radius: 10px; overflow: hidden; }
+    .budget-bar-used { height: 100%; border-radius: 10px; transition: width 0.4s ease; display: flex; align-items: center; justify-content: center; }
+    .budget-bar-pct { font-size: 0.65rem; font-weight: 700; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+    .bar-green { background: linear-gradient(90deg, #00C853, #69F0AE); }
+    .bar-gradient-mid { background: linear-gradient(90deg, #00C853, #F9A825); }
+    .bar-gradient-high { background: linear-gradient(90deg, #F9A825, #FF1744); }
+    .budget-footer { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--ion-color-medium); margin-top: 6px; }
+    .budget-remaining { font-weight: 600; color: var(--ion-color-dark); }
 
     /* ===== KEY METRICS ===== */
     .metrics-grid { --ion-grid-padding: 0; }
@@ -420,39 +535,46 @@ addIcons({
       color: var(--ion-color-medium);
       margin-top: 2px;
     }
-    .mini-success { color: var(--ion-color-success); font-weight: 600; }
-    .mini-danger { color: var(--ion-color-danger); font-weight: 600; }
+    .mini-success { color: #00C853; font-weight: 600; }
+    .mini-danger { color: #FF1744; font-weight: 600; }
+
+    /* ===== HEATMAP ===== */
+    .heatmap-row { display: flex; flex-wrap: wrap; gap: 3px; margin-bottom: 16px; padding: 12px; background: var(--ion-color-light); border-radius: 8px; }
+    .heatmap-cell { width: 14px; height: 14px; border-radius: 3px; background: var(--ion-color-medium-tint); }
+    .heatmap-green { background: #00C853; }
+    .heatmap-amber { background: #F9A825; }
+    .heatmap-red { background: #FF1744; }
 
     /* ===== DAILY AVAILABILITY ===== */
-    .daily-list { display: flex; flex-direction: column; gap: 2px; }
-    .daily-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-size: 0.82rem;
-      background: var(--ion-color-light);
-    }
-    .daily-row.daily-perfect { background: rgba(67, 160, 71, 0.06); }
-    .daily-row.daily-amber { background: rgba(253, 216, 53, 0.12); }
-    .daily-row.daily-red { background: rgba(229, 57, 53, 0.08); }
+    .daily-card { page-break-inside: avoid; }
 
-    .daily-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      flex-shrink: 0;
-      background: var(--ion-color-medium);
+    .daily-header {
+      display: flex; align-items: center; gap: 10px; padding: 8px 12px;
+      font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.04em; color: var(--ion-color-medium);
+      border-bottom: 2px solid var(--ion-color-light-shade); margin-bottom: 2px;
     }
-    .daily-dot.dot-green { background: var(--ion-color-success); }
-    .daily-dot.dot-amber { background: var(--ion-color-warning); }
-    .daily-dot.dot-red { background: var(--ion-color-danger); }
+    .daily-hdr-dot { width: 12px; flex-shrink: 0; }
+    .daily-hdr-date { flex: 1; min-width: 100px; }
+    .daily-hdr-uptime { min-width: 64px; text-align: right; }
+    .daily-hdr-downtime, .daily-hdr-incidents { min-width: 80px; text-align: right; }
 
+    .daily-list { display: flex; flex-direction: column; gap: 1px; }
+    .daily-row { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 4px; font-size: 0.82rem; }
+    .daily-row-alt { background: var(--ion-color-light); }
+    .daily-row.daily-perfect { background: rgba(0,200,83,0.05); }
+    .daily-row.daily-perfect.daily-row-alt { background: rgba(0,200,83,0.09); }
+    .daily-row.daily-amber { background: rgba(249,168,37,0.08); }
+    .daily-row.daily-amber.daily-row-alt { background: rgba(249,168,37,0.12); }
+    .daily-row.daily-red { background: rgba(255,23,68,0.06); }
+    .daily-row.daily-red.daily-row-alt { background: rgba(255,23,68,0.10); }
+    .daily-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; background: var(--ion-color-medium); }
+    .daily-dot.dot-green { background: #00C853; }
+    .daily-dot.dot-amber { background: #F9A825; }
+    .daily-dot.dot-red { background: #FF1744; }
     .daily-date { flex: 1; font-weight: 500; min-width: 100px; }
     .daily-uptime { font-weight: 700; min-width: 64px; text-align: right; font-family: 'DM Sans', monospace; }
-    .daily-downtime { min-width: 80px; text-align: right; color: var(--ion-color-medium); font-size: 0.75rem; }
-    .daily-incidents { min-width: 80px; text-align: right; color: var(--ion-color-medium); font-size: 0.75rem; }
+    .daily-downtime, .daily-incidents { min-width: 80px; text-align: right; color: var(--ion-color-medium); font-size: 0.75rem; }
 
     .empty-state {
       text-align: center;
@@ -461,32 +583,85 @@ addIcons({
       font-size: 0.85rem;
     }
 
-    /* ===== RESPONSE TIME ===== */
-    .response-stats {
-      display: flex;
-      justify-content: space-around;
-      text-align: center;
-      padding: 8px 0;
+    /* ===== INCIDENTS TABLE ===== */
+    .incidents-table { overflow-x: auto; }
+    .incidents-header {
+      display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+      font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.04em; color: var(--ion-color-medium);
+      border-bottom: 2px solid var(--ion-color-light-shade); margin-bottom: 2px;
     }
+    .incidents-row {
+      display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+      font-size: 0.82rem; border-radius: 4px;
+    }
+    .incidents-row-alt { background: var(--ion-color-light); }
+    .inc-col-title { flex: 2; min-width: 120px; font-weight: 500; }
+    .inc-col-severity { flex: 0.8; min-width: 70px; text-align: center; }
+    .inc-col-status { flex: 0.8; min-width: 80px; text-align: center; }
+    .inc-col-started { flex: 1.2; min-width: 120px; font-size: 0.75rem; color: var(--ion-color-medium); }
+    .inc-col-resolved { flex: 1.2; min-width: 120px; font-size: 0.75rem; color: var(--ion-color-medium); }
+    .inc-col-duration { flex: 0.7; min-width: 60px; text-align: right; font-weight: 600; font-family: 'DM Sans', monospace; }
+
+    /* ===== RESPONSE TIME ===== */
+    .response-stats { display: flex; justify-content: space-around; text-align: center; padding: 8px 0; gap: 12px; }
     .response-stat { flex: 1; }
-    .response-green { color: var(--ion-color-success); }
-    .response-amber { color: var(--ion-color-warning-shade); }
-    .response-red { color: var(--ion-color-danger); }
+    .response-green { color: #00C853; }
+    .response-amber { color: #F9A825; }
+    .response-red { color: #FF1744; }
+    .response-bar-wrapper { height: 8px; background: var(--ion-color-light); border-radius: 4px; overflow: hidden; margin-top: 8px; }
+    .response-bar { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
+    .rbar-green { background: #00C853; }
+    .rbar-amber { background: #F9A825; }
+    .rbar-red { background: #FF1744; }
 
     /* ===== PRINT STYLES ===== */
     @media print {
-      ion-header, ion-refresher, ion-segment, .no-print, .period-selector { display: none !important; }
-      ion-content { --overflow: visible; }
-      ion-card { break-inside: avoid; box-shadow: none; border: 1px solid #ddd; margin: 8px 0; }
+      /* Hide navigation and interactive elements */
+      ion-header, ion-menu, ion-toolbar, ion-refresher,
+      ion-segment, ion-menu-button, ion-back-button,
+      .no-print, .period-selector { display: none !important; }
+
+      /* Show print-only elements */
+      .print-only { display: block !important; }
+
+      /* Force clean background */
+      * { background: white !important; color: black !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+      ion-content { --overflow: visible; --background: white; }
+
+      /* Cards */
+      ion-card {
+        break-inside: avoid;
+        page-break-inside: avoid;
+        box-shadow: none !important;
+        border: 1px solid #ddd;
+        margin: 8px 0;
+      }
+
+      /* Restore colors for print */
+      .success-text, .text-success, .mini-success, .hero-value.success-text { color: #00C853 !important; }
+      .warning-text, .text-warning, .hero-value.warning-text { color: #F9A825 !important; }
+      .danger-text, .text-danger, .mini-danger, .hero-value.danger-text { color: #FF1744 !important; }
+      .status-icon-circle { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+      .circle-success, .bar-green, .heatmap-green, .dot-green, .rbar-green { background: #00C853 !important; }
+      .circle-warning, .bar-gradient-mid, .heatmap-amber, .dot-amber, .rbar-amber { background: #F9A825 !important; }
+      .circle-danger, .bar-gradient-high, .heatmap-red, .dot-red, .rbar-red { background: #FF1744 !important; }
+      .status-icon-circle ion-icon, .budget-bar-pct { color: #fff !important; }
+
       .stat-value, .hero-value { color: #000 !important; }
-      .print-header { display: block; text-align: center; margin-bottom: 16px; border-bottom: 2px solid #333; padding-bottom: 12px; }
-      .print-header h1 { font-size: 1.4rem; margin: 0 0 4px; }
-      .print-header p { font-size: 0.85rem; color: #666; margin: 0; }
-      .hero-grid { border-bottom-color: #ddd; }
-      .daily-row { background: #f9f9f9 !important; border: 1px solid #eee; }
+      .print-header { display: block !important; text-align: center; margin-bottom: 20px; border-bottom: 3px solid #1A2332; padding-bottom: 16px; }
+      .print-brand { font-size: 1.6rem; font-weight: 900; color: #1A2332 !important; letter-spacing: 0.05em; margin-bottom: 8px; }
+      .print-title { font-size: 1.3rem; font-weight: 700; color: #1A2332 !important; margin: 0 0 6px; }
+      .print-meta { font-size: 0.85rem; color: #666 !important; margin: 2px 0; }
+      .print-footer { display: block !important; text-align: center; font-size: 0.75rem; color: #999 !important; border-top: 1px solid #ddd; padding-top: 12px; margin-top: 24px; }
+      .daily-card, .daily-list, .print-footer { page-break-inside: avoid; }
+      .daily-row { background: #f9f9f9 !important; border-bottom: 1px solid #eee; }
+      .daily-row.daily-row-alt { background: #fff !important; }
       .daily-row.daily-red { background: #fff0f0 !important; }
-      .budget-bar-container { border: 1px solid #ccc; }
-      .status-badge { border: 2px solid currentColor; }
+      .hero-grid { border-bottom-color: #ddd; }
+      .budget-bar-container { border: 1px solid #ccc; background: #f0f0f0 !important; }
+      .heatmap-row { background: #f5f5f5 !important; }
     }
   `],
 })
@@ -502,6 +677,7 @@ export class SlaDetailComponent implements OnInit, ViewWillEnter {
   constructor(
     private route: ActivatedRoute,
     private api: ApiService,
+    private slaService: SlaService,
     private toastCtrl: ToastController,
   ) {}
 
@@ -549,8 +725,27 @@ export class SlaDetailComponent implements OnInit, ViewWillEnter {
     });
   }
 
-  onPrint(): void {
-    window.print();
+  onDownloadPdf(): void {
+    if (!this.sla()) return;
+    this.slaService.exportReport(this.sla()!.id, 'pdf').subscribe({
+      next: (blob: Blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `sla-report-${this.sla()!.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.pdf`;
+        a.click();
+        URL.revokeObjectURL(url);
+      },
+      error: async () => {
+        const toast = await this.toastCtrl.create({
+          message: 'Failed to generate PDF. Please try again.',
+          color: 'danger',
+          duration: 3000,
+          position: 'bottom',
+        });
+        await toast.present();
+      },
+    });
   }
 
   // ===== STATUS HELPERS =====
@@ -583,7 +778,7 @@ export class SlaDetailComponent implements OnInit, ViewWillEnter {
     if (minutes == null || minutes <= 0) return '0m';
     const d = Math.floor(minutes / 1440);
     const h = Math.floor((minutes % 1440) / 60);
-    const m = Math.round(minutes % 60);
+    const m = Math.floor(minutes % 60);
     const parts: string[] = [];
     if (d > 0) parts.push(`${d}d`);
     if (h > 0) parts.push(`${h}h`);
@@ -642,12 +837,35 @@ export class SlaDetailComponent implements OnInit, ViewWillEnter {
   getAvailabilityExclMaint(): number {
     const r = this.report();
     if (!r) return 0;
-    // If the API provides maintenance_minutes, exclude them from total period
     const maintMinutes = r.maintenance_minutes ?? 0;
     const totalMinutes = this.getTotalPeriodMinutes() - maintMinutes;
     if (totalMinutes <= 0) return 100;
     const downtime = r.total_downtime_minutes ?? 0;
     return ((totalMinutes - downtime) / totalMinutes) * 100;
+  }
+
+  // ===== INCIDENTS =====
+
+  getIncidents(): any[] {
+    return this.report()?.incidents || [];
+  }
+
+  getSeverityColor(severity: string): string {
+    switch (severity?.toLowerCase()) {
+      case 'critical': return 'danger';
+      case 'major': return 'warning';
+      case 'minor': return 'medium';
+      default: return 'medium';
+    }
+  }
+
+  getIncidentStatusColor(status: string): string {
+    switch (status?.toLowerCase()) {
+      case 'resolved': return 'success';
+      case 'investigating': return 'warning';
+      case 'open': return 'danger';
+      default: return 'medium';
+    }
   }
 
   // ===== DAILY BREAKDOWN =====
@@ -680,9 +898,15 @@ export class SlaDetailComponent implements OnInit, ViewWillEnter {
 
   getResponseClass(ms: number): string {
     if (ms <= 0) return 'stat-value';
-    if (ms < 100) return 'stat-value response-green';
-    if (ms <= 500) return 'stat-value response-amber';
+    if (ms < 200) return 'stat-value response-green';
+    if (ms < 500) return 'stat-value response-amber';
     return 'stat-value response-red';
+  }
+
+  getResponseBarWidth(ms: number): number {
+    if (ms <= 0) return 0;
+    // Scale: 1000ms = 100% width
+    return Math.min((ms / 1000) * 100, 100);
   }
 
   // ===== PERIOD =====

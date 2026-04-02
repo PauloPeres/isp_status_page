@@ -10,13 +10,13 @@
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="<?= $this->Url->build('/img/icon_isp_status_page.png') ?>">
     <link rel="apple-touch-icon" sizes="180x180" href="<?= $this->Url->build('/img/icon_isp_status_page.png') ?>">
-    <meta name="theme-color" content="#1E88E5">
+    <meta name="theme-color" content="#2979FF">
 
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="ISP Status">
+    <meta name="apple-mobile-web-app-title" content="<?= \Cake\Core\Configure::read('Brand.shortName', 'ISP Status') ?>">
 
     <meta name="description" content="<?= __('Real-time status page for internet services') ?>">
     <meta name="robots" content="index, follow">

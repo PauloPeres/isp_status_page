@@ -20,7 +20,7 @@ $this->assign('title', __d('emails', 'Access Invitation'));
 </p>
 
 <!-- Credentials Box -->
-<div class="info-box" style="margin: 20px 0; background: #f0f9ff; border-left: 4px solid #1E88E5;">
+<div class="info-box" style="margin: 20px 0; background: #E3F2FD; border-left: 4px solid #2979FF;">
     <p style="margin: 0;">
         <strong><?= __d('emails', 'Username:') ?></strong> <?= h($user->username) ?><br>
         <strong><?= __d('emails', 'Email:') ?></strong> <?= h($user->email) ?><br>

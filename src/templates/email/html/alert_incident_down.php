@@ -58,7 +58,7 @@
         <?php if (!empty($acknowledgeUrl)): ?>
         <div style="text-align: center; margin: 24px 0;">
             <a href="<?= h($acknowledgeUrl) ?>"
-               style="display: inline-block; padding: 12px 32px; background-color: #1E88E5; color: #ffffff; text-decoration: none; border-radius: 6px; font-size: 16px; font-weight: bold;">
+               style="display: inline-block; padding: 12px 32px; background-color: #2979FF; color: #ffffff; text-decoration: none; border-radius: 6px; font-size: 16px; font-weight: bold;">
                 <?= __d('emails', 'Acknowledge Incident') ?>
             </a>
             <p style="font-size: 12px; color: #999; margin-top: 8px;">

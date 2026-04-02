@@ -23,4 +23,4 @@ This invitation will expire on <?= h($invitation->expires_at->format('F j, Y')) 
 If you did not expect this invitation, you can safely ignore this email.
 
 --
-Sent by ISP Status Page
+Sent by <?= \Cake\Core\Configure::read('Brand.fullName', 'ISP Status Page') ?>

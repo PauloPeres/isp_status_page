@@ -42,11 +42,37 @@ class ChecksController extends AppController
         $query = $checksTable->find()
             ->contain(['Monitors' => ['fields' => ['id', 'name']]])
             ->where(['MonitorChecks.monitor_id IN' => $monitorIds])
-            ->orderBy(['MonitorChecks.created' => 'DESC']);
+            ->orderBy(['MonitorChecks.created' => 'DESC', 'MonitorChecks.id' => 'DESC']);
 
         $monitorId = $this->request->getQuery('monitor_id');
         if (!empty($monitorId) && in_array((int)$monitorId, $monitorIds)) {
             $query->where(['MonitorChecks.monitor_id' => (int)$monitorId]);
+        }
+
+        // Filter by status (success, failure, degraded, unknown, up, down)
+        $status = $this->request->getQuery('status');
+        if (!empty($status) && in_array($status, ['success', 'failure', 'degraded', 'unknown', 'up', 'down'])) {
+            $query->where(['MonitorChecks.status' => $status]);
+        }
+
+        // Filter by date range
+        $from = $this->request->getQuery('from');
+        $to = $this->request->getQuery('to');
+        if (!empty($from)) {
+            try {
+                $fromDate = new \DateTime($from);
+                $query->where(['MonitorChecks.created >=' => $fromDate->format('Y-m-d H:i:s')]);
+            } catch (\Exception $e) {
+                // Ignore invalid date
+            }
+        }
+        if (!empty($to)) {
+            try {
+                $toDate = new \DateTime($to);
+                $query->where(['MonitorChecks.created <=' => $toDate->format('Y-m-d H:i:s')]);
+            } catch (\Exception $e) {
+                // Ignore invalid date
+            }
         }
 
         $total = (clone $query)->count();

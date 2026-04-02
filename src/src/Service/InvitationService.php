@@ -11,6 +11,7 @@ use Cake\I18n\DateTime;
 use Cake\Log\Log;
 use Cake\Mailer\Mailer;
 use Cake\ORM\Locator\LocatorAwareTrait;
+use Cake\Core\Configure;
 use Cake\Routing\Router;
 
 /**
@@ -294,7 +295,7 @@ class InvitationService
             $mailer = new Mailer();
             $mailer->setTransport('default')
                 ->setFrom([
-                    $settingService->get('smtp_from_email', 'noreply@ispstatus.com') => $settingService->get('smtp_from_name', 'ISP Status'),
+                    $settingService->get('smtp_from_email', Configure::read('Brand.noreplyEmail', 'noreply@usekeeup.com')) => $settingService->get('smtp_from_name', Configure::read('Brand.emailFromName', 'KeepUp')),
                 ])
                 ->setTo($invitation->email)
                 ->setSubject(__('You\'ve been invited to join {0}', $orgName))

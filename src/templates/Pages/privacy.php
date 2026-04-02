@@ -3,11 +3,11 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Privacy Policy - ISP Status Page</title>
-    <meta name="description" content="Privacy Policy for ISP Status Page, a SaaS uptime monitoring platform by IuriLabs.">
+    <title>Privacy Policy - <?= \Cake\Core\Configure::read('Brand.fullName', 'ISP Status Page') ?></title>
+    <meta name="description" content="Privacy Policy for <?= \Cake\Core\Configure::read('Brand.fullName', 'ISP Status Page') ?>, a SaaS uptime monitoring platform by <?= \Cake\Core\Configure::read('Brand.company', 'IuriLabs') ?>.">
     <link rel="icon" type="image/png" href="/img/icon_isp_status_page.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/img/icon_isp_status_page.png">
-    <meta name="theme-color" content="#6366F1">
+    <meta name="theme-color" content="#1A2332">
     <link rel="stylesheet" href="/css/design-tokens.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -139,8 +139,8 @@
 <header class="legal-header">
     <div class="legal-header-inner">
         <a href="/" class="legal-brand">
-            <img src="/img/icon_isp_status_page.png" alt="ISP Status">
-            <span>ISP Status</span>
+            <img src="/img/icon_isp_status_page.png" alt="<?= \Cake\Core\Configure::read('Brand.name', 'ISP Status') ?>">
+            <span><?= \Cake\Core\Configure::read('Brand.name', 'ISP Status') ?></span>
         </a>
         <nav class="legal-nav">
             <a href="/">Home</a>
@@ -154,7 +154,7 @@
     <h1>Privacy Policy</h1>
     <p class="legal-meta">Effective Date: March 30, 2026 &middot; Last Updated: March 30, 2026</p>
 
-    <p>IuriLabs Limited Company ("IuriLabs," "we," "us," or "our") operates ISP Status Page ("Service"). This Privacy Policy explains how we collect, use, store, and protect your information when you use our Service.</p>
+    <p><?= \Cake\Core\Configure::read('Brand.company', 'IuriLabs') ?> Limited Company ("<?= \Cake\Core\Configure::read('Brand.company', 'IuriLabs') ?>," "we," "us," or "our") operates <?= \Cake\Core\Configure::read('Brand.fullName', 'ISP Status Page') ?> ("Service"). This Privacy Policy explains how we collect, use, store, and protect your information when you use our Service.</p>
 
     <h2>1. Information We Collect</h2>
 
@@ -309,7 +309,7 @@
 
 <footer class="legal-footer">
     <div class="legal-footer-inner">
-        <span>&copy; <?= date('Y') ?> IuriLabs Limited Company. All rights reserved.</span>
+        <span>&copy; <?= date('Y') ?> <?= \Cake\Core\Configure::read('Brand.company', 'IuriLabs') ?> Limited Company. All rights reserved.</span>
         <div class="legal-footer-links">
             <a href="/">Home</a>
             <a href="/terms">Terms of Service</a>

@@ -86,7 +86,7 @@ if ($incident->started_at && $incident->resolved_at) {
         <?php endif; ?>
 
         <p style="font-size: 12px; color: #999; margin-top: 24px; border-top: 1px solid #eee; padding-top: 12px;">
-            <?= __d('emails', 'This alert was sent automatically by {0}.', h($siteName ?? 'ISP Status')) ?>
+            <?= __d('emails', 'This alert was sent automatically by {0}.', h($siteName ?? \Cake\Core\Configure::read('Brand.name', 'ISP Status'))) ?>
         </p>
 
         <?php if (!empty($unsubscribeUrl)): ?>

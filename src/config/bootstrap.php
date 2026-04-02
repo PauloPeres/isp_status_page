@@ -97,6 +97,14 @@ if (file_exists(CONFIG . 'app_local.php')) {
 }
 
 /*
+ * Load brand configuration (name, logo, company).
+ * Override via environment variables: BRAND_NAME, BRAND_COMPANY, etc.
+ */
+if (file_exists(CONFIG . 'brand.php')) {
+    Configure::load('brand', 'default');
+}
+
+/*
  * When debug = true the metadata cache should only last
  * for a short time.
  */

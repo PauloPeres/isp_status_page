@@ -120,7 +120,7 @@
 <body>
     <div class="email-container">
         <div class="email-header">
-            <h1><?= $this->fetch('title', 'ISP Status') ?></h1>
+            <h1><?= $this->fetch('title', \Cake\Core\Configure::read('Brand.name', 'ISP Status')) ?></h1>
         </div>
         <div class="email-body">
             <?= $this->fetch('content') ?>

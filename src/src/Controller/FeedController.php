@@ -37,7 +37,7 @@ class FeedController extends AppController
             ->limit(20)
             ->all();
 
-        $siteName = (new \App\Service\SettingService())->get('site_name', 'ISP Status');
+        $siteName = (new \App\Service\SettingService())->get('site_name', \Cake\Core\Configure::read('Brand.name', 'ISP Status'));
         $siteUrl = (new \App\Service\SettingService())->get('site_url', '');
 
         $this->set(compact('incidents', 'siteName', 'siteUrl'));

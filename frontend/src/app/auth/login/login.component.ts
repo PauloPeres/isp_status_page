@@ -14,6 +14,7 @@ import {
 import { addIcons } from 'ionicons';
 import { logoGoogle, logoMicrosoft, eyeOutline, eyeOffOutline } from 'ionicons/icons';
 import { AuthService } from '../../core/services/auth.service';
+import { BRAND } from '../../core/config/brand.config';
 
 @Component({
   selector: 'app-login',
@@ -35,7 +36,7 @@ import { AuthService } from '../../core/services/auth.service';
       <div class="login-container">
         <div class="login-card">
           <div class="login-header">
-            <h1>ISP Status</h1>
+            <h1>{{ brand.name }}</h1>
             <p>Sign in to your account</p>
           </div>
 
@@ -221,6 +222,7 @@ import { AuthService } from '../../core/services/auth.service';
   ],
 })
 export class LoginComponent {
+  brand = BRAND;
   email = '';
   password = '';
   twoFactorCode = '';

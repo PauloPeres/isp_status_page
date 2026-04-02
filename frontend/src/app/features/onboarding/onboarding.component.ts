@@ -30,6 +30,7 @@ import {
   closeOutline,
 } from 'ionicons/icons';
 import { OnboardingService, OnboardingStep } from './onboarding.service';
+import { BRAND } from '../../core/config/brand.config';
 
 addIcons({
   'pulse-outline': pulseOutline,
@@ -83,7 +84,7 @@ addIcons({
         <!-- Welcome Header -->
         <div class="welcome-section">
           <ion-icon name="rocket-outline" class="welcome-icon"></ion-icon>
-          <h1>Welcome to ISP Status!</h1>
+          <h1>Welcome to {{ brand.name }}!</h1>
           <p>Let's get your monitoring set up in a few quick steps.</p>
         </div>
 
@@ -219,7 +220,7 @@ addIcons({
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
-        background: var(--ion-color-primary-tint);
+        background: rgba(41, 121, 255, 0.12);
       }
       .icon-completed {
         background: var(--ion-color-success-tint);
@@ -277,6 +278,8 @@ addIcons({
   ],
 })
 export class OnboardingComponent implements OnInit, ViewWillEnter {
+  brand = BRAND;
+
   constructor(
     public onboardingService: OnboardingService,
     private router: Router,

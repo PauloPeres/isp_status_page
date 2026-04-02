@@ -36,7 +36,8 @@ class SlaService
         int $monitorId,
         string $period = 'monthly',
         float $targetUptime = 99.9,
-        ?float $warningThreshold = null
+        ?float $warningThreshold = null,
+        bool $detailed = false
     ): array {
         $periodDates = $this->getPeriodDates($period);
         $periodStart = $periodDates['start'];
@@ -63,15 +64,134 @@ class SlaService
         $allowedDowntimeMinutes = round($totalMinutes * (100 - $targetUptime) / 100, 2);
         $remainingDowntimeMinutes = max(0, round($allowedDowntimeMinutes - $downtimeMinutes, 2));
 
-        // Count incidents in this period
+        // Fetch incidents in this period
         $incidentsTable = $this->fetchTable('Incidents');
-        $incidentsCount = $incidentsTable->find()
+        $incidents = $incidentsTable->find()
             ->where([
                 'Incidents.monitor_id' => $monitorId,
                 'Incidents.started_at >=' => $startDt->format('Y-m-d H:i:s'),
                 'Incidents.started_at <=' => $effectiveEnd->format('Y-m-d H:i:s'),
             ])
-            ->count();
+            ->orderBy(['Incidents.started_at' => 'DESC'])
+            ->all();
+
+        $incidentsCount = $incidents->count();
+        $longestIncidentMinutes = 0;
+        $totalIncidentMinutes = 0;
+        $incidentsList = [];
+        foreach ($incidents as $incident) {
+            $incEnd = $incident->resolved_at ?? $effectiveEnd;
+            $incDuration = max(0, ($incEnd->getTimestamp() - $incident->started_at->getTimestamp()) / 60);
+            $totalIncidentMinutes += $incDuration;
+            if ($incDuration > $longestIncidentMinutes) {
+                $longestIncidentMinutes = $incDuration;
+            }
+            $incidentsList[] = [
+                'id' => $incident->id,
+                'title' => $incident->title,
+                'severity' => $incident->severity,
+                'status' => $incident->status,
+                'started_at' => $incident->started_at->format('Y-m-d H:i:s'),
+                'resolved_at' => $incident->resolved_at ? $incident->resolved_at->format('Y-m-d H:i:s') : null,
+                'duration_minutes' => round($incDuration, 1),
+            ];
+        }
+
+        // MTBF / MTTR
+        $mtbfMinutes = $incidentsCount > 0 ? ($totalMinutes - $totalIncidentMinutes) / $incidentsCount : $totalMinutes;
+        $mttrMinutes = $incidentsCount > 0 ? $totalIncidentMinutes / $incidentsCount : 0;
+
+        // Check stats for response times and totals
+        $checksTable = $this->fetchTable('MonitorChecks');
+        $checkStats = $checksTable->find()
+            ->where([
+                'monitor_id' => $monitorId,
+                'created >=' => $startDt->format('Y-m-d H:i:s'),
+                'created <=' => $effectiveEnd->format('Y-m-d H:i:s'),
+            ])
+            ->select([
+                'total' => $checksTable->find()->func()->count('*'),
+                'success_count' => $checksTable->find()->func()->sum(
+                    'CASE WHEN status = \'success\' THEN 1 ELSE 0 END'
+                ),
+                'failure_count' => $checksTable->find()->func()->sum(
+                    'CASE WHEN status = \'failure\' THEN 1 ELSE 0 END'
+                ),
+                'avg_response' => $checksTable->find()->func()->avg('response_time'),
+                'max_response' => $checksTable->find()->func()->max('response_time'),
+            ])
+            ->first();
+
+        $totalChecks = (int)($checkStats->total ?? 0);
+        $successChecks = (int)($checkStats->success_count ?? 0);
+        $failedChecks = (int)($checkStats->failure_count ?? 0);
+        $avgResponse = $checkStats->avg_response ? round((float)$checkStats->avg_response, 1) : null;
+        $maxResponse = $checkStats->max_response ? (int)$checkStats->max_response : null;
+
+        // P95 response time
+        $p95Response = null;
+        if ($totalChecks > 0) {
+            $p95Row = $checksTable->find()
+                ->where([
+                    'monitor_id' => $monitorId,
+                    'created >=' => $startDt->format('Y-m-d H:i:s'),
+                    'created <=' => $effectiveEnd->format('Y-m-d H:i:s'),
+                    'response_time IS NOT' => null,
+                ])
+                ->orderBy(['response_time' => 'ASC'])
+                ->offset((int)floor($totalChecks * 0.95))
+                ->limit(1)
+                ->first();
+            $p95Response = $p95Row ? (int)$p95Row->response_time : null;
+        }
+
+        // Daily breakdown (skip when not detailed to avoid timeout on long periods)
+        $dailyBreakdown = [];
+        if ($detailed) {
+            $cursor = clone $startDt;
+            while ($cursor <= $effectiveEnd) {
+                $dayStr = $cursor->format('Y-m-d');
+                $dayStart = $dayStr . ' 00:00:00';
+                $dayEnd = $dayStr . ' 23:59:59';
+
+                $dayStats = $checksTable->find()
+                    ->where([
+                        'monitor_id' => $monitorId,
+                        'created >=' => $dayStart,
+                        'created <=' => $dayEnd,
+                    ])
+                    ->select([
+                        'total' => $checksTable->find()->func()->count('*'),
+                        'success_count' => $checksTable->find()->func()->sum(
+                            'CASE WHEN status = \'success\' THEN 1 ELSE 0 END'
+                        ),
+                    ])
+                    ->first();
+
+                $dayTotal = (int)($dayStats->total ?? 0);
+                $daySuccess = (int)($dayStats->success_count ?? 0);
+                $dayUptime = $dayTotal > 0 ? round(($daySuccess / $dayTotal) * 100, 2) : null;
+                $dayDownMinutes = $dayTotal > 0 ? round(1440 * (100 - $dayUptime) / 100, 1) : 0;
+
+                $dayIncidents = $incidentsTable->find()
+                    ->where([
+                        'Incidents.monitor_id' => $monitorId,
+                        'Incidents.started_at >=' => $dayStart,
+                        'Incidents.started_at <=' => $dayEnd,
+                    ])
+                    ->count();
+
+                $dailyBreakdown[] = [
+                    'date' => $dayStr,
+                    'uptime' => $dayUptime,
+                    'downtime_minutes' => $dayDownMinutes,
+                    'incidents' => $dayIncidents,
+                    'checks' => $dayTotal,
+                ];
+
+                $cursor->modify('+1 day');
+            }
+        }
 
         // Determine status
         $status = $this->determineStatus($actualUptime, $targetUptime, $warningThreshold);
@@ -89,6 +209,18 @@ class SlaService
             'remaining_downtime_minutes' => $remainingDowntimeMinutes,
             'status' => $status,
             'incidents_count' => $incidentsCount,
+            'longest_incident_minutes' => round($longestIncidentMinutes, 1),
+            'total_checks' => $totalChecks,
+            'successful_checks' => $successChecks,
+            'failed_checks' => $failedChecks,
+            'mtbf_minutes' => round($mtbfMinutes, 1),
+            'mttr_minutes' => round($mttrMinutes, 1),
+            'maintenance_minutes' => 0,
+            'avg_response_ms' => $avgResponse,
+            'p95_response_ms' => $p95Response,
+            'max_response_ms' => $maxResponse,
+            'incidents' => $incidentsList,
+            'daily_breakdown' => $dailyBreakdown,
             'period_start' => $periodStart->format('Y-m-d'),
             'period_end' => $periodEnd->format('Y-m-d'),
         ];
@@ -118,7 +250,8 @@ class SlaService
             $slaDef->monitor_id,
             $slaDef->measurement_period,
             (float)$slaDef->target_uptime,
-            $slaDef->warning_threshold !== null ? (float)$slaDef->warning_threshold : null
+            $slaDef->warning_threshold !== null ? (float)$slaDef->warning_threshold : null,
+            false
         );
 
         // Check if a report already exists for this period
@@ -274,7 +407,8 @@ class SlaService
                 $slaDef->monitor_id,
                 $slaDef->measurement_period,
                 (float)$slaDef->target_uptime,
-                $slaDef->warning_threshold !== null ? (float)$slaDef->warning_threshold : null
+                $slaDef->warning_threshold !== null ? (float)$slaDef->warning_threshold : null,
+                false
             );
 
             $status = $slaData['status'];

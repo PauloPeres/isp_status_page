@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use Cake\Core\Configure;
+
 /**
  * TwoFactorService
  *
@@ -39,7 +41,7 @@ class TwoFactorService
      */
     public function getQrCodeUrl(string $email, string $secret): string
     {
-        $issuer = urlencode('ISP Status Page');
+        $issuer = urlencode(Configure::read('Brand.fullName', 'ISP Status Page'));
         $encodedEmail = urlencode($email);
 
         return "otpauth://totp/{$issuer}:{$encodedEmail}?secret={$secret}&issuer={$issuer}&algorithm=SHA1&digits=6&period=30";

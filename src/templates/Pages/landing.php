@@ -3,11 +3,11 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>ISP Status - Monitor Your Infrastructure</title>
+    <title><?= \Cake\Core\Configure::read('Brand.name', 'ISP Status') ?> - Monitor Your Infrastructure</title>
     <meta name="description" content="Real-time uptime monitoring, beautiful status pages, and instant alerts. Free to start.">
     <link rel="icon" type="image/png" href="/img/icon_isp_status_page.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/img/icon_isp_status_page.png">
-    <meta name="theme-color" content="#1E88E5">
+    <meta name="theme-color" content="#2979FF">
     <link rel="stylesheet" href="/css/landing.css">
 </head>
 <body>
@@ -16,13 +16,22 @@
 <nav class="landing-nav">
     <div class="nav-container">
         <a href="/" class="nav-brand">
-            <img src="/img/icon_isp_status_page.png" alt="ISP Status" class="nav-logo">
-            <span>ISP Status</span>
+            <img src="/img/icon_isp_status_page.png" alt="<?= \Cake\Core\Configure::read('Brand.name', 'ISP Status') ?>" class="nav-logo">
+            <span><?= \Cake\Core\Configure::read('Brand.name', 'ISP Status') ?></span>
         </a>
         <div class="nav-links">
-            <a href="#features">Features</a>
+            <div class="nav-dropdown">
+                <a href="#features" class="nav-dropdown-trigger">Features &#9662;</a>
+                <div class="nav-dropdown-menu">
+                    <a href="/features/status-page">Status Pages</a>
+                    <a href="/features/alerting">Alerting</a>
+                    <a href="/use-cases/isp">For ISPs</a>
+                    <a href="/use-cases/saas">For SaaS</a>
+                </div>
+            </div>
             <a href="#pricing">Pricing</a>
-            <a href="/status" class="nav-link-subtle">Status</a>
+            <a href="/blog">Blog</a>
+            <a href="/about">About</a>
             <a href="/app/login" class="nav-btn nav-btn-outline">Sign In</a>
             <a href="/app/register" class="nav-btn nav-btn-primary">Start Free</a>
         </div>
@@ -182,20 +191,32 @@
     <div class="footer-container">
         <div class="footer-grid">
             <div class="footer-brand">
-                <img src="/img/icon_isp_status_page.png" alt="ISP Status" class="footer-logo">
+                <img src="/img/icon_isp_status_page.png" alt="<?= \Cake\Core\Configure::read('Brand.name', 'KeepUp') ?>" class="footer-logo">
                 <p>Real-time infrastructure monitoring for teams that care about uptime.</p>
             </div>
             <div class="footer-links">
                 <h4>Product</h4>
-                <a href="#features">Features</a>
+                <a href="/features/status-page">Status Pages</a>
+                <a href="/features/alerting">Alerting</a>
                 <a href="#pricing">Pricing</a>
-                <a href="/status">Status</a>
+                <a href="/changelog">Changelog</a>
                 <a href="/api/docs">API Docs</a>
             </div>
             <div class="footer-links">
-                <h4>Account</h4>
+                <h4>Use Cases</h4>
+                <a href="/use-cases/isp">For ISPs</a>
+                <a href="/use-cases/saas">For SaaS</a>
+                <a href="/alternatives/uptimerobot">vs UptimeRobot</a>
+                <a href="/alternatives/pingdom">vs Pingdom</a>
+                <a href="/alternatives/statuspage-io">vs StatusPage.io</a>
+            </div>
+            <div class="footer-links">
+                <h4>Resources</h4>
+                <a href="/blog">Blog</a>
+                <a href="/about">About</a>
+                <a href="/pt/monitoramento">Portugu&ecirc;s</a>
                 <a href="/app/login">Sign In</a>
-                <a href="/app/register">Register</a>
+                <a href="/app/register">Start Free</a>
             </div>
             <div class="footer-links">
                 <h4>Legal</h4>
@@ -204,7 +225,7 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; <?= date('Y') ?> ISP Status. All rights reserved.</p>
+            <p>&copy; <?= date('Y') ?> <?= \Cake\Core\Configure::read('Brand.name', 'ISP Status') ?>. All rights reserved.</p>
         </div>
     </div>
 </footer>

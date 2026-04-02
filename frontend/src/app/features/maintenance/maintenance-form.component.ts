@@ -235,7 +235,8 @@ interface DayOption {
     .recurring-preview {
       padding: 12px 16px;
       margin: 4px 0;
-      background: var(--ion-color-primary-tint);
+      background: rgba(41, 121, 255, 0.08);
+      border: 1px solid rgba(41, 121, 255, 0.15);
       border-radius: 8px;
     }
     .recurring-preview ion-note {

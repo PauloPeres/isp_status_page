@@ -1,37 +1,35 @@
 import { Injectable } from '@angular/core';
-import { ApiService } from '../../core/services/api.service';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
-export interface ReportResult {
-  data: any[];
-  summary: Record<string, any>;
-}
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ReportService {
-  constructor(private api: ApiService) {}
-
-  getUptime(params: { start: string; end: string }): Observable<ReportResult> {
-    return this.api.get<ReportResult>('/reports/uptime', params);
-  }
-
-  getIncidents(params: { start: string; end: string }): Observable<ReportResult> {
-    return this.api.get<ReportResult>('/reports/incidents', params);
-  }
-
-  getResponseTimes(params: { start: string; end: string }): Observable<ReportResult> {
-    return this.api.get<ReportResult>('/reports/response-times', params);
-  }
+  constructor(private http: HttpClient) {}
 
   downloadUptime(params: { start: string; end: string }): Observable<Blob> {
-    return this.api.get<Blob>('/reports/uptime/csv', params);
+    return this.downloadCsv('/reports/uptime', params);
   }
 
   downloadIncidents(params: { start: string; end: string }): Observable<Blob> {
-    return this.api.get<Blob>('/reports/incidents/csv', params);
+    return this.downloadCsv('/reports/incidents', params);
   }
 
   downloadResponseTimes(params: { start: string; end: string }): Observable<Blob> {
-    return this.api.get<Blob>('/reports/response-times/csv', params);
+    return this.downloadCsv('/reports/response-times', params);
+  }
+
+  private downloadCsv(
+    path: string,
+    params: { start: string; end: string },
+  ): Observable<Blob> {
+    let httpParams = new HttpParams();
+    if (params.start) httpParams = httpParams.set('start', params.start);
+    if (params.end) httpParams = httpParams.set('end', params.end);
+
+    return this.http.get(`${environment.apiUrl}${path}`, {
+      params: httpParams,
+      responseType: 'blob',
+    });
   }
 }

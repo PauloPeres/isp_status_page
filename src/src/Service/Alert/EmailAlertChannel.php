@@ -10,6 +10,7 @@ use App\Service\SettingService;
 use Cake\Log\Log;
 use Cake\Mailer\Mailer;
 use Cake\Mailer\TransportFactory;
+use Cake\Core\Configure;
 use Cake\ORM\Locator\LocatorAwareTrait;
 
 /**
@@ -130,9 +131,9 @@ class EmailAlertChannel implements ChannelInterface
         $mailer = new Mailer();
         $mailer->setTransport('alert');
 
-        $fromEmail = $this->settingService->getString('email_from', 'noreply@example.com');
-        $fromName = $this->settingService->getString('email_from_name', 'ISP Status');
-        $siteName = $this->settingService->getString('site_name', 'ISP Status');
+        $fromEmail = $this->settingService->getString('email_from', Configure::read('Brand.noreplyEmail', 'noreply@usekeeup.com'));
+        $fromName = $this->settingService->getString('email_from_name', Configure::read('Brand.emailFromName', 'KeepUp'));
+        $siteName = $this->settingService->getString('site_name', Configure::read('Brand.name', 'KeepUp'));
 
         $mailer->setFrom([$fromEmail => $fromName]);
         $mailer->setTo($recipientEmail);

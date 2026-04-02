@@ -91,6 +91,169 @@ class PagesController extends AppController
     }
 
     /**
+     * Before filter — allow unauthenticated access to marketing pages.
+     *
+     * @param \Cake\Event\EventInterface $event The event.
+     * @return \Cake\Http\Response|null|void
+     */
+    public function beforeFilter(\Cake\Event\EventInterface $event)
+    {
+        parent::beforeFilter($event);
+
+        $this->Authentication->addUnauthenticatedActions([
+            'about', 'changelog', 'alternatives', 'useCases', 'featurePage',
+            'pt', 'sitemap', 'robots',
+        ]);
+    }
+
+    /**
+     * About page.
+     *
+     * @return \Cake\Http\Response|null
+     */
+    public function about(): ?Response
+    {
+        $this->viewBuilder()->setLayout('marketing');
+
+        return null;
+    }
+
+    /**
+     * Public changelog page.
+     *
+     * @return \Cake\Http\Response|null
+     */
+    public function changelog(): ?Response
+    {
+        $this->viewBuilder()->setLayout('marketing');
+
+        return null;
+    }
+
+    /**
+     * Competitor comparison pages.
+     *
+     * @param string $competitor The competitor slug.
+     * @return \Cake\Http\Response|null
+     * @throws \Cake\Http\Exception\NotFoundException If competitor page not found.
+     */
+    public function alternatives(string $competitor): ?Response
+    {
+        $this->viewBuilder()->setLayout('marketing');
+
+        $allowed = ['uptimerobot', 'pingdom', 'statuspage-io'];
+        if (!in_array($competitor, $allowed, true)) {
+            throw new NotFoundException(__('Page not found.'));
+        }
+
+        $template = 'alternatives_' . str_replace('-', '_', $competitor);
+
+        return $this->render($template);
+    }
+
+    /**
+     * Use case pages.
+     *
+     * @param string $useCase The use case slug.
+     * @return \Cake\Http\Response|null
+     * @throws \Cake\Http\Exception\NotFoundException If use case page not found.
+     */
+    public function useCases(string $useCase): ?Response
+    {
+        $this->viewBuilder()->setLayout('marketing');
+
+        $allowed = ['isp', 'saas'];
+        if (!in_array($useCase, $allowed, true)) {
+            throw new NotFoundException(__('Page not found.'));
+        }
+
+        $template = 'use_cases_' . $useCase;
+
+        return $this->render($template);
+    }
+
+    /**
+     * Feature pages.
+     *
+     * @param string $feature The feature slug.
+     * @return \Cake\Http\Response|null
+     * @throws \Cake\Http\Exception\NotFoundException If feature page not found.
+     */
+    public function featurePage(string $feature): ?Response
+    {
+        $this->viewBuilder()->setLayout('marketing');
+
+        $allowed = ['status-page', 'alerting'];
+        if (!in_array($feature, $allowed, true)) {
+            throw new NotFoundException(__('Page not found.'));
+        }
+
+        $template = 'features_' . str_replace('-', '_', $feature);
+
+        return $this->render($template);
+    }
+
+    /**
+     * Portuguese marketing pages.
+     *
+     * @param string $page The page slug.
+     * @return \Cake\Http\Response|null
+     * @throws \Cake\Http\Exception\NotFoundException If page not found.
+     */
+    public function pt(string $page): ?Response
+    {
+        $this->viewBuilder()->setLayout('marketing');
+
+        $allowed = ['monitoramento', 'para-provedores'];
+        if (!in_array($page, $allowed, true)) {
+            throw new NotFoundException(__('Page not found.'));
+        }
+
+        $template = 'pt_' . str_replace('-', '_', $page);
+
+        return $this->render($template);
+    }
+
+    /**
+     * Dynamic XML sitemap.
+     *
+     * @return \Cake\Http\Response
+     */
+    public function sitemap(): Response
+    {
+        $this->viewBuilder()->disableAutoLayout();
+        $this->response = $this->response->withType('xml');
+
+        // Get published blog posts
+        $blogPosts = [];
+        try {
+            $blogPosts = $this->fetchTable('BlogPosts')
+                ->find('published')
+                ->all()
+                ->toArray();
+        } catch (\Exception $e) {
+            // Table may not exist yet
+        }
+
+        $this->set(compact('blogPosts'));
+
+        return $this->render('sitemap');
+    }
+
+    /**
+     * Robots.txt
+     *
+     * @return \Cake\Http\Response
+     */
+    public function robots(): Response
+    {
+        $this->viewBuilder()->disableAutoLayout();
+        $this->response = $this->response->withType('text/plain');
+
+        return $this->render('robots');
+    }
+
+    /**
      * Displays a view
      *
      * @param string ...$path Path segments.

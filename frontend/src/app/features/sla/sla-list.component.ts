@@ -13,9 +13,9 @@ import {
 import { SlaService, Sla } from './sla.service';
 import { ListSkeletonComponent } from '../../shared/components/list-skeleton.component';
 import { addIcons } from 'ionicons';
-import { ribbonOutline } from 'ionicons/icons';
+import { ribbonOutline, shieldCheckmarkOutline, warningOutline, alertCircleOutline } from 'ionicons/icons';
 
-addIcons({ ribbonOutline });
+addIcons({ ribbonOutline, shieldCheckmarkOutline, warningOutline, alertCircleOutline });
 
 @Component({
   selector: 'app-sla-list',
@@ -66,25 +66,61 @@ addIcons({ ribbonOutline });
       <ion-list>
         @for (item of items(); track item.id) {
           <ion-item-sliding>
-            <ion-item [routerLink]="['/sla', item.id]" detail>
-              <ion-label>
-                <h2>{{ item.name }}</h2>
-                <p>
-                  Target: {{ item.target_uptime }}%
-                  @if (item.actual_uptime != null) {
-                    | Actual: {{ item.actual_uptime }}%
-                  }
+            <ion-item [routerLink]="['/sla', item.id]" detail class="sla-list-item">
+              <div class="sla-row">
+                <div class="sla-row-main">
+                  <div class="sla-row-top">
+                    <h2 class="sla-name">{{ item.name }}</h2>
+                    <div class="sla-status-badge"
+                         [class.badge-compliant]="item.status === 'compliant'"
+                         [class.badge-at-risk]="item.status === 'at_risk'"
+                         [class.badge-breached]="item.status === 'breached'"
+                         [class.badge-unknown]="!item.status">
+                      @if (item.status === 'compliant') {
+                        <ion-icon name="shield-checkmark-outline"></ion-icon>
+                        <span>Compliant</span>
+                      } @else if (item.status === 'at_risk') {
+                        <ion-icon name="warning-outline"></ion-icon>
+                        <span>At Risk</span>
+                      } @else if (item.status === 'breached') {
+                        <ion-icon name="alert-circle-outline"></ion-icon>
+                        <span>Breached</span>
+                      } @else {
+                        <span>Unknown</span>
+                      }
+                    </div>
+                  </div>
                   @if (item.monitor_name) {
-                    <span style="margin-left: 8px; color: var(--ion-color-medium)">{{ item.monitor_name }}</span>
+                    <div class="sla-monitor-name">{{ item.monitor_name }}</div>
                   }
-                </p>
-                <p style="font-size: 0.7rem; margin-top: 2px; color: var(--ion-color-medium)">
-                  {{ item.measurement_period | titlecase }}
-                </p>
-              </ion-label>
-              <ion-badge slot="end" [color]="getStatusColor(item.status)">
-                {{ item.status }}
-              </ion-badge>
+                  <div class="sla-row-metrics">
+                    <div class="sla-uptime-section">
+                      <span class="sla-uptime-label">Actual</span>
+                      <span class="sla-uptime-value"
+                            [class.uptime-green]="item.status === 'compliant'"
+                            [class.uptime-amber]="item.status === 'at_risk'"
+                            [class.uptime-red]="item.status === 'breached'">
+                        {{ item.actual_uptime != null ? (item.actual_uptime | number:'1.3-3') + '%' : 'N/A' }}
+                      </span>
+                      <span class="sla-target-label">/ {{ item.target_uptime }}% target</span>
+                    </div>
+                    <div class="sla-budget-bar">
+                      <div class="sla-budget-track">
+                        <div class="sla-budget-fill"
+                             [style.width.%]="getBudgetPct(item)"
+                             [class.fill-green]="getBudgetPct(item) <= 50"
+                             [class.fill-amber]="getBudgetPct(item) > 50 && getBudgetPct(item) <= 80"
+                             [class.fill-red]="getBudgetPct(item) > 80">
+                        </div>
+                      </div>
+                      <span class="sla-budget-label">{{ getBudgetPct(item) | number:'1.0-0' }}% budget used</span>
+                    </div>
+                  </div>
+                  <div class="sla-row-period">
+                    {{ item.measurement_period | titlecase }}
+                  </div>
+                </div>
+              </div>
             </ion-item>
 
             <ion-item-options side="end">
@@ -107,6 +143,146 @@ addIcons({ ribbonOutline });
   styles: [`
     .empty-state { text-align: center; padding: 3rem 1rem; color: var(--ion-color-medium); }
     .empty-state h3 { margin: 1rem 0 0.5rem; color: var(--ion-text-color); }
+
+    .sla-list-item {
+      --padding-start: 16px;
+      --padding-end: 8px;
+      --inner-padding-end: 8px;
+    }
+
+    .sla-row {
+      width: 100%;
+      padding: 10px 0;
+    }
+
+    .sla-row-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .sla-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--ion-text-color);
+      margin: 0;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Status badges */
+    .sla-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .sla-status-badge ion-icon { font-size: 0.85rem; }
+
+    .badge-compliant {
+      background: rgba(0, 200, 83, 0.12);
+      color: #00C853;
+    }
+    .badge-at-risk {
+      background: rgba(255, 234, 0, 0.15);
+      color: #F9A825;
+    }
+    .badge-breached {
+      background: rgba(255, 23, 68, 0.1);
+      color: #FF1744;
+    }
+    .badge-unknown {
+      background: var(--ion-color-light);
+      color: var(--ion-color-medium);
+    }
+
+    .sla-monitor-name {
+      font-size: 0.75rem;
+      color: var(--ion-color-medium);
+      margin-top: 2px;
+      font-weight: 500;
+    }
+
+    .sla-row-metrics {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 8px;
+    }
+
+    .sla-uptime-section {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .sla-uptime-label {
+      font-size: 0.68rem;
+      color: var(--ion-color-medium);
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .sla-uptime-value {
+      font-family: 'DM Sans', monospace;
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+    .uptime-green { color: #00C853; }
+    .uptime-amber { color: #F9A825; }
+    .uptime-red { color: #FF1744; }
+
+    .sla-target-label {
+      font-size: 0.68rem;
+      color: var(--ion-color-medium);
+    }
+
+    /* Budget progress bar */
+    .sla-budget-bar {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .sla-budget-track {
+      height: 6px;
+      background: var(--ion-color-light-shade);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .sla-budget-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+    .fill-green { background: #00C853; }
+    .fill-amber { background: #F9A825; }
+    .fill-red { background: #FF1744; }
+
+    .sla-budget-label {
+      font-size: 0.65rem;
+      color: var(--ion-color-medium);
+      margin-top: 2px;
+      display: block;
+    }
+
+    .sla-row-period {
+      font-size: 0.68rem;
+      margin-top: 6px;
+      color: var(--ion-color-medium);
+      font-weight: 500;
+    }
   `],
 })
 export class SlaListComponent implements OnInit, ViewWillEnter {
@@ -213,5 +389,15 @@ export class SlaListComponent implements OnInit, ViewWillEnter {
       case 'breached': return 'danger';
       default: return 'medium';
     }
+  }
+
+  getBudgetPct(item: any): number {
+    // Use pre-computed value from API if available
+    if (item.budget_used_pct != null) return item.budget_used_pct;
+    if (item.actual_uptime == null || item.target_uptime == null) return 0;
+    const allowedDowntimePct = 100 - item.target_uptime;
+    if (allowedDowntimePct <= 0) return item.actual_uptime < 100 ? 100 : 0;
+    const actualDowntimePct = 100 - item.actual_uptime;
+    return Math.min(Math.max((actualDowntimePct / allowedDowntimePct) * 100, 0), 100);
   }
 }

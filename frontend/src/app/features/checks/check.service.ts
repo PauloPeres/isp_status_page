@@ -19,6 +19,9 @@ export class CheckService {
     page?: number;
     limit?: number;
     monitor_id?: number;
+    status?: string;
+    from?: string;
+    to?: string;
   }): Observable<PaginatedResponse<CheckWithMonitor>> {
     return this.api.get<any>('/checks', params).pipe(
       map(data => ({

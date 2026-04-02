@@ -40,7 +40,7 @@ $this->assign('title', __d('incidents', 'Incident Acknowledgement'));
     .ack-header.success { background: #43A047; }
     .ack-header.error { background: #E53935; }
     .ack-header.warning { background: #FDD835; color: #333; }
-    .ack-header.info { background: #1E88E5; }
+    .ack-header.info { background: #2979FF; }
 
     .ack-body {
         padding: 32px 24px;

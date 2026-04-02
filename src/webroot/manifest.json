@@ -1,4 +1,5 @@
 {
+    "_comment": "REBRAND: Update name, short_name values when rebranding. These cannot use PHP — must be updated manually.",
     "name": "ISP Status Page",
     "short_name": "ISP Status",
     "description": "Real-time uptime monitoring, status pages, and instant alerts",

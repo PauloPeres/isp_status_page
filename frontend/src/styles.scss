@@ -10,3 +10,68 @@ h1, h2, h3, h4, h5, h6, ion-title {
 code, pre {
   font-family: 'JetBrains Mono', monospace;
 }
+
+/* ===== Global Print Styles ===== */
+/* These must be global (not component-scoped) to reach ion-split-pane/ion-menu */
+@media print {
+  /* Hide the entire sidebar/menu */
+  ion-menu,
+  ion-split-pane > ion-menu,
+  .split-pane-side,
+  .menu-pane-visible {
+    display: none !important;
+    width: 0 !important;
+    min-width: 0 !important;
+    max-width: 0 !important;
+    flex: 0 !important;
+  }
+
+  /* Force main content to take full width */
+  ion-split-pane {
+    --side-width: 0px !important;
+    --side-min-width: 0px !important;
+    --side-max-width: 0px !important;
+  }
+
+  ion-split-pane > ion-router-outlet,
+  ion-split-pane > .split-pane-main,
+  #main-content {
+    flex: 1 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+  }
+
+  /* Hide app-level header/toolbar */
+  ion-header,
+  ion-toolbar,
+  ion-menu-button,
+  ion-back-button {
+    display: none !important;
+  }
+
+  /* Reset scrollable content for print */
+  ion-content {
+    --overflow: visible !important;
+    overflow: visible !important;
+    position: relative !important;
+    contain: none !important;
+  }
+
+  ion-content::part(scroll) {
+    overflow: visible !important;
+    position: relative !important;
+  }
+
+  /* Clean page setup */
+  body, html, ion-app, app-root {
+    overflow: visible !important;
+    position: relative !important;
+    height: auto !important;
+  }
+
+  @page {
+    margin: 1.5cm;
+    size: A4 portrait;
+  }
+}

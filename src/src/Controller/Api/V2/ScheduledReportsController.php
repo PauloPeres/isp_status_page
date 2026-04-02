@@ -269,7 +269,7 @@ class ScheduledReportsController extends AppController
             } else {
                 $this->error('Report generated but email delivery failed. Please check SMTP settings in Super Admin > Settings.', 422);
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $msg = $e->getMessage();
             if (str_contains($msg, 'SMTP') || str_contains($msg, 'smtp') || str_contains($msg, 'mail') || str_contains($msg, 'connect')) {
                 $this->error('Email not configured. Go to Super Admin > Settings to set up SMTP before sending reports.', 422);

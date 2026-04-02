@@ -1,8 +1,9 @@
 import type { CapacitorConfig } from '@capacitor/cli';
+import { BRAND } from './src/app/core/config/brand.config';
 
 const config: CapacitorConfig = {
   appId: 'com.ispstatus.app',
-  appName: 'ISP Status',
+  appName: BRAND.name,
   webDir: 'dist/frontend/browser',
   server: {
     androidScheme: 'https',
@@ -12,14 +13,14 @@ const config: CapacitorConfig = {
     SplashScreen: {
       launchShowDuration: 2000,
       launchAutoHide: true,
-      backgroundColor: '#6366F1',
+      backgroundColor: '#1A2332',
       showSpinner: false,
       splashImmersive: true,
       splashFullScreen: true,
     },
     StatusBar: {
       style: 'LIGHT',
-      backgroundColor: '#6366F1',
+      backgroundColor: '#1A2332',
     },
     PushNotifications: {
       presentationOptions: ['badge', 'sound', 'alert'],
@@ -32,11 +33,11 @@ const config: CapacitorConfig = {
   ios: {
     contentInset: 'automatic',
     preferredContentMode: 'mobile',
-    scheme: 'ISP Status',
+    scheme: BRAND.name,
   },
   android: {
     allowMixedContent: false,
-    backgroundColor: '#6366F1',
+    backgroundColor: '#1A2332',
   },
 };
 

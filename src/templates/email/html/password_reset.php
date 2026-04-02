@@ -14,7 +14,7 @@ $this->assign('title', __d('emails', 'Password Recovery'));
 <p><?= __d('emails', 'Hello!') ?></p>
 
 <p>
-    <?= __d('emails', 'You requested a password reset for your ISP Status Page account.') ?>
+    <?= __d('emails', 'You requested a password reset for your {0} account.', \Cake\Core\Configure::read('Brand.fullName', 'ISP Status Page')) ?>
 </p>
 
 <!-- User Info Box -->

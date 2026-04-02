@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ISP Status Page — API Documentation</title>
+    <title><?= \Cake\Core\Configure::read('Brand.fullName', 'ISP Status Page') ?> — API Documentation</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist/swagger-ui.css">
     <style>
         html {

@@ -585,7 +585,8 @@ addIcons({
       .onboarding-banner {
         cursor: pointer;
         margin-bottom: 16px;
-        --background: var(--ion-color-primary-tint);
+        --background: rgba(41, 121, 255, 0.08);
+        border: 1px solid rgba(41, 121, 255, 0.2);
       }
       .banner-content {
         display: flex;

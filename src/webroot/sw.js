@@ -1,3 +1,4 @@
+// REBRAND: Update 'ISP Status Alert' title in push handler below when rebranding.
 const CACHE_NAME = 'isp-status-v1';
 const OFFLINE_URL = '/offline.html';
 

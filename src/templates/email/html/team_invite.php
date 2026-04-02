@@ -17,10 +17,10 @@
         .container { max-width: 600px; margin: 0 auto; padding: 20px; }
         .card { background: white; border-radius: 8px; padding: 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         .header { text-align: center; margin-bottom: 30px; }
-        .header h1 { color: #1E88E5; font-size: 24px; margin: 0; }
+        .header h1 { color: #2979FF; font-size: 24px; margin: 0; }
         .content { color: #333; line-height: 1.6; }
-        .org-name { color: #1E88E5; font-weight: 600; }
-        .role { display: inline-block; padding: 4px 12px; background: #e3f2fd; color: #1E88E5; border-radius: 12px; font-size: 14px; }
+        .org-name { color: #2979FF; font-weight: 600; }
+        .role { display: inline-block; padding: 4px 12px; background: #E3F2FD; color: #2979FF; border-radius: 12px; font-size: 14px; }
         .btn { display: inline-block; padding: 12px 32px; background: #43A047; color: white; text-decoration: none; border-radius: 8px; font-size: 16px; margin: 20px 0; }
         .footer { text-align: center; color: #999; font-size: 12px; margin-top: 30px; }
     </style>
@@ -48,7 +48,7 @@
             </div>
         </div>
         <div class="footer">
-            <p><?= __('Sent by ISP Status Page') ?></p>
+            <p><?= __('Sent by {0}', \Cake\Core\Configure::read('Brand.fullName', 'ISP Status Page')) ?></p>
         </div>
     </div>
 </body>

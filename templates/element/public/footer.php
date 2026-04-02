@@ -1,8 +1,8 @@
 <?php
 use Cake\Core\Configure;
 
-$siteName = Configure::read('Settings.site_name', 'ISP Status');
-$supportEmail = Configure::read('Settings.support_email', 'support@example.com');
+$siteName = Configure::read('Settings.site_name', Configure::read('Brand.name', 'ISP Status'));
+$supportEmail = Configure::read('Settings.support_email', \Cake\Core\Configure::read('Brand.supportEmail', 'support@usekeeup.com'));
 ?>
 
 <footer class="public-footer">
@@ -54,7 +54,7 @@ $supportEmail = Configure::read('Settings.support_email', 'support@example.com')
         <div class="footer-bottom">
             <p>&copy; <?= date('Y') ?> <?= h($siteName) ?>. <?= __('All rights reserved.') ?></p>
             <p class="footer-powered">
-                Powered by <a href="https://github.com/PauloPeres/isp_status_page" target="_blank">ISP Status Page</a>
+                Powered by <a href="https://github.com/PauloPeres/isp_status_page" target="_blank"><?= Configure::read('Brand.fullName', 'ISP Status Page') ?></a>
             </p>
         </div>
     </div>
