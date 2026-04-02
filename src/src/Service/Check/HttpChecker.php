@@ -5,6 +5,7 @@ namespace App\Service\Check;
 
 use App\Model\Entity\Monitor;
 use Cake\Http\Client;
+use Cake\I18n\DateTime;
 use Cake\Log\Log;
 
 /**
@@ -377,8 +378,8 @@ class HttpChecker extends AbstractChecker
 
             return [
                 'issuer' => $cert['issuer']['O'] ?? $cert['issuer']['CN'] ?? 'Unknown',
-                'valid_from' => date('Y-m-d', $cert['validFrom_time_t'] ?? 0),
-                'valid_to' => date('Y-m-d', $validTo),
+                'valid_from' => DateTime::createFromTimestamp($cert['validFrom_time_t'] ?? 0)->format('Y-m-d'),
+                'valid_to' => DateTime::createFromTimestamp($validTo)->format('Y-m-d'),
                 'days_remaining' => $daysRemaining,
                 'expired' => $validTo < time(),
             ];

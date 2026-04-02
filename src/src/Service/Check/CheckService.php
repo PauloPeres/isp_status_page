@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Service\Check;
 
 use App\Model\Entity\Monitor;
+use Cake\I18n\DateTime;
 use Cake\Log\Log;
 use RuntimeException;
 
@@ -113,7 +114,7 @@ class CheckService
         $result = $checker->check($monitor);
 
         // Add timestamp to result
-        $result['checked_at'] = date('Y-m-d H:i:s');
+        $result['checked_at'] = DateTime::now()->format('Y-m-d H:i:s');
 
         Log::info("Check completed for monitor: {$monitor->name}", [
             'monitor_id' => $monitor->id,
@@ -149,7 +150,7 @@ class CheckService
                     'status_code' => null,
                     'error_message' => $e->getMessage(),
                     'metadata' => [],
-                    'checked_at' => date('Y-m-d H:i:s'),
+                    'checked_at' => DateTime::now()->format('Y-m-d H:i:s'),
                 ];
             }
         }

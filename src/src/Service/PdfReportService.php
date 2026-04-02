@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use Cake\Core\Configure;
+use Cake\I18n\DateTime;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 
@@ -41,12 +42,12 @@ class PdfReportService
         $totalChecks = (int)($reportData['total_checks'] ?? 0);
         $successChecks = (int)($reportData['successful_checks'] ?? 0);
         $failedChecks = (int)($reportData['failed_checks'] ?? 0);
-        $periodStart = $reportData['period_start'] ?? date('Y-m-01');
-        $periodEnd = $reportData['period_end'] ?? date('Y-m-t');
+        $periodStart = $reportData['period_start'] ?? DateTime::now()->format('Y-m-01');
+        $periodEnd = $reportData['period_end'] ?? DateTime::now()->format('Y-m-t');
         $slaName = htmlspecialchars($sla['name'] ?? 'SLA Report');
         $monitorName = htmlspecialchars($sla['monitor']['name'] ?? $sla['monitor_name'] ?? 'Monitor');
         $period = ucfirst($sla['measurement_period'] ?? 'monthly');
-        $generatedDate = date('F j, Y \a\t g:i A T');
+        $generatedDate = DateTime::now()->format('F j, Y \a\t g:i A T');
 
         $budgetPct = ((float)$allowedMin > 0) ? min(100, round((float)$downtimeMin / (float)$allowedMin * 100, 1)) : 0;
         $budgetBarColor = $budgetPct <= 50 ? '#00C853' : ($budgetPct <= 80 ? '#F9A825' : '#FF1744');

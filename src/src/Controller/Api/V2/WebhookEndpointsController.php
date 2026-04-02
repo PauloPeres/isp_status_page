@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Controller\Api\V2;
 
 use App\Service\PlanService;
+use Cake\I18n\DateTime;
 
 /**
  * WebhookEndpointsController (C-04)
@@ -159,7 +160,7 @@ class WebhookEndpointsController extends AppController
         try {
             $service->dispatch('test', [
                 'message' => 'This is a test webhook from ' . \Cake\Core\Configure::read('Brand.fullName', 'ISP Status Page'),
-                'timestamp' => date('c'),
+                'timestamp' => DateTime::now()->format('c'),
             ], $this->currentOrgId);
 
             $this->success(['message' => 'Test event dispatched']);

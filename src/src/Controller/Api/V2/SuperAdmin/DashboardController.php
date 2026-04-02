@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Controller\Api\V2\SuperAdmin;
 
 use App\Controller\Api\V2\AppController;
+use Cake\I18n\DateTime;
 
 /**
  * Super Admin DashboardController
@@ -47,37 +48,52 @@ class DashboardController extends AppController
             // Table may not have expected columns
         }
 
-        // Plan distribution
+        // Plan distribution (converted from raw SQL to ORM)
         $planDistribution = [];
         try {
-            $conn = $orgsTable->getConnection();
-            $stmt = $conn->execute(
-                "SELECT COALESCE(plan, 'free') as plan_name, COUNT(*) as org_count
-                 FROM organizations
-                 GROUP BY COALESCE(plan, 'free')
-                 ORDER BY org_count DESC"
-            );
-            foreach ($stmt->fetchAll('assoc') as $row) {
+            $query = $orgsTable->find();
+            $planField = $query->func()->coalesce([
+                'Organizations.plan' => 'identifier',
+                "'free'" => 'literal',
+            ]);
+            $results = $query
+                ->select([
+                    'plan_name' => $planField,
+                    'org_count' => $query->func()->count('*'),
+                ])
+                ->groupBy([$planField])
+                ->orderByDesc('org_count')
+                ->disableAutoFields()
+                ->all();
+            foreach ($results as $row) {
                 $planDistribution[] = [
-                    'plan' => $row['plan_name'],
-                    'count' => (int)$row['org_count'],
+                    'plan' => $row->plan_name,
+                    'count' => (int)$row->org_count,
                 ];
             }
         } catch (\Exception $e) {
             // Fallback
         }
 
-        // Monitor status breakdown
+        // Monitor status breakdown (converted from raw SQL to ORM)
         $monitorsByStatus = ['up' => 0, 'down' => 0, 'degraded' => 0, 'unknown' => 0];
         try {
-            $conn = $monitorsTable->getConnection();
-            $stmt = $conn->execute(
-                "SELECT COALESCE(status, 'unknown') as status, COUNT(*) as cnt
-                 FROM monitors WHERE active = true
-                 GROUP BY COALESCE(status, 'unknown')"
-            );
-            foreach ($stmt->fetchAll('assoc') as $row) {
-                $monitorsByStatus[$row['status']] = (int)$row['cnt'];
+            $query = $monitorsTable->find();
+            $statusField = $query->func()->coalesce([
+                'Monitors.status' => 'identifier',
+                "'unknown'" => 'literal',
+            ]);
+            $results = $query
+                ->select([
+                    'status_name' => $statusField,
+                    'cnt' => $query->func()->count('*'),
+                ])
+                ->where(['Monitors.active' => true])
+                ->groupBy([$statusField])
+                ->disableAutoFields()
+                ->all();
+            foreach ($results as $row) {
+                $monitorsByStatus[$row->status_name] = (int)$row->cnt;
             }
         } catch (\Exception $e) {
             // Fallback
@@ -87,7 +103,7 @@ class DashboardController extends AppController
         $recentSignups = 0;
         try {
             $recentSignups = $orgsTable->find()
-                ->where(['Organizations.created >=' => date('Y-m-d', strtotime('-30 days'))])
+                ->where(['Organizations.created >=' => DateTime::now()->subDays(30)->format('Y-m-d')])
                 ->count();
         } catch (\Exception $e) {
             // Fallback
@@ -97,7 +113,7 @@ class DashboardController extends AppController
         $checksLast24h = 0;
         try {
             $checksLast24h = $checksTable->find()
-                ->where(['MonitorChecks.checked_at >=' => date('Y-m-d H:i:s', strtotime('-24 hours'))])
+                ->where(['MonitorChecks.checked_at >=' => DateTime::now()->subHours(24)->format('Y-m-d H:i:s')])
                 ->count();
         } catch (\Exception $e) {
             // Fallback
@@ -135,7 +151,7 @@ class DashboardController extends AppController
                 ->select(['unique_users' => $logsTable->find()->func()->count('DISTINCT user_id')])
                 ->where([
                     'event_type' => 'login',
-                    'created >=' => date('Y-m-d', strtotime('-30 days')),
+                    'created >=' => DateTime::now()->subDays(30)->format('Y-m-d'),
                 ])
                 ->disableAutoFields()
                 ->first()
@@ -145,7 +161,7 @@ class DashboardController extends AppController
                 ->select(['unique_users' => $logsTable->find()->func()->count('DISTINCT user_id')])
                 ->where([
                     'event_type' => 'login',
-                    'created >=' => date('Y-m-d'),
+                    'created >=' => DateTime::now()->format('Y-m-d'),
                 ])
                 ->disableAutoFields()
                 ->first()
@@ -155,7 +171,7 @@ class DashboardController extends AppController
                 ->select(['unique_users' => $logsTable->find()->func()->count('DISTINCT user_id')])
                 ->where([
                     'event_type' => 'login',
-                    'created >=' => date('Y-m-d', strtotime('-7 days')),
+                    'created >=' => DateTime::now()->subDays(7)->format('Y-m-d'),
                 ])
                 ->disableAutoFields()
                 ->first()
@@ -165,6 +181,10 @@ class DashboardController extends AppController
         }
 
         // Churn indicator: orgs created > 30 days ago with 0 active monitors
+        // Raw SQL retained: correlated NOT EXISTS subquery is not cleanly
+        // expressible via CakePHP's ORM query builder without embedding raw
+        // SQL fragments, so there is no readability or safety gain from a
+        // partial conversion.
         $churnRisk = 0;
         try {
             $conn = $orgsTable->getConnection();
@@ -173,7 +193,7 @@ class DashboardController extends AppController
                  WHERE o.created < ? AND NOT EXISTS (
                     SELECT 1 FROM monitors m WHERE m.organization_id = o.id AND m.active = true
                  )",
-                [date('Y-m-d', strtotime('-30 days'))]
+                [DateTime::now()->subDays(30)->format('Y-m-d')]
             );
             $churnRisk = (int)($stmt->fetch('assoc')['cnt'] ?? 0);
         } catch (\Exception $e) {

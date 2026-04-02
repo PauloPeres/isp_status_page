@@ -7,6 +7,7 @@ use App\Model\Entity\AlertRule;
 use App\Model\Entity\Incident;
 use App\Model\Entity\Monitor;
 use Cake\Http\Client;
+use Cake\I18n\DateTime;
 use Cake\Log\Log;
 
 /**
@@ -200,7 +201,7 @@ class WhatsAppAlertChannel implements ChannelInterface
     {
         $isDown = $incident->isOngoing();
         $name = $monitor->name;
-        $time = $incident->started_at ? $incident->started_at->format('H:i') : date('H:i');
+        $time = $incident->started_at ? $incident->started_at->format('H:i') : DateTime::now()->format('H:i');
 
         if ($isDown) {
             $ackUrl = $this->getAcknowledgeUrl($incident);

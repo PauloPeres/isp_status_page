@@ -7,6 +7,7 @@ use App\Model\Entity\AlertRule;
 use App\Model\Entity\Incident;
 use App\Model\Entity\Monitor;
 use Cake\Http\Client;
+use Cake\I18n\DateTime;
 use Cake\Log\Log;
 
 /**
@@ -182,7 +183,7 @@ class WebhookAlertChannel implements ChannelInterface
                 'status' => $incident->status,
                 'started_at' => $incident->started_at ? $incident->started_at->format('c') : null,
             ],
-            'timestamp' => date('c'),
+            'timestamp' => DateTime::now()->format('c'),
         ];
     }
 

@@ -126,7 +126,7 @@ class StatusController extends AppController
                     ->orderBy(['IncidentUpdates.created' => 'ASC']);
             }])
             ->where([
-                'Incidents.created >=' => date('Y-m-d H:i:s', strtotime('-7 days'))
+                'Incidents.created >=' => DateTime::now()->subDays(7)->format('Y-m-d H:i:s')
             ])
             ->orderBy(['Incidents.created' => 'DESC'])
             ->limit(5)
@@ -250,7 +250,7 @@ class StatusController extends AppController
                     ->orderBy(['IncidentUpdates.created' => 'ASC']);
             }])
             ->where([
-                'Incidents.created >=' => date('Y-m-d H:i:s', strtotime('-30 days'))
+                'Incidents.created >=' => DateTime::now()->subDays(30)->format('Y-m-d H:i:s')
             ])
             ->orderBy(['Incidents.created' => 'DESC'])
             ->all();

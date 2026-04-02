@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use Cake\I18n\DateTime;
 use Cake\Log\LogTrait;
 use Cake\ORM\Locator\LocatorAwareTrait;
 
@@ -37,7 +38,7 @@ class AuditLogService
                 'ip_address' => $ipAddress,
                 'user_agent' => $userAgent,
                 'details' => $details ? json_encode($details) : null,
-                'created' => date('Y-m-d H:i:s'),
+                'created' => DateTime::now()->format('Y-m-d H:i:s'),
             ]);
             $table->save($entry);
         } catch (\Exception $e) {

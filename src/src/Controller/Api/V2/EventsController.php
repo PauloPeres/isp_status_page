@@ -55,7 +55,7 @@ class EventsController extends AppController
 
             // Always send a heartbeat so connection stays alive
             echo "event: heartbeat\n";
-            echo 'data: ' . json_encode(['time' => date('c')]) . "\n\n";
+            echo 'data: ' . json_encode(['time' => DateTime::now()->format('c')]) . "\n\n";
 
             if (ob_get_level()) {
                 ob_flush();

@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use Cake\I18n\DateTime;
+
 /**
  * StatusPages Controller
  *
@@ -157,7 +159,7 @@ class StatusPagesController extends AppController
         $showUptimeChart = (bool)$statusPage->show_uptime_chart;
         if ($showUptimeChart && !empty($monitors)) {
             $checksTable = $this->fetchTable('MonitorChecks');
-            $startDate = date('Y-m-d', strtotime('-90 days'));
+            $startDate = DateTime::now()->subDays(90)->format('Y-m-d');
 
             foreach ($monitors as $monitor) {
                 $conn = $checksTable->getConnection();
@@ -184,7 +186,7 @@ class StatusPagesController extends AppController
                 // Pad to 90 days
                 $days = [];
                 for ($i = 89; $i >= 0; $i--) {
-                    $date = date('Y-m-d', strtotime("-{$i} days"));
+                    $date = DateTime::now()->subDays($i)->format('Y-m-d');
                     if (isset($rawDays[$date])) {
                         $days[] = $rawDays[$date];
                     } else {
@@ -241,7 +243,7 @@ class StatusPagesController extends AppController
         }
         // Pad timeline to 14 days
         for ($i = 0; $i < 14; $i++) {
-            $date = date('Y-m-d', strtotime("-{$i} days"));
+            $date = DateTime::now()->subDays($i)->format('Y-m-d');
             if (!isset($timeline[$date])) {
                 $timeline[$date] = [];
             }
