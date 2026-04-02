@@ -28,7 +28,14 @@ class SettingsController extends AppController
         }
 
         $service = new SettingService();
-        $settings = $service->getAll();
+
+        // Merge system settings with org-level settings (org takes precedence)
+        $systemSettings = $service->getAll();
+        $orgSettings = [];
+        if ($this->currentOrgId) {
+            $orgSettings = $service->getAllOrg();
+        }
+        $settings = array_merge($systemSettings, $orgSettings);
 
         // Mask sensitive values before returning
         $sensitiveKeys = ['smtp_password', 'backup_ftp_password', 'telegram_bot_token', 'stripe_secret_key', 'twilio_auth_token'];
@@ -38,7 +45,8 @@ class SettingsController extends AppController
             }
         }
 
-        $this->success(['settings' => $settings]);
+        // Return flat object (frontend expects flat key-value, not wrapped)
+        $this->success($settings);
     }
 
     /**

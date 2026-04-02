@@ -154,6 +154,48 @@ class SettingService
     }
 
     /**
+     * Get all org-level settings from Organization.settings JSON.
+     *
+     * @param int|null $orgId Organization ID (null = use TenantContext)
+     * @return array<string, mixed>
+     */
+    public function getAllOrg(?int $orgId = null): array
+    {
+        $settingsJson = null;
+
+        // Try TenantContext first
+        if ($orgId === null && TenantContext::isSet()) {
+            $org = TenantContext::getCurrentOrganization();
+            $settingsJson = $org['settings'] ?? null;
+        }
+
+        // If no settings from context, or orgId explicitly provided, read from DB
+        if ($settingsJson === null && ($orgId !== null || TenantContext::isSet())) {
+            $resolvedOrgId = $orgId ?? TenantContext::getCurrentOrgId();
+            if ($resolvedOrgId) {
+                $orgsTable = TableRegistry::getTableLocator()->get('Organizations');
+                $org = $orgsTable->find()
+                    ->select(['settings'])
+                    ->where(['id' => $resolvedOrgId])
+                    ->disableHydration()
+                    ->first();
+                $settingsJson = $org['settings'] ?? null;
+            }
+        }
+
+        if ($settingsJson && is_string($settingsJson)) {
+            $orgSettings = json_decode($settingsJson, true);
+            if (is_array($orgSettings)) {
+                // Filter out corrupted nested 'settings' key (from previous bug)
+                unset($orgSettings['settings']);
+                return $orgSettings;
+            }
+        }
+
+        return [];
+    }
+
+    /**
      * Check if a setting key must always be read from system level.
      *
      * @param string $key The setting key
@@ -391,6 +433,9 @@ class SettingService
     {
         $systemData = [];
         $orgData = [];
+
+        // Filter out corrupted nested 'settings' key if present
+        unset($data['settings']);
 
         // Separate system-only keys from org-level keys
         foreach ($data as $key => $value) {
