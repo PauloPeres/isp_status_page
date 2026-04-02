@@ -6,7 +6,6 @@ namespace App\Service\Check;
 use App\Model\Entity\Monitor;
 use Cake\I18n\DateTime;
 use Cake\Log\Log;
-use Cake\ORM\TableRegistry;
 
 /**
  * Heartbeat Checker
@@ -30,7 +29,7 @@ class HeartbeatChecker extends AbstractChecker
     {
         $startTime = microtime(true);
 
-        $heartbeatsTable = TableRegistry::getTableLocator()->get('Heartbeats');
+        $heartbeatsTable = $this->fetchTable('Heartbeats');
 
         $heartbeat = $heartbeatsTable->find()
             ->where(['monitor_id' => $monitor->id])

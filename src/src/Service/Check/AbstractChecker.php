@@ -5,6 +5,7 @@ namespace App\Service\Check;
 
 use App\Model\Entity\Monitor;
 use Cake\Log\Log;
+use Cake\ORM\Locator\LocatorAwareTrait;
 
 /**
  * Abstract Checker
@@ -14,6 +15,7 @@ use Cake\Log\Log;
  */
 abstract class AbstractChecker implements CheckerInterface
 {
+    use LocatorAwareTrait;
     /**
      * Status constants
      */

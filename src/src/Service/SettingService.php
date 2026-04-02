@@ -8,7 +8,6 @@ use App\Tenant\TenantContext;
 use Cake\Cache\Cache;
 use Cake\Log\Log;
 use Cake\ORM\Locator\LocatorAwareTrait;
-use Cake\ORM\TableRegistry;
 
 /**
  * Setting Service
@@ -123,7 +122,7 @@ class SettingService
      */
     public function getSystem(string $key, mixed $default = null): mixed
     {
-        $settingsTable = TableRegistry::getTableLocator()->get('Settings');
+        $settingsTable = $this->fetchTable('Settings');
         // Query WITHOUT tenant scope
         $setting = $settingsTable->find()
             ->applyOptions(['skipTenantScope' => true])
@@ -173,7 +172,7 @@ class SettingService
         if ($settingsJson === null && ($orgId !== null || TenantContext::isSet())) {
             $resolvedOrgId = $orgId ?? TenantContext::getCurrentOrgId();
             if ($resolvedOrgId) {
-                $orgsTable = TableRegistry::getTableLocator()->get('Organizations');
+                $orgsTable = $this->fetchTable('Organizations');
                 $org = $orgsTable->find()
                     ->select(['settings'])
                     ->where(['id' => $resolvedOrgId])
@@ -456,7 +455,7 @@ class SettingService
 
         // Save org-level settings to Organization.settings JSON column
         if (!empty($orgData) && $orgId !== null) {
-            $orgsTable = TableRegistry::getTableLocator()->get('Organizations');
+            $orgsTable = $this->fetchTable('Organizations');
             $org = $orgsTable->find()
                 ->where(['id' => $orgId])
                 ->first();

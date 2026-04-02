@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use Cake\ORM\TableRegistry;
+use Cake\ORM\Locator\LocatorAwareTrait;
 
 /**
  * ReportService
@@ -12,13 +12,14 @@ use Cake\ORM\TableRegistry;
  */
 class ReportService
 {
+    use LocatorAwareTrait;
     /**
      * Generate uptime CSV report.
      */
     public function generateUptimeCsv(int $orgId, ?string $from, ?string $to): string
     {
-        $monitorsTable = TableRegistry::getTableLocator()->get('Monitors');
-        $checksTable = TableRegistry::getTableLocator()->get('MonitorChecks');
+        $monitorsTable = $this->fetchTable('Monitors');
+        $checksTable = $this->fetchTable('MonitorChecks');
 
         $monitors = $monitorsTable->find()
             ->where(['Monitors.organization_id' => $orgId])
@@ -71,7 +72,7 @@ class ReportService
      */
     public function generateIncidentsCsv(int $orgId, ?string $from, ?string $to): string
     {
-        $incidentsTable = TableRegistry::getTableLocator()->get('Incidents');
+        $incidentsTable = $this->fetchTable('Incidents');
 
         $fromDate = $from ? new \DateTime($from) : new \DateTime('-30 days');
         $toDate = $to ? new \DateTime($to) : new \DateTime();
@@ -116,8 +117,8 @@ class ReportService
      */
     public function generateResponseTimesCsv(int $orgId, ?string $from, ?string $to): string
     {
-        $monitorsTable = TableRegistry::getTableLocator()->get('Monitors');
-        $checksTable = TableRegistry::getTableLocator()->get('MonitorChecks');
+        $monitorsTable = $this->fetchTable('Monitors');
+        $checksTable = $this->fetchTable('MonitorChecks');
 
         $monitors = $monitorsTable->find()
             ->where(['Monitors.organization_id' => $orgId])

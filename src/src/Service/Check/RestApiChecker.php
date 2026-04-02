@@ -6,7 +6,6 @@ namespace App\Service\Check;
 use App\Integration\RestApi\RestApiAdapter;
 use App\Model\Entity\Monitor;
 use Cake\Log\Log;
-use Cake\ORM\TableRegistry;
 
 /**
  * REST API Checker
@@ -234,7 +233,7 @@ class RestApiChecker extends AbstractChecker
     protected function mergeIntegrationConfig(int $integrationId, array $adapterConfig): array
     {
         try {
-            $integrationsTable = TableRegistry::getTableLocator()->get('Integrations');
+            $integrationsTable = $this->fetchTable('Integrations');
             $integration = $integrationsTable->get($integrationId);
             $integrationConfig = $integration->getRawConfiguration();
 
