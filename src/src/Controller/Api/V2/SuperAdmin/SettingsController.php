@@ -12,6 +12,14 @@ use App\Service\SettingService;
  */
 class SettingsController extends AppController
 {
+    protected SettingService $settingService;
+
+    public function initialize(): void
+    {
+        parent::initialize();
+        $this->settingService = new SettingService();
+    }
+
     /**
      * GET /api/v2/super-admin/settings
      *
@@ -23,8 +31,7 @@ class SettingsController extends AppController
     {
         $this->request->allowMethod(['get']);
 
-        $service = new SettingService();
-        $settings = $service->getAll();
+        $settings = $this->settingService->getAll();
 
         $this->success(['settings' => $settings]);
     }
@@ -41,8 +48,7 @@ class SettingsController extends AppController
         $this->request->allowMethod(['put']);
 
         try {
-            $service = new SettingService();
-            $service->saveMultiple($this->request->getData());
+            $this->settingService->saveMultiple($this->request->getData());
 
             $this->success(['message' => 'System settings saved']);
         } catch (\Exception $e) {
@@ -69,8 +75,7 @@ class SettingsController extends AppController
         }
 
         try {
-            $service = new SettingService();
-            $service->testEmail($to);
+            $this->settingService->testEmail($to);
 
             $this->success(['message' => 'Test email sent to ' . $to]);
         } catch (\Exception $e) {

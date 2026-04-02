@@ -19,6 +19,14 @@ use Cake\Validation\Validator;
  */
 class AuthController extends AppController
 {
+    protected JwtService $jwtService;
+
+    public function initialize(): void
+    {
+        parent::initialize();
+        $this->jwtService = new JwtService();
+    }
+
     /**
      * POST /api/v2/auth/register
      *
@@ -134,7 +142,7 @@ class AuthController extends AppController
         }
 
         // Generate tokens
-        $jwtService = new JwtService();
+        $jwtService = $this->jwtService;
         $accessToken = $jwtService->generateAccessToken(
             $user->id,
             $org->id,
@@ -254,7 +262,7 @@ class AuthController extends AppController
         $refreshTtl = $rememberMe ? 604800 : 7200; // 7 days vs 2 hours
 
         // Generate tokens
-        $jwtService = new JwtService();
+        $jwtService = $this->jwtService;
         $accessToken = $jwtService->generateAccessToken(
             $user->id,
             $orgId,
@@ -326,7 +334,7 @@ class AuthController extends AppController
             return;
         }
 
-        $jwtService = new JwtService();
+        $jwtService = $this->jwtService;
         $userId = $jwtService->validateRefreshToken($refreshToken);
 
         if ($userId === null) {
@@ -403,7 +411,7 @@ class AuthController extends AppController
     {
         $this->request->allowMethod(['post']);
 
-        $jwtService = new JwtService();
+        $jwtService = $this->jwtService;
 
         // Accept refresh token from body (backwards compat) or HttpOnly cookie
         $refreshToken = $this->request->getData('refresh_token')
@@ -669,7 +677,7 @@ class AuthController extends AppController
         $role = $orgUser ? $orgUser->role : 'admin';
 
         // Generate a new access token with the target org
-        $jwtService = new JwtService();
+        $jwtService = $this->jwtService;
         $accessToken = $jwtService->generateAccessToken(
             $this->currentUserId,
             $orgId,

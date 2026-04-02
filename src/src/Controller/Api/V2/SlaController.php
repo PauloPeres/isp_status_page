@@ -10,6 +10,14 @@ namespace App\Controller\Api\V2;
  */
 class SlaController extends AppController
 {
+    protected \App\Service\SlaService $slaService;
+
+    public function initialize(): void
+    {
+        parent::initialize();
+        $this->slaService = new \App\Service\SlaService();
+    }
+
     /**
      * GET /api/v2/sla
      *
@@ -28,7 +36,6 @@ class SlaController extends AppController
             ->toArray();
 
         // Enrich each SLA with current compliance data
-        $slaService = new \App\Service\SlaService();
         $checksTable = $this->fetchTable('MonitorChecks');
 
         foreach ($slas as &$sla) {
@@ -36,7 +43,7 @@ class SlaController extends AppController
                 $sla['monitor_name'] = $sla['monitor']['name'] ?? '';
 
                 // Get period dates for this SLA
-                $periodDates = $slaService->getPeriodDates($sla['measurement_period'] ?? 'monthly');
+                $periodDates = $this->slaService->getPeriodDates($sla['measurement_period'] ?? 'monthly');
                 $now = new \DateTime();
                 $startStr = $periodDates['start']->format('Y-m-d 00:00:00');
                 $effectiveEnd = ($periodDates['end'] > $now) ? $now : $periodDates['end'];
@@ -67,7 +74,7 @@ class SlaController extends AppController
                 $sla['total_checks'] = $total;
 
                 if ($actualUptime !== null) {
-                    $sla['status'] = $slaService->determineStatus($actualUptime, $targetUptime, isset($sla['warning_threshold']) ? (float)$sla['warning_threshold'] : null);
+                    $sla['status'] = $this->slaService->determineStatus($actualUptime, $targetUptime, isset($sla['warning_threshold']) ? (float)$sla['warning_threshold'] : null);
                     $downtimeMin = round($totalMinutes * (100 - $actualUptime) / 100, 2);
                     $allowedMin = round($totalMinutes * (100 - $targetUptime) / 100, 2);
                     $sla['budget_used_pct'] = $allowedMin > 0 ? min(100, round(($downtimeMin / $allowedMin) * 100, 1)) : 0;
@@ -243,8 +250,6 @@ class SlaController extends AppController
         }
 
         try {
-            $service = new \App\Service\SlaService();
-
             // Use from/to query params if provided, otherwise use the SLA's measurement period
             $from = $this->request->getQuery('from');
             $to = $this->request->getQuery('to');
@@ -253,7 +258,7 @@ class SlaController extends AppController
                 $startDate = new \DateTime($from);
                 $endDate = $to ? new \DateTime($to) : new \DateTime();
             } else {
-                $periodDates = $service->getPeriodDates($sla->measurement_period);
+                $periodDates = $this->slaService->getPeriodDates($sla->measurement_period);
                 $startDate = $periodDates['start'];
                 $endDate = $periodDates['end'];
             }
@@ -402,7 +407,7 @@ class SlaController extends AppController
                 $cursor->modify('+1 day');
             }
 
-            $status = $service->determineStatus($actualUptime, $targetUptime, $sla->warning_threshold ? (float)$sla->warning_threshold : null);
+            $status = $this->slaService->determineStatus($actualUptime, $targetUptime, $sla->warning_threshold ? (float)$sla->warning_threshold : null);
 
             $report = [
                 'current_uptime' => $actualUptime,
@@ -472,8 +477,7 @@ class SlaController extends AppController
         $format = $this->request->getQuery('format', 'pdf');
 
         try {
-            $slaService = new \App\Service\SlaService();
-            $reportData = $slaService->calculateCurrentSla(
+            $reportData = $this->slaService->calculateCurrentSla(
                 $sla->monitor_id,
                 $sla->measurement_period,
                 (float)$sla->target_uptime,
@@ -494,7 +498,7 @@ class SlaController extends AppController
                     ->withHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
                     ->withStringBody($pdfContent);
             } else {
-                $csv = $slaService->exportReportCsv($sla);
+                $csv = $this->slaService->exportReportCsv($sla);
 
                 $this->autoRender = false;
                 $this->response = $this->response

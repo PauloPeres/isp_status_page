@@ -13,6 +13,14 @@ use App\Service\SettingService;
  */
 class SettingsController extends AppController
 {
+    protected SettingService $settingService;
+
+    public function initialize(): void
+    {
+        parent::initialize();
+        $this->settingService = new SettingService();
+    }
+
     /**
      * GET /api/v2/settings
      *
@@ -28,13 +36,11 @@ class SettingsController extends AppController
             return;
         }
 
-        $service = new SettingService();
-
         // Merge system settings with org-level settings (org takes precedence)
-        $systemSettings = $service->getAll();
+        $systemSettings = $this->settingService->getAll();
         $orgSettings = [];
         if ($this->currentOrgId) {
-            $orgSettings = $service->getAllOrg();
+            $orgSettings = $this->settingService->getAllOrg();
         }
         $settings = array_merge($systemSettings, $orgSettings);
 
@@ -66,7 +72,6 @@ class SettingsController extends AppController
         }
 
         try {
-            $service = new SettingService();
             $data = $this->request->getData();
 
             // Filter out masked sensitive values to prevent overwriting real secrets with placeholder
@@ -77,7 +82,7 @@ class SettingsController extends AppController
                 }
             }
 
-            $service->saveMultiple($data, $this->currentOrgId);
+            $this->settingService->saveMultiple($data, $this->currentOrgId);
 
             $audit = new AuditLogService();
             $audit->log(

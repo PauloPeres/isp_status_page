@@ -13,6 +13,14 @@ use App\Service\PlanService;
  */
 class IntegrationsController extends AppController
 {
+    protected AuditLogService $auditLogService;
+
+    public function initialize(): void
+    {
+        parent::initialize();
+        $this->auditLogService = new AuditLogService();
+    }
+
     /**
      * GET /api/v2/integrations
      *
@@ -94,8 +102,7 @@ class IntegrationsController extends AppController
             return;
         }
 
-        $audit = new AuditLogService();
-        $audit->log(
+        $this->auditLogService->log(
             'integration_created',
             $this->currentUserId,
             $this->request->clientIp(),
@@ -182,8 +189,7 @@ class IntegrationsController extends AppController
             return;
         }
 
-        $audit = new AuditLogService();
-        $audit->log(
+        $this->auditLogService->log(
             'integration_deleted',
             $this->currentUserId,
             $this->request->clientIp(),

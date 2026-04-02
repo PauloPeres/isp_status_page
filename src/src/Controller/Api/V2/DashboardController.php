@@ -17,6 +17,14 @@ use App\Service\UptimeCalculationService;
  */
 class DashboardController extends AppController
 {
+    protected UptimeCalculationService $uptimeCalculationService;
+
+    public function initialize(): void
+    {
+        parent::initialize();
+        $this->uptimeCalculationService = new UptimeCalculationService();
+    }
+
     /**
      * GET /api/v2/dashboard/summary
      *
@@ -97,7 +105,7 @@ class DashboardController extends AppController
         $days = min((int)$this->request->getQuery('days', 1), 30);
 
         $monitorsTable = $this->fetchTable('Monitors');
-        $uptimeService = new UptimeCalculationService();
+        $uptimeService = $this->uptimeCalculationService;
 
         $monitors = $monitorsTable->find()
             ->where(['active' => true])
@@ -138,7 +146,7 @@ class DashboardController extends AppController
         $days = min((int)$this->request->getQuery('days', 1), 30);
 
         $monitorsTable = $this->fetchTable('Monitors');
-        $uptimeService = new UptimeCalculationService();
+        $uptimeService = $this->uptimeCalculationService;
 
         $monitors = $monitorsTable->find()
             ->where(['active' => true])

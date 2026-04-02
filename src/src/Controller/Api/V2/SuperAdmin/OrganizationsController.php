@@ -12,6 +12,14 @@ use App\Service\JwtService;
  */
 class OrganizationsController extends AppController
 {
+    protected JwtService $jwtService;
+
+    public function initialize(): void
+    {
+        parent::initialize();
+        $this->jwtService = new JwtService();
+    }
+
     /**
      * GET /api/v2/super-admin/organizations
      *
@@ -103,7 +111,7 @@ class OrganizationsController extends AppController
             return;
         }
 
-        $jwtService = new JwtService();
+        $jwtService = $this->jwtService;
         $accessToken = $jwtService->generateAccessToken(
             $this->currentUserId,
             (int)$id,
@@ -140,7 +148,7 @@ class OrganizationsController extends AppController
         $orgId = $orgUser ? $orgUser->organization_id : 0;
         $role = $orgUser ? $orgUser->role : 'admin';
 
-        $jwtService = new JwtService();
+        $jwtService = $this->jwtService;
         $accessToken = $jwtService->generateAccessToken(
             $this->currentUserId,
             $orgId,

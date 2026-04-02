@@ -10,6 +10,14 @@ namespace App\Controller\Api\V2;
  */
 class ScheduledReportsController extends AppController
 {
+    protected \App\Service\ScheduledReportService $scheduledReportService;
+
+    public function initialize(): void
+    {
+        parent::initialize();
+        $this->scheduledReportService = new \App\Service\ScheduledReportService();
+    }
+
     /**
      * GET /api/v2/scheduled-reports
      *
@@ -91,7 +99,7 @@ class ScheduledReportsController extends AppController
 
         // Calculate next_send_at based on frequency
         try {
-            $service = new \App\Service\ScheduledReportService();
+            $service = $this->scheduledReportService;
             $report->set('next_send_at', $service->calculateNextSendAt($data['frequency'] ?? 'weekly'));
         } catch (\Exception $e) {
             // Non-critical
@@ -221,7 +229,7 @@ class ScheduledReportsController extends AppController
         }
 
         try {
-            $service = new \App\Service\ScheduledReportService();
+            $service = $this->scheduledReportService;
             $preview = $service->preview($report);
 
             $this->success(['preview' => $preview]);
@@ -261,7 +269,7 @@ class ScheduledReportsController extends AppController
         }
 
         try {
-            $service = new \App\Service\ScheduledReportService();
+            $service = $this->scheduledReportService;
             $result = $service->sendReport($report);
 
             if ($result) {

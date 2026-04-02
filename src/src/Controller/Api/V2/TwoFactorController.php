@@ -12,6 +12,14 @@ use App\Service\TwoFactorService;
  */
 class TwoFactorController extends AppController
 {
+    protected TwoFactorService $twoFactorService;
+
+    public function initialize(): void
+    {
+        parent::initialize();
+        $this->twoFactorService = new TwoFactorService();
+    }
+
     /**
      * GET|POST /api/v2/two-factor/setup
      *
@@ -25,7 +33,7 @@ class TwoFactorController extends AppController
         $this->request->allowMethod(['get', 'post']);
 
         if ($this->request->is('get')) {
-            $service = new TwoFactorService();
+            $service = $this->twoFactorService;
             $secret = $service->generateSecret();
 
             $user = $this->fetchTable('Users')->get($this->currentUserId);
@@ -49,7 +57,7 @@ class TwoFactorController extends AppController
             return;
         }
 
-        $service = new TwoFactorService();
+        $service = $this->twoFactorService;
         if (!$service->verifyCode($secret, $code)) {
             $this->error('Invalid verification code', 422);
 
@@ -101,7 +109,7 @@ class TwoFactorController extends AppController
             return;
         }
 
-        $service = new TwoFactorService();
+        $service = $this->twoFactorService;
         if (!$service->verifyCode($user->two_factor_secret, $code)) {
             $this->error('Invalid code', 422);
 
@@ -138,7 +146,7 @@ class TwoFactorController extends AppController
             return;
         }
 
-        $service = new TwoFactorService();
+        $service = $this->twoFactorService;
         if (!$service->verifyCode($user->two_factor_secret, $code)) {
             $this->error('Invalid code', 422);
 
@@ -187,7 +195,7 @@ class TwoFactorController extends AppController
         }
 
         // POST — regenerate
-        $service = new TwoFactorService();
+        $service = $this->twoFactorService;
         $newCodes = $service->generateRecoveryCodes();
         $user->set('two_factor_recovery_codes', json_encode($newCodes));
 

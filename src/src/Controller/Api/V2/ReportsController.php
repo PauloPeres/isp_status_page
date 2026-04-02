@@ -12,6 +12,14 @@ use App\Service\ReportService;
  */
 class ReportsController extends AppController
 {
+    protected ReportService $reportService;
+
+    public function initialize(): void
+    {
+        parent::initialize();
+        $this->reportService = new ReportService();
+    }
+
     /**
      * Extract and validate date params — accepts both from/to and start/end.
      */
@@ -60,7 +68,7 @@ class ReportsController extends AppController
         $this->request->allowMethod(['get']);
 
         try {
-            $service = new ReportService();
+            $service = $this->reportService;
             [$from, $to] = $this->getDates();
             $csv = $service->generateUptimeCsv($this->currentOrgId, $from, $to);
             $this->sendCsv($csv, 'uptime-report.csv');
@@ -78,7 +86,7 @@ class ReportsController extends AppController
         $this->request->allowMethod(['get']);
 
         try {
-            $service = new ReportService();
+            $service = $this->reportService;
             [$from, $to] = $this->getDates();
             $csv = $service->generateIncidentsCsv($this->currentOrgId, $from, $to);
             $this->sendCsv($csv, 'incidents-report.csv');
@@ -96,7 +104,7 @@ class ReportsController extends AppController
         $this->request->allowMethod(['get']);
 
         try {
-            $service = new ReportService();
+            $service = $this->reportService;
             [$from, $to] = $this->getDates();
             $csv = $service->generateResponseTimesCsv($this->currentOrgId, $from, $to);
             $this->sendCsv($csv, 'response-times-report.csv');

@@ -10,6 +10,14 @@ namespace App\Controller\Api\V2;
  */
 class BillingController extends AppController
 {
+    protected \App\Service\BillingService $billingService;
+
+    public function initialize(): void
+    {
+        parent::initialize();
+        $this->billingService = new \App\Service\BillingService();
+    }
+
     /**
      * GET /api/v2/billing/plans
      *
@@ -22,7 +30,7 @@ class BillingController extends AppController
         $this->request->allowMethod(['get']);
 
         try {
-            $service = new \App\Service\BillingService();
+            $service = $this->billingService;
             $plans = $service->getPlans();
 
             $this->success(['plans' => $plans]);
@@ -54,7 +62,7 @@ class BillingController extends AppController
         }
 
         try {
-            $service = new \App\Service\BillingService();
+            $service = $this->billingService;
             $session = $service->createCheckoutSession($this->currentOrgId, $planSlug);
 
             if (empty($session)) {
@@ -85,7 +93,7 @@ class BillingController extends AppController
         }
 
         try {
-            $service = new \App\Service\BillingService();
+            $service = $this->billingService;
             $url = $service->createPortalSession($this->currentOrgId);
 
             $this->success(['portal_url' => $url]);
@@ -110,7 +118,7 @@ class BillingController extends AppController
         }
 
         try {
-            $service = new \App\Service\BillingService();
+            $service = $this->billingService;
             $usage = $service->getUsage($this->currentOrgId);
 
             $this->success(['usage' => $usage]);
@@ -135,7 +143,7 @@ class BillingController extends AppController
         }
 
         try {
-            $service = new \App\Service\BillingService();
+            $service = $this->billingService;
             $credits = $service->getCredits($this->currentOrgId);
 
             $this->success(['credits' => $credits]);

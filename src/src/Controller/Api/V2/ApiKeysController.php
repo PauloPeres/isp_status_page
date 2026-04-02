@@ -13,6 +13,14 @@ use App\Service\PlanService;
  */
 class ApiKeysController extends AppController
 {
+    protected AuditLogService $auditLogService;
+
+    public function initialize(): void
+    {
+        parent::initialize();
+        $this->auditLogService = new AuditLogService();
+    }
+
     /**
      * GET /api/v2/api-keys
      *
@@ -71,8 +79,7 @@ class ApiKeysController extends AppController
             return;
         }
 
-        $audit = new AuditLogService();
-        $audit->log(
+        $this->auditLogService->log(
             'api_key_created',
             $this->currentUserId,
             $this->request->clientIp(),
@@ -119,8 +126,7 @@ class ApiKeysController extends AppController
             return;
         }
 
-        $audit = new AuditLogService();
-        $audit->log(
+        $this->auditLogService->log(
             'api_key_deleted',
             $this->currentUserId,
             $this->request->clientIp(),
