@@ -458,6 +458,7 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/subscribers/toggle/*', ['controller' => 'Subscribers', 'action' => 'toggle']);
         $builder->connect('/subscribers/verify/*', ['controller' => 'Subscribers', 'action' => 'verify']);
         $builder->connect('/subscribers/unsubscribe/*', ['controller' => 'Subscribers', 'action' => 'unsubscribe']);
+        $builder->connect('/subscribers/subscribe', ['controller' => 'Subscribers', 'action' => 'subscribe']);
 
         // UsersController
         $builder->connect('/users/index', ['controller' => 'Users', 'action' => 'index']);
