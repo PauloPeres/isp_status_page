@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Controller\Api\V2;
 
 use App\Service\AuditLogService;
+use App\Service\MonitorStatsService;
 use App\Service\PlanService;
 use Cake\I18n\DateTime;
 
@@ -17,6 +18,14 @@ use Cake\I18n\DateTime;
  */
 class MonitorsController extends AppController
 {
+    protected AuditLogService $auditLogService;
+
+    public function initialize(): void
+    {
+        parent::initialize();
+        $this->auditLogService = new AuditLogService();
+    }
+
     /**
      * GET /api/v2/monitors
      *
@@ -98,156 +107,16 @@ class MonitorsController extends AppController
     {
         $this->request->allowMethod(['get']);
 
-        $monitorsTable = $this->fetchTable('Monitors');
+        $statsService = new MonitorStatsService();
+        $result = $statsService->getMonitorDetail((int)$id, $this->currentOrgId);
 
-        try {
-            $monitor = $monitorsTable->get($id, contain: [
-                'MonitorChecks' => function ($q) {
-                    return $q->orderBy(['created' => 'DESC'])->limit(50);
-                },
-                'Incidents' => function ($q) {
-                    return $q->orderBy(['created' => 'DESC'])->limit(10);
-                },
-                'NotificationPolicies' => [
-                    'NotificationPolicySteps' => [
-                        'sort' => ['NotificationPolicySteps.step_order' => 'ASC'],
-                        'NotificationChannels',
-                    ],
-                ],
-            ]);
-        } catch (\Cake\Datasource\Exception\RecordNotFoundException $e) {
+        if ($result === null) {
             $this->error('Monitor not found', 404);
 
             return;
         }
 
-        // Calculate 24h uptime
-        $checksTable = $this->fetchTable('MonitorChecks');
-        $since24h = date('Y-m-d H:i:s', strtotime('-24 hours'));
-
-        $uptimeResult = $checksTable->find()
-            ->select([
-                'total' => $checksTable->find()->func()->count('*'),
-                'success' => $checksTable->find()->func()->sum(
-                    "CASE WHEN status = 'success' THEN 1 ELSE 0 END"
-                ),
-            ])
-            ->where([
-                'monitor_id' => $id,
-                'checked_at >=' => $since24h,
-            ])
-            ->disableAutoFields()
-            ->first();
-
-        $totalChecks = (int)($uptimeResult->total ?? 0);
-        $successfulChecks = (int)($uptimeResult->success ?? 0);
-        $uptime = $totalChecks > 0 ? round(($successfulChecks / $totalChecks) * 100, 2) : 0;
-
-        // Average response time (24h)
-        $avgQuery = $checksTable->find();
-        $avgResult = $avgQuery
-            ->select(['avg' => $avgQuery->func()->avg('response_time')])
-            ->where([
-                'monitor_id' => $id,
-                'checked_at >=' => $since24h,
-                'response_time IS NOT' => null,
-            ])
-            ->disableAutoFields()
-            ->first();
-        $avgResponseTime = $avgResult && $avgResult->avg ? round((float)$avgResult->avg, 2) : null;
-
-        // 30-day uptime history
-        $conn = $checksTable->getConnection();
-        $stmt = $conn->execute(
-            "SELECT DATE(checked_at) as check_date,
-                    COUNT(*) as total,
-                    SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) as success_count
-             FROM monitor_checks mc
-             WHERE mc.monitor_id = ? AND mc.checked_at >= ? AND mc.organization_id = ?
-             GROUP BY DATE(checked_at)
-             ORDER BY check_date ASC",
-            [(int)$id, DateTime::now()->subDays(29)->startOfDay()->format('Y-m-d H:i:s'), $this->currentOrgId]
-        );
-        $dailyStats = [];
-        foreach ($stmt->fetchAll('assoc') as $row) {
-            $dailyStats[$row['check_date']] = $row;
-        }
-
-        $uptimeHistory = [];
-        for ($i = 29; $i >= 0; $i--) {
-            $dayStr = DateTime::now()->subDays($i)->format('Y-m-d');
-            $total = (int)($dailyStats[$dayStr]['total'] ?? 0);
-            $success = (int)($dailyStats[$dayStr]['success_count'] ?? 0);
-            $uptimeHistory[] = [
-                'date' => $dayStr,
-                'uptime' => $total > 0 ? round(($success / $total) * 100, 2) : 0,
-                'checks' => $total,
-            ];
-        }
-
-        // SLA data
-        $slaData = null;
-        try {
-            $slaDefinitionsTable = $this->fetchTable('SlaDefinitions');
-            $slaDef = $slaDefinitionsTable->find()
-                ->where(['SlaDefinitions.monitor_id' => $id, 'SlaDefinitions.active' => true])
-                ->first();
-            if ($slaDef) {
-                $slaService = new \App\Service\SlaService();
-                $slaData = $slaService->calculateCurrentSla(
-                    (int)$id,
-                    $slaDef->measurement_period,
-                    (float)$slaDef->target_uptime,
-                    $slaDef->warning_threshold !== null ? (float)$slaDef->warning_threshold : null,
-                    false
-                );
-                $slaData['sla_id'] = $slaDef->id;
-                $slaData['sla_name'] = $slaDef->name;
-            }
-        } catch (\Exception $e) {
-            // SLA tables may not exist yet
-        }
-
-        // Per-region breakdown (C-01: Multi-region)
-        $regionBreakdown = [];
-        try {
-            $regionStmt = $conn->execute(
-                "SELECT cr.id, cr.name, cr.code,
-                        COUNT(*) as total_checks,
-                        SUM(CASE WHEN mc.status = 'success' THEN 1 ELSE 0 END) as success_checks,
-                        ROUND(AVG(mc.response_time)::numeric, 2) as avg_response_time
-                 FROM monitor_checks mc
-                 JOIN check_regions cr ON cr.id = mc.region_id
-                 WHERE mc.monitor_id = ? AND mc.checked_at >= ? AND mc.organization_id = ?
-                 GROUP BY cr.id, cr.name, cr.code
-                 ORDER BY cr.name",
-                [(int)$id, $since24h, $this->currentOrgId]
-            );
-            foreach ($regionStmt->fetchAll('assoc') as $row) {
-                $rTotal = (int)$row['total_checks'];
-                $rSuccess = (int)$row['success_checks'];
-                $regionBreakdown[] = [
-                    'region_id' => (int)$row['id'],
-                    'region_name' => $row['name'],
-                    'region_code' => $row['code'],
-                    'uptime' => $rTotal > 0 ? round(($rSuccess / $rTotal) * 100, 2) : 0,
-                    'avg_response_time' => $row['avg_response_time'] !== null ? (float)$row['avg_response_time'] : null,
-                    'total_checks' => $rTotal,
-                ];
-            }
-        } catch (\Exception $e) {
-            // check_regions table may not exist or no regional data
-        }
-
-        $this->success([
-            'monitor' => $monitor,
-            'uptime_24h' => $uptime,
-            'avg_response_time' => $avgResponseTime,
-            'total_checks_24h' => $totalChecks,
-            'uptime_history' => $uptimeHistory,
-            'sla' => $slaData,
-            'region_breakdown' => $regionBreakdown,
-        ]);
+        $this->success($result);
     }
 
     /**
@@ -285,8 +154,7 @@ class MonitorsController extends AppController
         $monitor = $monitorsTable->newEntity($data);
 
         if ($monitorsTable->save($monitor)) {
-            $audit = new AuditLogService();
-            $audit->log(
+            $this->auditLogService->log(
                 'monitor_created',
                 $this->currentUserId,
                 $this->request->clientIp(),
@@ -333,8 +201,7 @@ class MonitorsController extends AppController
         $monitor = $monitorsTable->patchEntity($monitor, $data);
 
         if ($monitorsTable->save($monitor)) {
-            $audit = new AuditLogService();
-            $audit->log(
+            $this->auditLogService->log(
                 'monitor_updated',
                 $this->currentUserId,
                 $this->request->clientIp(),
@@ -375,8 +242,7 @@ class MonitorsController extends AppController
         }
 
         if ($monitorsTable->delete($monitor)) {
-            $audit = new AuditLogService();
-            $audit->log(
+            $this->auditLogService->log(
                 'monitor_deleted',
                 $this->currentUserId,
                 $this->request->clientIp(),
