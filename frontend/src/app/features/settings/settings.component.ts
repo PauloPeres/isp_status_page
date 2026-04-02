@@ -202,7 +202,7 @@ addIcons({
                   </div>
                 </div>
                 <div class="link-cards">
-                  <a class="link-card" routerLink="/app/channels">
+                  <a class="link-card" routerLink="/channels">
                     <ion-icon name="mail-outline"></ion-icon>
                     <div>
                       <strong>Notification Channels</strong>
@@ -210,19 +210,11 @@ addIcons({
                     </div>
                     <ion-icon name="open-outline" class="link-arrow"></ion-icon>
                   </a>
-                  <a class="link-card" routerLink="/app/notification-policies">
+                  <a class="link-card" routerLink="/notifications">
                     <ion-icon name="alert-circle-outline"></ion-icon>
                     <div>
                       <strong>Escalation Policies</strong>
                       <span>Define multi-step alert chains with delays and escalation rules</span>
-                    </div>
-                    <ion-icon name="open-outline" class="link-arrow"></ion-icon>
-                  </a>
-                  <a class="link-card" routerLink="/app/notification-schedules">
-                    <ion-icon name="time-outline"></ion-icon>
-                    <div>
-                      <strong>Notification Schedules</strong>
-                      <span>Set up suppress/allow windows per channel and severity</span>
                     </div>
                     <ion-icon name="open-outline" class="link-arrow"></ion-icon>
                   </a>
