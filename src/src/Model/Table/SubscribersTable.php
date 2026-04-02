@@ -69,7 +69,7 @@ class SubscribersTable extends Table
             ->email('email')
             ->requirePresence('email', 'create')
             ->notEmptyString('email')
-            ->add('email', 'unique', ['rule' => 'validateUnique', 'provider' => 'table']);
+            ->add('email', 'unique', ['rule' => ['validateUnique', ['scope' => 'organization_id']], 'provider' => 'table']);
 
         $validator
             ->scalar('name')
@@ -111,8 +111,30 @@ class SubscribersTable extends Table
     public function buildRules(RulesChecker $rules): RulesChecker
     {
         $rules->add($rules->existsIn(['organization_id'], 'Organizations'), ['errorField' => 'organization_id']);
-        $rules->add($rules->isUnique(['email']), ['errorField' => 'email']);
+        $rules->add($rules->isUnique(['email', 'organization_id']), ['errorField' => 'email']);
 
         return $rules;
+    }
+
+    /**
+     * Finder for active subscribers.
+     *
+     * @param \Cake\ORM\Query\SelectQuery $query The query to modify.
+     * @return \Cake\ORM\Query\SelectQuery
+     */
+    public function findActive(SelectQuery $query): SelectQuery
+    {
+        return $query->where(['Subscribers.active' => true]);
+    }
+
+    /**
+     * Finder for verified subscribers.
+     *
+     * @param \Cake\ORM\Query\SelectQuery $query The query to modify.
+     * @return \Cake\ORM\Query\SelectQuery
+     */
+    public function findVerified(SelectQuery $query): SelectQuery
+    {
+        return $query->where(['Subscribers.verified' => true]);
     }
 }

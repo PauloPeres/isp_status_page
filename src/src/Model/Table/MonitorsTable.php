@@ -193,4 +193,39 @@ class MonitorsTable extends Table
 
         return $rules;
     }
+
+    /**
+     * Finder for active monitors.
+     *
+     * @param \Cake\ORM\Query\SelectQuery $query The query to modify.
+     * @return \Cake\ORM\Query\SelectQuery
+     */
+    public function findActive(SelectQuery $query): SelectQuery
+    {
+        return $query->where(['Monitors.active' => true]);
+    }
+
+    /**
+     * Finder for monitors by status.
+     *
+     * @param \Cake\ORM\Query\SelectQuery $query The query to modify.
+     * @param string $status The status to filter by.
+     * @return \Cake\ORM\Query\SelectQuery
+     */
+    public function findByStatus(SelectQuery $query, string $status): SelectQuery
+    {
+        return $query->where(['Monitors.status' => $status]);
+    }
+
+    /**
+     * Finder for monitors by type.
+     *
+     * @param \Cake\ORM\Query\SelectQuery $query The query to modify.
+     * @param string $type The type to filter by.
+     * @return \Cake\ORM\Query\SelectQuery
+     */
+    public function findByType(SelectQuery $query, string $type): SelectQuery
+    {
+        return $query->where(['Monitors.type' => $type]);
+    }
 }

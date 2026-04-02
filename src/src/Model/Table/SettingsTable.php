@@ -58,8 +58,7 @@ class SettingsTable extends Table
             ->scalar('key')
             ->maxLength('key', 100)
             ->requirePresence('key', 'create')
-            ->notEmptyString('key')
-            ->add('key', 'unique', ['rule' => 'validateUnique', 'provider' => 'table']);
+            ->notEmptyString('key');
 
         $validator
             ->scalar('value')
