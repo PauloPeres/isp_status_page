@@ -13,6 +13,14 @@ use App\Service\SettingService;
  */
 class SettingsController extends AppController
 {
+    private const SENSITIVE_KEYS = [
+        'smtp_password',
+        'backup_ftp_password',
+        'telegram_bot_token',
+        'stripe_secret_key',
+        'twilio_auth_token',
+    ];
+
     protected SettingService $settingService;
 
     public function initialize(): void
@@ -45,8 +53,7 @@ class SettingsController extends AppController
         $settings = array_merge($systemSettings, $orgSettings);
 
         // Mask sensitive values before returning
-        $sensitiveKeys = ['smtp_password', 'backup_ftp_password', 'telegram_bot_token', 'stripe_secret_key', 'twilio_auth_token'];
-        foreach ($sensitiveKeys as $key) {
+        foreach (self::SENSITIVE_KEYS as $key) {
             if (isset($settings[$key]) && !empty($settings[$key])) {
                 $settings[$key] = '••••••••';
             }
@@ -75,8 +82,7 @@ class SettingsController extends AppController
             $data = $this->request->getData();
 
             // Filter out masked sensitive values to prevent overwriting real secrets with placeholder
-            $sensitiveKeys = ['smtp_password', 'backup_ftp_password', 'telegram_bot_token', 'stripe_secret_key', 'twilio_auth_token'];
-            foreach ($sensitiveKeys as $key) {
+            foreach (self::SENSITIVE_KEYS as $key) {
                 if (isset($data[$key]) && $data[$key] === '••••••••') {
                     unset($data[$key]);
                 }
