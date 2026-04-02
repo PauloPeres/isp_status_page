@@ -288,15 +288,26 @@ class NotificationChannelsController extends AppController
         $recipients = $this->mapConfigToRecipients($channel->type, $config);
         $alertRule->set('recipients', json_encode($recipients));
 
-        // Build a mock Monitor
-        $monitor = $this->fetchTable('Monitors')->newEmptyEntity();
-        $monitor->set('name', 'Test Monitor');
-        $monitor->set('type', 'http');
-        $monitor->set('status', 'down');
-        $monitor->set('configuration', json_encode(['url' => 'https://example.com']));
+        // Build a mock Monitor — try to use a real monitor from the org
+        $monitorsTable = $this->fetchTable('Monitors');
+        $monitor = $monitorsTable->find()
+            ->where(['Monitors.organization_id' => $this->currentOrgId])
+            ->first();
 
-        // Build a mock Incident
+        if (!$monitor) {
+            // No monitors exist — build a minimal in-memory mock
+            $monitor = $monitorsTable->newEmptyEntity();
+            $monitor->set('id', 0);
+            $monitor->set('name', 'Test Monitor');
+            $monitor->set('type', 'http');
+            $monitor->set('status', 'down');
+            $monitor->set('configuration', json_encode(['url' => 'https://example.com']));
+            $monitor->set('organization_id', $this->currentOrgId);
+        }
+
+        // Build a mock Incident with a valid monitor_id
         $incident = $this->fetchTable('Incidents')->newEmptyEntity();
+        $incident->set('monitor_id', $monitor->id);
         $incident->set('title', 'Test Notification');
         $incident->set('status', 'investigating');
         $incident->set('started_at', new \Cake\I18n\DateTime());

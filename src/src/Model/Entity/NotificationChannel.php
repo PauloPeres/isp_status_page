@@ -76,9 +76,12 @@ class NotificationChannel extends Entity
     /**
      * Get configuration as array (with sensitive values masked).
      *
+     * CakePHP accessor: automatically called during toArray()/jsonSerialize()
+     * so that sensitive values are never leaked in API responses.
+     *
      * @return array
      */
-    public function getConfiguration(): array
+    protected function _getConfiguration(): array
     {
         $raw = $this->_fields['configuration'] ?? null;
         if (empty($raw)) {
