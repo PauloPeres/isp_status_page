@@ -27,11 +27,27 @@ export class ApiKeyService {
 
   getAll(params?: any): Observable<PaginatedResponse<ApiKey>> {
     return this.api.get<any>('/api-keys', params).pipe(
-      map(data => ({
-        items: data.api_keys || data.items || [],
-        pagination: data.pagination || { page: 1, limit: 999, total: (data.api_keys || data.items || []).length, pages: 1 },
-      }))
+      map(data => {
+        const raw = data.api_keys || data.items || [];
+        const items = raw.map((item: any) => ({
+          ...item,
+          permissions: this.parsePermissions(item.permissions),
+        }));
+        return {
+          items,
+          pagination: data.pagination || { page: 1, limit: 999, total: raw.length, pages: 1 },
+        };
+      })
     );
+  }
+
+  private parsePermissions(perms: any): string[] {
+    if (Array.isArray(perms)) return perms;
+    if (typeof perms === 'string') {
+      try { const parsed = JSON.parse(perms); return Array.isArray(parsed) ? parsed : [perms]; }
+      catch { return perms.split(',').map((s: string) => s.trim()).filter(Boolean); }
+    }
+    return [];
   }
 
   create(data: { name: string; permissions: string[]; expires_at?: string }): Observable<ApiKeyCreateResponse> {
