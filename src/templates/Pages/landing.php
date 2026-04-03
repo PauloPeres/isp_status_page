@@ -9,6 +9,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/img/icon_isp_status_page.png">
     <meta name="theme-color" content="#2979FF">
     <link rel="stylesheet" href="/css/landing.css">
+    <link rel="stylesheet" href="/css/pricing.css">
 </head>
 <body>
 
@@ -114,72 +115,31 @@
         <h2 class="section-title">Simple, Transparent Pricing</h2>
         <p class="section-subtitle">Start free. Upgrade when you need more.</p>
 
-        <div class="pricing-grid">
+        <div class="plan-cards-grid">
             <?php if (!empty($plans)): ?>
-                <?php foreach ($plans as $i => $plan):
-                    $isFeatured = ($plan->slug === 'pro');
-                    $isFree = ($plan->price_monthly == 0);
-                    $priceFormatted = $isFree ? '$0' : '$' . number_format($plan->price_monthly / 100, 0);
-
-                    // Build feature list from plan limits
-                    $features = [];
-                    $features[] = ($plan->monitor_limit == -1 ? 'Unlimited' : 'Up to ' . $plan->monitor_limit) . ' monitors';
-
-                    $interval = $plan->check_interval_min;
-                    if ($interval < 60) {
-                        $features[] = $interval . '-second check interval';
-                    } else {
-                        $features[] = ($interval / 60) . '-minute check interval';
-                    }
-
-                    $features[] = ($plan->status_page_limit == -1 ? 'Unlimited' : $plan->status_page_limit) . ' status page' . ($plan->status_page_limit != 1 ? 's' : '');
-
-                    // Features from JSON
-                    $planFeatures = json_decode($plan->features ?? '[]', true) ?: [];
-                    if (in_array('email_alerts', $planFeatures)) $features[] = 'Email alerts';
-                    if (in_array('slack_alerts', $planFeatures)) $features[] = 'Slack, Discord & Telegram alerts';
-                    if (in_array('all_alert_channels', $planFeatures)) $features[] = 'All alert channels';
-                    if (in_array('api_access', $planFeatures)) $features[] = 'API access';
-                    if (in_array('custom_domains', $planFeatures)) $features[] = 'Custom domains';
-                    if (in_array('multi_region', $planFeatures)) $features[] = 'Multi-region checks';
-                    if (in_array('custom_branding', $planFeatures)) $features[] = 'Custom branding';
-                    if (in_array('sso_saml', $planFeatures)) $features[] = 'SSO / SAML';
-                    if (in_array('priority_support', $planFeatures)) $features[] = 'Priority support';
-                    if (in_array('dedicated_support', $planFeatures)) $features[] = 'Dedicated support';
-
-                    $features[] = $plan->data_retention_days . '-day data retention';
-
-                    $teamLimit = ($plan->team_member_limit == -1 ? 'Unlimited' : $plan->team_member_limit) . ' team member' . ($plan->team_member_limit != 1 ? 's' : '');
-                    $features[] = $teamLimit;
-                ?>
-                <div class="pricing-card<?= $isFeatured ? ' pricing-card-featured' : '' ?>">
-                    <?php if ($isFeatured): ?>
-                        <div class="pricing-badge">Most Popular</div>
-                    <?php endif; ?>
-                    <div class="pricing-header">
-                        <h3><?= h($plan->name) ?></h3>
-                        <div class="pricing-price">
-                            <span class="price-amount"><?= $priceFormatted ?></span>
-                            <span class="price-period">/month</span>
-                        </div>
-                    </div>
-                    <ul class="pricing-features">
-                        <?php foreach ($features as $feature): ?>
-                            <li><?= h($feature) ?></li>
-                        <?php endforeach; ?>
-                    </ul>
-                    <a href="/app/register" class="btn <?= $isFeatured ? 'btn-pricing-featured' : 'btn-pricing' ?>"><?= $isFree ? 'Start Free' : 'Start Free Trial' ?></a>
-                </div>
+                <?php foreach ($plans as $plan): ?>
+                    <?= $this->element('pricing/plan_card', ['plan' => $plan]) ?>
                 <?php endforeach; ?>
             <?php else: ?>
-                <!-- Fallback if plans table not available -->
-                <div class="pricing-card">
-                    <div class="pricing-header">
-                        <h3>Free</h3>
-                        <div class="pricing-price"><span class="price-amount">$0</span><span class="price-period">/month</span></div>
+                <div class="plan-card">
+                    <div class="plan-card__header">
+                        <h3 class="plan-card__name">Free</h3>
+                        <div class="plan-card__price">
+                            <span class="plan-card__price-amount">$0</span>
+                        </div>
+                        <p class="plan-card__price-subtitle">Free forever</p>
                     </div>
-                    <ul class="pricing-features"><li>1 monitor</li><li>Email alerts</li></ul>
-                    <a href="/app/register" class="btn btn-pricing">Start Free</a>
+                    <ul class="plan-card__features">
+                        <li class="plan-card__feature">
+                            <svg class="plan-card__check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <span>1 monitor</span>
+                        </li>
+                        <li class="plan-card__feature">
+                            <svg class="plan-card__check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <span>Email alerts</span>
+                        </li>
+                    </ul>
+                    <a href="/app/register" class="plan-card__cta">Start Free</a>
                 </div>
             <?php endif; ?>
         </div>

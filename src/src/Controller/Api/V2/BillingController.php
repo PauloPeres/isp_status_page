@@ -33,7 +33,19 @@ class BillingController extends AppController
             $service = $this->billingService;
             $plans = $service->getPlans();
 
-            $this->success(['plans' => $plans]);
+            // Include current plan slug for the authenticated organization
+            $currentPlan = 'free';
+            if ($this->currentOrgId > 0) {
+                $orgsTable = $this->fetchTable('Organizations');
+                $org = $orgsTable->find()
+                    ->where(['Organizations.id' => $this->currentOrgId])
+                    ->first();
+                if ($org && !empty($org->plan)) {
+                    $currentPlan = $org->plan;
+                }
+            }
+
+            $this->success(['plans' => $plans, 'current_plan' => $currentPlan]);
         } catch (\Exception $e) {
             $this->error('Failed to fetch plans: ' . $e->getMessage(), 500);
         }
