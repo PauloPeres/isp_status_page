@@ -101,6 +101,12 @@ class JwtAuthMiddleware implements MiddlewareInterface
             return $this->unauthorized('Invalid or expired access token');
         }
 
+        // Check if the token has been blocked (e.g. after logout)
+        $tokenId = $jwtService->getTokenIdentifier($token, $payload);
+        if ($jwtService->isTokenBlocked($tokenId)) {
+            return $this->unauthorized('Token has been revoked');
+        }
+
         // Set tenant context from JWT org_id claim
         if (isset($payload->org_id) && $payload->org_id > 0) {
             TenantContext::setCurrentOrgId((int)$payload->org_id);
