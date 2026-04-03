@@ -134,6 +134,13 @@ class SlaController extends AppController
             return;
         }
 
+        // Gate SLA tracking to plans with the sla_tracking feature
+        $planService = new \App\Service\PlanService();
+        if (!$planService->canUseFeature($this->currentOrgId, 'sla_tracking')) {
+            $this->planLimitError('SLA tracking requires an Enterprise plan.', $planService->checkFeature($this->currentOrgId, 'sla_tracking'));
+            return;
+        }
+
         $table = $this->fetchTable('SlaDefinitions');
         $sla = $table->newEntity($this->request->getData());
         $sla->set('organization_id', $this->currentOrgId);

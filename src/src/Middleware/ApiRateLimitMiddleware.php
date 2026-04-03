@@ -51,20 +51,48 @@ class ApiRateLimitMiddleware implements MiddlewareInterface
     {
         $path = $request->getUri()->getPath();
 
-        // Only apply to /api/v1/* routes
-        if (!str_starts_with($path, '/api/v1/')) {
+        // Apply to both /api/v1/* and /api/v2/* routes
+        $isV1 = str_starts_with($path, '/api/v1/');
+        $isV2 = str_starts_with($path, '/api/v2/');
+        if (!$isV1 && !$isV2) {
             return $handler->handle($request);
         }
 
-        $apiKey = $request->getAttribute('apiKey');
-        if (!$apiKey) {
-            // No API key on request — let downstream handle (ApiAuthMiddleware
-            // would have returned 401 already, but be defensive).
-            return $handler->handle($request);
+        // For v1 routes, use the apiKey attribute (set by ApiAuthMiddleware)
+        // For v2 routes, resolve the rate limit from the org's plan via JWT payload
+        $rateLimit = self::DEFAULT_RATE_LIMIT;
+        $cacheIdentifier = null;
+
+        if ($isV1) {
+            $apiKey = $request->getAttribute('apiKey');
+            if (!$apiKey) {
+                return $handler->handle($request);
+            }
+            $rateLimit = $apiKey->rate_limit ?: self::DEFAULT_RATE_LIMIT;
+            $cacheIdentifier = $apiKey->key_prefix;
+        } elseif ($isV2) {
+            $jwtPayload = $request->getAttribute('jwt_payload');
+            if (!$jwtPayload) {
+                // No JWT — let downstream handle (JwtAuthMiddleware would have returned 401)
+                return $handler->handle($request);
+            }
+            $orgId = (int)($jwtPayload->org_id ?? 0);
+            if ($orgId > 0) {
+                try {
+                    $planService = new \App\Service\PlanService();
+                    $plan = $planService->getPlanForOrganization($orgId);
+                    $rateLimit = $plan->api_rate_limit ?: self::DEFAULT_RATE_LIMIT;
+                } catch (\Throwable $e) {
+                    // Fall back to default if plan lookup fails
+                }
+            }
+            $cacheIdentifier = 'jwt_org_' . $orgId;
         }
 
-        $rateLimit = $apiKey->rate_limit ?: self::DEFAULT_RATE_LIMIT;
-        $cacheKey = self::CACHE_KEY_PREFIX . $apiKey->key_prefix;
+        if ($cacheIdentifier === null) {
+            return $handler->handle($request);
+        }
+        $cacheKey = self::CACHE_KEY_PREFIX . $cacheIdentifier;
 
         // Read current request count from cache
         $current = Cache::read($cacheKey, 'default');

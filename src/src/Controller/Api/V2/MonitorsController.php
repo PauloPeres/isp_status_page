@@ -156,6 +156,18 @@ class MonitorsController extends AppController
 
         $monitorsTable = $this->fetchTable('Monitors');
         $data = $this->request->getData();
+
+        // Gate SSL monitoring to plans with the ssl_monitoring feature
+        if (($data['type'] ?? '') === 'ssl' && !$planService->canUseFeature($this->currentOrgId, 'ssl_monitoring')) {
+            $this->planLimitError('SSL monitoring requires a Pro plan or higher.', $planService->checkFeature($this->currentOrgId, 'ssl_monitoring'));
+            return;
+        }
+
+        // Gate Heartbeat monitoring to plans with the heartbeat_monitoring feature
+        if (($data['type'] ?? '') === 'heartbeat' && !$planService->canUseFeature($this->currentOrgId, 'heartbeat_monitoring')) {
+            $this->planLimitError('Heartbeat monitoring requires a Business plan or higher.', $planService->checkFeature($this->currentOrgId, 'heartbeat_monitoring'));
+            return;
+        }
         $data['check_interval'] = $planService->validateCheckInterval($this->currentOrgId, $data['check_interval'] ?? 300);
         $data = $this->processTagsData($data);
         $data = $this->processConfigurationData($data);
@@ -204,6 +216,13 @@ class MonitorsController extends AppController
         }
 
         $data = $this->request->getData();
+
+        // Validate check_interval against plan minimum (same as add)
+        if (isset($data['check_interval'])) {
+            $planService = new PlanService();
+            $data['check_interval'] = $planService->validateCheckInterval($this->currentOrgId, (int)$data['check_interval']);
+        }
+
         $data = $this->processTagsData($data);
         $data = $this->processConfigurationData($data);
 
@@ -463,6 +482,17 @@ class MonitorsController extends AppController
             return;
         }
 
+        // Check plan limit before processing CSV
+        $planService = new PlanService();
+        $limitCheck = $planService->checkLimit($this->currentOrgId, 'monitor');
+        if (!$limitCheck['allowed']) {
+            $this->planLimitError(
+                "Monitor limit reached. Your {$limitCheck['plan_name']} plan allows {$limitCheck['limit']} monitors. Upgrade to import more.",
+                $limitCheck
+            );
+            return;
+        }
+
         // Accept CSV content from body or file upload
         $csvContent = $this->request->getData('csv');
 
@@ -512,7 +542,15 @@ class MonitorsController extends AppController
         $errors = [];
         $lineNum = 1;
 
+        // Calculate remaining capacity
+        $remaining = ($limitCheck['limit'] === 'unlimited') ? PHP_INT_MAX : ((int)$limitCheck['limit'] - (int)$limitCheck['current']);
+
         foreach ($lines as $line) {
+            // Stop if we would exceed the plan limit
+            if ($created >= $remaining) {
+                $errors[] = "Line {$lineNum}: Monitor limit reached. Your {$limitCheck['plan_name']} plan allows {$limitCheck['limit']} monitors. " . ($remaining > 0 ? "Only {$remaining} could be imported." : "No more monitors can be added.");
+                break;
+            }
             $lineNum++;
             $row = str_getcsv(trim($line));
             if (empty(array_filter($row))) {
@@ -622,6 +660,17 @@ class MonitorsController extends AppController
             return;
         }
 
+        // Check plan limit before processing import
+        $planService = new PlanService();
+        $limitCheck = $planService->checkLimit($this->currentOrgId, 'monitor');
+        if (!$limitCheck['allowed']) {
+            $this->planLimitError(
+                "Monitor limit reached. Your {$limitCheck['plan_name']} plan allows {$limitCheck['limit']} monitors. Upgrade to import more.",
+                $limitCheck
+            );
+            return;
+        }
+
         $content = $this->request->getData('content');
         $format = $this->request->getData('format'); // optional: uptimerobot, pingdom, betteruptime
 
@@ -649,7 +698,15 @@ class MonitorsController extends AppController
         $created = 0;
         $errors = $result['errors'];
 
+        // Calculate remaining capacity
+        $remaining = ($limitCheck['limit'] === 'unlimited') ? PHP_INT_MAX : ((int)$limitCheck['limit'] - (int)$limitCheck['current']);
+
         foreach ($result['monitors'] as $i => $monitorData) {
+            // Stop if we would exceed the plan limit
+            if ($created >= $remaining) {
+                $errors[] = "Monitor limit reached after importing {$created}. Your {$limitCheck['plan_name']} plan allows {$limitCheck['limit']} monitors.";
+                break;
+            }
             $data = [
                 'name' => $monitorData['name'],
                 'type' => $monitorData['type'],

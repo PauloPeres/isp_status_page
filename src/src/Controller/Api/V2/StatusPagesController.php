@@ -77,8 +77,18 @@ class StatusPagesController extends AppController
             return;
         }
 
+        // Gate custom domains to plans with the custom_domains feature
+        $data = $this->request->getData();
+        if (!empty($data['custom_domain'])) {
+            $planService = new PlanService();
+            if (!$planService->canUseFeature($this->currentOrgId, 'custom_domains')) {
+                $this->planLimitError('Custom domains require a Pro plan or higher.', $planService->checkFeature($this->currentOrgId, 'custom_domains'));
+                return;
+            }
+        }
+
         $table = $this->fetchTable('StatusPages');
-        $page = $table->newEntity($this->request->getData());
+        $page = $table->newEntity($data);
         $page->set('organization_id', $this->currentOrgId);
 
         if (!$table->save($page)) {
@@ -118,7 +128,17 @@ class StatusPagesController extends AppController
             return;
         }
 
-        $page = $table->patchEntity($page, $this->request->getData());
+        // Gate custom domains to plans with the custom_domains feature
+        $data = $this->request->getData();
+        if (!empty($data['custom_domain'])) {
+            $planService = new PlanService();
+            if (!$planService->canUseFeature($this->currentOrgId, 'custom_domains')) {
+                $this->planLimitError('Custom domains require a Pro plan or higher.', $planService->checkFeature($this->currentOrgId, 'custom_domains'));
+                return;
+            }
+        }
+
+        $page = $table->patchEntity($page, $data);
         if (!$table->save($page)) {
             $this->error('Validation failed', 422, $page->getErrors());
 

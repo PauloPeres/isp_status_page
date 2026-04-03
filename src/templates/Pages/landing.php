@@ -50,7 +50,7 @@
             <a href="/app/register" class="btn btn-hero-primary">Start Free</a>
             <a href="/status" class="btn btn-hero-secondary">View Demo</a>
         </div>
-        <p class="hero-note">No credit card required. Monitor up to 5 services free.</p>
+        <p class="hero-note">No credit card required. Start monitoring free.</p>
     </div>
 </section>
 
@@ -68,7 +68,7 @@
                     </svg>
                 </div>
                 <h3>Uptime Monitoring</h3>
-                <p>HTTP, Ping, Port, SSL Certificate, and Heartbeat monitoring. Check every 30 seconds from multiple regions around the world.</p>
+                <p>HTTP, Ping, Port, SSL Certificate, and Heartbeat monitoring. Checks as fast as 30 seconds, from multiple regions around the world.</p>
             </div>
 
             <div class="feature-card">
@@ -178,7 +178,7 @@
                         <h3>Free</h3>
                         <div class="pricing-price"><span class="price-amount">$0</span><span class="price-period">/month</span></div>
                     </div>
-                    <ul class="pricing-features"><li>5 monitors</li><li>Email alerts</li></ul>
+                    <ul class="pricing-features"><li>1 monitor</li><li>Email alerts</li></ul>
                     <a href="/app/register" class="btn btn-pricing">Start Free</a>
                 </div>
             <?php endif; ?>
