@@ -855,5 +855,11 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/super-admin/blog-posts/{id}', ['controller' => 'BlogPosts', 'action' => 'delete', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
         $builder->connect('/super-admin/blog-posts/{id}/publish', ['controller' => 'BlogPosts', 'action' => 'publish', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
         $builder->connect('/super-admin/blog-posts/{id}/unpublish', ['controller' => 'BlogPosts', 'action' => 'unpublish', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
+
+        // Super Admin — Queue Dashboard (Phase 5)
+        $builder->connect('/super-admin/queue', ['controller' => 'Queue', 'action' => 'index', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'GET']);
+        $builder->connect('/super-admin/queue/failed-jobs', ['controller' => 'Queue', 'action' => 'failedJobs', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'GET']);
+        $builder->connect('/super-admin/queue/retry/{id}', ['controller' => 'Queue', 'action' => 'retryJob', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/super-admin/queue/failed-jobs', ['controller' => 'Queue', 'action' => 'purgeFailedJobs', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'DELETE']);
     });
 };

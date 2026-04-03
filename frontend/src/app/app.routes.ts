@@ -400,6 +400,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'queue',
+        loadComponent: () =>
+          import('./features/super-admin/queue/queue-dashboard.component').then(
+            (m) => m.QueueDashboardComponent,
+          ),
+      },
+      {
         path: 'blog-posts',
         loadComponent: () =>
           import('./features/super-admin/blog/blog-post-list.component').then(

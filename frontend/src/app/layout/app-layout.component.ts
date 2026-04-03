@@ -58,6 +58,7 @@ import {
   serverOutline,
   walletOutline,
   megaphoneOutline,
+  layersOutline,
 } from 'ionicons/icons';
 
 addIcons({
@@ -94,6 +95,7 @@ addIcons({
   'server-outline': serverOutline,
   'wallet-outline': walletOutline,
   'megaphone-outline': megaphoneOutline,
+  'layers-outline': layersOutline,
 });
 
 @Component({
@@ -362,6 +364,13 @@ addIcons({
                   <ion-item routerLink="/super-admin/health" routerLinkActive="selected">
                     <ion-icon name="server-outline" slot="start"></ion-icon>
                     <ion-label>Health</ion-label>
+                  </ion-item>
+                </ion-menu-toggle>
+
+                <ion-menu-toggle auto-hide="false">
+                  <ion-item routerLink="/super-admin/queue" routerLinkActive="selected">
+                    <ion-icon name="layers-outline" slot="start"></ion-icon>
+                    <ion-label>Queue</ion-label>
                   </ion-item>
                 </ion-menu-toggle>
 

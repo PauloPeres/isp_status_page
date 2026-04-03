@@ -156,6 +156,9 @@ class SchedulerCommand extends Command
                 Log::info("Scheduler cycle: {$monitorsScheduled} monitors queued, {$escalationsScheduled} escalations queued ({$elapsed}ms)");
             }
 
+            // Record heartbeat so the queue dashboard knows the scheduler is alive
+            $this->recordHeartbeat($io);
+
             return static::CODE_SUCCESS;
         } catch (\Exception $e) {
             $io->error("Scheduler cycle failed: {$e->getMessage()}");
@@ -268,6 +271,48 @@ class SchedulerCommand extends Command
         }
 
         return $count;
+    }
+
+    /**
+     * Record a scheduler heartbeat in Redis.
+     *
+     * Sets the key `keepup:scheduler:last_tick` with a 90-second TTL.
+     * If the scheduler dies the key expires and the dashboard reports "stopped".
+     *
+     * @param \Cake\Console\ConsoleIo $io The console io
+     * @return void
+     */
+    protected function recordHeartbeat(ConsoleIo $io): void
+    {
+        try {
+            $redis = new \Redis();
+            $redisUrl = getenv('REDIS_URL') ?: '';
+            $host = '127.0.0.1';
+            $port = 6379;
+            $password = '';
+
+            if ($redisUrl) {
+                $parsed = parse_url($redisUrl);
+                $host = $parsed['host'] ?? '127.0.0.1';
+                $port = $parsed['port'] ?? 6379;
+                $password = $parsed['pass'] ?? '';
+            }
+
+            $redis->connect($host, $port, 2.0);
+            if ($password !== '') {
+                $redis->auth($password);
+            }
+            $redis->select(6);
+
+            $now = (new DateTime())->toIso8601String();
+            $redis->setex('keepup:scheduler:last_tick', 90, $now);
+            $redis->close();
+
+            $io->verbose("Heartbeat recorded at {$now}");
+        } catch (\Exception $e) {
+            // Non-fatal — the scheduler keeps running even if heartbeat fails
+            Log::warning("Scheduler: Failed to record heartbeat: {$e->getMessage()}");
+        }
     }
 
     /**
