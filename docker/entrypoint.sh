@@ -90,6 +90,7 @@ bin/cake monitor_check
 CRONEOF
 
     # Re-write with actual env vars expanded
+    # Uses scheduler --once to push due checks to the queue (Redis lock prevents duplicates)
     cat > /usr/local/bin/monitor-check-cron.sh <<EOF
 #!/bin/bash
 export DATABASE_URL="${DATABASE_URL}"
@@ -97,7 +98,7 @@ export REDIS_URL="${REDIS_URL}"
 export CACHE_DRIVER="${CACHE_DRIVER}"
 export SESSION_DRIVER="${SESSION_DRIVER}"
 cd /var/www/html
-bin/cake monitor_check
+bin/cake scheduler --once
 EOF
 
     chmod +x /usr/local/bin/monitor-check-cron.sh

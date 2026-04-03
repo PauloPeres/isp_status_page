@@ -207,6 +207,15 @@ return [
             'queue' => 'default',
             'logger' => 'default',
             'receiveTimeout' => 5000,
+            'uniqueCache' => [
+                'className' => RedisEngine::class,
+                'host' => $redisHost,
+                'port' => $redisPort,
+                'password' => $redisPassword ?: null,
+                'database' => 6,
+                'duration' => '+5 minutes',
+                'prefix' => 'queue_unique_default_',
+            ],
         ],
         'notifications' => [
             'url' => env(
@@ -218,6 +227,15 @@ return [
             'queue' => 'notifications',
             'logger' => 'default',
             'receiveTimeout' => 5000,
+            'uniqueCache' => [
+                'className' => RedisEngine::class,
+                'host' => $redisHost,
+                'port' => $redisPort,
+                'password' => $redisPassword ?: null,
+                'database' => 6,
+                'duration' => '+5 minutes',
+                'prefix' => 'queue_unique_notif_',
+            ],
         ],
     ],
 ];
