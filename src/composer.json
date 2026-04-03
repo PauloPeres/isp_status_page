@@ -13,9 +13,11 @@
         "cakephp/plugin-installer": "^2.0",
         "cakephp/queue": "^2.0",
         "dompdf/dompdf": "^3.1",
+        "enqueue/redis": "^0.10.27",
         "firebase/php-jwt": "^7.0",
         "mobiledetect/mobiledetectlib": "^3.74",
         "phpseclib/phpseclib": "^3.0",
+        "predis/predis": "^3.4",
         "robmorgan/phinx": "0.16.10",
         "stripe/stripe-php": "^16.0"
     },

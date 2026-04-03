@@ -79,7 +79,8 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
             $this->addPlugin('DebugKit');
         }
 
-        // Load more plugins here
+        // Load Queue plugin for background job processing
+        $this->addPlugin('Cake/Queue');
     }
 
     /**

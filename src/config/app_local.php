@@ -191,4 +191,33 @@ return [
     ],
     'Cache' => $cacheConfig,
     'Session' => $sessionConfig,
+
+    /*
+     * Queue configuration for background job processing.
+     * Uses Redis DB 5 for the queue broker and DB 6 for unique-job cache.
+     */
+    'Queue' => [
+        'default' => [
+            'url' => env(
+                'REDIS_QUEUE_URL',
+                $redisPassword
+                    ? "redis://:{$redisPassword}@{$redisHost}:{$redisPort}/5"
+                    : "redis://{$redisHost}:{$redisPort}/5"
+            ),
+            'queue' => 'default',
+            'logger' => 'default',
+            'receiveTimeout' => 5000,
+        ],
+        'notifications' => [
+            'url' => env(
+                'REDIS_QUEUE_URL',
+                $redisPassword
+                    ? "redis://:{$redisPassword}@{$redisHost}:{$redisPort}/5"
+                    : "redis://{$redisHost}:{$redisPort}/5"
+            ),
+            'queue' => 'notifications',
+            'logger' => 'default',
+            'receiveTimeout' => 5000,
+        ],
+    ],
 ];
