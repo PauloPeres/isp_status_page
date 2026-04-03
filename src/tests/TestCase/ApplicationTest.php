@@ -102,10 +102,12 @@ class ApplicationTest extends TestCase
         $middleware->seek(1);
         $this->assertInstanceOf(\App\Middleware\SecurityHeadersMiddleware::class, $middleware->current());
         $middleware->seek(2);
-        $this->assertInstanceOf(ErrorHandlerMiddleware::class, $middleware->current());
+        $this->assertInstanceOf(\App\Middleware\PageCacheMiddleware::class, $middleware->current());
         $middleware->seek(3);
-        $this->assertInstanceOf(AssetMiddleware::class, $middleware->current());
+        $this->assertInstanceOf(ErrorHandlerMiddleware::class, $middleware->current());
         $middleware->seek(4);
+        $this->assertInstanceOf(AssetMiddleware::class, $middleware->current());
+        $middleware->seek(5);
         $this->assertInstanceOf(RoutingMiddleware::class, $middleware->current());
     }
 }

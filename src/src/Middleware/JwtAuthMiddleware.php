@@ -32,6 +32,8 @@ class JwtAuthMiddleware implements MiddlewareInterface
         '/api/v2/auth/refresh',
         '/api/v2/auth/register',
         '/api/v2/auth/oauth/exchange',
+        '/api/v2/health',
+        '/api/v2/health/ping',
     ];
 
     /**

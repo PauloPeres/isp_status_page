@@ -606,6 +606,10 @@ return function (RouteBuilder $routes): void {
         );
         $builder->connect('/auth/oauth/exchange', ['controller' => 'OAuth', 'action' => 'exchangeOAuthCode', 'prefix' => 'Api/V2', '_method' => 'POST']);
 
+        // --- Health check (no JWT required) ---
+        $builder->connect('/health', ['controller' => 'Health', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
+        $builder->connect('/health/ping', ['controller' => 'Health', 'action' => 'ping', 'prefix' => 'Api/V2', '_method' => 'GET']);
+
         // --- Public status page API (no JWT required) ---
         $builder->connect(
             '/public/status/{slug}',

@@ -37,6 +37,7 @@ use App\Middleware\CorsMiddleware;
 use App\Middleware\JwtAuthMiddleware;
 use App\Middleware\PlanLimitMiddleware;
 use App\Middleware\EmailVerificationMiddleware;
+use App\Middleware\PageCacheMiddleware;
 use App\Middleware\SecurityHeadersMiddleware;
 use App\Middleware\SuperAdminMiddleware;
 use App\Middleware\TenantMiddleware;
@@ -97,6 +98,9 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
 
             // Security headers on all responses (TASK-AUTH-008)
             ->add(new SecurityHeadersMiddleware())
+
+            // Redis page cache for public/static pages (before routing for max performance)
+            ->add(new PageCacheMiddleware())
 
             // Catch any exceptions in the lower layers,
             // and make an error page/response
