@@ -13,6 +13,8 @@ It integrates with IXC, Zabbix, and REST APIs to monitor services and display re
 **Database**: PostgreSQL 16 (SQLite for tests)
 **Tests**: PHPUnit 10.5.58
 **Container**: Docker (use `make quick-start` to boot)
+**Queue**: Redis-backed (cakephp/queue) with dedicated worker containers
+**Scheduler**: Long-running `bin/cake scheduler` daemon pushes due checks to queue
 
 ---
 
@@ -26,7 +28,7 @@ isp_status_page/
 │   │   ├── Migrations/         ← Database migrations
 │   │   └── Seeds/              ← Database seeders
 │   ├── src/
-│   │   ├── Command/            ← CLI commands (monitor_check, cleanup, backup)
+│   │   ├── Command/            ← CLI commands (scheduler, monitor_check, cleanup, backup)
 │   │   ├── Controller/         ← HTTP controllers
 │   │   ├── Integration/        ← IXC, Zabbix, REST adapters
 │   │   ├── Model/
@@ -83,7 +85,7 @@ isp_status_page/
 - Integration interface + AbstractIntegration base class
 - CleanupCommand + BackupCommand
 - 78+ tests passing (191 assertions)
-- Docker setup with cron, migrations, seeds
+- Docker setup with scheduler daemon, queue workers, cron fallback, migrations, seeds
 - Tooltip system with 68+ translations (pt_BR, en, es)
 
 ---
@@ -402,6 +404,46 @@ The project is **COMPLETE** when ALL of the following are true:
 - [ ] All new DB fields added via proper migrations (not manual SQL)
 - [ ] New settings added via Settings seeds or migrations
 - [ ] All new routes accessible from the admin sidebar
+
+---
+
+## Docker Architecture (Phase 4+)
+
+The application runs as multiple containers in production (`docker-compose.prod.yml`):
+
+| Container | Role | Key env |
+|-----------|------|---------|
+| **app** | Apache + PHP web server, serves HTTP requests. Runs cron as safety fallback. | `ENABLE_CRON=true` |
+| **postgres** | PostgreSQL 16 database | |
+| **redis** | Redis 7 -- cache, sessions, and job queue broker | |
+| **scheduler** | Long-running `bin/cake scheduler` daemon. Evaluates monitors on their individual intervals and pushes `MonitorCheckJob` / `EscalationCheckJob` to the Redis queue. Uses Redis locks to prevent duplicate scheduling. | `ENABLE_CRON=false` |
+| **worker** | `bin/cake queue worker --config default` -- processes monitor check and escalation jobs from the default queue. | `ENABLE_CRON=false` |
+| **worker-notifications** | `bin/cake queue worker --config notifications` -- processes alert, webhook delivery, and notification jobs. | `ENABLE_CRON=false` |
+
+### How monitoring works (queue-based flow)
+
+1. **Scheduler daemon** (`bin/cake scheduler`) runs continuously, sleeping between ticks.
+2. Each tick evaluates which monitors are due for a check based on their `check_interval`.
+3. For each due monitor, the scheduler pushes a `MonitorCheckJob` to the Redis `default` queue.
+4. **worker** container picks up `MonitorCheckJob`, runs the checker, saves results, and triggers alerts if status changed.
+5. Alert dispatch pushes `WebhookDeliveryJob` / notification jobs to the `notifications` queue.
+6. **worker-notifications** container processes those asynchronously.
+
+### Cron (safety fallback only)
+
+The **app** container still runs cron with `ENABLE_CRON=true` as a belt-and-suspenders fallback:
+- `* * * * *` -- `bin/cake scheduler --once` (single-tick fallback if scheduler daemon dies)
+- `* * * * *` -- `bin/cake escalation_check`
+- `0 * * * *` -- `bin/cake send_scheduled_reports`
+- `0 0 1 * *` -- `bin/cake grant_monthly_credits`
+- `0 3 * * *` -- `bin/cake cleanup`
+- `0 2 * * *` -- `bin/cake backup`
+
+Old cron entries for `monitor_check` (every minute) and `webhook_retry` (every 2 minutes) have been removed -- these are now handled by the scheduler + queue workers.
+
+### WebhookRetryCommand (deprecated)
+
+`bin/cake webhook_retry` is kept for backward compatibility but is deprecated. In queue mode it simply pushes `WebhookDeliveryJob` instances. The queue workers now handle webhook retries automatically via job-level retry logic.
 
 ---
 

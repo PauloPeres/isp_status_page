@@ -1,10 +1,10 @@
 # ISP Status Page - Cron Configuration
-# Run monitor checks every minute
+# Updated: Phase 4 cleanup — monitor_check and webhook_retry removed
+# (scheduler daemon + queue workers handle those now)
 
-* * * * * www-data /usr/local/bin/monitor-check-cron.sh >> /var/www/html/logs/cron.log 2>&1
-
-# Retry failed webhook deliveries every 2 minutes
-*/2 * * * * www-data cd /var/www/html && bin/cake webhook_retry >> /var/www/html/logs/webhook_retry.log 2>&1
+# Safety fallback: run scheduler --once every minute
+# In case the scheduler daemon container dies, this ensures checks still get pushed to the queue
+* * * * * www-data cd /var/www/html && bin/cake scheduler --once >> /var/www/html/logs/cron.log 2>&1
 
 # Run cleanup daily at 3 AM
 0 3 * * * www-data /usr/local/bin/cleanup-cron.sh >> /var/www/html/logs/cleanup.log 2>&1

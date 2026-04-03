@@ -17,8 +17,13 @@ use Cake\Queue\QueueManager;
 /**
  * WebhookRetryCommand (C-04)
  *
+ * @deprecated Since Phase 4. Webhook retries are now handled automatically by
+ *             WebhookDeliveryJob via the Redis-backed queue workers. This command
+ *             is kept for backward compatibility and as a manual fallback.
+ *             In queue mode it simply pushes WebhookDeliveryJob instances; when no
+ *             queue is configured it falls back to synchronous delivery.
+ *
  * Processes failed webhook deliveries that are eligible for retry.
- * Should be run via cron every 1-5 minutes.
  *
  * Usage: bin/cake webhook_retry
  */

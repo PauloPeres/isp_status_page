@@ -142,10 +142,37 @@ EOF
 
     chmod +x /usr/local/bin/escalation-check-cron.sh
 
+    # Create wrapper script for cleanup
+    cat > /usr/local/bin/cleanup-cron.sh <<EOF
+#!/bin/bash
+export DATABASE_URL="${DATABASE_URL}"
+export REDIS_URL="${REDIS_URL}"
+export CACHE_DRIVER="${CACHE_DRIVER}"
+export SESSION_DRIVER="${SESSION_DRIVER}"
+cd /var/www/html
+bin/cake cleanup
+EOF
+
+    chmod +x /usr/local/bin/cleanup-cron.sh
+
+    # Create wrapper script for backup
+    cat > /usr/local/bin/backup-cron.sh <<EOF
+#!/bin/bash
+export DATABASE_URL="${DATABASE_URL}"
+export REDIS_URL="${REDIS_URL}"
+export CACHE_DRIVER="${CACHE_DRIVER}"
+export SESSION_DRIVER="${SESSION_DRIVER}"
+cd /var/www/html
+bin/cake backup
+EOF
+
+    chmod +x /usr/local/bin/backup-cron.sh
+
     # Create cron job file
     cat > /etc/cron.d/isp-status-cron <<EOF
-# ISP Status Page - Monitor Check Cron
-# Runs every minute to check all monitors
+# ISP Status Page - Scheduler Safety Fallback
+# Runs every minute as a fallback in case the scheduler daemon container dies
+# The scheduler daemon is the primary mechanism; this is belt-and-suspenders
 * * * * * www-data /usr/local/bin/monitor-check-cron.sh >> /var/www/html/logs/cron.log 2>&1
 
 # ISP Status Page - Escalation Check Cron
@@ -159,6 +186,14 @@ EOF
 # ISP Status Page - Monthly Credit Grant
 # Runs at midnight on the 1st of each month to grant notification credits
 0 0 1 * * www-data /usr/local/bin/grant-monthly-credits-cron.sh >> /var/www/html/logs/credit-grants.log 2>&1
+
+# ISP Status Page - Cleanup
+# Runs daily at 3 AM to clean up old data
+0 3 * * * www-data /usr/local/bin/cleanup-cron.sh >> /var/www/html/logs/cleanup.log 2>&1
+
+# ISP Status Page - Backup
+# Runs daily at 2 AM to create database backups
+0 2 * * * www-data /usr/local/bin/backup-cron.sh >> /var/www/html/logs/backup.log 2>&1
 
 EOF
 
