@@ -1,5 +1,6 @@
 export interface Sla {
   id: number;
+  public_id: string;
   name: string;
   monitor_id: number;
   target_uptime: number;

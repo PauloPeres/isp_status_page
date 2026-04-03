@@ -51,7 +51,7 @@ addIcons({
             <ion-button (click)="onDownloadPdf()">
               <ion-icon name="download-outline" slot="icon-only"></ion-icon>
             </ion-button>
-            <ion-button [routerLink]="['/sla', sla()!.id, 'edit']">
+            <ion-button [routerLink]="['/sla', sla()!.public_id, 'edit']">
               <ion-icon name="create-outline" slot="icon-only"></ion-icon>
             </ion-button>
           }
@@ -672,7 +672,7 @@ export class SlaDetailComponent implements OnInit, ViewWillEnter {
   period = 'this_month';
   today = new Date();
 
-  private slaId = 0;
+  private slaId = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -682,7 +682,7 @@ export class SlaDetailComponent implements OnInit, ViewWillEnter {
   ) {}
 
   ngOnInit(): void {
-    this.slaId = Number(this.route.snapshot.paramMap.get('id'));
+    this.slaId = this.route.snapshot.paramMap.get('id') ?? '';
   }
 
   ionViewWillEnter(): void {
@@ -727,7 +727,7 @@ export class SlaDetailComponent implements OnInit, ViewWillEnter {
 
   onDownloadPdf(): void {
     if (!this.sla()) return;
-    this.slaService.exportReport(this.sla()!.id, 'pdf').subscribe({
+    this.slaService.exportReport(this.sla()!.public_id, 'pdf').subscribe({
       next: (blob: Blob) => {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');

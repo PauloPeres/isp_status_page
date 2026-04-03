@@ -22,7 +22,7 @@ export class MonitorService {
     return this.api.get<PaginatedResponse<Monitor>>('/monitors', params);
   }
 
-  getMonitor(id: number): Observable<any> {
+  getMonitor(id: string): Observable<any> {
     return this.api.get(`/monitors/${id}`);
   }
 
@@ -30,24 +30,24 @@ export class MonitorService {
     return this.api.post<Monitor>('/monitors', data);
   }
 
-  updateMonitor(id: number, data: Partial<Monitor>): Observable<Monitor> {
+  updateMonitor(id: string, data: Partial<Monitor>): Observable<Monitor> {
     return this.api.put<Monitor>(`/monitors/${id}`, data);
   }
 
-  deleteMonitor(id: number): Observable<void> {
+  deleteMonitor(id: string): Observable<void> {
     return this.api.delete<void>(`/monitors/${id}`);
   }
 
-  pauseMonitor(id: number): Observable<void> {
+  pauseMonitor(id: string): Observable<void> {
     return this.api.post<void>(`/monitors/${id}/pause`);
   }
 
-  resumeMonitor(id: number): Observable<void> {
+  resumeMonitor(id: string): Observable<void> {
     return this.api.post<void>(`/monitors/${id}/resume`);
   }
 
   getChecks(
-    id: number,
+    id: string,
     params?: { page?: number; limit?: number },
   ): Observable<PaginatedResponse<any>> {
     return this.api.get<PaginatedResponse<any>>(

@@ -278,7 +278,7 @@ export class MaintenanceFormComponent implements OnInit {
   saving = false;
   submitted = false;
   isEdit = false;
-  editId: number | null = null;
+  editId: string | null = null;
   loadingData = false;
 
   get recurringPreview(): string {
@@ -316,7 +316,7 @@ export class MaintenanceFormComponent implements OnInit {
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
       this.isEdit = true;
-      this.editId = +idParam;
+      this.editId = idParam;
       this.loadingData = true;
       this.service.get(this.editId).subscribe({
         next: (item) => {

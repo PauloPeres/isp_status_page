@@ -15,6 +15,7 @@ export type MonitorStatus = 'up' | 'down' | 'degraded' | 'unknown';
 
 export interface Monitor {
   id: number;
+  public_id: string;
   name: string;
   description?: string;
   type: MonitorType;

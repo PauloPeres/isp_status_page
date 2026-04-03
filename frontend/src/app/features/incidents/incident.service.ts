@@ -25,7 +25,7 @@ export class IncidentService {
     return this.api.get<PaginatedResponse<Incident>>('/incidents', params);
   }
 
-  getIncident(id: number): Observable<Incident> {
+  getIncident(id: string): Observable<Incident> {
     return this.api.get<any>(`/incidents/${id}`).pipe(
       map(data => ({ ...(data.incident || data), timeline: data.updates || data.timeline || (data.incident || data).timeline || [] })),
     );
@@ -37,18 +37,18 @@ export class IncidentService {
     );
   }
 
-  updateIncident(id: number, data: Partial<Incident>): Observable<Incident> {
+  updateIncident(id: string, data: Partial<Incident>): Observable<Incident> {
     return this.api.put<Incident>(`/incidents/${id}`, data);
   }
 
-  acknowledgeIncident(id: number): Observable<Incident> {
+  acknowledgeIncident(id: string): Observable<Incident> {
     return this.api.post<any>(`/incidents/${id}/acknowledge`).pipe(
       map(data => data.incident || data),
     );
   }
 
   addUpdate(
-    id: number,
+    id: string,
     data: { status: string; message: string; is_public?: boolean },
   ): Observable<IncidentTimelineEntry> {
     return this.api.post<any>(

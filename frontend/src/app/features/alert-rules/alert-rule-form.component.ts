@@ -129,7 +129,7 @@ export class AlertRuleFormComponent implements OnInit {
   saving = signal(false);
   monitors = signal<any[]>([]);
   form: FormGroup;
-  private ruleId: number | null = null;
+  private ruleId: string | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -155,7 +155,7 @@ export class AlertRuleFormComponent implements OnInit {
 
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
-      this.ruleId = Number(idParam);
+      this.ruleId = idParam;
       this.isEdit.set(true);
       this.service.get(this.ruleId).subscribe((rule) => {
         this.form.patchValue({

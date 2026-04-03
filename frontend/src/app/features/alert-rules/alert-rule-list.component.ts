@@ -58,7 +58,7 @@ addIcons({ notificationsOutline });
       <ion-list>
         @for (item of items(); track item.id) {
           <ion-item-sliding>
-            <ion-item [routerLink]="['/alert-rules', item.id, 'edit']" detail>
+            <ion-item [routerLink]="['/alert-rules', item.public_id, 'edit']" detail>
               <ion-label>
                 <h2>{{ item.name }}</h2>
                 <p>
@@ -79,7 +79,7 @@ addIcons({ notificationsOutline });
             </ion-item>
 
             <ion-item-options side="end">
-              <ion-item-option color="primary" [routerLink]="['/alert-rules', item.id, 'edit']">Edit</ion-item-option>
+              <ion-item-option color="primary" [routerLink]="['/alert-rules', item.public_id, 'edit']">Edit</ion-item-option>
               <ion-item-option color="danger" (click)="onDelete(item)">Delete</ion-item-option>
             </ion-item-options>
           </ion-item-sliding>
@@ -158,7 +158,7 @@ export class AlertRuleListComponent implements OnInit, ViewWillEnter {
       buttons: [
         { text: 'Cancel', role: 'cancel' },
         { text: 'Delete', role: 'destructive', handler: () => {
-          this.service.delete(item.id).subscribe(() => {
+          this.service.delete(item.public_id).subscribe(() => {
             this.allItems.update((list) => list.filter((i) => i.id !== item.id));
             this.items.update((list) => list.filter((i) => i.id !== item.id));
           });

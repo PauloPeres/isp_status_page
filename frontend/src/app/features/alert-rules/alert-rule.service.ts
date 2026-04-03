@@ -30,7 +30,7 @@ export class AlertRuleService {
     );
   }
 
-  get(id: number): Observable<AlertRule> {
+  get(id: string): Observable<AlertRule> {
     return this.api.get<any>(`/alert-rules/${id}`).pipe(
       map(data => data.alert_rule || data)
     );
@@ -40,11 +40,11 @@ export class AlertRuleService {
     return this.api.post<AlertRule>('/alert-rules', data);
   }
 
-  update(id: number, data: Partial<AlertRule>): Observable<AlertRule> {
+  update(id: string, data: Partial<AlertRule>): Observable<AlertRule> {
     return this.api.put<AlertRule>(`/alert-rules/${id}`, data);
   }
 
-  delete(id: number): Observable<void> {
+  delete(id: string): Observable<void> {
     return this.api.delete<void>(`/alert-rules/${id}`);
   }
 }

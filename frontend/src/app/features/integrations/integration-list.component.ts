@@ -58,7 +58,7 @@ addIcons({ extensionPuzzleOutline });
       <ion-list>
         @for (item of items(); track item.id) {
           <ion-item-sliding>
-            <ion-item [routerLink]="['/integrations', item.id, 'edit']" detail>
+            <ion-item [routerLink]="['/integrations', item.public_id, 'edit']" detail>
               <ion-label>
                 <h2>{{ item.name }}</h2>
                 <p>
@@ -82,7 +82,7 @@ addIcons({ extensionPuzzleOutline });
             </ion-item>
 
             <ion-item-options side="end">
-              <ion-item-option color="primary" [routerLink]="['/integrations', item.id, 'edit']">Edit</ion-item-option>
+              <ion-item-option color="primary" [routerLink]="['/integrations', item.public_id, 'edit']">Edit</ion-item-option>
               <ion-item-option color="danger" (click)="onDelete(item)">Delete</ion-item-option>
             </ion-item-options>
           </ion-item-sliding>
@@ -160,7 +160,7 @@ export class IntegrationListComponent implements OnInit, ViewWillEnter {
 
   onTest(item: Integration): void {
     this.testing.set(item.id);
-    this.service.testConnection(item.id).subscribe({
+    this.service.testConnection(item.public_id).subscribe({
       next: async (res) => {
         this.testing.set(null);
         const toast = await this.toastCtrl.create({
@@ -188,7 +188,7 @@ export class IntegrationListComponent implements OnInit, ViewWillEnter {
       buttons: [
         { text: 'Cancel', role: 'cancel' },
         { text: 'Delete', role: 'destructive', handler: () => {
-          this.service.delete(item.id).subscribe(() => {
+          this.service.delete(item.public_id).subscribe(() => {
             this.allItems.update((list) => list.filter((i) => i.id !== item.id));
             this.items.update((list) => list.filter((i) => i.id !== item.id));
           });

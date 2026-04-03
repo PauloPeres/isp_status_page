@@ -119,7 +119,7 @@ interface Check {
         <ion-buttons slot="end">
           @if (detail()?.monitor) {
             <ion-button
-              [routerLink]="['/monitors', detail()!.monitor.id, 'edit']"
+              [routerLink]="['/monitors', detail()!.monitor.public_id, 'edit']"
             >
               <ion-icon slot="icon-only" name="create-outline"></ion-icon>
             </ion-button>
@@ -257,7 +257,7 @@ interface Check {
           <ion-card>
             <ion-card-content style="text-align: center; color: var(--ion-color-medium); padding: 16px">
               <p>No notification policy assigned</p>
-              <ion-button fill="outline" size="small" [routerLink]="['/monitors', detail()!.monitor.id, 'edit']">
+              <ion-button fill="outline" size="small" [routerLink]="['/monitors', detail()!.monitor.public_id, 'edit']">
                 Add Notifications
               </ion-button>
             </ion-card-content>
@@ -627,7 +627,7 @@ export class MonitorDetailComponent implements OnInit, ViewWillEnter {
   loading = signal(true);
   error = signal(false);
 
-  private monitorId = 0;
+  private monitorId = '';
 
   recentChecks = computed(() => this.checks().slice(0, 20));
 
@@ -639,7 +639,7 @@ export class MonitorDetailComponent implements OnInit, ViewWillEnter {
   ) {}
 
   ngOnInit(): void {
-    this.monitorId = Number(this.route.snapshot.paramMap.get('id'));
+    this.monitorId = this.route.snapshot.paramMap.get('id') ?? '';
   }
 
   ionViewWillEnter(): void {
@@ -759,7 +759,7 @@ export class MonitorDetailComponent implements OnInit, ViewWillEnter {
           text: 'Delete',
           role: 'destructive',
           handler: () => {
-            this.monitorService.deleteMonitor(monitor.id).subscribe(() => {
+            this.monitorService.deleteMonitor(monitor.public_id).subscribe(() => {
               this.router.navigate(['/monitors']);
             });
           },

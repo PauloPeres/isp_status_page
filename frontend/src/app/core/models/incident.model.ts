@@ -3,6 +3,7 @@ export type IncidentStatus = 'investigating' | 'identified' | 'monitoring' | 're
 
 export interface Incident {
   id: number;
+  public_id: string;
   monitor_id: number;
   title: string;
   description?: string;
@@ -22,6 +23,7 @@ export interface Incident {
 
 export interface IncidentTimelineEntry {
   id: number;
+  public_id: string;
   incident_id: number;
   type: string;
   status?: IncidentStatus;

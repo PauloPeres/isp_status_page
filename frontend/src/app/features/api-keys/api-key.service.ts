@@ -5,6 +5,7 @@ import { map } from 'rxjs/operators';
 
 export interface ApiKey {
   id: number;
+  public_id: string;
   name: string;
   prefix: string;
   permissions: string[];
@@ -15,6 +16,7 @@ export interface ApiKey {
 
 export interface ApiKeyCreateResponse {
   id: number;
+  public_id: string;
   name: string;
   key: string;
   prefix: string;
@@ -54,7 +56,7 @@ export class ApiKeyService {
     return this.api.post<ApiKeyCreateResponse>('/api-keys', data);
   }
 
-  delete(id: number): Observable<void> {
+  delete(id: string): Observable<void> {
     return this.api.delete<void>(`/api-keys/${id}`);
   }
 }

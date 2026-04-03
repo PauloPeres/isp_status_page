@@ -58,7 +58,7 @@ addIcons({ globeOutline, copyOutline, openOutline });
       <ion-list>
         @for (item of items(); track item.id) {
           <ion-item-sliding>
-            <ion-item [routerLink]="['/status-pages', item.id, 'edit']" detail>
+            <ion-item [routerLink]="['/status-pages', item.public_id, 'edit']" detail>
               <ion-label>
                 <h2 style="font-weight: 600">{{ item.name }}</h2>
                 <p style="font-size: 0.75rem; margin: 4px 0 2px">
@@ -89,7 +89,7 @@ addIcons({ globeOutline, copyOutline, openOutline });
 
             <ion-item-options side="end">
               <ion-item-option color="tertiary" (click)="viewPublicPage(item)">View</ion-item-option>
-              <ion-item-option color="primary" [routerLink]="['/status-pages', item.id, 'edit']">Edit</ion-item-option>
+              <ion-item-option color="primary" [routerLink]="['/status-pages', item.public_id, 'edit']">Edit</ion-item-option>
               <ion-item-option color="danger" (click)="onDelete(item)">Delete</ion-item-option>
             </ion-item-options>
           </ion-item-sliding>
@@ -185,7 +185,7 @@ export class StatusPageListComponent implements OnInit, ViewWillEnter {
       buttons: [
         { text: 'Cancel', role: 'cancel' },
         { text: 'Delete', role: 'destructive', handler: () => {
-          this.service.delete(item.id).subscribe(() => {
+          this.service.delete(item.public_id).subscribe(() => {
             this.allItems.update((list) => list.filter((i) => i.id !== item.id));
             this.items.update((list) => list.filter((i) => i.id !== item.id));
           });

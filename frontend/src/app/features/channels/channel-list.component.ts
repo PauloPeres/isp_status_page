@@ -58,7 +58,7 @@ addIcons({ megaphoneOutline });
       <ion-list>
         @for (item of items(); track item.id) {
           <ion-item-sliding>
-            <ion-item [routerLink]="['/channels', item.id, 'edit']" detail>
+            <ion-item [routerLink]="['/channels', item.public_id, 'edit']" detail>
               <ion-label>
                 <h2>{{ item.name }}</h2>
                 <p>
@@ -80,7 +80,7 @@ addIcons({ megaphoneOutline });
             </ion-item>
 
             <ion-item-options side="end">
-              <ion-item-option color="primary" [routerLink]="['/channels', item.id, 'edit']">Edit</ion-item-option>
+              <ion-item-option color="primary" [routerLink]="['/channels', item.public_id, 'edit']">Edit</ion-item-option>
               <ion-item-option color="danger" (click)="onDelete(item)">Delete</ion-item-option>
             </ion-item-options>
           </ion-item-sliding>
@@ -161,7 +161,7 @@ export class ChannelListComponent implements OnInit, ViewWillEnter {
     event.stopPropagation();
     event.preventDefault();
     this.testing.set(item.id);
-    this.service.test(item.id).subscribe({
+    this.service.test(item.public_id).subscribe({
       next: async (res) => {
         this.testing.set(null);
         const toast = await this.toastCtrl.create({
@@ -188,7 +188,7 @@ export class ChannelListComponent implements OnInit, ViewWillEnter {
       buttons: [
         { text: 'Cancel', role: 'cancel' },
         { text: 'Delete', role: 'destructive', handler: () => {
-          this.service.delete(item.id).subscribe(() => {
+          this.service.delete(item.public_id).subscribe(() => {
             this.allItems.update((list) => list.filter((i) => i.id !== item.id));
             this.items.update((list) => list.filter((i) => i.id !== item.id));
           });

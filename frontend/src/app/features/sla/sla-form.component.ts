@@ -85,7 +85,7 @@ export class SlaFormComponent implements OnInit {
   saving = signal(false);
   monitors = signal<any[]>([]);
   form: FormGroup;
-  private slaId: number | null = null;
+  private slaId: string | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -108,7 +108,7 @@ export class SlaFormComponent implements OnInit {
 
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
-      this.slaId = Number(idParam);
+      this.slaId = idParam;
       this.isEdit.set(true);
       this.service.get(this.slaId).subscribe((sla) => {
         this.form.patchValue({

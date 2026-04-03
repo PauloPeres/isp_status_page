@@ -131,7 +131,7 @@ addIcons({ warningOutline, checkmarkCircleOutline });
         @for (incident of incidents(); track incident.id) {
           <ion-item-sliding>
             <ion-item
-              [routerLink]="['/incidents', incident.id]"
+              [routerLink]="['/incidents', incident.public_id]"
               detail
             >
               <div slot="start" class="severity-indicator">
@@ -383,7 +383,7 @@ export class IncidentListComponent implements OnInit, ViewWillEnter {
   }
 
   onAcknowledge(incident: Incident): void {
-    this.incidentService.acknowledgeIncident(incident.id).subscribe({
+    this.incidentService.acknowledgeIncident(incident.public_id).subscribe({
       next: async () => {
         this.incidents.update((list) =>
           list.map((i) =>

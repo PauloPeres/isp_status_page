@@ -58,7 +58,7 @@ addIcons({ calendarOutline, sendOutline });
       <ion-list>
         @for (item of items(); track item.id) {
           <ion-item-sliding>
-            <ion-item [routerLink]="['/scheduled-reports', item.id, 'edit']" detail>
+            <ion-item [routerLink]="['/scheduled-reports', item.public_id, 'edit']" detail>
               <ion-label>
                 <h2>{{ item.name }}</h2>
                 <p>
@@ -84,7 +84,7 @@ addIcons({ calendarOutline, sendOutline });
             </ion-item>
 
             <ion-item-options side="end">
-              <ion-item-option color="primary" [routerLink]="['/scheduled-reports', item.id, 'edit']">Edit</ion-item-option>
+              <ion-item-option color="primary" [routerLink]="['/scheduled-reports', item.public_id, 'edit']">Edit</ion-item-option>
               <ion-item-option color="danger" (click)="onDelete(item)">Delete</ion-item-option>
             </ion-item-options>
           </ion-item-sliding>
@@ -162,7 +162,7 @@ export class ScheduledReportListComponent implements OnInit, ViewWillEnter {
 
   onSendNow(item: ScheduledReport): void {
     this.sending.set(item.id);
-    this.service.sendNow(item.id).subscribe({
+    this.service.sendNow(item.public_id).subscribe({
       next: async (res) => {
         this.sending.set(null);
         const toast = await this.toastCtrl.create({
@@ -189,7 +189,7 @@ export class ScheduledReportListComponent implements OnInit, ViewWillEnter {
       buttons: [
         { text: 'Cancel', role: 'cancel' },
         { text: 'Delete', role: 'destructive', handler: () => {
-          this.service.delete(item.id).subscribe(() => {
+          this.service.delete(item.public_id).subscribe(() => {
             this.allItems.update((list) => list.filter((i) => i.id !== item.id));
             this.items.update((list) => list.filter((i) => i.id !== item.id));
           });

@@ -7,6 +7,7 @@ import { environment } from '../../../environments/environment';
 
 export interface Sla {
   id: number;
+  public_id: string;
   name: string;
   monitor_id: number;
   monitor_name?: string;
@@ -35,7 +36,7 @@ export class SlaService {
     );
   }
 
-  get(id: number): Observable<Sla> {
+  get(id: string): Observable<Sla> {
     return this.api.get<any>(`/sla/${id}`).pipe(
       map(data => data.sla || data)
     );
@@ -45,22 +46,22 @@ export class SlaService {
     return this.api.post<Sla>('/sla', data);
   }
 
-  update(id: number, data: Partial<Sla>): Observable<Sla> {
+  update(id: string, data: Partial<Sla>): Observable<Sla> {
     return this.api.put<Sla>(`/sla/${id}`, data);
   }
 
-  delete(id: number): Observable<void> {
+  delete(id: string): Observable<void> {
     return this.api.delete<void>(`/sla/${id}`);
   }
 
-  getReport(id: number, params?: any): Observable<any> {
+  getReport(id: string, params?: any): Observable<any> {
     return this.api.get(`/sla/${id}/report`, params);
   }
 
   /**
    * Download SLA report as PDF or CSV blob (bypasses JSON ApiService).
    */
-  exportReport(id: number, format: 'pdf' | 'csv' = 'pdf'): Observable<Blob> {
+  exportReport(id: string, format: 'pdf' | 'csv' = 'pdf'): Observable<Blob> {
     const params = new HttpParams().set('format', format);
     return this.http.get(`${environment.apiUrl}/sla/${id}/export`, {
       params,

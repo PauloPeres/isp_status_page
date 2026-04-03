@@ -5,6 +5,7 @@ import { map } from 'rxjs/operators';
 
 export interface Subscriber {
   id: number;
+  public_id: string;
   email: string;
   verified: boolean;
   verified_at?: string;
@@ -25,7 +26,7 @@ export class SubscriberService {
     );
   }
 
-  delete(id: number): Observable<void> {
+  delete(id: string): Observable<void> {
     return this.api.delete<void>(`/subscribers/${id}`);
   }
 }

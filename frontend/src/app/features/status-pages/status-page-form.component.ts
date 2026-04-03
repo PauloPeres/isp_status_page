@@ -240,7 +240,7 @@ export class StatusPageFormComponent implements OnInit {
   saving = false;
   submitted = false;
   isEdit = false;
-  editId: number | null = null;
+  editId: string | null = null;
   loadingData = false;
   loadingMonitors = false;
   monitors: MonitorOption[] = [];
@@ -260,7 +260,7 @@ export class StatusPageFormComponent implements OnInit {
 
     if (idParam) {
       this.isEdit = true;
-      this.editId = +idParam;
+      this.editId = idParam;
       this.autoSlug = false;
       this.loadingData = true;
 

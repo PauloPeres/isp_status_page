@@ -433,7 +433,7 @@ export class IncidentDetailComponent implements OnInit, ViewWillEnter {
   updateMessage = '';
   updatePublic = true;
 
-  private incidentId = 0;
+  private incidentId = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -442,7 +442,7 @@ export class IncidentDetailComponent implements OnInit, ViewWillEnter {
   ) {}
 
   ngOnInit(): void {
-    this.incidentId = Number(this.route.snapshot.paramMap.get('id'));
+    this.incidentId = this.route.snapshot.paramMap.get('id') ?? '';
     this.loadData();
   }
 

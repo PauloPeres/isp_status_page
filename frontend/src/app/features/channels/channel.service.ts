@@ -5,6 +5,7 @@ import { map } from 'rxjs/operators';
 
 export interface NotificationChannel {
   id: number;
+  public_id: string;
   name: string;
   type: string;
   configuration: any;
@@ -25,7 +26,7 @@ export class ChannelService {
     );
   }
 
-  get(id: number): Observable<NotificationChannel> {
+  get(id: string): Observable<NotificationChannel> {
     return this.api.get<any>(`/notification-channels/${id}`).pipe(
       map(data => data.notification_channel || data)
     );
@@ -35,15 +36,15 @@ export class ChannelService {
     return this.api.post<NotificationChannel>('/notification-channels', data);
   }
 
-  update(id: number, data: Partial<NotificationChannel>): Observable<NotificationChannel> {
+  update(id: string, data: Partial<NotificationChannel>): Observable<NotificationChannel> {
     return this.api.put<NotificationChannel>(`/notification-channels/${id}`, data);
   }
 
-  delete(id: number): Observable<void> {
+  delete(id: string): Observable<void> {
     return this.api.delete<void>(`/notification-channels/${id}`);
   }
 
-  test(id: number): Observable<{ success: boolean; message: string }> {
+  test(id: string): Observable<{ success: boolean; message: string }> {
     return this.api.post<{ success: boolean; message: string }>(`/notification-channels/${id}/test`);
   }
 }

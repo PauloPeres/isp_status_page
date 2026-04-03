@@ -15,6 +15,7 @@ export interface NotificationPolicyStep {
 
 export interface NotificationPolicy {
   id: number;
+  public_id: string;
   name: string;
   description: string;
   trigger_type: string;
@@ -40,7 +41,7 @@ export class NotificationPolicyService {
     );
   }
 
-  get(id: number): Observable<NotificationPolicy> {
+  get(id: string): Observable<NotificationPolicy> {
     return this.api.get<any>(`/notification-policies/${id}`).pipe(
       map(data => data.notification_policy || data)
     );
@@ -50,11 +51,11 @@ export class NotificationPolicyService {
     return this.api.post<NotificationPolicy>('/notification-policies', data);
   }
 
-  update(id: number, data: Partial<NotificationPolicy>): Observable<NotificationPolicy> {
+  update(id: string, data: Partial<NotificationPolicy>): Observable<NotificationPolicy> {
     return this.api.put<NotificationPolicy>(`/notification-policies/${id}`, data);
   }
 
-  delete(id: number): Observable<void> {
+  delete(id: string): Observable<void> {
     return this.api.delete<void>(`/notification-policies/${id}`);
   }
 }

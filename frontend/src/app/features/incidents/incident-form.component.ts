@@ -176,7 +176,7 @@ export class IncidentFormComponent {
 
     this.incidentService.createIncident(this.form as any).subscribe({
       next: (incident) => {
-        this.router.navigate(['/incidents', incident.id]);
+        this.router.navigate(['/incidents', incident.public_id]);
       },
       error: async (err: any) => {
         const toast = await this.toastCtrl.create({

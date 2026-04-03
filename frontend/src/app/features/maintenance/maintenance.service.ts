@@ -5,6 +5,7 @@ import { map } from 'rxjs/operators';
 
 export interface MaintenanceWindow {
   id: number;
+  public_id: string;
   title: string;
   description: string;
   status: 'scheduled' | 'in_progress' | 'completed' | 'cancelled';
@@ -37,7 +38,7 @@ export class MaintenanceService {
     );
   }
 
-  get(id: number): Observable<MaintenanceWindow> {
+  get(id: string): Observable<MaintenanceWindow> {
     return this.api.get<any>(`/maintenance-windows/${id}`).pipe(
       map(data => data.maintenance_window || data)
     );
@@ -47,11 +48,11 @@ export class MaintenanceService {
     return this.api.post<MaintenanceWindow>('/maintenance-windows', data);
   }
 
-  update(id: number, data: any): Observable<MaintenanceWindow> {
+  update(id: string, data: any): Observable<MaintenanceWindow> {
     return this.api.put<MaintenanceWindow>(`/maintenance-windows/${id}`, data);
   }
 
-  delete(id: number): Observable<void> {
+  delete(id: string): Observable<void> {
     return this.api.delete<void>(`/maintenance-windows/${id}`);
   }
 }

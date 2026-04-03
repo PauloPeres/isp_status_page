@@ -117,7 +117,7 @@ addIcons({ pulseOutline });
       <ion-list>
         @for (monitor of monitors(); track monitor.id) {
           <ion-item-sliding>
-            <ion-item [routerLink]="['/monitors', monitor.id]" detail class="monitor-item">
+            <ion-item [routerLink]="['/monitors', monitor.public_id]" detail class="monitor-item">
               <div slot="start" class="status-dot" [style.background]="getStatusDotColor(monitor.status)"></div>
               <ion-label>
                 <div class="monitor-header">
@@ -378,7 +378,7 @@ export class MonitorListComponent implements ViewWillEnter {
   }
 
   onPause(monitor: Monitor): void {
-    this.monitorService.pauseMonitor(monitor.id).subscribe(() => {
+    this.monitorService.pauseMonitor(monitor.public_id).subscribe(() => {
       this.monitors.update((list) =>
         list.map((m) => (m.id === monitor.id ? { ...m, active: false } : m)),
       );
@@ -386,7 +386,7 @@ export class MonitorListComponent implements ViewWillEnter {
   }
 
   onResume(monitor: Monitor): void {
-    this.monitorService.resumeMonitor(monitor.id).subscribe(() => {
+    this.monitorService.resumeMonitor(monitor.public_id).subscribe(() => {
       this.monitors.update((list) =>
         list.map((m) => (m.id === monitor.id ? { ...m, active: true } : m)),
       );
@@ -403,7 +403,7 @@ export class MonitorListComponent implements ViewWillEnter {
           text: 'Delete',
           role: 'destructive',
           handler: () => {
-            this.monitorService.deleteMonitor(monitor.id).subscribe(() => {
+            this.monitorService.deleteMonitor(monitor.public_id).subscribe(() => {
               this.monitors.update((list) =>
                 list.filter((m) => m.id !== monitor.id),
               );

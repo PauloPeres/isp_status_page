@@ -5,6 +5,7 @@ import { map } from 'rxjs/operators';
 
 export interface StatusPage {
   id: number;
+  public_id: string;
   name: string;
   slug: string;
   custom_domain: string | null;
@@ -27,7 +28,7 @@ export class StatusPageService {
     );
   }
 
-  get(id: number): Observable<StatusPage> {
+  get(id: string): Observable<StatusPage> {
     return this.api.get<any>(`/status-pages/${id}`).pipe(
       map(data => data.status_page || data)
     );
@@ -37,11 +38,11 @@ export class StatusPageService {
     return this.api.post<StatusPage>('/status-pages', data);
   }
 
-  update(id: number, data: Partial<StatusPage>): Observable<StatusPage> {
+  update(id: string, data: Partial<StatusPage>): Observable<StatusPage> {
     return this.api.put<StatusPage>(`/status-pages/${id}`, data);
   }
 
-  delete(id: number): Observable<void> {
+  delete(id: string): Observable<void> {
     return this.api.delete<void>(`/status-pages/${id}`);
   }
 }

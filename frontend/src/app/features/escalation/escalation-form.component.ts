@@ -126,7 +126,7 @@ export class EscalationFormComponent implements OnInit {
   isEdit = signal(false);
   saving = signal(false);
   form: FormGroup;
-  private policyId: number | null = null;
+  private policyId: string | null = null;
 
   get stepsArray(): FormArray {
     return this.form.get('steps') as FormArray;
@@ -150,7 +150,7 @@ export class EscalationFormComponent implements OnInit {
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
-      this.policyId = Number(idParam);
+      this.policyId = idParam;
       this.isEdit.set(true);
       this.service.get(this.policyId).subscribe((policy) => {
         this.form.patchValue({ name: policy.name, description: policy.description, active: policy.active });

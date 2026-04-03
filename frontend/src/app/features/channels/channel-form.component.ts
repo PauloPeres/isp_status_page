@@ -217,7 +217,7 @@ export class ChannelFormComponent implements OnInit {
   form: FormGroup;
   configValues: Record<string, any> = {};
   chipValues: Record<string, string[]> = {};
-  private channelId: number | null = null;
+  private channelId: string | null = null;
 
   channelTypes = [
     { value: 'email', label: 'Email' },
@@ -256,7 +256,7 @@ export class ChannelFormComponent implements OnInit {
 
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
-      this.channelId = Number(idParam);
+      this.channelId = idParam;
       this.isEdit.set(true);
       this.loadingData.set(true);
       this.service.get(this.channelId).subscribe({

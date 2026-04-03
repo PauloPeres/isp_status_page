@@ -66,7 +66,7 @@ addIcons({ ribbonOutline, shieldCheckmarkOutline, warningOutline, alertCircleOut
       <ion-list>
         @for (item of items(); track item.id) {
           <ion-item-sliding>
-            <ion-item [routerLink]="['/sla', item.id]" detail class="sla-list-item">
+            <ion-item [routerLink]="['/sla', item.public_id]" detail class="sla-list-item">
               <div class="sla-row">
                 <div class="sla-row-main">
                   <div class="sla-row-top">
@@ -124,7 +124,7 @@ addIcons({ ribbonOutline, shieldCheckmarkOutline, warningOutline, alertCircleOut
             </ion-item>
 
             <ion-item-options side="end">
-              <ion-item-option color="primary" [routerLink]="['/sla', item.id, 'edit']">Edit</ion-item-option>
+              <ion-item-option color="primary" [routerLink]="['/sla', item.public_id, 'edit']">Edit</ion-item-option>
               <ion-item-option color="danger" (click)="onDelete(item)">Delete</ion-item-option>
             </ion-item-options>
           </ion-item-sliding>
@@ -371,7 +371,7 @@ export class SlaListComponent implements OnInit, ViewWillEnter {
       buttons: [
         { text: 'Cancel', role: 'cancel' },
         { text: 'Delete', role: 'destructive', handler: () => {
-          this.service.delete(item.id).subscribe(() => {
+          this.service.delete(item.public_id).subscribe(() => {
             this.allItems.update((list) => list.filter((i) => i.id !== item.id));
             this.items.update((list) => list.filter((i) => i.id !== item.id));
           });

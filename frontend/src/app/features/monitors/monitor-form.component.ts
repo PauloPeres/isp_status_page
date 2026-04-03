@@ -481,7 +481,7 @@ export class MonitorFormComponent implements OnInit {
 
   form: FormGroup;
 
-  private monitorId: number | null = null;
+  private monitorId: string | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -532,7 +532,7 @@ export class MonitorFormComponent implements OnInit {
 
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
-      this.monitorId = Number(idParam);
+      this.monitorId = idParam;
       this.isEdit.set(true);
       this.advancedMode.set(true);
       this.loadMonitor();

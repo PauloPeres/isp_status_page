@@ -5,6 +5,7 @@ import { map } from 'rxjs/operators';
 
 export interface ScheduledReport {
   id: number;
+  public_id: string;
   name: string;
   report_type: string;
   frequency: 'daily' | 'weekly' | 'monthly';
@@ -30,7 +31,7 @@ export class ScheduledReportService {
     );
   }
 
-  get(id: number): Observable<ScheduledReport> {
+  get(id: string): Observable<ScheduledReport> {
     return this.api.get<any>(`/scheduled-reports/${id}`).pipe(
       map(data => data.scheduled_report || data)
     );
@@ -40,19 +41,19 @@ export class ScheduledReportService {
     return this.api.post<ScheduledReport>('/scheduled-reports', data);
   }
 
-  update(id: number, data: any): Observable<ScheduledReport> {
+  update(id: string, data: any): Observable<ScheduledReport> {
     return this.api.put<ScheduledReport>(`/scheduled-reports/${id}`, data);
   }
 
-  delete(id: number): Observable<void> {
+  delete(id: string): Observable<void> {
     return this.api.delete<void>(`/scheduled-reports/${id}`);
   }
 
-  sendNow(id: number): Observable<{ success: boolean; message: string }> {
+  sendNow(id: string): Observable<{ success: boolean; message: string }> {
     return this.api.post<{ success: boolean; message: string }>(`/scheduled-reports/${id}/send-now`);
   }
 
-  preview(id: number): Observable<any> {
+  preview(id: string): Observable<any> {
     return this.api.get(`/scheduled-reports/${id}/preview`);
   }
 }

@@ -5,6 +5,7 @@ import { map } from 'rxjs/operators';
 
 export interface Integration {
   id: number;
+  public_id: string;
   name: string;
   type: string;
   configuration: any;
@@ -28,7 +29,7 @@ export class IntegrationService {
     );
   }
 
-  get(id: number): Observable<Integration> {
+  get(id: string): Observable<Integration> {
     return this.api.get<any>(`/integrations/${id}`).pipe(
       map(data => data.integration || data)
     );
@@ -38,15 +39,15 @@ export class IntegrationService {
     return this.api.post<Integration>('/integrations', data);
   }
 
-  update(id: number, data: Partial<Integration>): Observable<Integration> {
+  update(id: string, data: Partial<Integration>): Observable<Integration> {
     return this.api.put<Integration>(`/integrations/${id}`, data);
   }
 
-  delete(id: number): Observable<void> {
+  delete(id: string): Observable<void> {
     return this.api.delete<void>(`/integrations/${id}`);
   }
 
-  testConnection(id: number): Observable<{ success: boolean; message: string }> {
+  testConnection(id: string): Observable<{ success: boolean; message: string }> {
     return this.api.post<{ success: boolean; message: string }>(`/integrations/${id}/test`);
   }
 }
