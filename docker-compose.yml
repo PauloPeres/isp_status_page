@@ -85,6 +85,37 @@ services:
       retries: 10
       start_period: 5s
 
+  # Queue Worker: Notifications (processes async alert/escalation jobs)
+  worker-notifications:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: isp-status-worker-notifications
+    volumes:
+      - ./src:/var/www/html
+      - ./src/logs:/var/www/html/logs
+    environment:
+      - APP_NAME=ISP Status Page
+      - APP_URL=${APP_URL:-http://localhost:8765}
+      - APP_DEBUG=${APP_DEBUG:-false}
+      - SECURITY_SALT=${SECURITY_SALT:-change-me-in-production}
+      - DATABASE_URL=postgres://isp:${POSTGRES_PASSWORD:-isp_secret}@postgres:5432/isp_status
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-redis_secret}@redis:6379
+      - CACHE_DRIVER=redis
+      - SESSION_DRIVER=redis
+    command: ["sh", "-c", "cd /var/www/html && bin/cake queue worker --config notifications --verbose"]
+    cap_add:
+      - NET_RAW
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - isp-status-network
+
 networks:
   isp-status-network:
     driver: bridge

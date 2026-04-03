@@ -3,12 +3,16 @@ declare(strict_types=1);
 
 namespace App\Command;
 
+use App\Job\WebhookDeliveryJob;
 use App\Service\WebhookDeliveryService;
 use Cake\Command\Command;
 use Cake\Console\Arguments;
 use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
+use Cake\Core\Configure;
+use Cake\Log\Log;
 use Cake\ORM\Locator\LocatorAwareTrait;
+use Cake\Queue\QueueManager;
 
 /**
  * WebhookRetryCommand (C-04)
@@ -90,9 +94,35 @@ class WebhookRetryCommand extends Command
         $success = 0;
         $failed = 0;
         $exhausted = 0;
+        $useQueue = !empty(Configure::read('Queue.default'));
+
+        if ($useQueue) {
+            $io->verbose('Queue mode: pushing WebhookDeliveryJobs to default queue');
+        }
 
         foreach ($pending as $delivery) {
             try {
+                // When queue is available, push a WebhookDeliveryJob instead of retrying inline
+                if ($useQueue) {
+                    try {
+                        QueueManager::push(WebhookDeliveryJob::class, [
+                            'data' => [
+                                'delivery_id' => $delivery->id,
+                                'attempt' => $delivery->attempts + 1,
+                            ],
+                        ], ['config' => 'default']);
+
+                        $success++;
+                        $io->verbose("  → Queued WebhookDeliveryJob for #{$delivery->id} ({$delivery->event_type})");
+                        Log::debug("WebhookRetry: Queued WebhookDeliveryJob for delivery #{$delivery->id}");
+
+                        continue;
+                    } catch (\Exception $e) {
+                        Log::warning("WebhookRetry: Failed to queue WebhookDeliveryJob for #{$delivery->id}, falling back to sync: {$e->getMessage()}");
+                    }
+                }
+
+                // Synchronous fallback
                 $result = $service->deliver($delivery->id);
 
                 if ($result) {
@@ -116,7 +146,7 @@ class WebhookRetryCommand extends Command
         }
 
         $io->out('');
-        $io->out("Results: {$success} delivered, {$failed} rescheduled, {$exhausted} exhausted");
+        $io->out("Results: {$success} delivered/queued, {$failed} rescheduled, {$exhausted} exhausted");
 
         return self::CODE_SUCCESS;
     }

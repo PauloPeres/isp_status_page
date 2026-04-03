@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Command;
 
+use App\Job\NotificationJob;
 use App\Service\Alert\AlertService;
 use App\Service\Alert\DiscordAlertChannel;
 use App\Service\Alert\EmailAlertChannel;
@@ -27,8 +28,10 @@ use Cake\Command\Command;
 use Cake\Console\Arguments;
 use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
+use Cake\Core\Configure;
 use Cake\I18n\DateTime;
 use Cake\Log\Log;
+use Cake\Queue\QueueManager;
 
 /**
  * Monitor Check Command
@@ -353,13 +356,13 @@ class MonitorCheckCommand extends Command
 
                 if ($incident !== null) {
                     // New incident created - dispatch alerts
-                    $this->alertService->dispatch($monitor, $incident);
+                    $this->dispatchAlertOrQueue($monitor, $incident);
                     Log::info("Incident created and alerts dispatched for monitor {$monitor->id}");
                 } else {
                     // Incident already exists - check if we should still alert
                     $existingIncident = $this->incidentService->getActiveIncidentForMonitor($monitor->id);
                     if ($existingIncident !== null && $oldStatus !== $newStatus) {
-                        $this->alertService->dispatch($monitor, $existingIncident);
+                        $this->dispatchAlertOrQueue($monitor, $existingIncident);
                     }
                 }
             } elseif ($newStatus === 'up' && ($oldStatus === 'down' || $oldStatus === 'degraded')) {
@@ -375,13 +378,50 @@ class MonitorCheckCommand extends Command
                     $incidentsTable = $this->fetchTable('Incidents');
                     $resolvedIncident = $incidentsTable->get($activeIncident->id);
 
-                    $this->alertService->dispatch($monitor, $resolvedIncident);
+                    $this->dispatchAlertOrQueue($monitor, $resolvedIncident);
                     Log::info("Incident resolved and recovery alerts dispatched for monitor {$monitor->id}");
                 }
             }
         } catch (\Exception $e) {
             Log::error("Failed to handle incidents/alerts for monitor {$monitor->id}: {$e->getMessage()}");
         }
+    }
+
+    /**
+     * Dispatch alert via queue (async) or fall back to synchronous AlertService.
+     *
+     * When the 'notifications' queue config is present, pushes a NotificationJob
+     * to the queue for async processing. Otherwise, calls AlertService::dispatch()
+     * synchronously for backward compatibility.
+     *
+     * @param \App\Model\Entity\Monitor $monitor The monitor entity
+     * @param \App\Model\Entity\Incident $incident The incident entity
+     * @return void
+     */
+    protected function dispatchAlertOrQueue($monitor, $incident): void
+    {
+        $useQueue = !empty(Configure::read('Queue.notifications'));
+
+        if ($useQueue) {
+            try {
+                QueueManager::push(NotificationJob::class, [
+                    'data' => [
+                        'monitor_id' => $monitor->id,
+                        'incident_id' => $incident->id,
+                        'organization_id' => $monitor->organization_id,
+                    ],
+                ], ['config' => 'notifications']);
+
+                Log::debug("Queued NotificationJob for monitor {$monitor->id}, incident {$incident->id}");
+
+                return;
+            } catch (\Exception $e) {
+                Log::warning("Failed to push NotificationJob to queue, falling back to sync: {$e->getMessage()}");
+            }
+        }
+
+        // Fallback: synchronous dispatch
+        $this->alertService->dispatch($monitor, $incident);
     }
 
     /**

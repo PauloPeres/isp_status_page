@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Job;
 
+use App\Job\NotificationJob;
 use App\Service\Alert\AlertService;
 use App\Service\Alert\DiscordAlertChannel;
 use App\Service\Alert\EmailAlertChannel;
@@ -24,11 +25,13 @@ use App\Service\Check\SslCertChecker;
 use App\Service\IncidentService;
 use App\Service\MonitorCacheService;
 use App\Service\RedisLockService;
+use Cake\Core\Configure;
 use Cake\I18n\DateTime;
 use Cake\Log\Log;
 use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\Queue\Job\JobInterface;
 use Cake\Queue\Job\Message;
+use Cake\Queue\QueueManager;
 use Interop\Queue\Processor;
 
 /**
@@ -235,16 +238,6 @@ class MonitorCheckJob implements JobInterface
     {
         try {
             $incidentService = new IncidentService();
-            $alertService = new AlertService();
-            $alertService->registerChannel(new EmailAlertChannel());
-            $alertService->registerChannel(new SlackAlertChannel());
-            $alertService->registerChannel(new DiscordAlertChannel());
-            $alertService->registerChannel(new TelegramAlertChannel());
-            $alertService->registerChannel(new WebhookAlertChannel());
-            $alertService->registerChannel(new SmsAlertChannel());
-            $alertService->registerChannel(new WhatsAppAlertChannel());
-            $alertService->registerChannel(new PagerDutyAlertChannel());
-            $alertService->registerChannel(new OpsGenieAlertChannel());
 
             $newStatus = $checkResult['status'];
 
@@ -252,12 +245,12 @@ class MonitorCheckJob implements JobInterface
                 $incident = $incidentService->createIncident($monitor);
 
                 if ($incident !== null) {
-                    $alertService->dispatch($monitor, $incident);
+                    $this->dispatchAlertOrQueue($monitor, $incident);
                     Log::info("MonitorCheckJob: Incident created and alerts dispatched for monitor {$monitor->id}");
                 } else {
                     $existingIncident = $incidentService->getActiveIncidentForMonitor($monitor->id);
                     if ($existingIncident !== null && $oldStatus !== $newStatus) {
-                        $alertService->dispatch($monitor, $existingIncident);
+                        $this->dispatchAlertOrQueue($monitor, $existingIncident);
                     }
                 }
             } elseif ($newStatus === 'up' && ($oldStatus === 'down' || $oldStatus === 'degraded')) {
@@ -267,12 +260,56 @@ class MonitorCheckJob implements JobInterface
                 if ($activeIncident !== null) {
                     $incidentsTable = $this->fetchTable('Incidents');
                     $resolvedIncident = $incidentsTable->get($activeIncident->id);
-                    $alertService->dispatch($monitor, $resolvedIncident);
+                    $this->dispatchAlertOrQueue($monitor, $resolvedIncident);
                     Log::info("MonitorCheckJob: Incident resolved and recovery alerts dispatched for monitor {$monitor->id}");
                 }
             }
         } catch (\Exception $e) {
             Log::error("MonitorCheckJob: Failed to handle incidents/alerts for monitor {$monitor->id}: {$e->getMessage()}");
         }
+    }
+
+    /**
+     * Dispatch alert via queue (async) or fall back to synchronous AlertService.
+     *
+     * @param \App\Model\Entity\Monitor $monitor The monitor entity
+     * @param \App\Model\Entity\Incident $incident The incident entity
+     * @return void
+     */
+    protected function dispatchAlertOrQueue($monitor, $incident): void
+    {
+        $useQueue = !empty(Configure::read('Queue.notifications'));
+
+        if ($useQueue) {
+            try {
+                QueueManager::push(NotificationJob::class, [
+                    'data' => [
+                        'monitor_id' => $monitor->id,
+                        'incident_id' => $incident->id,
+                        'organization_id' => $monitor->organization_id,
+                    ],
+                ], ['config' => 'notifications']);
+
+                Log::debug("MonitorCheckJob: Queued NotificationJob for monitor {$monitor->id}, incident {$incident->id}");
+
+                return;
+            } catch (\Exception $e) {
+                Log::warning("MonitorCheckJob: Failed to push NotificationJob to queue, falling back to sync: {$e->getMessage()}");
+            }
+        }
+
+        // Fallback: synchronous dispatch
+        $alertService = new AlertService();
+        $alertService->registerChannel(new EmailAlertChannel());
+        $alertService->registerChannel(new SlackAlertChannel());
+        $alertService->registerChannel(new DiscordAlertChannel());
+        $alertService->registerChannel(new TelegramAlertChannel());
+        $alertService->registerChannel(new WebhookAlertChannel());
+        $alertService->registerChannel(new SmsAlertChannel());
+        $alertService->registerChannel(new WhatsAppAlertChannel());
+        $alertService->registerChannel(new PagerDutyAlertChannel());
+        $alertService->registerChannel(new OpsGenieAlertChannel());
+
+        $alertService->dispatch($monitor, $incident);
     }
 }

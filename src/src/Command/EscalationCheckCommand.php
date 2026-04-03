@@ -3,13 +3,16 @@ declare(strict_types=1);
 
 namespace App\Command;
 
+use App\Job\EscalationJob;
 use App\Service\EscalationService;
 use Cake\Command\Command;
 use Cake\Console\Arguments;
 use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
+use Cake\Core\Configure;
 use Cake\Log\Log;
 use Cake\ORM\Locator\LocatorAwareTrait;
+use Cake\Queue\QueueManager;
 
 /**
  * Escalation Check Command
@@ -84,8 +87,12 @@ class EscalationCheckCommand extends Command
             $total = $incidents->count();
             $processed = 0;
             $escalated = 0;
+            $useQueue = !empty(Configure::read('Queue.notifications'));
 
             $io->verbose("Found {$total} unacknowledged incident(s) to check");
+            if ($useQueue) {
+                $io->verbose('Queue mode: pushing EscalationJobs to notifications queue');
+            }
 
             foreach ($incidents as $incident) {
                 $processed++;
@@ -107,6 +114,25 @@ class EscalationCheckCommand extends Command
                     continue;
                 }
 
+                if ($useQueue) {
+                    try {
+                        QueueManager::push(EscalationJob::class, [
+                            'data' => [
+                                'incident_id' => $incident->id,
+                            ],
+                        ], ['config' => 'notifications']);
+
+                        $escalated++;
+                        $io->verbose("Incident #{$incident->id}: queued EscalationJob");
+                        Log::debug("Escalation: Queued EscalationJob for incident #{$incident->id}");
+
+                        continue;
+                    } catch (\Exception $e) {
+                        Log::warning("Escalation: Failed to queue EscalationJob for incident #{$incident->id}, falling back to sync: {$e->getMessage()}");
+                    }
+                }
+
+                // Synchronous fallback
                 $result = $this->escalationService->processEscalation($incident);
 
                 if ($result !== null) {
