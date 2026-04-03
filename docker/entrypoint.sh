@@ -37,6 +37,8 @@ fi
 echo "Running database migrations..."
 if [ -d /var/www/html/config/Migrations ]; then
     bin/cake migrations migrate || echo "Migrations failed"
+    # Clear model cache after migrations to pick up schema changes
+    bin/cake cache clear _cake_model_ 2>/dev/null || true
 else
     echo "No migrations found. Skipping."
 fi
