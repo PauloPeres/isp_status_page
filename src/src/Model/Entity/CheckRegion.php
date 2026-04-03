@@ -32,6 +32,7 @@ class CheckRegion extends Entity
      * @var array<string, bool>
      */
     protected array $_accessible = [
+        'public_id' => true,
         'name' => true,
         'code' => true,
         'endpoint_url' => true,

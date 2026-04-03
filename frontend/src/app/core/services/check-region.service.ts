@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 
 export interface CheckRegion {
   id: number;
+  public_id: string;
   name: string;
   code: string;
   endpoint_url: string | null;

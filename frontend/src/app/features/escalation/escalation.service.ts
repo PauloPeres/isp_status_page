@@ -11,6 +11,7 @@ export interface EscalationStep {
 
 export interface EscalationPolicy {
   id: number;
+  public_id: string;
   name: string;
   description: string;
   steps: EscalationStep[];

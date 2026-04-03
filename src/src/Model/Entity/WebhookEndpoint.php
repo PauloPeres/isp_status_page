@@ -28,6 +28,7 @@ class WebhookEndpoint extends Entity
      * @var array<string, bool>
      */
     protected array $_accessible = [
+        'public_id' => true,
         'organization_id' => true,
         'url' => true,
         'secret' => true,

@@ -34,6 +34,8 @@ class CheckRegionsTable extends Table
         $this->setDisplayField('name');
         $this->setPrimaryKey('id');
 
+        $this->addBehavior('PublicId');
+
         $this->hasMany('MonitorChecks', [
             'foreignKey' => 'region_id',
         ]);

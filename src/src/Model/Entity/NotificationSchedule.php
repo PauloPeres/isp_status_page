@@ -23,6 +23,7 @@ use Cake\ORM\Entity;
 class NotificationSchedule extends Entity
 {
     protected array $_accessible = [
+        'public_id' => true,
         'organization_id' => true,
         'name' => true,
         'channels' => true,

@@ -44,6 +44,7 @@ class SlaDefinitionsTable extends Table
 
         $this->addBehavior('Timestamp');
         $this->addBehavior('TenantScope');
+        $this->addBehavior('PublicId');
 
         $this->belongsTo('Organizations', [
             'foreignKey' => 'organization_id',

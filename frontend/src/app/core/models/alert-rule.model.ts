@@ -3,6 +3,7 @@ export type AlertChannel = 'email' | 'telegram' | 'sms' | 'webhook';
 
 export interface AlertRule {
   id: number;
+  public_id: string;
   name: string;
   monitor_id?: number;
   trigger_type: AlertTriggerType;
