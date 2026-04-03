@@ -263,16 +263,40 @@ export class ApiKeyListComponent implements OnInit, ViewWillEnter {
   }
 
   async onCreate(): Promise<void> {
-    const alert = await this.alertCtrl.create({
+    // Step 1: Get key name
+    const nameAlert = await this.alertCtrl.create({
       header: 'Create API Key',
+      message: 'Enter a name for the new API key.',
       inputs: [
         { name: 'name', type: 'text', placeholder: 'Key name (e.g. CI/CD)' },
       ],
       buttons: [
         { text: 'Cancel', role: 'cancel' },
-        { text: 'Create', handler: (data) => {
+        { text: 'Next', handler: (data) => {
           if (!data.name) return false;
-          this.service.create({ name: data.name, permissions: ['read', 'write'] }).subscribe({
+          this.showPermissionsPicker(data.name);
+          return true;
+        }},
+      ],
+    });
+    await nameAlert.present();
+  }
+
+  private async showPermissionsPicker(keyName: string): Promise<void> {
+    // Step 2: Choose permissions
+    const permAlert = await this.alertCtrl.create({
+      header: 'Permissions',
+      message: `Select permissions for "${keyName}".`,
+      inputs: [
+        { name: 'read', type: 'checkbox', label: 'Read — view monitors, incidents, status', value: 'read', checked: true },
+        { name: 'write', type: 'checkbox', label: 'Write — create and update resources', value: 'write', checked: true },
+        { name: 'admin', type: 'checkbox', label: 'Admin — manage settings and users', value: 'admin', checked: false },
+      ],
+      buttons: [
+        { text: 'Back', role: 'cancel' },
+        { text: 'Create', handler: (selectedPerms: string[]) => {
+          const permissions = selectedPerms && selectedPerms.length > 0 ? selectedPerms : ['read'];
+          this.service.create({ name: keyName, permissions }).subscribe({
             next: (res: ApiKeyCreateResponse) => {
               this.newKey.set(res.key);
               this.load();
@@ -285,7 +309,7 @@ export class ApiKeyListComponent implements OnInit, ViewWillEnter {
         }},
       ],
     });
-    await alert.present();
+    await permAlert.present();
   }
 
   async copyKey(): Promise<void> {

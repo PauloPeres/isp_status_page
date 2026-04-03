@@ -63,19 +63,19 @@ return function (RouteBuilder $routes): void {
         $builder->connect(
             '/incidents/acknowledge/{id}/{token}',
             ['controller' => 'Incidents', 'action' => 'acknowledge'],
-            ['pass' => ['id', 'token'], 'id' => '\d+', 'token' => '[a-f0-9]{64}']
+            ['pass' => ['id', 'token'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+', 'token' => '[a-f0-9]{64}']
         );
         // Admin: authenticated acknowledge
         $builder->connect(
             '/incidents/{id}/acknowledge-admin',
             ['controller' => 'Incidents', 'action' => 'acknowledgeAdmin'],
-            ['pass' => ['id'], 'id' => '\d+']
+            ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']
         );
         // Incident timeline update
         $builder->connect(
             '/incidents/{id}/update',
             ['controller' => 'Incidents', 'action' => 'addUpdate'],
-            ['pass' => ['id'], 'id' => '\d+']
+            ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']
         );
 
         /*
@@ -295,7 +295,7 @@ return function (RouteBuilder $routes): void {
         $builder->connect(
             '/invitations/revoke/{id}',
             ['controller' => 'Invitations', 'action' => 'revoke'],
-            ['pass' => ['id'], 'id' => '\d+']
+            ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']
         );
 
         /*
@@ -333,22 +333,22 @@ return function (RouteBuilder $routes): void {
         $builder->connect(
             '/sla/edit/{id}',
             ['controller' => 'Sla', 'action' => 'edit'],
-            ['pass' => ['id'], 'id' => '\d+']
+            ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']
         );
         $builder->connect(
             '/sla/delete/{id}',
             ['controller' => 'Sla', 'action' => 'delete'],
-            ['pass' => ['id'], 'id' => '\d+']
+            ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']
         );
         $builder->connect(
             '/sla/report/{id}',
             ['controller' => 'Sla', 'action' => 'report'],
-            ['pass' => ['id'], 'id' => '\d+']
+            ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']
         );
         $builder->connect(
             '/sla/export/{id}',
             ['controller' => 'Sla', 'action' => 'exportReport'],
-            ['pass' => ['id'], 'id' => '\d+']
+            ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']
         );
 
         /*
@@ -365,17 +365,17 @@ return function (RouteBuilder $routes): void {
         $builder->connect(
             '/escalation-policies/edit/{id}',
             ['controller' => 'EscalationPolicies', 'action' => 'edit'],
-            ['pass' => ['id'], 'id' => '\d+']
+            ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']
         );
         $builder->connect(
             '/escalation-policies/delete/{id}',
             ['controller' => 'EscalationPolicies', 'action' => 'delete'],
-            ['pass' => ['id'], 'id' => '\d+']
+            ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']
         );
         $builder->connect(
             '/escalation-policies/view/{id}',
             ['controller' => 'EscalationPolicies', 'action' => 'view'],
-            ['pass' => ['id'], 'id' => '\d+']
+            ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']
         );
 
         /*
@@ -392,22 +392,22 @@ return function (RouteBuilder $routes): void {
         $builder->connect(
             '/scheduled-reports/edit/{id}',
             ['controller' => 'ScheduledReports', 'action' => 'edit'],
-            ['pass' => ['id'], 'id' => '\d+']
+            ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']
         );
         $builder->connect(
             '/scheduled-reports/delete/{id}',
             ['controller' => 'ScheduledReports', 'action' => 'delete'],
-            ['pass' => ['id'], 'id' => '\d+']
+            ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']
         );
         $builder->connect(
             '/scheduled-reports/preview/{id}',
             ['controller' => 'ScheduledReports', 'action' => 'preview'],
-            ['pass' => ['id'], 'id' => '\d+']
+            ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']
         );
         $builder->connect(
             '/scheduled-reports/send-now/{id}',
             ['controller' => 'ScheduledReports', 'action' => 'sendNow'],
-            ['pass' => ['id'], 'id' => '\d+']
+            ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']
         );
 
         /*
@@ -524,11 +524,11 @@ return function (RouteBuilder $routes): void {
     $routes->prefix('SuperAdmin', ['path' => '/super-admin'], function (RouteBuilder $builder): void {
         $builder->connect('/', ['controller' => 'Dashboard', 'action' => 'index']);
         $builder->connect('/organizations', ['controller' => 'Organizations', 'action' => 'index']);
-        $builder->connect('/organizations/{id}', ['controller' => 'Organizations', 'action' => 'view'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/organizations/{id}/impersonate', ['controller' => 'Organizations', 'action' => 'impersonate'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/organizations/{id}', ['controller' => 'Organizations', 'action' => 'view'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/organizations/{id}/impersonate', ['controller' => 'Organizations', 'action' => 'impersonate'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
         $builder->connect('/organizations/stop-impersonation', ['controller' => 'Organizations', 'action' => 'stopImpersonation']);
         $builder->connect('/users', ['controller' => 'Users', 'action' => 'index']);
-        $builder->connect('/users/{id}', ['controller' => 'Users', 'action' => 'view'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/users/{id}', ['controller' => 'Users', 'action' => 'view'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
         $builder->connect('/revenue', ['controller' => 'Revenue', 'action' => 'index']);
         $builder->connect('/health', ['controller' => 'Health', 'action' => 'index']);
         $builder->connect('/settings', ['controller' => 'Settings', 'action' => 'index']);
@@ -548,29 +548,29 @@ return function (RouteBuilder $routes): void {
         // --- Monitors ---
         $builder->connect('/monitors', ['controller' => 'Monitors', 'action' => 'index', 'prefix' => 'Api/V1', '_method' => 'GET']);
         $builder->connect('/monitors', ['controller' => 'Monitors', 'action' => 'add', 'prefix' => 'Api/V1', '_method' => 'POST']);
-        $builder->connect('/monitors/{id}', ['controller' => 'Monitors', 'action' => 'view', 'prefix' => 'Api/V1', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/monitors/{id}', ['controller' => 'Monitors', 'action' => 'edit', 'prefix' => 'Api/V1', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/monitors/{id}', ['controller' => 'Monitors', 'action' => 'delete', 'prefix' => 'Api/V1', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/monitors/{id}/checks', ['controller' => 'Monitors', 'action' => 'checks', 'prefix' => 'Api/V1', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/monitors/{id}/pause', ['controller' => 'Monitors', 'action' => 'pause', 'prefix' => 'Api/V1', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/monitors/{id}/resume', ['controller' => 'Monitors', 'action' => 'resume', 'prefix' => 'Api/V1', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/monitors/{id}', ['controller' => 'Monitors', 'action' => 'view', 'prefix' => 'Api/V1', '_method' => 'GET'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/monitors/{id}', ['controller' => 'Monitors', 'action' => 'edit', 'prefix' => 'Api/V1', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/monitors/{id}', ['controller' => 'Monitors', 'action' => 'delete', 'prefix' => 'Api/V1', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/monitors/{id}/checks', ['controller' => 'Monitors', 'action' => 'checks', 'prefix' => 'Api/V1', '_method' => 'GET'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/monitors/{id}/pause', ['controller' => 'Monitors', 'action' => 'pause', 'prefix' => 'Api/V1', '_method' => 'POST'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/monitors/{id}/resume', ['controller' => 'Monitors', 'action' => 'resume', 'prefix' => 'Api/V1', '_method' => 'POST'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
 
         // --- Incidents ---
         $builder->connect('/incidents', ['controller' => 'Incidents', 'action' => 'index', 'prefix' => 'Api/V1', '_method' => 'GET']);
         $builder->connect('/incidents', ['controller' => 'Incidents', 'action' => 'add', 'prefix' => 'Api/V1', '_method' => 'POST']);
-        $builder->connect('/incidents/{id}', ['controller' => 'Incidents', 'action' => 'view', 'prefix' => 'Api/V1', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/incidents/{id}', ['controller' => 'Incidents', 'action' => 'edit', 'prefix' => 'Api/V1', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/incidents/{id}', ['controller' => 'Incidents', 'action' => 'view', 'prefix' => 'Api/V1', '_method' => 'GET'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/incidents/{id}', ['controller' => 'Incidents', 'action' => 'edit', 'prefix' => 'Api/V1', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
 
         // --- Checks (read-only) ---
         $builder->connect('/checks', ['controller' => 'Checks', 'action' => 'index', 'prefix' => 'Api/V1', '_method' => 'GET']);
-        $builder->connect('/checks/{id}', ['controller' => 'Checks', 'action' => 'view', 'prefix' => 'Api/V1', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/checks/{id}', ['controller' => 'Checks', 'action' => 'view', 'prefix' => 'Api/V1', '_method' => 'GET'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
 
         // --- Alert Rules ---
         $builder->connect('/alert-rules', ['controller' => 'AlertRules', 'action' => 'index', 'prefix' => 'Api/V1', '_method' => 'GET']);
         $builder->connect('/alert-rules', ['controller' => 'AlertRules', 'action' => 'add', 'prefix' => 'Api/V1', '_method' => 'POST']);
-        $builder->connect('/alert-rules/{id}', ['controller' => 'AlertRules', 'action' => 'view', 'prefix' => 'Api/V1', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/alert-rules/{id}', ['controller' => 'AlertRules', 'action' => 'edit', 'prefix' => 'Api/V1', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/alert-rules/{id}', ['controller' => 'AlertRules', 'action' => 'delete', 'prefix' => 'Api/V1', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/alert-rules/{id}', ['controller' => 'AlertRules', 'action' => 'view', 'prefix' => 'Api/V1', '_method' => 'GET'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/alert-rules/{id}', ['controller' => 'AlertRules', 'action' => 'edit', 'prefix' => 'Api/V1', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/alert-rules/{id}', ['controller' => 'AlertRules', 'action' => 'delete', 'prefix' => 'Api/V1', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
     });
 
     /*
@@ -636,62 +636,62 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/monitors/bulk-action', ['controller' => 'Monitors', 'action' => 'bulkAction', 'prefix' => 'Api/V2', '_method' => 'POST']);
         $builder->connect('/monitors/import', ['controller' => 'Monitors', 'action' => 'import', 'prefix' => 'Api/V2', '_method' => 'POST']);
         $builder->connect('/monitors/import-competitor', ['controller' => 'Monitors', 'action' => 'importCompetitor', 'prefix' => 'Api/V2', '_method' => 'POST']);
-        $builder->connect('/monitors/{id}', ['controller' => 'Monitors', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/monitors/{id}', ['controller' => 'Monitors', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/monitors/{id}', ['controller' => 'Monitors', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/monitors/{id}', ['controller' => 'Monitors', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/monitors/{id}/checks', ['controller' => 'Monitors', 'action' => 'checks', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/monitors/{id}/pause', ['controller' => 'Monitors', 'action' => 'pause', 'prefix' => 'Api/V2', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/monitors/{id}/resume', ['controller' => 'Monitors', 'action' => 'resume', 'prefix' => 'Api/V2', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/monitors/{id}', ['controller' => 'Monitors', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/monitors/{id}', ['controller' => 'Monitors', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/monitors/{id}', ['controller' => 'Monitors', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/monitors/{id}', ['controller' => 'Monitors', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/monitors/{id}/checks', ['controller' => 'Monitors', 'action' => 'checks', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/monitors/{id}/pause', ['controller' => 'Monitors', 'action' => 'pause', 'prefix' => 'Api/V2', '_method' => 'POST'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/monitors/{id}/resume', ['controller' => 'Monitors', 'action' => 'resume', 'prefix' => 'Api/V2', '_method' => 'POST'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
 
         // --- Incidents (TASK-NG-005) ---
         $builder->connect('/incidents', ['controller' => 'Incidents', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
         $builder->connect('/incidents', ['controller' => 'Incidents', 'action' => 'add', 'prefix' => 'Api/V2', '_method' => 'POST']);
-        $builder->connect('/incidents/{id}', ['controller' => 'Incidents', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/incidents/{id}', ['controller' => 'Incidents', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/incidents/{id}', ['controller' => 'Incidents', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/incidents/{id}', ['controller' => 'Incidents', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/incidents/{id}/acknowledge', ['controller' => 'Incidents', 'action' => 'acknowledge', 'prefix' => 'Api/V2', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/incidents/{id}/updates', ['controller' => 'Incidents', 'action' => 'addUpdate', 'prefix' => 'Api/V2', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/incidents/{id}', ['controller' => 'Incidents', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/incidents/{id}', ['controller' => 'Incidents', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/incidents/{id}', ['controller' => 'Incidents', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/incidents/{id}', ['controller' => 'Incidents', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/incidents/{id}/acknowledge', ['controller' => 'Incidents', 'action' => 'acknowledge', 'prefix' => 'Api/V2', '_method' => 'POST'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/incidents/{id}/updates', ['controller' => 'Incidents', 'action' => 'addUpdate', 'prefix' => 'Api/V2', '_method' => 'POST'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
 
         // Checks (read-only)
         $builder->connect('/checks', ['controller' => 'Checks', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
-        $builder->connect('/checks/{id}', ['controller' => 'Checks', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/checks/{id}', ['controller' => 'Checks', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
 
         // Integrations
         $builder->connect('/integrations', ['controller' => 'Integrations', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
         $builder->connect('/integrations', ['controller' => 'Integrations', 'action' => 'add', 'prefix' => 'Api/V2', '_method' => 'POST']);
-        $builder->connect('/integrations/{id}', ['controller' => 'Integrations', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/integrations/{id}', ['controller' => 'Integrations', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/integrations/{id}', ['controller' => 'Integrations', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/integrations/{id}', ['controller' => 'Integrations', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/integrations/{id}/test', ['controller' => 'Integrations', 'action' => 'test', 'prefix' => 'Api/V2', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/integrations/{id}', ['controller' => 'Integrations', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/integrations/{id}', ['controller' => 'Integrations', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/integrations/{id}', ['controller' => 'Integrations', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/integrations/{id}', ['controller' => 'Integrations', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/integrations/{id}/test', ['controller' => 'Integrations', 'action' => 'test', 'prefix' => 'Api/V2', '_method' => 'POST'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
 
         // Alert Rules
         $builder->connect('/alert-rules', ['controller' => 'AlertRules', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
         $builder->connect('/alert-rules', ['controller' => 'AlertRules', 'action' => 'add', 'prefix' => 'Api/V2', '_method' => 'POST']);
-        $builder->connect('/alert-rules/{id}', ['controller' => 'AlertRules', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/alert-rules/{id}', ['controller' => 'AlertRules', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/alert-rules/{id}', ['controller' => 'AlertRules', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/alert-rules/{id}', ['controller' => 'AlertRules', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/alert-rules/{id}', ['controller' => 'AlertRules', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/alert-rules/{id}', ['controller' => 'AlertRules', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/alert-rules/{id}', ['controller' => 'AlertRules', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/alert-rules/{id}', ['controller' => 'AlertRules', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
 
         // Escalation Policies
         $builder->connect('/escalation-policies', ['controller' => 'EscalationPolicies', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
         $builder->connect('/escalation-policies', ['controller' => 'EscalationPolicies', 'action' => 'add', 'prefix' => 'Api/V2', '_method' => 'POST']);
-        $builder->connect('/escalation-policies/{id}', ['controller' => 'EscalationPolicies', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/escalation-policies/{id}', ['controller' => 'EscalationPolicies', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/escalation-policies/{id}', ['controller' => 'EscalationPolicies', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/escalation-policies/{id}', ['controller' => 'EscalationPolicies', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/escalation-policies/{id}', ['controller' => 'EscalationPolicies', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/escalation-policies/{id}', ['controller' => 'EscalationPolicies', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/escalation-policies/{id}', ['controller' => 'EscalationPolicies', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/escalation-policies/{id}', ['controller' => 'EscalationPolicies', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
 
         // SLA
         $builder->connect('/sla', ['controller' => 'Sla', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
         $builder->connect('/sla', ['controller' => 'Sla', 'action' => 'add', 'prefix' => 'Api/V2', '_method' => 'POST']);
-        $builder->connect('/sla/{id}', ['controller' => 'Sla', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/sla/{id}', ['controller' => 'Sla', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/sla/{id}', ['controller' => 'Sla', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/sla/{id}', ['controller' => 'Sla', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/sla/{id}/report', ['controller' => 'Sla', 'action' => 'report', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/sla/{id}/export', ['controller' => 'Sla', 'action' => 'export', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/sla/{id}', ['controller' => 'Sla', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/sla/{id}', ['controller' => 'Sla', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/sla/{id}', ['controller' => 'Sla', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/sla/{id}', ['controller' => 'Sla', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/sla/{id}/report', ['controller' => 'Sla', 'action' => 'report', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/sla/{id}/export', ['controller' => 'Sla', 'action' => 'export', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
 
         // Settings
         $builder->connect('/settings', ['controller' => 'Settings', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
@@ -708,20 +708,20 @@ return function (RouteBuilder $routes): void {
 
         // Users (Team)
         $builder->connect('/users', ['controller' => 'Users', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
-        $builder->connect('/users/{id}', ['controller' => 'Users', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/users/{id}/role', ['controller' => 'Users', 'action' => 'updateRole', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/users/{id}', ['controller' => 'Users', 'action' => 'remove', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/users/{id}', ['controller' => 'Users', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/users/{id}/role', ['controller' => 'Users', 'action' => 'updateRole', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/users/{id}', ['controller' => 'Users', 'action' => 'remove', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
 
         // Invitations
         $builder->connect('/invitations', ['controller' => 'Invitations', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
         $builder->connect('/invitations', ['controller' => 'Invitations', 'action' => 'send', 'prefix' => 'Api/V2', '_method' => 'POST']);
-        $builder->connect('/invitations/{id}', ['controller' => 'Invitations', 'action' => 'revoke', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/invitations/{id}/resend', ['controller' => 'Invitations', 'action' => 'resend', 'prefix' => 'Api/V2', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/invitations/{id}', ['controller' => 'Invitations', 'action' => 'revoke', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/invitations/{id}/resend', ['controller' => 'Invitations', 'action' => 'resend', 'prefix' => 'Api/V2', '_method' => 'POST'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
 
         // API Keys
         $builder->connect('/api-keys', ['controller' => 'ApiKeys', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
         $builder->connect('/api-keys', ['controller' => 'ApiKeys', 'action' => 'add', 'prefix' => 'Api/V2', '_method' => 'POST']);
-        $builder->connect('/api-keys/{id}', ['controller' => 'ApiKeys', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/api-keys/{id}', ['controller' => 'ApiKeys', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
 
         // Reports
         $builder->connect('/reports/uptime', ['controller' => 'Reports', 'action' => 'uptime', 'prefix' => 'Api/V2', '_method' => 'GET']);
@@ -731,28 +731,28 @@ return function (RouteBuilder $routes): void {
         // Scheduled Reports
         $builder->connect('/scheduled-reports', ['controller' => 'ScheduledReports', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
         $builder->connect('/scheduled-reports', ['controller' => 'ScheduledReports', 'action' => 'add', 'prefix' => 'Api/V2', '_method' => 'POST']);
-        $builder->connect('/scheduled-reports/{id}', ['controller' => 'ScheduledReports', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/scheduled-reports/{id}', ['controller' => 'ScheduledReports', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/scheduled-reports/{id}', ['controller' => 'ScheduledReports', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/scheduled-reports/{id}', ['controller' => 'ScheduledReports', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/scheduled-reports/{id}/send-now', ['controller' => 'ScheduledReports', 'action' => 'sendNow', 'prefix' => 'Api/V2', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/scheduled-reports/{id}/preview', ['controller' => 'ScheduledReports', 'action' => 'preview', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/scheduled-reports/{id}', ['controller' => 'ScheduledReports', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/scheduled-reports/{id}', ['controller' => 'ScheduledReports', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/scheduled-reports/{id}', ['controller' => 'ScheduledReports', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/scheduled-reports/{id}', ['controller' => 'ScheduledReports', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/scheduled-reports/{id}/send-now', ['controller' => 'ScheduledReports', 'action' => 'sendNow', 'prefix' => 'Api/V2', '_method' => 'POST'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/scheduled-reports/{id}/preview', ['controller' => 'ScheduledReports', 'action' => 'preview', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
 
         // Maintenance Windows
         $builder->connect('/maintenance-windows', ['controller' => 'MaintenanceWindows', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
         $builder->connect('/maintenance-windows', ['controller' => 'MaintenanceWindows', 'action' => 'add', 'prefix' => 'Api/V2', '_method' => 'POST']);
-        $builder->connect('/maintenance-windows/{id}', ['controller' => 'MaintenanceWindows', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/maintenance-windows/{id}', ['controller' => 'MaintenanceWindows', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/maintenance-windows/{id}', ['controller' => 'MaintenanceWindows', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/maintenance-windows/{id}', ['controller' => 'MaintenanceWindows', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/maintenance-windows/{id}', ['controller' => 'MaintenanceWindows', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/maintenance-windows/{id}', ['controller' => 'MaintenanceWindows', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/maintenance-windows/{id}', ['controller' => 'MaintenanceWindows', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/maintenance-windows/{id}', ['controller' => 'MaintenanceWindows', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
 
         // Status Pages
         $builder->connect('/status-pages', ['controller' => 'StatusPages', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
         $builder->connect('/status-pages', ['controller' => 'StatusPages', 'action' => 'add', 'prefix' => 'Api/V2', '_method' => 'POST']);
-        $builder->connect('/status-pages/{id}', ['controller' => 'StatusPages', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/status-pages/{id}', ['controller' => 'StatusPages', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/status-pages/{id}', ['controller' => 'StatusPages', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/status-pages/{id}', ['controller' => 'StatusPages', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/status-pages/{id}', ['controller' => 'StatusPages', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/status-pages/{id}', ['controller' => 'StatusPages', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/status-pages/{id}', ['controller' => 'StatusPages', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/status-pages/{id}', ['controller' => 'StatusPages', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
 
         // Two-Factor Auth
         $builder->connect('/2fa/setup', ['controller' => 'TwoFactor', 'action' => 'setup', 'prefix' => 'Api/V2', '_method' => ['GET', 'POST']]);
@@ -775,9 +775,9 @@ return function (RouteBuilder $routes): void {
         // Notification Schedules (C-05)
         $builder->connect('/notification-schedules', ['controller' => 'NotificationSchedules', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
         $builder->connect('/notification-schedules', ['controller' => 'NotificationSchedules', 'action' => 'add', 'prefix' => 'Api/V2', '_method' => 'POST']);
-        $builder->connect('/notification-schedules/{id}', ['controller' => 'NotificationSchedules', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/notification-schedules/{id}', ['controller' => 'NotificationSchedules', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/notification-schedules/{id}', ['controller' => 'NotificationSchedules', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/notification-schedules/{id}', ['controller' => 'NotificationSchedules', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/notification-schedules/{id}', ['controller' => 'NotificationSchedules', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/notification-schedules/{id}', ['controller' => 'NotificationSchedules', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
 
         // Telegram Bot Webhook (C-04) - no JWT auth, verified by URL token
         $builder->connect('/telegram/webhook/{org_id}/{token}', ['controller' => 'TelegramWebhook', 'action' => 'webhook', 'prefix' => 'Api/V2', '_method' => 'POST'], ['pass' => ['org_id', 'token']]);
@@ -785,41 +785,41 @@ return function (RouteBuilder $routes): void {
         // Webhook Endpoints (C-04)
         $builder->connect('/webhook-endpoints', ['controller' => 'WebhookEndpoints', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
         $builder->connect('/webhook-endpoints', ['controller' => 'WebhookEndpoints', 'action' => 'add', 'prefix' => 'Api/V2', '_method' => 'POST']);
-        $builder->connect('/webhook-endpoints/{id}', ['controller' => 'WebhookEndpoints', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/webhook-endpoints/{id}', ['controller' => 'WebhookEndpoints', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/webhook-endpoints/{id}', ['controller' => 'WebhookEndpoints', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/webhook-endpoints/{id}/test', ['controller' => 'WebhookEndpoints', 'action' => 'test', 'prefix' => 'Api/V2', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/webhook-endpoints/{id}/deliveries', ['controller' => 'WebhookEndpoints', 'action' => 'deliveries', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/webhook-endpoints/{id}', ['controller' => 'WebhookEndpoints', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/webhook-endpoints/{id}', ['controller' => 'WebhookEndpoints', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/webhook-endpoints/{id}', ['controller' => 'WebhookEndpoints', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/webhook-endpoints/{id}/test', ['controller' => 'WebhookEndpoints', 'action' => 'test', 'prefix' => 'Api/V2', '_method' => 'POST'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/webhook-endpoints/{id}/deliveries', ['controller' => 'WebhookEndpoints', 'action' => 'deliveries', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
 
         // Check Regions (C-01)
         $builder->connect('/check-regions', ['controller' => 'CheckRegions', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
         $builder->connect('/check-regions', ['controller' => 'CheckRegions', 'action' => 'add', 'prefix' => 'Api/V2', '_method' => 'POST']);
-        $builder->connect('/check-regions/{id}', ['controller' => 'CheckRegions', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/check-regions/{id}', ['controller' => 'CheckRegions', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/check-regions/{id}', ['controller' => 'CheckRegions', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/check-regions/{id}', ['controller' => 'CheckRegions', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/check-regions/{id}', ['controller' => 'CheckRegions', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/check-regions/{id}', ['controller' => 'CheckRegions', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/check-regions/{id}', ['controller' => 'CheckRegions', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/check-regions/{id}', ['controller' => 'CheckRegions', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
 
         // Notification Channels
         $builder->connect('/notification-channels', ['controller' => 'NotificationChannels', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
         $builder->connect('/notification-channels', ['controller' => 'NotificationChannels', 'action' => 'add', 'prefix' => 'Api/V2', '_method' => 'POST']);
-        $builder->connect('/notification-channels/{id}', ['controller' => 'NotificationChannels', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/notification-channels/{id}', ['controller' => 'NotificationChannels', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/notification-channels/{id}', ['controller' => 'NotificationChannels', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/notification-channels/{id}', ['controller' => 'NotificationChannels', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/notification-channels/{id}/test', ['controller' => 'NotificationChannels', 'action' => 'test', 'prefix' => 'Api/V2', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/notification-channels/{id}', ['controller' => 'NotificationChannels', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/notification-channels/{id}', ['controller' => 'NotificationChannels', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/notification-channels/{id}', ['controller' => 'NotificationChannels', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/notification-channels/{id}', ['controller' => 'NotificationChannels', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/notification-channels/{id}/test', ['controller' => 'NotificationChannels', 'action' => 'test', 'prefix' => 'Api/V2', '_method' => 'POST'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
 
         // Notification Policies
         $builder->connect('/notification-policies', ['controller' => 'NotificationPolicies', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
         $builder->connect('/notification-policies', ['controller' => 'NotificationPolicies', 'action' => 'add', 'prefix' => 'Api/V2', '_method' => 'POST']);
-        $builder->connect('/notification-policies/{id}', ['controller' => 'NotificationPolicies', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/notification-policies/{id}', ['controller' => 'NotificationPolicies', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/notification-policies/{id}', ['controller' => 'NotificationPolicies', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/notification-policies/{id}', ['controller' => 'NotificationPolicies', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/notification-policies/{id}', ['controller' => 'NotificationPolicies', 'action' => 'view', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/notification-policies/{id}', ['controller' => 'NotificationPolicies', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/notification-policies/{id}', ['controller' => 'NotificationPolicies', 'action' => 'edit', 'prefix' => 'Api/V2', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/notification-policies/{id}', ['controller' => 'NotificationPolicies', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
 
         // Subscribers
         $builder->connect('/subscribers', ['controller' => 'Subscribers', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
-        $builder->connect('/subscribers/{id}', ['controller' => 'Subscribers', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/subscribers/{id}/toggle', ['controller' => 'Subscribers', 'action' => 'toggle', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/subscribers/{id}', ['controller' => 'Subscribers', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/subscribers/{id}/toggle', ['controller' => 'Subscribers', 'action' => 'toggle', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
 
         // Email Logs (reads from alert_logs)
         $builder->connect('/email-logs', ['controller' => 'EmailLogs', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
@@ -827,12 +827,12 @@ return function (RouteBuilder $routes): void {
         // Super Admin
         $builder->connect('/super-admin/dashboard', ['controller' => 'Dashboard', 'action' => 'index', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'GET']);
         $builder->connect('/super-admin/organizations', ['controller' => 'Organizations', 'action' => 'index', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'GET']);
-        $builder->connect('/super-admin/organizations/{id}', ['controller' => 'Organizations', 'action' => 'view', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/super-admin/organizations/{id}/impersonate', ['controller' => 'Organizations', 'action' => 'impersonate', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/super-admin/organizations/{id}/grant-credits', ['controller' => 'Organizations', 'action' => 'grantCredits', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/super-admin/organizations/{id}', ['controller' => 'Organizations', 'action' => 'view', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'GET'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/super-admin/organizations/{id}/impersonate', ['controller' => 'Organizations', 'action' => 'impersonate', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'POST'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/super-admin/organizations/{id}/grant-credits', ['controller' => 'Organizations', 'action' => 'grantCredits', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'POST'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
         $builder->connect('/super-admin/stop-impersonation', ['controller' => 'Organizations', 'action' => 'stopImpersonation', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'POST']);
         $builder->connect('/super-admin/users', ['controller' => 'Users', 'action' => 'index', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'GET']);
-        $builder->connect('/super-admin/users/{id}', ['controller' => 'Users', 'action' => 'view', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/super-admin/users/{id}', ['controller' => 'Users', 'action' => 'view', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'GET'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
         $builder->connect('/super-admin/revenue', ['controller' => 'Revenue', 'action' => 'index', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'GET']);
         $builder->connect('/super-admin/health', ['controller' => 'Health', 'action' => 'index', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'GET']);
         $builder->connect('/super-admin/settings', ['controller' => 'Settings', 'action' => 'index', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'GET']);
@@ -844,26 +844,26 @@ return function (RouteBuilder $routes): void {
         // Super Admin — Plans (D-02)
         $builder->connect('/super-admin/plans', ['controller' => 'Plans', 'action' => 'index', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'GET']);
         $builder->connect('/super-admin/plans', ['controller' => 'Plans', 'action' => 'add', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'POST']);
-        $builder->connect('/super-admin/plans/{id}', ['controller' => 'Plans', 'action' => 'view', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/super-admin/plans/{id}', ['controller' => 'Plans', 'action' => 'edit', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/super-admin/plans/{id}', ['controller' => 'Plans', 'action' => 'edit', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/super-admin/plans/{id}', ['controller' => 'Plans', 'action' => 'delete', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/super-admin/plans/{id}/duplicate', ['controller' => 'Plans', 'action' => 'duplicate', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/super-admin/plans/{id}', ['controller' => 'Plans', 'action' => 'view', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'GET'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/super-admin/plans/{id}', ['controller' => 'Plans', 'action' => 'edit', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/super-admin/plans/{id}', ['controller' => 'Plans', 'action' => 'edit', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/super-admin/plans/{id}', ['controller' => 'Plans', 'action' => 'delete', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/super-admin/plans/{id}/duplicate', ['controller' => 'Plans', 'action' => 'duplicate', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'POST'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
 
         // Super Admin — Blog Posts
         $builder->connect('/super-admin/blog-posts', ['controller' => 'BlogPosts', 'action' => 'index', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'GET']);
         $builder->connect('/super-admin/blog-posts', ['controller' => 'BlogPosts', 'action' => 'add', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'POST']);
-        $builder->connect('/super-admin/blog-posts/{id}', ['controller' => 'BlogPosts', 'action' => 'view', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'GET'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/super-admin/blog-posts/{id}', ['controller' => 'BlogPosts', 'action' => 'edit', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/super-admin/blog-posts/{id}', ['controller' => 'BlogPosts', 'action' => 'edit', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/super-admin/blog-posts/{id}', ['controller' => 'BlogPosts', 'action' => 'delete', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/super-admin/blog-posts/{id}/publish', ['controller' => 'BlogPosts', 'action' => 'publish', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
-        $builder->connect('/super-admin/blog-posts/{id}/unpublish', ['controller' => 'BlogPosts', 'action' => 'unpublish', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/super-admin/blog-posts/{id}', ['controller' => 'BlogPosts', 'action' => 'view', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'GET'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/super-admin/blog-posts/{id}', ['controller' => 'BlogPosts', 'action' => 'edit', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/super-admin/blog-posts/{id}', ['controller' => 'BlogPosts', 'action' => 'edit', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'PATCH'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/super-admin/blog-posts/{id}', ['controller' => 'BlogPosts', 'action' => 'delete', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/super-admin/blog-posts/{id}/publish', ['controller' => 'BlogPosts', 'action' => 'publish', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'POST'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/super-admin/blog-posts/{id}/unpublish', ['controller' => 'BlogPosts', 'action' => 'unpublish', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'POST'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
 
         // Super Admin — Queue Dashboard (Phase 5)
         $builder->connect('/super-admin/queue', ['controller' => 'Queue', 'action' => 'index', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'GET']);
         $builder->connect('/super-admin/queue/failed-jobs', ['controller' => 'Queue', 'action' => 'failedJobs', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'GET']);
-        $builder->connect('/super-admin/queue/retry/{id}', ['controller' => 'Queue', 'action' => 'retryJob', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'POST'], ['pass' => ['id'], 'id' => '\d+']);
+        $builder->connect('/super-admin/queue/retry/{id}', ['controller' => 'Queue', 'action' => 'retryJob', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'POST'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
         $builder->connect('/super-admin/queue/failed-jobs', ['controller' => 'Queue', 'action' => 'purgeFailedJobs', 'prefix' => 'Api/V2/SuperAdmin', '_method' => 'DELETE']);
     });
 };

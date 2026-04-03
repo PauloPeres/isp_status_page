@@ -40,13 +40,7 @@ class AlertRulesController extends AppController
     {
         $this->request->allowMethod(['get']);
 
-        $table = $this->fetchTable('AlertRules');
-        $rule = $table->find()
-            ->where([
-                'AlertRules.id' => $id,
-                'AlertRules.organization_id' => $this->currentOrgId,
-            ])
-            ->first();
+        $rule = $this->resolveOrgEntity('AlertRules', $id);
 
         if (!$rule) {
             $this->error('Alert rule not found', 404);
@@ -115,12 +109,7 @@ class AlertRulesController extends AppController
         }
 
         $table = $this->fetchTable('AlertRules');
-        $rule = $table->find()
-            ->where([
-                'AlertRules.id' => $id,
-                'AlertRules.organization_id' => $this->currentOrgId,
-            ])
-            ->first();
+        $rule = $this->resolveOrgEntity('AlertRules', $id);
 
         if (!$rule) {
             $this->error('Alert rule not found', 404);
@@ -153,12 +142,7 @@ class AlertRulesController extends AppController
         }
 
         $table = $this->fetchTable('AlertRules');
-        $rule = $table->find()
-            ->where([
-                'AlertRules.id' => $id,
-                'AlertRules.organization_id' => $this->currentOrgId,
-            ])
-            ->first();
+        $rule = $this->resolveOrgEntity('AlertRules', $id);
 
         if (!$rule) {
             $this->error('Alert rule not found', 404);

@@ -52,11 +52,9 @@ class CheckRegionsController extends AppController
     {
         $this->request->allowMethod(['get']);
 
-        $table = $this->fetchTable('CheckRegions');
+        $region = $this->resolveEntity('CheckRegions', $id);
 
-        try {
-            $region = $table->get((int)$id);
-        } catch (\Cake\Datasource\Exception\RecordNotFoundException $e) {
+        if (!$region) {
             $this->error('Region not found', 404);
             return;
         }
@@ -109,10 +107,9 @@ class CheckRegionsController extends AppController
         }
 
         $table = $this->fetchTable('CheckRegions');
+        $region = $this->resolveEntity('CheckRegions', $id);
 
-        try {
-            $region = $table->get((int)$id);
-        } catch (\Cake\Datasource\Exception\RecordNotFoundException $e) {
+        if (!$region) {
             $this->error('Region not found', 404);
             return;
         }
@@ -145,10 +142,9 @@ class CheckRegionsController extends AppController
         }
 
         $table = $this->fetchTable('CheckRegions');
+        $region = $this->resolveEntity('CheckRegions', $id);
 
-        try {
-            $region = $table->get((int)$id);
-        } catch (\Cake\Datasource\Exception\RecordNotFoundException $e) {
+        if (!$region) {
             $this->error('Region not found', 404);
             return;
         }

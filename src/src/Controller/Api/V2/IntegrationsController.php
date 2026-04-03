@@ -53,13 +53,7 @@ class IntegrationsController extends AppController
     {
         $this->request->allowMethod(['get']);
 
-        $table = $this->fetchTable('Integrations');
-        $integration = $table->find()
-            ->where([
-                'Integrations.id' => $id,
-                'Integrations.organization_id' => $this->currentOrgId,
-            ])
-            ->first();
+        $integration = $this->resolveOrgEntity('Integrations', $id);
 
         if (!$integration) {
             $this->error('Integration not found', 404);
@@ -131,12 +125,7 @@ class IntegrationsController extends AppController
         }
 
         $table = $this->fetchTable('Integrations');
-        $integration = $table->find()
-            ->where([
-                'Integrations.id' => $id,
-                'Integrations.organization_id' => $this->currentOrgId,
-            ])
-            ->first();
+        $integration = $this->resolveOrgEntity('Integrations', $id);
 
         if (!$integration) {
             $this->error('Integration not found', 404);
@@ -171,12 +160,7 @@ class IntegrationsController extends AppController
         }
 
         $table = $this->fetchTable('Integrations');
-        $integration = $table->find()
-            ->where([
-                'Integrations.id' => $id,
-                'Integrations.organization_id' => $this->currentOrgId,
-            ])
-            ->first();
+        $integration = $this->resolveOrgEntity('Integrations', $id);
 
         if (!$integration) {
             $this->error('Integration not found', 404);
@@ -218,13 +202,7 @@ class IntegrationsController extends AppController
             return;
         }
 
-        $table = $this->fetchTable('Integrations');
-        $integration = $table->find()
-            ->where([
-                'Integrations.id' => $id,
-                'Integrations.organization_id' => $this->currentOrgId,
-            ])
-            ->first();
+        $integration = $this->resolveOrgEntity('Integrations', $id);
 
         if (!$integration) {
             $this->error('Integration not found', 404);

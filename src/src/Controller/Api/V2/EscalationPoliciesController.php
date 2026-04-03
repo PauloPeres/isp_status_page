@@ -38,13 +38,7 @@ class EscalationPoliciesController extends AppController
     {
         $this->request->allowMethod(['get']);
 
-        $table = $this->fetchTable('EscalationPolicies');
-        $policy = $table->find()
-            ->where([
-                'EscalationPolicies.id' => $id,
-                'EscalationPolicies.organization_id' => $this->currentOrgId,
-            ])
-            ->first();
+        $policy = $this->resolveOrgEntity('EscalationPolicies', $id);
 
         if (!$policy) {
             $this->error('Escalation policy not found', 404);
@@ -96,12 +90,7 @@ class EscalationPoliciesController extends AppController
         }
 
         $table = $this->fetchTable('EscalationPolicies');
-        $policy = $table->find()
-            ->where([
-                'EscalationPolicies.id' => $id,
-                'EscalationPolicies.organization_id' => $this->currentOrgId,
-            ])
-            ->first();
+        $policy = $this->resolveOrgEntity('EscalationPolicies', $id);
 
         if (!$policy) {
             $this->error('Escalation policy not found', 404);
@@ -134,12 +123,7 @@ class EscalationPoliciesController extends AppController
         }
 
         $table = $this->fetchTable('EscalationPolicies');
-        $policy = $table->find()
-            ->where([
-                'EscalationPolicies.id' => $id,
-                'EscalationPolicies.organization_id' => $this->currentOrgId,
-            ])
-            ->first();
+        $policy = $this->resolveOrgEntity('EscalationPolicies', $id);
 
         if (!$policy) {
             $this->error('Escalation policy not found', 404);

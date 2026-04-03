@@ -86,10 +86,9 @@ class SubscribersController extends AppController
         }
 
         $table = $this->fetchTable('Subscribers');
+        $subscriber = $this->resolveEntity('Subscribers', $id);
 
-        try {
-            $subscriber = $table->get($id);
-        } catch (\Cake\Datasource\Exception\RecordNotFoundException $e) {
+        if (!$subscriber) {
             $this->error('Subscriber not found', 404);
 
             return;
@@ -119,10 +118,9 @@ class SubscribersController extends AppController
         }
 
         $table = $this->fetchTable('Subscribers');
+        $subscriber = $this->resolveEntity('Subscribers', $id);
 
-        try {
-            $subscriber = $table->get($id);
-        } catch (\Cake\Datasource\Exception\RecordNotFoundException $e) {
+        if (!$subscriber) {
             $this->error('Subscriber not found', 404);
 
             return;

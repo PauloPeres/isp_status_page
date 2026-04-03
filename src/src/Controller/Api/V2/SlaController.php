@@ -104,13 +104,7 @@ class SlaController extends AppController
     {
         $this->request->allowMethod(['get']);
 
-        $table = $this->fetchTable('SlaDefinitions');
-        $sla = $table->find()
-            ->where([
-                'SlaDefinitions.id' => $id,
-                'SlaDefinitions.organization_id' => $this->currentOrgId,
-            ])
-            ->first();
+        $sla = $this->resolveOrgEntity('SlaDefinitions', $id);
 
         if (!$sla) {
             $this->error('SLA not found', 404);
@@ -162,12 +156,7 @@ class SlaController extends AppController
         }
 
         $table = $this->fetchTable('SlaDefinitions');
-        $sla = $table->find()
-            ->where([
-                'SlaDefinitions.id' => $id,
-                'SlaDefinitions.organization_id' => $this->currentOrgId,
-            ])
-            ->first();
+        $sla = $this->resolveOrgEntity('SlaDefinitions', $id);
 
         if (!$sla) {
             $this->error('SLA not found', 404);
@@ -200,12 +189,7 @@ class SlaController extends AppController
         }
 
         $table = $this->fetchTable('SlaDefinitions');
-        $sla = $table->find()
-            ->where([
-                'SlaDefinitions.id' => $id,
-                'SlaDefinitions.organization_id' => $this->currentOrgId,
-            ])
-            ->first();
+        $sla = $this->resolveOrgEntity('SlaDefinitions', $id);
 
         if (!$sla) {
             $this->error('SLA not found', 404);
@@ -234,14 +218,9 @@ class SlaController extends AppController
     {
         $this->request->allowMethod(['get']);
 
-        $table = $this->fetchTable('SlaDefinitions');
-        $sla = $table->find()
-            ->contain(['Monitors'])
-            ->where([
-                'SlaDefinitions.id' => $id,
-                'SlaDefinitions.organization_id' => $this->currentOrgId,
-            ])
-            ->first();
+        $sla = $this->resolveOrgEntity('SlaDefinitions', $id, [
+            'contain' => ['Monitors'],
+        ]);
 
         if (!$sla) {
             $this->error('SLA not found', 404);
@@ -459,14 +438,9 @@ class SlaController extends AppController
     {
         $this->request->allowMethod(['get']);
 
-        $table = $this->fetchTable('SlaDefinitions');
-        $sla = $table->find()
-            ->contain(['Monitors'])
-            ->where([
-                'SlaDefinitions.id' => $id,
-                'SlaDefinitions.organization_id' => $this->currentOrgId,
-            ])
-            ->first();
+        $sla = $this->resolveOrgEntity('SlaDefinitions', $id, [
+            'contain' => ['Monitors'],
+        ]);
 
         if (!$sla) {
             $this->error('SLA not found', 404);

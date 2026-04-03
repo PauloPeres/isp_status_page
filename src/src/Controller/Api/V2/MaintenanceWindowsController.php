@@ -38,13 +38,7 @@ class MaintenanceWindowsController extends AppController
     {
         $this->request->allowMethod(['get']);
 
-        $table = $this->fetchTable('MaintenanceWindows');
-        $window = $table->find()
-            ->where([
-                'MaintenanceWindows.id' => $id,
-                'MaintenanceWindows.organization_id' => $this->currentOrgId,
-            ])
-            ->first();
+        $window = $this->resolveOrgEntity('MaintenanceWindows', $id);
 
         if (!$window) {
             $this->error('Maintenance window not found', 404);
@@ -118,12 +112,7 @@ class MaintenanceWindowsController extends AppController
         }
 
         $table = $this->fetchTable('MaintenanceWindows');
-        $window = $table->find()
-            ->where([
-                'MaintenanceWindows.id' => $id,
-                'MaintenanceWindows.organization_id' => $this->currentOrgId,
-            ])
-            ->first();
+        $window = $this->resolveOrgEntity('MaintenanceWindows', $id);
 
         if (!$window) {
             $this->error('Maintenance window not found', 404);
@@ -169,12 +158,7 @@ class MaintenanceWindowsController extends AppController
         }
 
         $table = $this->fetchTable('MaintenanceWindows');
-        $window = $table->find()
-            ->where([
-                'MaintenanceWindows.id' => $id,
-                'MaintenanceWindows.organization_id' => $this->currentOrgId,
-            ])
-            ->first();
+        $window = $this->resolveOrgEntity('MaintenanceWindows', $id);
 
         if (!$window) {
             $this->error('Maintenance window not found', 404);

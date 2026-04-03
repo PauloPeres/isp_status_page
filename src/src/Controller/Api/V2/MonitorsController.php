@@ -297,11 +297,8 @@ class MonitorsController extends AppController
     {
         $this->request->allowMethod(['get']);
 
-        $monitorsTable = $this->fetchTable('Monitors');
-
-        try {
-            $monitorsTable->get($id);
-        } catch (\Cake\Datasource\Exception\RecordNotFoundException $e) {
+        $monitor = $this->resolveEntity('Monitors', $id);
+        if ($monitor === null) {
             $this->error('Monitor not found', 404);
 
             return;
@@ -309,7 +306,7 @@ class MonitorsController extends AppController
 
         $checksTable = $this->fetchTable('MonitorChecks');
         $query = $checksTable->find()
-            ->where(['MonitorChecks.monitor_id' => $id])
+            ->where(['MonitorChecks.monitor_id' => $monitor->id])
             ->orderBy(['MonitorChecks.checked_at' => 'DESC']);
 
         $page = max(1, (int)$this->request->getQuery('page', 1));
@@ -346,10 +343,9 @@ class MonitorsController extends AppController
         }
 
         $monitorsTable = $this->fetchTable('Monitors');
+        $monitor = $this->resolveEntity('Monitors', $id);
 
-        try {
-            $monitor = $monitorsTable->get($id);
-        } catch (\Cake\Datasource\Exception\RecordNotFoundException $e) {
+        if ($monitor === null) {
             $this->error('Monitor not found', 404);
 
             return;
@@ -381,10 +377,9 @@ class MonitorsController extends AppController
         }
 
         $monitorsTable = $this->fetchTable('Monitors');
+        $monitor = $this->resolveEntity('Monitors', $id);
 
-        try {
-            $monitor = $monitorsTable->get($id);
-        } catch (\Cake\Datasource\Exception\RecordNotFoundException $e) {
+        if ($monitor === null) {
             $this->error('Monitor not found', 404);
 
             return;

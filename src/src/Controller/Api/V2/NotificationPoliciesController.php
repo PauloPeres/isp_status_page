@@ -57,19 +57,14 @@ class NotificationPoliciesController extends AppController
     {
         $this->request->allowMethod(['get']);
 
-        $table = $this->fetchTable('NotificationPolicies');
-        $policy = $table->find()
-            ->where([
-                'NotificationPolicies.id' => $id,
-                'NotificationPolicies.organization_id' => $this->currentOrgId,
-            ])
-            ->contain([
+        $policy = $this->resolveOrgEntity('NotificationPolicies', $id, [
+            'contain' => [
                 'NotificationPolicySteps' => [
                     'NotificationChannels',
                     'sort' => ['NotificationPolicySteps.step_order' => 'ASC'],
                 ],
-            ])
-            ->first();
+            ],
+        ]);
 
         if (!$policy) {
             $this->error('Notification policy not found', 404);
@@ -164,12 +159,7 @@ class NotificationPoliciesController extends AppController
         }
 
         $table = $this->fetchTable('NotificationPolicies');
-        $policy = $table->find()
-            ->where([
-                'NotificationPolicies.id' => $id,
-                'NotificationPolicies.organization_id' => $this->currentOrgId,
-            ])
-            ->first();
+        $policy = $this->resolveOrgEntity('NotificationPolicies', $id);
 
         if (!$policy) {
             $this->error('Notification policy not found', 404);
@@ -249,12 +239,7 @@ class NotificationPoliciesController extends AppController
         }
 
         $table = $this->fetchTable('NotificationPolicies');
-        $policy = $table->find()
-            ->where([
-                'NotificationPolicies.id' => $id,
-                'NotificationPolicies.organization_id' => $this->currentOrgId,
-            ])
-            ->first();
+        $policy = $this->resolveOrgEntity('NotificationPolicies', $id);
 
         if (!$policy) {
             $this->error('Notification policy not found', 404);

@@ -40,13 +40,7 @@ class StatusPagesController extends AppController
     {
         $this->request->allowMethod(['get']);
 
-        $table = $this->fetchTable('StatusPages');
-        $page = $table->find()
-            ->where([
-                'StatusPages.id' => $id,
-                'StatusPages.organization_id' => $this->currentOrgId,
-            ])
-            ->first();
+        $page = $this->resolveOrgEntity('StatusPages', $id);
 
         if (!$page) {
             $this->error('Status page not found', 404);
@@ -115,12 +109,7 @@ class StatusPagesController extends AppController
         }
 
         $table = $this->fetchTable('StatusPages');
-        $page = $table->find()
-            ->where([
-                'StatusPages.id' => $id,
-                'StatusPages.organization_id' => $this->currentOrgId,
-            ])
-            ->first();
+        $page = $this->resolveOrgEntity('StatusPages', $id);
 
         if (!$page) {
             $this->error('Status page not found', 404);
@@ -163,12 +152,7 @@ class StatusPagesController extends AppController
         }
 
         $table = $this->fetchTable('StatusPages');
-        $page = $table->find()
-            ->where([
-                'StatusPages.id' => $id,
-                'StatusPages.organization_id' => $this->currentOrgId,
-            ])
-            ->first();
+        $page = $this->resolveOrgEntity('StatusPages', $id);
 
         if (!$page) {
             $this->error('Status page not found', 404);

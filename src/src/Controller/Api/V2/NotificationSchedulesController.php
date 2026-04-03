@@ -69,10 +69,7 @@ class NotificationSchedulesController extends AppController
         }
 
         $table = $this->fetchTable('NotificationSchedules');
-
-        $schedule = $table->find()
-            ->where(['id' => (int)$id, 'organization_id' => $this->currentOrgId])
-            ->first();
+        $schedule = $this->resolveOrgEntity('NotificationSchedules', $id);
 
         if (!$schedule) {
             $this->error('Schedule not found', 404);
@@ -105,10 +102,7 @@ class NotificationSchedulesController extends AppController
         }
 
         $table = $this->fetchTable('NotificationSchedules');
-
-        $schedule = $table->find()
-            ->where(['id' => (int)$id, 'organization_id' => $this->currentOrgId])
-            ->first();
+        $schedule = $this->resolveOrgEntity('NotificationSchedules', $id);
 
         if (!$schedule) {
             $this->error('Schedule not found', 404);

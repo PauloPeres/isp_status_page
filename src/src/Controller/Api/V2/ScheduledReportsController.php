@@ -46,13 +46,7 @@ class ScheduledReportsController extends AppController
     {
         $this->request->allowMethod(['get']);
 
-        $table = $this->fetchTable('ScheduledReports');
-        $report = $table->find()
-            ->where([
-                'ScheduledReports.id' => $id,
-                'ScheduledReports.organization_id' => $this->currentOrgId,
-            ])
-            ->first();
+        $report = $this->resolveOrgEntity('ScheduledReports', $id);
 
         if (!$report) {
             $this->error('Scheduled report not found', 404);
@@ -129,12 +123,7 @@ class ScheduledReportsController extends AppController
         }
 
         $table = $this->fetchTable('ScheduledReports');
-        $report = $table->find()
-            ->where([
-                'ScheduledReports.id' => $id,
-                'ScheduledReports.organization_id' => $this->currentOrgId,
-            ])
-            ->first();
+        $report = $this->resolveOrgEntity('ScheduledReports', $id);
 
         if (!$report) {
             $this->error('Scheduled report not found', 404);
@@ -180,12 +169,7 @@ class ScheduledReportsController extends AppController
         }
 
         $table = $this->fetchTable('ScheduledReports');
-        $report = $table->find()
-            ->where([
-                'ScheduledReports.id' => $id,
-                'ScheduledReports.organization_id' => $this->currentOrgId,
-            ])
-            ->first();
+        $report = $this->resolveOrgEntity('ScheduledReports', $id);
 
         if (!$report) {
             $this->error('Scheduled report not found', 404);
@@ -214,13 +198,7 @@ class ScheduledReportsController extends AppController
     {
         $this->request->allowMethod(['get']);
 
-        $table = $this->fetchTable('ScheduledReports');
-        $report = $table->find()
-            ->where([
-                'ScheduledReports.id' => $id,
-                'ScheduledReports.organization_id' => $this->currentOrgId,
-            ])
-            ->first();
+        $report = $this->resolveOrgEntity('ScheduledReports', $id);
 
         if (!$report) {
             $this->error('Scheduled report not found', 404);
@@ -254,13 +232,7 @@ class ScheduledReportsController extends AppController
             return;
         }
 
-        $table = $this->fetchTable('ScheduledReports');
-        $report = $table->find()
-            ->where([
-                'ScheduledReports.id' => $id,
-                'ScheduledReports.organization_id' => $this->currentOrgId,
-            ])
-            ->first();
+        $report = $this->resolveOrgEntity('ScheduledReports', $id);
 
         if (!$report) {
             $this->error('Scheduled report not found', 404);

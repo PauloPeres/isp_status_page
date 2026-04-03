@@ -55,13 +55,7 @@ class NotificationChannelsController extends AppController
     {
         $this->request->allowMethod(['get']);
 
-        $table = $this->fetchTable('NotificationChannels');
-        $channel = $table->find()
-            ->where([
-                'NotificationChannels.id' => $id,
-                'NotificationChannels.organization_id' => $this->currentOrgId,
-            ])
-            ->first();
+        $channel = $this->resolveOrgEntity('NotificationChannels', $id);
 
         if (!$channel) {
             $this->error('Notification channel not found', 404);
@@ -145,12 +139,7 @@ class NotificationChannelsController extends AppController
         }
 
         $table = $this->fetchTable('NotificationChannels');
-        $channel = $table->find()
-            ->where([
-                'NotificationChannels.id' => $id,
-                'NotificationChannels.organization_id' => $this->currentOrgId,
-            ])
-            ->first();
+        $channel = $this->resolveOrgEntity('NotificationChannels', $id);
 
         if (!$channel) {
             $this->error('Notification channel not found', 404);
@@ -185,12 +174,7 @@ class NotificationChannelsController extends AppController
         }
 
         $table = $this->fetchTable('NotificationChannels');
-        $channel = $table->find()
-            ->where([
-                'NotificationChannels.id' => $id,
-                'NotificationChannels.organization_id' => $this->currentOrgId,
-            ])
-            ->first();
+        $channel = $this->resolveOrgEntity('NotificationChannels', $id);
 
         if (!$channel) {
             $this->error('Notification channel not found', 404);
@@ -201,7 +185,7 @@ class NotificationChannelsController extends AppController
         // Check if channel is used by any policy step
         $stepsTable = $this->fetchTable('NotificationPolicySteps');
         $usedCount = $stepsTable->find()
-            ->where(['NotificationPolicySteps.notification_channel_id' => $id])
+            ->where(['NotificationPolicySteps.notification_channel_id' => $channel->id])
             ->count();
 
         if ($usedCount > 0) {
@@ -238,13 +222,7 @@ class NotificationChannelsController extends AppController
             return;
         }
 
-        $table = $this->fetchTable('NotificationChannels');
-        $channel = $table->find()
-            ->where([
-                'NotificationChannels.id' => $id,
-                'NotificationChannels.organization_id' => $this->currentOrgId,
-            ])
-            ->first();
+        $channel = $this->resolveOrgEntity('NotificationChannels', $id);
 
         if (!$channel) {
             $this->error('Notification channel not found', 404);

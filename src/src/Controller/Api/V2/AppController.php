@@ -197,15 +197,52 @@ class AppController extends Controller
             if (!empty($options['contain'])) {
                 $query->contain($options['contain']);
             }
+            if (!empty($options['conditions'])) {
+                $query->where($options['conditions']);
+            }
 
             return $query->first();
         }
 
         try {
-            return $table->get((int)$id, contain: $options['contain'] ?? []);
+            $entity = $table->get((int)$id, contain: $options['contain'] ?? []);
+
+            // Apply additional conditions (e.g. organization_id scoping)
+            if (!empty($options['conditions'])) {
+                foreach ($options['conditions'] as $field => $value) {
+                    // Strip table alias prefix for entity property access
+                    $prop = preg_replace('/^[A-Za-z]+\./', '', $field);
+                    if ($entity->get($prop) != $value) {
+                        return null;
+                    }
+                }
+            }
+
+            return $entity;
         } catch (\Cake\Datasource\Exception\RecordNotFoundException $e) {
             return null;
         }
+    }
+
+    /**
+     * Resolve an org-scoped entity by integer ID or UUID public_id.
+     *
+     * Convenience wrapper around resolveEntity() that automatically adds
+     * the organization_id condition for the current user's org.
+     *
+     * @param string $tableName The table alias (e.g. 'NotificationChannels').
+     * @param string $id The integer ID or UUID public_id.
+     * @param array $options Options passed to resolveEntity() such as 'contain'.
+     * @return \Cake\Datasource\EntityInterface|null The entity, or null when not found.
+     */
+    protected function resolveOrgEntity(string $tableName, string $id, array $options = []): ?EntityInterface
+    {
+        $options['conditions'] = array_merge(
+            $options['conditions'] ?? [],
+            [$tableName . '.organization_id' => $this->currentOrgId]
+        );
+
+        return $this->resolveEntity($tableName, $id, $options);
     }
 
     /**

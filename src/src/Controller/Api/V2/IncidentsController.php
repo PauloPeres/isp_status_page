@@ -224,11 +224,12 @@ class IncidentsController extends AppController
         $newStatus = $data['status'] ?? $incident->status;
         $description = $data['description'] ?? null;
 
+        $incidentsTable = $this->fetchTable('Incidents');
         $updated = $this->incidentService->updateIncident($incident, $newStatus, $description);
 
         if ($updated) {
             // Reload to get fresh data
-            $incident = $incidentsTable->get($id, contain: ['Monitors']);
+            $incident = $incidentsTable->get($incident->id, contain: ['Monitors']);
             $this->success(['incident' => $incident]);
         } else {
             $this->error('Unable to update incident', 422, $incident->getErrors());
@@ -252,10 +253,9 @@ class IncidentsController extends AppController
         }
 
         $incidentsTable = $this->fetchTable('Incidents');
+        $incident = $this->resolveEntity('Incidents', $id);
 
-        try {
-            $incident = $incidentsTable->get($id);
-        } catch (\Cake\Datasource\Exception\RecordNotFoundException $e) {
+        if ($incident === null) {
             $this->error('Incident not found', 404);
 
             return;
@@ -281,10 +281,11 @@ class IncidentsController extends AppController
         $this->request->allowMethod(['post']);
 
         $incidentsTable = $this->fetchTable('Incidents');
+        $incident = $this->resolveEntity('Incidents', $id, [
+            'contain' => ['Monitors'],
+        ]);
 
-        try {
-            $incident = $incidentsTable->get($id, contain: ['Monitors']);
-        } catch (\Cake\Datasource\Exception\RecordNotFoundException $e) {
+        if ($incident === null) {
             $this->error('Incident not found', 404);
 
             return;
@@ -334,10 +335,9 @@ class IncidentsController extends AppController
         }
 
         $incidentsTable = $this->fetchTable('Incidents');
+        $incident = $this->resolveEntity('Incidents', $id);
 
-        try {
-            $incident = $incidentsTable->get($id);
-        } catch (\Cake\Datasource\Exception\RecordNotFoundException $e) {
+        if ($incident === null) {
             $this->error('Incident not found', 404);
 
             return;
@@ -345,7 +345,7 @@ class IncidentsController extends AppController
 
         $updatesTable = $this->fetchTable('IncidentUpdates');
         $update = $updatesTable->newEntity([
-            'incident_id' => (int)$id,
+            'incident_id' => $incident->id,
             'organization_id' => $incident->organization_id,
             'user_id' => $this->currentUserId,
             'status' => $this->request->getData('status', 'update'),

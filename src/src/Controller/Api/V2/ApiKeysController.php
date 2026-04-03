@@ -108,12 +108,7 @@ class ApiKeysController extends AppController
         }
 
         $table = $this->fetchTable('ApiKeys');
-        $key = $table->find()
-            ->where([
-                'ApiKeys.id' => $id,
-                'ApiKeys.organization_id' => $this->currentOrgId,
-            ])
-            ->first();
+        $key = $this->resolveOrgEntity('ApiKeys', $id);
 
         if (!$key) {
             $this->error('API key not found', 404);
