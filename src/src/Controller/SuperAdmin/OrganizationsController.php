@@ -144,7 +144,8 @@ class OrganizationsController extends AppController
             $identity ? (int)$identity->id : null,
             $this->request->clientIp(),
             $this->request->getHeaderLine('User-Agent'),
-            ['organization_id' => $org->id, 'organization_name' => $org->name]
+            ['organization_id' => $org->id, 'organization_name' => $org->name],
+            (int)$org->id
         );
 
         $this->Flash->success(__('Now impersonating: {0}', $org->name));
@@ -187,7 +188,8 @@ class OrganizationsController extends AppController
                 'organization_name' => $org->name,
                 'amount' => $amount,
                 'reason' => $reason,
-            ]
+            ],
+            (int)$org->id
         );
 
         $this->Flash->success(__('Granted %d credits to %s', $amount, $org->name));

@@ -160,7 +160,8 @@ class MonitorsController extends AppController
                 $this->currentUserId,
                 $this->request->clientIp(),
                 $this->request->getHeaderLine('User-Agent'),
-                ['monitor_id' => $monitor->id, 'name' => $monitor->name, 'type' => $monitor->type]
+                ['monitor_id' => $monitor->id, 'name' => $monitor->name, 'type' => $monitor->type],
+                $this->currentOrgId ?: null
             );
 
             $this->success(['monitor' => $monitor], 201);
@@ -207,7 +208,8 @@ class MonitorsController extends AppController
                 $this->currentUserId,
                 $this->request->clientIp(),
                 $this->request->getHeaderLine('User-Agent'),
-                ['monitor_id' => $monitor->id, 'name' => $monitor->name, 'type' => $monitor->type]
+                ['monitor_id' => $monitor->id, 'name' => $monitor->name, 'type' => $monitor->type],
+                $this->currentOrgId ?: null
             );
 
             $this->success(['monitor' => $monitor]);
@@ -248,7 +250,8 @@ class MonitorsController extends AppController
                 $this->currentUserId,
                 $this->request->clientIp(),
                 $this->request->getHeaderLine('User-Agent'),
-                ['monitor_id' => (int)$id, 'name' => $monitor->name, 'type' => $monitor->type]
+                ['monitor_id' => (int)$id, 'name' => $monitor->name, 'type' => $monitor->type],
+                $this->currentOrgId ?: null
             );
 
             $this->success(['message' => 'Monitor deleted']);

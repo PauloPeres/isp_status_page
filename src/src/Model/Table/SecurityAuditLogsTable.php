@@ -10,6 +10,7 @@ use Cake\Validation\Validator;
  * SecurityAuditLogs Model (TASK-AUTH-018)
  *
  * @property \App\Model\Table\UsersTable&\Cake\ORM\Association\BelongsTo $Users
+ * @property \App\Model\Table\OrganizationsTable&\Cake\ORM\Association\BelongsTo $Organizations
  *
  * @method \App\Model\Entity\SecurityAuditLog newEmptyEntity()
  * @method \App\Model\Entity\SecurityAuditLog newEntity(array $data, array $options = [])
@@ -33,6 +34,11 @@ class SecurityAuditLogsTable extends Table
 
         $this->belongsTo('Users', [
             'foreignKey' => 'user_id',
+            'joinType' => 'LEFT',
+        ]);
+
+        $this->belongsTo('Organizations', [
+            'foreignKey' => 'organization_id',
             'joinType' => 'LEFT',
         ]);
     }

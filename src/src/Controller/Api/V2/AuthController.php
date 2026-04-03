@@ -433,6 +433,17 @@ class AuthController extends AppController
 
         $jwtService = $this->jwtService;
 
+        // Block the current access token so it cannot be reused after logout
+        $authHeader = $this->request->getHeaderLine('Authorization');
+        if (str_starts_with($authHeader, 'Bearer ')) {
+            $rawToken = substr($authHeader, 7);
+            $payload = $jwtService->verifyAccessToken($rawToken);
+            if ($payload !== null && isset($payload->exp)) {
+                $tokenId = $jwtService->getTokenIdentifier($rawToken, $payload);
+                $jwtService->blockToken($tokenId, (int)$payload->exp);
+            }
+        }
+
         // Accept refresh token from body (backwards compat) or HttpOnly cookie
         $refreshToken = $this->request->getData('refresh_token')
             ?? $this->request->getCookie('refresh_token');
@@ -455,7 +466,8 @@ class AuthController extends AppController
             $this->currentUserId > 0 ? $this->currentUserId : null,
             $this->request->clientIp(),
             $this->request->getHeaderLine('User-Agent'),
-            ['revoke_all' => $revokeAll]
+            ['revoke_all' => $revokeAll],
+            $this->currentOrgId ?: null
         );
 
         $this->success(['message' => 'Logged out successfully']);

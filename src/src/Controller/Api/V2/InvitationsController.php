@@ -78,7 +78,8 @@ class InvitationsController extends AppController
                 $this->currentUserId,
                 $this->request->clientIp(),
                 $this->request->getHeaderLine('User-Agent'),
-                ['email' => $email, 'role' => $role, 'invitation_id' => $invitation->id ?? null]
+                ['email' => $email, 'role' => $role, 'invitation_id' => $invitation->id ?? null],
+                $this->currentOrgId ?: null
             );
 
             $this->success(['invitation' => $invitation], 201);

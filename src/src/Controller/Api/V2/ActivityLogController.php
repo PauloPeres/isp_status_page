@@ -7,6 +7,7 @@ namespace App\Controller\Api\V2;
  * ActivityLogController (TASK-NG-013)
  *
  * View organization activity log with optional event type filtering.
+ * Tenant-scoped: only returns logs belonging to the current organization.
  */
 class ActivityLogController extends AppController
 {
@@ -14,6 +15,8 @@ class ActivityLogController extends AppController
      * GET /api/v2/activity-log
      *
      * List activity log entries with optional event_type filter.
+     * Scoped to the current organization. Super admins also see
+     * system-level events (organization_id IS NULL).
      *
      * @return void
      */
@@ -28,6 +31,19 @@ class ActivityLogController extends AppController
         $table = $this->fetchTable('SecurityAuditLogs');
         $query = $table->find()
             ->orderBy(['SecurityAuditLogs.created' => 'DESC']);
+
+        // Tenant isolation: filter by organization_id
+        if ($this->isSuperAdmin) {
+            // Super admins see their org's logs + system-level events (null org)
+            $query->where([
+                'OR' => [
+                    'SecurityAuditLogs.organization_id' => $this->currentOrgId,
+                    'SecurityAuditLogs.organization_id IS' => null,
+                ],
+            ]);
+        } else {
+            $query->where(['SecurityAuditLogs.organization_id' => $this->currentOrgId]);
+        }
 
         $eventType = $this->request->getQuery('event_type');
         if (!empty($eventType)) {
@@ -57,6 +73,7 @@ class ActivityLogController extends AppController
      *
      * Export audit logs as CSV or JSON for compliance.
      * Query params: format (csv|json, default csv), from, to, event_type
+     * Scoped to the current organization.
      *
      * @return void
      */
@@ -77,6 +94,18 @@ class ActivityLogController extends AppController
         $query = $table->find()
             ->contain(['Users' => ['fields' => ['id', 'username', 'email']]])
             ->orderBy(['SecurityAuditLogs.created' => 'ASC']);
+
+        // Tenant isolation: filter by organization_id
+        if ($this->isSuperAdmin) {
+            $query->where([
+                'OR' => [
+                    'SecurityAuditLogs.organization_id' => $this->currentOrgId,
+                    'SecurityAuditLogs.organization_id IS' => null,
+                ],
+            ]);
+        } else {
+            $query->where(['SecurityAuditLogs.organization_id' => $this->currentOrgId]);
+        }
 
         if (!empty($eventType)) {
             $query->where(['SecurityAuditLogs.event_type' => $eventType]);

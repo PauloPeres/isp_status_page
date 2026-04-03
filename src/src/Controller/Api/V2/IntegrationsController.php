@@ -107,7 +107,8 @@ class IntegrationsController extends AppController
             $this->currentUserId,
             $this->request->clientIp(),
             $this->request->getHeaderLine('User-Agent'),
-            ['integration_id' => $integration->id, 'name' => $integration->name, 'type' => $integration->type ?? null]
+            ['integration_id' => $integration->id, 'name' => $integration->name, 'type' => $integration->type ?? null],
+            $this->currentOrgId ?: null
         );
 
         $this->success(['integration' => $integration], 201);
@@ -194,7 +195,8 @@ class IntegrationsController extends AppController
             $this->currentUserId,
             $this->request->clientIp(),
             $this->request->getHeaderLine('User-Agent'),
-            ['integration_id' => (int)$id, 'name' => $integration->name, 'type' => $integration->type ?? null]
+            ['integration_id' => (int)$id, 'name' => $integration->name, 'type' => $integration->type ?? null],
+            $this->currentOrgId ?: null
         );
 
         $this->success(['message' => 'Integration deleted']);

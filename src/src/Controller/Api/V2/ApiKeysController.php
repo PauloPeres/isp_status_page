@@ -84,7 +84,8 @@ class ApiKeysController extends AppController
             $this->currentUserId,
             $this->request->clientIp(),
             $this->request->getHeaderLine('User-Agent'),
-            ['api_key_id' => $key->id, 'name' => $key->name ?? null]
+            ['api_key_id' => $key->id, 'name' => $key->name ?? null],
+            $this->currentOrgId ?: null
         );
 
         $this->success(['api_key' => $key], 201);
@@ -131,7 +132,8 @@ class ApiKeysController extends AppController
             $this->currentUserId,
             $this->request->clientIp(),
             $this->request->getHeaderLine('User-Agent'),
-            ['api_key_id' => (int)$id, 'name' => $key->name ?? null]
+            ['api_key_id' => (int)$id, 'name' => $key->name ?? null],
+            $this->currentOrgId ?: null
         );
 
         $this->success(['message' => 'API key deleted']);

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Tenant\TenantContext;
 use Cake\I18n\DateTime;
 use Cake\Log\LogTrait;
 use Cake\ORM\Locator\LocatorAwareTrait;
@@ -26,14 +27,21 @@ class AuditLogService
      * @param string $ipAddress The client IP address.
      * @param string|null $userAgent The client user agent string.
      * @param array|null $details Optional key-value details to store as JSON.
+     * @param int|null $organizationId The organization ID. If null, auto-resolves from TenantContext.
      * @return void
      */
-    public function log(string $eventType, ?int $userId, string $ipAddress, ?string $userAgent = null, ?array $details = null): void
+    public function log(string $eventType, ?int $userId, string $ipAddress, ?string $userAgent = null, ?array $details = null, ?int $organizationId = null): void
     {
         try {
+            // Auto-resolve organization_id from TenantContext if not explicitly provided
+            if ($organizationId === null && TenantContext::isSet()) {
+                $organizationId = TenantContext::getCurrentOrgId();
+            }
+
             $table = $this->fetchTable('SecurityAuditLogs');
             $entry = $table->newEntity([
                 'user_id' => $userId,
+                'organization_id' => $organizationId,
                 'event_type' => $eventType,
                 'ip_address' => $ipAddress,
                 'user_agent' => $userAgent,
@@ -43,7 +51,6 @@ class AuditLogService
             $table->save($entry);
         } catch (\Exception $e) {
             // Never let audit logging break the main flow
-            // Use LogTrait::log() via explicit level-based call
             \Cake\Log\Log::write('error', "Failed to write audit log ({$eventType}): {$e->getMessage()}");
         }
     }

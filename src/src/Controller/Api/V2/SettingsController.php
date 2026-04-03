@@ -97,7 +97,8 @@ class SettingsController extends AppController
                 $this->currentUserId,
                 $this->request->clientIp(),
                 $this->request->getHeaderLine('User-Agent'),
-                ['keys_changed' => array_keys($data)]
+                ['keys_changed' => array_keys($data)],
+                $this->currentOrgId ?: null
             );
 
             $this->success(['message' => 'Settings saved']);
