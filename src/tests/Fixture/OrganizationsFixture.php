@@ -18,6 +18,7 @@ class OrganizationsFixture extends TestFixture
     public array $records = [
         [
             'id' => 1,
+            'public_id' => 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
             'name' => 'Acme ISP',
             'slug' => 'acme-isp',
             'plan' => 'free',
@@ -35,6 +36,7 @@ class OrganizationsFixture extends TestFixture
         ],
         [
             'id' => 2,
+            'public_id' => '550e8400-e29b-41d4-a716-446655440000',
             'name' => 'Pro Networks',
             'slug' => 'pro-networks',
             'plan' => 'pro',

@@ -49,6 +49,7 @@ class IncidentsTable extends Table
 
         $this->addBehavior('Timestamp');
         $this->addBehavior('TenantScope');
+        $this->addBehavior('PublicId');
 
         $this->belongsTo('Monitors', [
             'foreignKey' => 'monitor_id',

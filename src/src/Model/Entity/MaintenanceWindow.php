@@ -49,6 +49,7 @@ class MaintenanceWindow extends Entity
      * @var array<string, bool>
      */
     protected array $_accessible = [
+        'public_id' => true,
         'organization_id' => true,
         'title' => true,
         'description' => true,

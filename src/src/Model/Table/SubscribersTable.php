@@ -47,6 +47,7 @@ class SubscribersTable extends Table
 
         $this->addBehavior('Timestamp');
         $this->addBehavior('TenantScope');
+        $this->addBehavior('PublicId');
 
         $this->hasMany('Subscriptions', [
             'foreignKey' => 'subscriber_id',

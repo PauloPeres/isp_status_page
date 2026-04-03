@@ -41,6 +41,7 @@ class ApiKey extends Entity
      * @var array<string, bool>
      */
     protected array $_accessible = [
+        'public_id' => true,
         'organization_id' => true,
         'user_id' => true,
         'name' => true,

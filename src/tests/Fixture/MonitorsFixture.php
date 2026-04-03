@@ -18,6 +18,7 @@ class MonitorsFixture extends TestFixture
     public array $records = [
         [
             'id' => 1,
+            'public_id' => 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d',
             'organization_id' => 1,
             'name' => 'Website',
             'description' => 'Main website monitoring',
@@ -38,6 +39,7 @@ class MonitorsFixture extends TestFixture
         ],
         [
             'id' => 2,
+            'public_id' => 'b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e',
             'organization_id' => 1,
             'name' => 'API Server',
             'description' => 'API endpoint monitoring',
@@ -58,6 +60,7 @@ class MonitorsFixture extends TestFixture
         ],
         [
             'id' => 3,
+            'public_id' => 'c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f',
             'organization_id' => 1,
             'name' => 'Inactive Monitor',
             'description' => 'This monitor is inactive',

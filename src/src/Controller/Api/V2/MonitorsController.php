@@ -109,7 +109,15 @@ class MonitorsController extends AppController
     {
         $this->request->allowMethod(['get']);
 
-        $result = $this->monitorStatsService->getMonitorDetail((int)$id, $this->currentOrgId);
+        // Support UUID public_id lookup
+        $monitor = $this->resolveEntity('Monitors', $id);
+        if ($monitor === null) {
+            $this->error('Monitor not found', 404);
+
+            return;
+        }
+
+        $result = $this->monitorStatsService->getMonitorDetail($monitor->id, $this->currentOrgId);
 
         if ($result === null) {
             $this->error('Monitor not found', 404);
@@ -188,9 +196,8 @@ class MonitorsController extends AppController
 
         $monitorsTable = $this->fetchTable('Monitors');
 
-        try {
-            $monitor = $monitorsTable->get($id);
-        } catch (\Cake\Datasource\Exception\RecordNotFoundException $e) {
+        $monitor = $this->resolveEntity('Monitors', $id);
+        if ($monitor === null) {
             $this->error('Monitor not found', 404);
 
             return;
@@ -236,9 +243,8 @@ class MonitorsController extends AppController
 
         $monitorsTable = $this->fetchTable('Monitors');
 
-        try {
-            $monitor = $monitorsTable->get($id);
-        } catch (\Cake\Datasource\Exception\RecordNotFoundException $e) {
+        $monitor = $this->resolveEntity('Monitors', $id);
+        if ($monitor === null) {
             $this->error('Monitor not found', 404);
 
             return;

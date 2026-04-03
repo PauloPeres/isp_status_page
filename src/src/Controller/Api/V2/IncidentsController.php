@@ -119,17 +119,17 @@ class IncidentsController extends AppController
     {
         $this->request->allowMethod(['get']);
 
-        $incidentsTable = $this->fetchTable('Incidents');
-
-        try {
-            $incident = $incidentsTable->get($id, contain: [
+        $incident = $this->resolveEntity('Incidents', $id, [
+            'contain' => [
                 'Monitors',
                 'AcknowledgedByUsers',
                 'AlertLogs' => function ($q) {
                     return $q->orderBy(['created' => 'DESC']);
                 },
-            ]);
-        } catch (\Cake\Datasource\Exception\RecordNotFoundException $e) {
+            ],
+        ]);
+
+        if ($incident === null) {
             $this->error('Incident not found', 404);
 
             return;
@@ -139,7 +139,7 @@ class IncidentsController extends AppController
         $incidentUpdates = $this->fetchTable('IncidentUpdates')
             ->find()
             ->contain(['Users'])
-            ->where(['IncidentUpdates.incident_id' => $id])
+            ->where(['IncidentUpdates.incident_id' => $incident->id])
             ->orderBy(['IncidentUpdates.created' => 'ASC'])
             ->toArray();
 
@@ -210,11 +210,11 @@ class IncidentsController extends AppController
             return;
         }
 
-        $incidentsTable = $this->fetchTable('Incidents');
+        $incident = $this->resolveEntity('Incidents', $id, [
+            'contain' => ['Monitors'],
+        ]);
 
-        try {
-            $incident = $incidentsTable->get($id, contain: ['Monitors']);
-        } catch (\Cake\Datasource\Exception\RecordNotFoundException $e) {
+        if ($incident === null) {
             $this->error('Incident not found', 404);
 
             return;

@@ -51,6 +51,7 @@ class OrganizationsTable extends Table
         $this->setPrimaryKey('id');
 
         $this->addBehavior('Timestamp');
+        $this->addBehavior('PublicId');
 
         $this->hasMany('OrganizationUsers', [
             'foreignKey' => 'organization_id',

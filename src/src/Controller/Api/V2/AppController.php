@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Controller\Api\V2;
 
 use Cake\Controller\Controller;
+use Cake\Datasource\EntityInterface;
 use Cake\Event\EventInterface;
 
 /**
@@ -172,6 +173,39 @@ class AppController extends Controller
         }
 
         return true;
+    }
+
+    /**
+     * Resolve an entity by either integer ID or UUID public_id.
+     *
+     * If the $id looks like a UUID (matches the 8-4-... pattern), the
+     * entity is looked up via the `byPublicId` finder provided by
+     * PublicIdBehavior.  Otherwise it falls back to the standard
+     * integer-based `get()`.
+     *
+     * @param string $tableName The table alias (e.g. 'Monitors').
+     * @param string $id The integer ID or UUID public_id.
+     * @param array $options Options passed to get() / find() such as 'contain'.
+     * @return \Cake\Datasource\EntityInterface|null The entity, or null when not found.
+     */
+    protected function resolveEntity(string $tableName, string $id, array $options = []): ?EntityInterface
+    {
+        $table = $this->fetchTable($tableName);
+
+        if (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-/i', $id)) {
+            $query = $table->find('byPublicId', publicId: $id);
+            if (!empty($options['contain'])) {
+                $query->contain($options['contain']);
+            }
+
+            return $query->first();
+        }
+
+        try {
+            return $table->get((int)$id, contain: $options['contain'] ?? []);
+        } catch (\Cake\Datasource\Exception\RecordNotFoundException $e) {
+            return null;
+        }
     }
 
     /**

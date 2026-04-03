@@ -18,6 +18,7 @@ class MaintenanceWindowsFixture extends TestFixture
     public array $records = [
         [
             'id' => 1,
+            'public_id' => 'd6e7f809-1021-4324-3546-576879809102',
             'organization_id' => 1,
             'title' => 'Scheduled Maintenance',
             'description' => 'Routine server maintenance',

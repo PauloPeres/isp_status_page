@@ -51,6 +51,7 @@ class NotificationPolicy extends Entity
      * @var array<string, bool>
      */
     protected array $_accessible = [
+        'public_id' => true,
         'organization_id' => true,
         'name' => true,
         'description' => true,

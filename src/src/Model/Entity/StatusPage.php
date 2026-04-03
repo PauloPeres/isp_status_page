@@ -37,6 +37,7 @@ class StatusPage extends Entity
     protected array $_hidden = ['password'];
 
     protected array $_accessible = [
+        'public_id' => true,
         'organization_id' => true,
         'name' => true,
         'slug' => true,

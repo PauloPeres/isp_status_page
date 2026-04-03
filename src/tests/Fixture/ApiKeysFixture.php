@@ -27,6 +27,7 @@ class ApiKeysFixture extends TestFixture
         $this->records = [
             [
                 'id' => 1,
+                'public_id' => 'd0e1f2a3-b4c5-4d6e-7f80-910213243546',
                 'organization_id' => 1,
                 'user_id' => 1,
                 'name' => 'Production API Key',
@@ -42,6 +43,7 @@ class ApiKeysFixture extends TestFixture
             ],
             [
                 'id' => 2,
+                'public_id' => 'e1f2a3b4-c5d6-4e7f-8091-021324354657',
                 'organization_id' => 1,
                 'user_id' => 1,
                 'name' => 'Read Only Key',
@@ -57,6 +59,7 @@ class ApiKeysFixture extends TestFixture
             ],
             [
                 'id' => 3,
+                'public_id' => 'f2a3b4c5-d6e7-4f80-9102-132435465768',
                 'organization_id' => 1,
                 'user_id' => 1,
                 'name' => 'Expired Key',
@@ -72,6 +75,7 @@ class ApiKeysFixture extends TestFixture
             ],
             [
                 'id' => 4,
+                'public_id' => 'a3b4c5d6-e7f8-4091-0213-243546576879',
                 'organization_id' => 1,
                 'user_id' => 1,
                 'name' => 'Revoked Key',

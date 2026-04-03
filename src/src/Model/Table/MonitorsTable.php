@@ -51,6 +51,7 @@ class MonitorsTable extends Table
 
         $this->addBehavior('Timestamp');
         $this->addBehavior('TenantScope');
+        $this->addBehavior('PublicId');
 
         $this->hasMany('AlertLogs', [
             'foreignKey' => 'monitor_id',

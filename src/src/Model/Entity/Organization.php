@@ -57,6 +57,7 @@ class Organization extends Entity
     ];
 
     protected array $_accessible = [
+        'public_id' => true,
         'name' => true,
         'slug' => true,
         'plan' => true,

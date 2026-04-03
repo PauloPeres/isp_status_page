@@ -18,6 +18,7 @@ class StatusPagesFixture extends TestFixture
     public array $records = [
         [
             'id' => 1,
+            'public_id' => 'b4c5d6e7-f809-4102-1324-354657687980',
             'organization_id' => 1,
             'name' => 'Acme Status',
             'slug' => 'acme-status',
@@ -33,6 +34,7 @@ class StatusPagesFixture extends TestFixture
         ],
         [
             'id' => 2,
+            'public_id' => 'c5d6e7f8-0910-4213-2435-465768798091',
             'organization_id' => 1,
             'name' => 'Inactive Page',
             'slug' => 'inactive-page',

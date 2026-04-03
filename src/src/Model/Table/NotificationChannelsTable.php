@@ -45,6 +45,7 @@ class NotificationChannelsTable extends Table
 
         $this->addBehavior('Timestamp');
         $this->addBehavior('TenantScope');
+        $this->addBehavior('PublicId');
 
         // Override schema type so CakePHP marshaller properly handles array <-> JSON
         $this->getSchema()->setColumnType('configuration', 'json');
