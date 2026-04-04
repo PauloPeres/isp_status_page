@@ -717,6 +717,11 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/settings', ['controller' => 'Settings', 'action' => 'save', 'prefix' => 'Api/V2', '_method' => 'PUT']);
         $builder->connect('/settings', ['controller' => 'Settings', 'action' => 'save', 'prefix' => 'Api/V2', '_method' => 'PATCH']);
 
+        // SIP Configuration (Voice Call Alerts)
+        $builder->connect('/sip-configuration', ['controller' => 'SipConfiguration', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
+        $builder->connect('/sip-configuration', ['controller' => 'SipConfiguration', 'action' => 'save', 'prefix' => 'Api/V2', '_method' => 'PUT']);
+        $builder->connect('/sip-configuration/test', ['controller' => 'SipConfiguration', 'action' => 'test', 'prefix' => 'Api/V2', '_method' => 'POST']);
+
         // Billing
         $builder->connect('/billing/plans', ['controller' => 'Billing', 'action' => 'plans', 'prefix' => 'Api/V2', '_method' => 'GET']);
         $builder->connect('/billing/checkout', ['controller' => 'Billing', 'action' => 'checkout', 'prefix' => 'Api/V2', '_method' => 'POST']);

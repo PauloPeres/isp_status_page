@@ -37,6 +37,7 @@ class NotificationChannel extends Entity
     public const TYPE_PAGERDUTY = 'pagerduty';
     public const TYPE_OPSGENIE = 'opsgenie';
     public const TYPE_WEBHOOK = 'webhook';
+    public const TYPE_VOICE_CALL = 'voice_call';
 
     /**
      * All valid channel types
@@ -51,6 +52,7 @@ class NotificationChannel extends Entity
         self::TYPE_PAGERDUTY,
         self::TYPE_OPSGENIE,
         self::TYPE_WEBHOOK,
+        self::TYPE_VOICE_CALL,
     ];
 
     /**
@@ -185,6 +187,7 @@ class NotificationChannel extends Entity
             self::TYPE_PAGERDUTY => 'PagerDuty',
             self::TYPE_OPSGENIE => 'OpsGenie',
             self::TYPE_WEBHOOK => 'Webhook',
+            self::TYPE_VOICE_CALL => 'Voice Call',
             default => ucfirst($this->type),
         };
     }

@@ -151,7 +151,7 @@ class Plan extends Entity
 
             // "all_alert_channels" is a superset that implies all specific alert features
             if (in_array('all_alert_channels', $features, true)) {
-                $impliedByAll = ['email_alerts', 'slack_alerts', 'webhook_alerts'];
+                $impliedByAll = ['email_alerts', 'slack_alerts', 'webhook_alerts', 'voice_call_alerts'];
                 if (in_array($feature, $impliedByAll, true)) {
                     return true;
                 }

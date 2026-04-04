@@ -11,6 +11,7 @@ use App\Service\Alert\PagerDutyAlertChannel;
 use App\Service\Alert\SlackAlertChannel;
 use App\Service\Alert\SmsAlertChannel;
 use App\Service\Alert\TelegramAlertChannel;
+use App\Service\Alert\VoiceCallAlertChannel;
 use App\Service\Alert\WebhookAlertChannel;
 use App\Service\Alert\WhatsAppAlertChannel;
 use App\Service\PlanService;
@@ -94,6 +95,7 @@ class NotificationChannelsController extends AppController
                 'pagerduty' => 'all_alert_channels',
                 'opsgenie' => 'all_alert_channels',
                 'webhook' => 'webhook_alerts',
+                'voice_call' => 'voice_call_alerts',
             ];
             $requiredFeature = $featureMap[$type] ?? null;
             if ($requiredFeature) {
@@ -320,6 +322,7 @@ class NotificationChannelsController extends AppController
             'pagerduty' => [$config['routing_key'] ?? ''],
             'opsgenie' => [$config['api_key'] ?? ''],
             'webhook' => [$config['url'] ?? ''],
+            'voice_call' => $config['phone_numbers'] ?? [],
             default => [],
         };
     }
@@ -342,6 +345,7 @@ class NotificationChannelsController extends AppController
             'pagerduty' => new PagerDutyAlertChannel(),
             'opsgenie' => new OpsGenieAlertChannel(),
             'webhook' => new WebhookAlertChannel(),
+            'voice_call' => new VoiceCallAlertChannel(),
             default => null,
         };
     }

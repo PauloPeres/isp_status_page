@@ -218,6 +218,14 @@ addIcons({
                     </div>
                     <ion-icon name="open-outline" class="link-arrow"></ion-icon>
                   </a>
+                  <a class="link-card" routerLink="/settings/sip">
+                    <ion-icon name="megaphone-outline"></ion-icon>
+                    <div>
+                      <strong>Voice / SIP Configuration</strong>
+                      <span>Configure voice call alerts via Twilio or your own SIP trunk</span>
+                    </div>
+                    <ion-icon name="open-outline" class="link-arrow"></ion-icon>
+                  </a>
                 </div>
               </div>
             </div>

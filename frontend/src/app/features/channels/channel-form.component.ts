@@ -79,6 +79,12 @@ const CHANNEL_TYPE_CONFIGS: Record<string, ChannelTypeConfig> = {
       { key: 'secret', label: 'Secret', placeholder: 'Optional shared secret for signing', type: 'password' },
     ],
   },
+  voice_call: {
+    label: 'Voice Call',
+    fields: [
+      { key: 'phone_numbers', label: 'Phone Numbers', placeholder: '+1234567890 (E.164 format)', multi: true },
+    ],
+  },
 };
 
 @Component({
@@ -229,6 +235,7 @@ export class ChannelFormComponent implements OnInit {
     { value: 'pagerduty', label: 'PagerDuty' },
     { value: 'opsgenie', label: 'OpsGenie' },
     { value: 'webhook', label: 'Webhook' },
+    { value: 'voice_call', label: 'Voice Call' },
   ];
 
   constructor(

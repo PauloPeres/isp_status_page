@@ -319,6 +319,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'settings/sip',
+        loadComponent: () =>
+          import('./features/settings/sip-settings.component').then(
+            (m) => m.SipSettingsComponent,
+          ),
+      },
+      {
         path: 'billing',
         loadComponent: () =>
           import('./features/billing/billing.component').then(
