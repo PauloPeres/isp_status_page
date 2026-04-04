@@ -849,6 +849,13 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/subscribers/{id}', ['controller' => 'Subscribers', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
         $builder->connect('/subscribers/{id}/toggle', ['controller' => 'Subscribers', 'action' => 'toggle', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
 
+        // AI Chat Assistant
+        $builder->connect('/chat/conversations', ['controller' => 'Chat', 'action' => 'createConversation', 'prefix' => 'Api/V2', '_method' => 'POST']);
+        $builder->connect('/chat/conversations', ['controller' => 'Chat', 'action' => 'listConversations', 'prefix' => 'Api/V2', '_method' => 'GET']);
+        $builder->connect('/chat/conversations/{id}', ['controller' => 'Chat', 'action' => 'viewConversation', 'prefix' => 'Api/V2', '_method' => 'GET'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/chat/conversations/{id}', ['controller' => 'Chat', 'action' => 'deleteConversation', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+        $builder->connect('/chat/conversations/{id}/messages', ['controller' => 'Chat', 'action' => 'sendMessage', 'prefix' => 'Api/V2', '_method' => 'POST'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
+
         // Email Logs (reads from alert_logs)
         $builder->connect('/email-logs', ['controller' => 'EmailLogs', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
 
