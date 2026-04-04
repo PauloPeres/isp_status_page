@@ -9,6 +9,7 @@ use App\Service\Alert\DiscordAlertChannel;
 use App\Service\Alert\EmailAlertChannel;
 use App\Service\Alert\OpsGenieAlertChannel;
 use App\Service\Alert\PagerDutyAlertChannel;
+use App\Service\Alert\VoiceCallAlertChannel;
 use App\Service\Alert\SlackAlertChannel;
 use App\Service\Alert\SmsAlertChannel;
 use App\Service\Alert\TelegramAlertChannel;
@@ -309,6 +310,7 @@ class MonitorCheckJob implements JobInterface
         $alertService->registerChannel(new WhatsAppAlertChannel());
         $alertService->registerChannel(new PagerDutyAlertChannel());
         $alertService->registerChannel(new OpsGenieAlertChannel());
+        $alertService->registerChannel(new VoiceCallAlertChannel());
 
         $alertService->dispatch($monitor, $incident);
     }

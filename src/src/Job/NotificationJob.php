@@ -12,6 +12,7 @@ use App\Service\Alert\SlackAlertChannel;
 use App\Service\Alert\SmsAlertChannel;
 use App\Service\Alert\TelegramAlertChannel;
 use App\Service\Alert\WebhookAlertChannel;
+use App\Service\Alert\VoiceCallAlertChannel;
 use App\Service\Alert\WhatsAppAlertChannel;
 use Cake\Log\Log;
 use Cake\ORM\Locator\LocatorAwareTrait;
@@ -74,6 +75,7 @@ class NotificationJob implements JobInterface
             $alertService->registerChannel(new WhatsAppAlertChannel());
             $alertService->registerChannel(new PagerDutyAlertChannel());
             $alertService->registerChannel(new OpsGenieAlertChannel());
+            $alertService->registerChannel(new VoiceCallAlertChannel());
 
             // Dispatch alerts — AlertService handles throttle, quiet hours, etc.
             $dispatched = $alertService->dispatch($monitor, $incident);

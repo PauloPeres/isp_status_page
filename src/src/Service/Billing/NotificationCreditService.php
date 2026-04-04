@@ -297,6 +297,28 @@ class NotificationCreditService
     }
 
     /**
+     * Credit costs per notification channel.
+     *
+     * @var array<string, int>
+     */
+    private const CHANNEL_COSTS = [
+        'sms' => 1,
+        'whatsapp' => 1,
+        'voice_call' => 3,
+    ];
+
+    /**
+     * Get the credit cost for a notification channel.
+     *
+     * @param string $channel The channel type (sms, whatsapp, voice_call)
+     * @return int The number of credits required
+     */
+    public function getCostForChannel(string $channel): int
+    {
+        return self::CHANNEL_COSTS[$channel] ?? 1;
+    }
+
+    /**
      * Get the monthly grant amount for a plan.
      *
      * @param string $plan Plan slug

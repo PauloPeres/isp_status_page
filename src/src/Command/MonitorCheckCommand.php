@@ -14,6 +14,7 @@ use App\Service\Alert\WebhookAlertChannel;
 use App\Service\Alert\WhatsAppAlertChannel;
 use App\Service\Alert\PagerDutyAlertChannel;
 use App\Service\Alert\OpsGenieAlertChannel;
+use App\Service\Alert\VoiceCallAlertChannel;
 use App\Service\Check\CheckService;
 use App\Service\Check\HeartbeatChecker;
 use App\Service\Check\HttpChecker;
@@ -102,6 +103,7 @@ class MonitorCheckCommand extends Command
         $this->alertService->registerChannel(new WhatsAppAlertChannel());
         $this->alertService->registerChannel(new PagerDutyAlertChannel());
         $this->alertService->registerChannel(new OpsGenieAlertChannel());
+        $this->alertService->registerChannel(new VoiceCallAlertChannel());
 
         // Initialize incident service
         $this->incidentService = new IncidentService();
