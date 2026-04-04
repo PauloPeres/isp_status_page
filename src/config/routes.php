@@ -277,6 +277,25 @@ return function (RouteBuilder $routes): void {
         );
 
         /*
+         * Voice call webhook routes (Twilio IVR)
+         */
+        $builder->connect(
+            '/webhooks/voice/answer/{callLogId}',
+            ['controller' => 'VoiceWebhook', 'action' => 'answer'],
+            ['pass' => ['callLogId'], 'callLogId' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}']
+        );
+        $builder->connect(
+            '/webhooks/voice/dtmf/{callLogId}',
+            ['controller' => 'VoiceWebhook', 'action' => 'dtmfInput'],
+            ['pass' => ['callLogId'], 'callLogId' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}']
+        );
+        $builder->connect(
+            '/webhooks/voice/status/{callLogId}',
+            ['controller' => 'VoiceWebhook', 'action' => 'statusCallback'],
+            ['pass' => ['callLogId'], 'callLogId' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}']
+        );
+
+        /*
          * Invitation routes (TASK-702)
          */
         $builder->connect(

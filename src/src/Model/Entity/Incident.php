@@ -49,6 +49,7 @@ class Incident extends Entity
     public const ACK_VIA_WEB = 'web';
     public const ACK_VIA_TELEGRAM = 'telegram';
     public const ACK_VIA_SMS = 'sms';
+    public const ACK_VIA_VOICE_CALL = 'voice_call';
 
     /**
      * Token expiry in hours

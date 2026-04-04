@@ -8,8 +8,10 @@ use App\Service\Billing\NotificationCreditService;
 use Cake\I18n\DateTime;
 use Cake\Log\Log;
 use Cake\ORM\Locator\LocatorAwareTrait;
+use Cake\Queue\QueueManager;
 use Cake\Routing\Router;
 use Cake\Utility\Text;
+use App\Job\VoiceEscalationJob;
 
 /**
  * Voice Call Service
@@ -246,6 +248,32 @@ class VoiceCallService
      */
     public function handleNoAnswer(VoiceCallLog $callLog): void
     {
+        try {
+            QueueManager::push(VoiceEscalationJob::class, [
+                'data' => [
+                    'voice_call_log_id' => $callLog->id,
+                ],
+            ], ['config' => 'notifications']);
+
+            Log::info("VoiceCallService: Pushed VoiceEscalationJob for call log {$callLog->id} (incident {$callLog->incident_id})");
+        } catch (\Exception $e) {
+            Log::error("VoiceCallService: Failed to push VoiceEscalationJob for call log {$callLog->id}: {$e->getMessage()}");
+
+            // Fallback: try direct escalation
+            $this->handleNoAnswerDirect($callLog);
+        }
+    }
+
+    /**
+     * Direct escalation fallback (no queue).
+     *
+     * Used when the queue is unavailable.
+     *
+     * @param \App\Model\Entity\VoiceCallLog $callLog The unanswered call log
+     * @return void
+     */
+    private function handleNoAnswerDirect(VoiceCallLog $callLog): void
+    {
         $voiceCallLogsTable = $this->fetchTable('VoiceCallLogs');
 
         // Find the next call in the escalation chain
@@ -253,7 +281,6 @@ class VoiceCallService
             ->where([
                 'incident_id' => $callLog->incident_id,
                 'escalation_position' => $callLog->escalation_position + 1,
-                'status' => VoiceCallLog::STATUS_INITIATED,
             ])
             ->first();
 
@@ -263,7 +290,12 @@ class VoiceCallService
             return;
         }
 
-        // Initiate the next call in the chain
+        if ($nextCall->isTerminal()) {
+            Log::info("VoiceCallService: Next call log {$nextCall->id} is already terminal, skipping");
+
+            return;
+        }
+
         $result = $this->initiateCall($nextCall);
 
         if ($result['success']) {
