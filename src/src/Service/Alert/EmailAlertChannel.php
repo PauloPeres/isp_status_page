@@ -50,6 +50,14 @@ class EmailAlertChannel implements ChannelInterface
      */
     public function send(AlertRule $rule, Monitor $monitor, Incident $incident): array
     {
+        // Use resolved recipients if available, fall back to legacy getRecipients()
+        /** @var \App\Service\Alert\ResolvedRecipient[]|null $resolvedRecipients */
+        $resolvedRecipients = $rule->_resolvedRecipients ?? null;
+
+        if ($resolvedRecipients !== null && !empty($resolvedRecipients)) {
+            return $this->sendToResolvedRecipients($resolvedRecipients, $rule, $monitor, $incident);
+        }
+
         $recipients = $rule->getRecipients();
 
         if (empty($recipients)) {
@@ -75,6 +83,7 @@ class EmailAlertChannel implements ChannelInterface
                     'recipient' => $recipientEmail,
                     'status' => 'sent',
                     'error' => null,
+                    'user_id' => null,
                 ];
 
                 Log::info("Alert email sent to {$recipientEmail} for monitor {$monitor->name}");
@@ -85,6 +94,63 @@ class EmailAlertChannel implements ChannelInterface
                     'recipient' => $recipientEmail,
                     'status' => 'failed',
                     'error' => $e->getMessage(),
+                    'user_id' => null,
+                ];
+
+                Log::error("Failed to send alert email to {$recipientEmail}: {$e->getMessage()}");
+            }
+        }
+
+        return [
+            'success' => $allSuccess,
+            'results' => $results,
+        ];
+    }
+
+    /**
+     * Send alert emails using resolved recipients with user tracking.
+     *
+     * @param array<\App\Service\Alert\ResolvedRecipient> $resolvedRecipients Resolved recipients
+     * @param \App\Model\Entity\AlertRule $rule The alert rule
+     * @param \App\Model\Entity\Monitor $monitor The monitor
+     * @param \App\Model\Entity\Incident $incident The incident
+     * @return array Result with success flag and per-recipient results
+     */
+    protected function sendToResolvedRecipients(
+        array $resolvedRecipients,
+        AlertRule $rule,
+        Monitor $monitor,
+        Incident $incident
+    ): array {
+        $this->configureTransport();
+
+        $results = [];
+        $allSuccess = true;
+
+        foreach ($resolvedRecipients as $recipient) {
+            $recipientEmail = $recipient->address;
+
+            try {
+                // Build per-user acknowledge URL with user identifier
+                $userParam = $recipient->userId !== null ? (string)$recipient->userId : null;
+                $this->sendToRecipient($recipientEmail, $monitor, $incident, $userParam);
+
+                $results[] = [
+                    'recipient' => $recipientEmail,
+                    'status' => 'sent',
+                    'error' => null,
+                    'user_id' => $recipient->userId,
+                ];
+
+                Log::info("Alert email sent to {$recipientEmail} (user_id: {$recipient->userId}) for monitor {$monitor->name}");
+            } catch (\Exception $e) {
+                $allSuccess = false;
+
+                $results[] = [
+                    'recipient' => $recipientEmail,
+                    'status' => 'failed',
+                    'error' => $e->getMessage(),
+                    'user_id' => $recipient->userId,
                 ];
 
                 Log::error("Failed to send alert email to {$recipientEmail}: {$e->getMessage()}");
@@ -123,10 +189,11 @@ class EmailAlertChannel implements ChannelInterface
      * @param string $recipientEmail Recipient email address
      * @param \App\Model\Entity\Monitor $monitor The monitor
      * @param \App\Model\Entity\Incident $incident The incident
+     * @param string|null $userParam Optional user identifier for per-user acknowledge URL
      * @return void
      * @throws \Exception If sending fails
      */
-    protected function sendToRecipient(string $recipientEmail, Monitor $monitor, Incident $incident): void
+    protected function sendToRecipient(string $recipientEmail, Monitor $monitor, Incident $incident, ?string $userParam = null): void
     {
         $mailer = new Mailer();
         $mailer->setTransport('alert');
@@ -154,10 +221,14 @@ class EmailAlertChannel implements ChannelInterface
                 ->setLayout('default');
         }
 
-        // Build acknowledge URL for down alerts
+        // Build acknowledge URL for down alerts (with per-user tracking)
         $acknowledgeUrl = '';
         if ($isDown) {
             $acknowledgeUrl = $this->buildAcknowledgeUrl($incident, $siteName);
+            if (!empty($acknowledgeUrl) && $userParam !== null) {
+                $separator = str_contains($acknowledgeUrl, '?') ? '&' : '?';
+                $acknowledgeUrl .= $separator . 'u=' . urlencode($userParam);
+            }
         }
 
         $mailer->setViewVars([

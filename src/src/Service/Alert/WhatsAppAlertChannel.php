@@ -83,6 +83,14 @@ class WhatsAppAlertChannel implements ChannelInterface
             ];
         }
 
+        // Use resolved recipients if available, fall back to legacy getRecipients()
+        /** @var \App\Service\Alert\ResolvedRecipient[]|null $resolvedRecipients */
+        $resolvedRecipients = $rule->_resolvedRecipients ?? null;
+
+        if ($resolvedRecipients !== null && !empty($resolvedRecipients)) {
+            return $this->sendToResolvedRecipients($resolvedRecipients, $monitor, $incident);
+        }
+
         $recipients = $rule->getRecipients();
 
         if (empty($recipients)) {
@@ -105,17 +113,7 @@ class WhatsAppAlertChannel implements ChannelInterface
             }
 
             try {
-                $response = $this->httpClient->post(
-                    "https://api.twilio.com/2010-04-01/Accounts/{$this->twilioSid}/Messages.json",
-                    [
-                        'To' => 'whatsapp:' . $phoneNumber,
-                        'From' => 'whatsapp:' . $this->twilioWhatsAppNumber,
-                        'Body' => $message,
-                    ],
-                    [
-                        'auth' => ['username' => $this->twilioSid, 'password' => $this->twilioAuthToken],
-                    ]
-                );
+                $response = $this->sendWhatsApp($phoneNumber, $message);
 
                 if ($response->getStatusCode() >= 400) {
                     $allSuccess = false;
@@ -124,6 +122,7 @@ class WhatsAppAlertChannel implements ChannelInterface
                         'recipient' => $phoneNumber,
                         'status' => 'failed',
                         'error' => "HTTP {$response->getStatusCode()}: {$response->getStringBody()}",
+                        'user_id' => null,
                     ];
 
                     Log::error("WhatsApp send failed to {$phoneNumber}: {$response->getStringBody()}");
@@ -132,6 +131,7 @@ class WhatsAppAlertChannel implements ChannelInterface
                         'recipient' => $phoneNumber,
                         'status' => 'sent',
                         'error' => null,
+                        'user_id' => null,
                     ];
 
                     Log::info("WhatsApp alert sent to {$phoneNumber} for monitor {$monitor->name}");
@@ -143,6 +143,7 @@ class WhatsAppAlertChannel implements ChannelInterface
                     'recipient' => $phoneNumber,
                     'status' => 'failed',
                     'error' => $e->getMessage(),
+                    'user_id' => null,
                 ];
 
                 Log::error("WhatsApp send error to {$phoneNumber}: {$e->getMessage()}");
@@ -153,6 +154,95 @@ class WhatsAppAlertChannel implements ChannelInterface
             'success' => $allSuccess,
             'results' => $results,
         ];
+    }
+
+    /**
+     * Send WhatsApp alerts using resolved recipients with user tracking.
+     *
+     * @param array<\App\Service\Alert\ResolvedRecipient> $resolvedRecipients Resolved recipients
+     * @param \App\Model\Entity\Monitor $monitor The monitor
+     * @param \App\Model\Entity\Incident $incident The incident
+     * @return array Result with success flag and per-recipient results
+     */
+    protected function sendToResolvedRecipients(
+        array $resolvedRecipients,
+        Monitor $monitor,
+        Incident $incident
+    ): array {
+        $message = $this->formatMessage($monitor, $incident);
+        $results = [];
+        $allSuccess = true;
+
+        foreach ($resolvedRecipients as $recipient) {
+            $phoneNumber = trim($recipient->address);
+            if (empty($phoneNumber)) {
+                continue;
+            }
+
+            try {
+                $response = $this->sendWhatsApp($phoneNumber, $message);
+
+                if ($response->getStatusCode() >= 400) {
+                    $allSuccess = false;
+
+                    $results[] = [
+                        'recipient' => $phoneNumber,
+                        'status' => 'failed',
+                        'error' => "HTTP {$response->getStatusCode()}: {$response->getStringBody()}",
+                        'user_id' => $recipient->userId,
+                    ];
+
+                    Log::error("WhatsApp send failed to {$phoneNumber}: {$response->getStringBody()}");
+                } else {
+                    $results[] = [
+                        'recipient' => $phoneNumber,
+                        'status' => 'sent',
+                        'error' => null,
+                        'user_id' => $recipient->userId,
+                    ];
+
+                    Log::info("WhatsApp alert sent to {$phoneNumber} (user_id: {$recipient->userId}) for monitor {$monitor->name}");
+                }
+            } catch (\Exception $e) {
+                $allSuccess = false;
+
+                $results[] = [
+                    'recipient' => $phoneNumber,
+                    'status' => 'failed',
+                    'error' => $e->getMessage(),
+                    'user_id' => $recipient->userId,
+                ];
+
+                Log::error("WhatsApp send error to {$phoneNumber}: {$e->getMessage()}");
+            }
+        }
+
+        return [
+            'success' => $allSuccess,
+            'results' => $results,
+        ];
+    }
+
+    /**
+     * Send a single WhatsApp message via Twilio.
+     *
+     * @param string $phoneNumber Recipient phone number
+     * @param string $message Message body
+     * @return \Cake\Http\Client\Response
+     */
+    protected function sendWhatsApp(string $phoneNumber, string $message): \Cake\Http\Client\Response
+    {
+        return $this->httpClient->post(
+            "https://api.twilio.com/2010-04-01/Accounts/{$this->twilioSid}/Messages.json",
+            [
+                'To' => 'whatsapp:' . $phoneNumber,
+                'From' => 'whatsapp:' . $this->twilioWhatsAppNumber,
+                'Body' => $message,
+            ],
+            [
+                'auth' => ['username' => $this->twilioSid, 'password' => $this->twilioAuthToken],
+            ]
+        );
     }
 
     /**

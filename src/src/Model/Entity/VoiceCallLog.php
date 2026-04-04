@@ -12,6 +12,7 @@ use Cake\ORM\Entity;
  *
  * @property int $id
  * @property int $organization_id
+ * @property int|null $user_id
  * @property int $incident_id
  * @property int $monitor_id
  * @property int|null $notification_channel_id
@@ -84,6 +85,7 @@ class VoiceCallLog extends Entity
      */
     protected array $_accessible = [
         'organization_id' => false,
+        'user_id' => true,
         'incident_id' => true,
         'monitor_id' => true,
         'notification_channel_id' => true,

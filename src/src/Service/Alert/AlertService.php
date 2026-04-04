@@ -9,6 +9,7 @@ use App\Model\Entity\Incident;
 use App\Model\Entity\Monitor;
 use App\Model\Table\AlertLogsTable;
 use App\Model\Table\AlertRulesTable;
+use App\Service\Alert\RecipientResolverService;
 use App\Service\MaintenanceService;
 use App\Service\NotificationCreditService;
 use App\Service\NotificationScheduleService;
@@ -65,6 +66,13 @@ class AlertService
     protected NotificationScheduleService $scheduleService;
 
     /**
+     * Recipient resolver service
+     *
+     * @var \App\Service\Alert\RecipientResolverService
+     */
+    protected RecipientResolverService $recipientResolver;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -74,6 +82,7 @@ class AlertService
         $this->maintenanceService = new MaintenanceService();
         $this->quietHoursService = new QuietHoursService();
         $this->scheduleService = new NotificationScheduleService();
+        $this->recipientResolver = new RecipientResolverService();
     }
 
     /**
@@ -205,6 +214,17 @@ class AlertService
                         }
                     }
 
+                    // Resolve recipients for auditable tracking
+                    try {
+                        $orgId = (int)$monitor->organization_id;
+                        $resolvedRecipients = $this->recipientResolver->resolveForRule($rule, $orgId);
+                        if (!empty($resolvedRecipients)) {
+                            $rule->_resolvedRecipients = $resolvedRecipients;
+                        }
+                    } catch (\Exception $e) {
+                        Log::warning("Failed to resolve recipients for rule {$rule->id}: {$e->getMessage()}");
+                    }
+
                     // Send the alert
                     $result = $channel->send($rule, $monitor, $incident);
 
@@ -216,7 +236,8 @@ class AlertService
                                 $incident,
                                 $recipientResult['status'] ?? AlertLog::STATUS_FAILED,
                                 $recipientResult['error'] ?? null,
-                                $recipientResult['recipient'] ?? ''
+                                $recipientResult['recipient'] ?? '',
+                                $recipientResult['user_id'] ?? null
                             );
                         }
                     }
@@ -360,6 +381,7 @@ class AlertService
      * @param string $status The status ('sent', 'failed', 'queued')
      * @param string|null $error Optional error message
      * @param string $recipient The recipient address
+     * @param int|null $userId The user ID associated with the recipient (for auditable tracking)
      * @return \App\Model\Entity\AlertLog|false
      */
     public function logAlert(
@@ -367,13 +389,15 @@ class AlertService
         Incident $incident,
         string $status,
         ?string $error = null,
-        string $recipient = ''
+        string $recipient = '',
+        ?int $userId = null
     ): AlertLog|false {
         try {
             $logEntity = $this->AlertLogs->newEntity([
                 'alert_rule_id' => $rule->id,
                 'incident_id' => $incident->id,
                 'monitor_id' => $rule->monitor_id,
+                'user_id' => $userId,
                 'channel' => $rule->channel,
                 'recipient' => $recipient ?: 'unknown',
                 'status' => $status,

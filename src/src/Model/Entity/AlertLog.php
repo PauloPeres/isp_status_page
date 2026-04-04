@@ -12,6 +12,7 @@ use Cake\ORM\Entity;
  * @property int $alert_rule_id
  * @property int|null $incident_id
  * @property int $monitor_id
+ * @property int|null $user_id
  * @property string $channel
  * @property string $recipient
  * @property string $status
@@ -22,6 +23,7 @@ use Cake\ORM\Entity;
  * @property \App\Model\Entity\AlertRule $alert_rule
  * @property \App\Model\Entity\Incident $incident
  * @property \App\Model\Entity\Monitor $monitor
+ * @property \App\Model\Entity\User|null $user
  */
 class AlertLog extends Entity
 {
@@ -46,6 +48,7 @@ class AlertLog extends Entity
         'alert_rule_id' => true,
         'incident_id' => true,
         'monitor_id' => true,
+        'user_id' => true,
         'channel' => true,
         'recipient' => true,
         'status' => true,

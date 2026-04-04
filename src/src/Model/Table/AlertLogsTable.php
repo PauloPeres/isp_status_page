@@ -17,6 +17,7 @@ use Cake\Validation\Validator;
  * @property \App\Model\Table\AlertRulesTable&\Cake\ORM\Association\BelongsTo $AlertRules
  * @property \App\Model\Table\IncidentsTable&\Cake\ORM\Association\BelongsTo $Incidents
  * @property \App\Model\Table\MonitorsTable&\Cake\ORM\Association\BelongsTo $Monitors
+ * @property \App\Model\Table\UsersTable&\Cake\ORM\Association\BelongsTo $Users
  *
  * @method \App\Model\Entity\AlertLog newEmptyEntity()
  * @method \App\Model\Entity\AlertLog newEntity(array $data, array $options = [])
@@ -64,6 +65,10 @@ class AlertLogsTable extends Table
             'foreignKey' => 'monitor_id',
             'joinType' => 'INNER',
         ]);
+        $this->belongsTo('Users', [
+            'foreignKey' => 'user_id',
+            'joinType' => 'LEFT',
+        ]);
         $this->belongsTo('Organizations', [
             'foreignKey' => 'organization_id',
             'joinType' => 'INNER',
@@ -89,6 +94,10 @@ class AlertLogsTable extends Table
         $validator
             ->integer('monitor_id')
             ->notEmptyString('monitor_id');
+
+        $validator
+            ->integer('user_id')
+            ->allowEmptyString('user_id');
 
         $validator
             ->scalar('channel')

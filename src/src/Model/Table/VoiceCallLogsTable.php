@@ -54,6 +54,11 @@ class VoiceCallLogsTable extends Table
             'joinType' => 'INNER',
         ]);
 
+        $this->belongsTo('Users', [
+            'foreignKey' => 'user_id',
+            'joinType' => 'LEFT',
+        ]);
+
         $this->belongsTo('Incidents', [
             'foreignKey' => 'incident_id',
             'joinType' => 'INNER',

@@ -79,6 +79,14 @@ class SmsAlertChannel implements ChannelInterface
             ];
         }
 
+        // Use resolved recipients if available, fall back to legacy getRecipients()
+        /** @var \App\Service\Alert\ResolvedRecipient[]|null $resolvedRecipients */
+        $resolvedRecipients = $rule->_resolvedRecipients ?? null;
+
+        if ($resolvedRecipients !== null && !empty($resolvedRecipients)) {
+            return $this->sendToResolvedRecipients($resolvedRecipients, $monitor, $incident);
+        }
+
         $recipients = $rule->getRecipients();
 
         if (empty($recipients)) {
@@ -101,17 +109,7 @@ class SmsAlertChannel implements ChannelInterface
             }
 
             try {
-                $response = $this->httpClient->post(
-                    "https://api.twilio.com/2010-04-01/Accounts/{$this->twilioSid}/Messages.json",
-                    [
-                        'To' => $phoneNumber,
-                        'From' => $this->twilioFromNumber,
-                        'Body' => $message,
-                    ],
-                    [
-                        'auth' => ['username' => $this->twilioSid, 'password' => $this->twilioAuthToken],
-                    ]
-                );
+                $response = $this->sendSms($phoneNumber, $message);
 
                 if ($response->getStatusCode() >= 400) {
                     $allSuccess = false;
@@ -120,6 +118,7 @@ class SmsAlertChannel implements ChannelInterface
                         'recipient' => $phoneNumber,
                         'status' => 'failed',
                         'error' => "HTTP {$response->getStatusCode()}: {$response->getStringBody()}",
+                        'user_id' => null,
                     ];
 
                     Log::error("SMS send failed to {$phoneNumber}: {$response->getStringBody()}");
@@ -128,6 +127,7 @@ class SmsAlertChannel implements ChannelInterface
                         'recipient' => $phoneNumber,
                         'status' => 'sent',
                         'error' => null,
+                        'user_id' => null,
                     ];
 
                     Log::info("SMS alert sent to {$phoneNumber} for monitor {$monitor->name}");
@@ -139,6 +139,7 @@ class SmsAlertChannel implements ChannelInterface
                     'recipient' => $phoneNumber,
                     'status' => 'failed',
                     'error' => $e->getMessage(),
+                    'user_id' => null,
                 ];
 
                 Log::error("SMS send error to {$phoneNumber}: {$e->getMessage()}");
@@ -149,6 +150,95 @@ class SmsAlertChannel implements ChannelInterface
             'success' => $allSuccess,
             'results' => $results,
         ];
+    }
+
+    /**
+     * Send SMS alerts using resolved recipients with user tracking.
+     *
+     * @param array<\App\Service\Alert\ResolvedRecipient> $resolvedRecipients Resolved recipients
+     * @param \App\Model\Entity\Monitor $monitor The monitor
+     * @param \App\Model\Entity\Incident $incident The incident
+     * @return array Result with success flag and per-recipient results
+     */
+    protected function sendToResolvedRecipients(
+        array $resolvedRecipients,
+        Monitor $monitor,
+        Incident $incident
+    ): array {
+        $message = $this->formatMessage($monitor, $incident);
+        $results = [];
+        $allSuccess = true;
+
+        foreach ($resolvedRecipients as $recipient) {
+            $phoneNumber = trim($recipient->address);
+            if (empty($phoneNumber)) {
+                continue;
+            }
+
+            try {
+                $response = $this->sendSms($phoneNumber, $message);
+
+                if ($response->getStatusCode() >= 400) {
+                    $allSuccess = false;
+
+                    $results[] = [
+                        'recipient' => $phoneNumber,
+                        'status' => 'failed',
+                        'error' => "HTTP {$response->getStatusCode()}: {$response->getStringBody()}",
+                        'user_id' => $recipient->userId,
+                    ];
+
+                    Log::error("SMS send failed to {$phoneNumber}: {$response->getStringBody()}");
+                } else {
+                    $results[] = [
+                        'recipient' => $phoneNumber,
+                        'status' => 'sent',
+                        'error' => null,
+                        'user_id' => $recipient->userId,
+                    ];
+
+                    Log::info("SMS alert sent to {$phoneNumber} (user_id: {$recipient->userId}) for monitor {$monitor->name}");
+                }
+            } catch (\Exception $e) {
+                $allSuccess = false;
+
+                $results[] = [
+                    'recipient' => $phoneNumber,
+                    'status' => 'failed',
+                    'error' => $e->getMessage(),
+                    'user_id' => $recipient->userId,
+                ];
+
+                Log::error("SMS send error to {$phoneNumber}: {$e->getMessage()}");
+            }
+        }
+
+        return [
+            'success' => $allSuccess,
+            'results' => $results,
+        ];
+    }
+
+    /**
+     * Send a single SMS via Twilio.
+     *
+     * @param string $phoneNumber Recipient phone number
+     * @param string $message Message body
+     * @return \Cake\Http\Client\Response
+     */
+    protected function sendSms(string $phoneNumber, string $message): \Cake\Http\Client\Response
+    {
+        return $this->httpClient->post(
+            "https://api.twilio.com/2010-04-01/Accounts/{$this->twilioSid}/Messages.json",
+            [
+                'To' => $phoneNumber,
+                'From' => $this->twilioFromNumber,
+                'Body' => $message,
+            ],
+            [
+                'auth' => ['username' => $this->twilioSid, 'password' => $this->twilioAuthToken],
+            ]
+        );
     }
 
     /**

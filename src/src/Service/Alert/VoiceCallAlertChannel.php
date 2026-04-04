@@ -73,16 +73,9 @@ class VoiceCallAlertChannel implements ChannelInterface
      */
     public function send(AlertRule $rule, Monitor $monitor, Incident $incident): array
     {
-        $recipients = $rule->getRecipients();
-
-        if (empty($recipients)) {
-            Log::warning("VoiceCallAlertChannel: Alert rule {$rule->id} has no recipients configured");
-
-            return [
-                'success' => false,
-                'results' => [],
-            ];
-        }
+        // Use resolved recipients if available, fall back to legacy getRecipients()
+        /** @var \App\Service\Alert\ResolvedRecipient[]|null $resolvedRecipients */
+        $resolvedRecipients = $rule->_resolvedRecipients ?? null;
 
         $orgId = $monitor->organization_id;
         $results = [];
@@ -97,8 +90,40 @@ class VoiceCallAlertChannel implements ChannelInterface
             ? $this->ttsBuilder->buildDownMessage($monitor, $incident, $locale)
             : $this->ttsBuilder->buildResolvedMessage($monitor, $locale);
 
-        foreach ($recipients as $position => $phoneNumber) {
-            $phoneNumber = trim($phoneNumber);
+        // Build the list of phone numbers to call with optional user_id
+        $callList = [];
+        if ($resolvedRecipients !== null && !empty($resolvedRecipients)) {
+            foreach ($resolvedRecipients as $position => $resolved) {
+                $callList[] = [
+                    'phone_number' => trim($resolved->address),
+                    'user_id' => $resolved->userId,
+                    'position' => $position,
+                ];
+            }
+        } else {
+            $recipients = $rule->getRecipients();
+            if (empty($recipients)) {
+                Log::warning("VoiceCallAlertChannel: Alert rule {$rule->id} has no recipients configured");
+
+                return [
+                    'success' => false,
+                    'results' => [],
+                ];
+            }
+            foreach ($recipients as $position => $phoneNumber) {
+                $callList[] = [
+                    'phone_number' => trim($phoneNumber),
+                    'user_id' => null,
+                    'position' => $position,
+                ];
+            }
+        }
+
+        foreach ($callList as $entry) {
+            $phoneNumber = $entry['phone_number'];
+            $userId = $entry['user_id'];
+            $position = $entry['position'];
+
             if (empty($phoneNumber)) {
                 continue;
             }
@@ -110,6 +135,7 @@ class VoiceCallAlertChannel implements ChannelInterface
                     'recipient' => $phoneNumber,
                     'status' => 'failed',
                     'error' => 'Invalid phone number format (must be E.164)',
+                    'user_id' => $userId,
                 ];
                 $allSuccess = false;
                 continue;
@@ -124,6 +150,7 @@ class VoiceCallAlertChannel implements ChannelInterface
                     'recipient' => $phoneNumber,
                     'status' => 'failed',
                     'error' => 'Insufficient notification credits (requires ' . self::CREDITS_PER_CALL . ')',
+                    'user_id' => $userId,
                 ];
                 continue;
             }
@@ -135,6 +162,7 @@ class VoiceCallAlertChannel implements ChannelInterface
                 $callLog = $voiceCallLogsTable->newEntity([
                     'incident_id' => $incident->id,
                     'monitor_id' => $monitor->id,
+                    'user_id' => $userId,
                     'notification_channel_id' => null,
                     'phone_number' => $phoneNumber,
                     'status' => VoiceCallLog::STATUS_INITIATED,
@@ -154,6 +182,7 @@ class VoiceCallAlertChannel implements ChannelInterface
                         'recipient' => $phoneNumber,
                         'status' => 'failed',
                         'error' => 'Failed to create voice call log record',
+                        'user_id' => $userId,
                     ];
                     continue;
                 }
@@ -165,15 +194,17 @@ class VoiceCallAlertChannel implements ChannelInterface
                     'recipient' => $phoneNumber,
                     'status' => 'queued',
                     'error' => null,
+                    'user_id' => $userId,
                 ];
 
-                Log::info("VoiceCallAlertChannel: Queued voice call to {$phoneNumber} for monitor {$monitor->name}");
+                Log::info("VoiceCallAlertChannel: Queued voice call to {$phoneNumber} (user_id: {$userId}) for monitor {$monitor->name}");
             } catch (\Exception $e) {
                 $allSuccess = false;
                 $results[] = [
                     'recipient' => $phoneNumber,
                     'status' => 'failed',
                     'error' => $e->getMessage(),
+                    'user_id' => $userId,
                 ];
 
                 Log::error("VoiceCallAlertChannel: Error queueing call to {$phoneNumber}: {$e->getMessage()}");
