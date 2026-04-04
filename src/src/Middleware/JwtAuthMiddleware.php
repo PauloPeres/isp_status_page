@@ -44,6 +44,7 @@ class JwtAuthMiddleware implements MiddlewareInterface
     private const EXCLUDED_PREFIXES = [
         '/api/v2/auth/oauth/',
         '/api/v2/public/',
+        '/api/v2/mcp',
     ];
 
     /**

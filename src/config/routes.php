@@ -849,6 +849,10 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/subscribers/{id}', ['controller' => 'Subscribers', 'action' => 'delete', 'prefix' => 'Api/V2', '_method' => 'DELETE'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
         $builder->connect('/subscribers/{id}/toggle', ['controller' => 'Subscribers', 'action' => 'toggle', 'prefix' => 'Api/V2', '_method' => 'PUT'], ['pass' => ['id'], 'id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d+']);
 
+        // MCP Server (API key auth — excluded from JWT middleware)
+        $builder->connect('/mcp', ['controller' => 'Mcp', 'action' => 'handle', 'prefix' => 'Api/V2', '_method' => 'POST']);
+        $builder->connect('/mcp/info', ['controller' => 'Mcp', 'action' => 'info', 'prefix' => 'Api/V2', '_method' => 'GET']);
+
         // AI Chat Assistant
         $builder->connect('/chat/conversations', ['controller' => 'Chat', 'action' => 'createConversation', 'prefix' => 'Api/V2', '_method' => 'POST']);
         $builder->connect('/chat/conversations', ['controller' => 'Chat', 'action' => 'listConversations', 'prefix' => 'Api/V2', '_method' => 'GET']);
