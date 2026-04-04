@@ -89,6 +89,17 @@ export interface CreditUsageResponse {
   pagination: { page: number; limit: number; total: number; pages: number };
 }
 
+export interface AutoReplenishSettings {
+  enabled: boolean;
+  threshold: number;
+  amount: number;
+  max_monthly: number;
+  last_charged_at: string | null;
+  monthly_auto_replenished: number;
+  has_payment_method: boolean;
+  price_per_100_credits: number; // cents
+}
+
 export interface VoiceCallLog {
   id: number;
   public_id: string;
@@ -164,6 +175,18 @@ export class BillingService {
     if (params.limit) queryParts.push(`limit=${params.limit}`);
     const qs = queryParts.length > 0 ? '?' + queryParts.join('&') : '';
     return this.api.get<CreditUsageResponse>(`/billing/credit-usage${qs}`);
+  }
+
+  getAutoReplenishSettings(): Observable<AutoReplenishSettings> {
+    return this.api.get<{ auto_replenish: AutoReplenishSettings }>('/billing/auto-replenish').pipe(
+      map(data => data.auto_replenish)
+    );
+  }
+
+  updateAutoReplenishSettings(settings: Partial<{ enabled: boolean; threshold: number; amount: number; max_monthly: number }>): Observable<AutoReplenishSettings> {
+    return this.api.put<{ auto_replenish: AutoReplenishSettings }>('/billing/auto-replenish', settings).pipe(
+      map(data => data.auto_replenish)
+    );
   }
 
   getVoiceCallLogs(params: { page?: number; limit?: number } = {}): Observable<VoiceCallLogsResponse> {

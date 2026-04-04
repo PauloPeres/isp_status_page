@@ -425,6 +425,103 @@ class BillingController extends AppController
     }
 
     /**
+     * GET /api/v2/billing/auto-replenish
+     *
+     * Returns current auto-replenish settings for the organization.
+     *
+     * @return void
+     */
+    public function autoReplenish(): void
+    {
+        $this->request->allowMethod(['get']);
+
+        if (!$this->requireRole(['owner', 'admin'])) {
+            return;
+        }
+
+        try {
+            $creditService = new \App\Service\Billing\NotificationCreditService();
+            $settings = $creditService->getAutoReplenishSettings($this->currentOrgId);
+
+            $this->success(['auto_replenish' => $settings]);
+        } catch (\Exception $e) {
+            $this->error('Failed to fetch auto-replenish settings: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * PUT /api/v2/billing/auto-replenish
+     *
+     * Update auto-replenish settings (enable/disable, threshold, amount, max monthly).
+     *
+     * @return void
+     */
+    public function updateAutoReplenish(): void
+    {
+        $this->request->allowMethod(['put']);
+
+        if (!$this->requireRole(['owner'])) {
+            return;
+        }
+
+        $data = $this->request->getData();
+        $settings = [];
+
+        if (array_key_exists('enabled', $data)) {
+            $settings['enabled'] = $data['enabled'];
+        }
+        if (array_key_exists('threshold', $data)) {
+            $threshold = (int)$data['threshold'];
+            if ($threshold < 1 || $threshold > 10000) {
+                $this->error('Threshold must be between 1 and 10,000', 400);
+
+                return;
+            }
+            $settings['threshold'] = $threshold;
+        }
+        if (array_key_exists('amount', $data)) {
+            $amount = (int)$data['amount'];
+            if ($amount < 100 || $amount > 10000) {
+                $this->error('Amount must be between 100 and 10,000', 400);
+
+                return;
+            }
+            $settings['amount'] = $amount;
+        }
+        if (array_key_exists('max_monthly', $data)) {
+            $maxMonthly = (int)$data['max_monthly'];
+            if ($maxMonthly < 100 || $maxMonthly > 100000) {
+                $this->error('Monthly cap must be between 100 and 100,000', 400);
+
+                return;
+            }
+            $settings['max_monthly'] = $maxMonthly;
+        }
+
+        if (empty($settings)) {
+            $this->error('No settings provided to update', 400);
+
+            return;
+        }
+
+        try {
+            $creditService = new \App\Service\Billing\NotificationCreditService();
+            $result = $creditService->updateAutoReplenishSettings($this->currentOrgId, $settings);
+
+            if (!$result) {
+                $this->error('Failed to save auto-replenish settings', 500);
+
+                return;
+            }
+
+            $updatedSettings = $creditService->getAutoReplenishSettings($this->currentOrgId);
+            $this->success(['auto_replenish' => $updatedSettings]);
+        } catch (\Exception $e) {
+            $this->error('Failed to update auto-replenish settings: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /**
      * POST /api/v2/billing/credits/buy
      *
      * Create a Stripe checkout session for purchasing notification credits.

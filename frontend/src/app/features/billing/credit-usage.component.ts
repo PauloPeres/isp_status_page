@@ -6,11 +6,12 @@ import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonButton,
   IonLabel, IonBadge, IonIcon, IonSpinner, IonSegment, IonSegmentButton,
   IonRefresher, IonRefresherContent, IonSelect, IonSelectOption, IonItem, IonNote,
-  IonInfiniteScroll, IonInfiniteScrollContent,
+  IonInfiniteScroll, IonInfiniteScrollContent, IonToggle, IonInput,
   ToastController,
 } from '@ionic/angular/standalone';
 import {
   BillingService, CreditUsageResponse, CreditTransaction, VoiceCallLog, VoiceCallLogsResponse,
+  AutoReplenishSettings,
 } from './billing.service';
 import { addIcons } from 'ionicons';
 import {
@@ -18,7 +19,8 @@ import {
   callOutline, chatbubbleOutline, mailOutline, filterOutline,
   arrowForwardOutline, warningOutline, checkmarkCircleOutline,
   closeCircleOutline, arrowUpOutline, removeOutline, timeOutline,
-  statsChartOutline, cardOutline,
+  statsChartOutline, cardOutline, refreshOutline, settingsOutline,
+  shieldCheckmarkOutline,
 } from 'ionicons/icons';
 
 addIcons({
@@ -26,7 +28,8 @@ addIcons({
   callOutline, chatbubbleOutline, mailOutline, filterOutline,
   arrowForwardOutline, warningOutline, checkmarkCircleOutline,
   closeCircleOutline, arrowUpOutline, removeOutline, timeOutline,
-  statsChartOutline, cardOutline,
+  statsChartOutline, cardOutline, refreshOutline, settingsOutline,
+  shieldCheckmarkOutline,
 });
 
 @Component({
@@ -37,7 +40,7 @@ addIcons({
     IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonButton,
     IonLabel, IonBadge, IonIcon, IonSpinner, IonSegment, IonSegmentButton,
     IonRefresher, IonRefresherContent, IonSelect, IonSelectOption, IonItem, IonNote,
-    IonInfiniteScroll, IonInfiniteScrollContent,
+    IonInfiniteScroll, IonInfiniteScrollContent, IonToggle, IonInput,
   ],
   template: `
     <ion-header>
@@ -108,6 +111,88 @@ addIcons({
               <div class="cu-stat-value">{{ data()?.summary?.projected_monthly ?? 0 }}</div>
               <div class="cu-stat-label">Projected / Month</div>
             </div>
+          </div>
+
+          <!-- Auto-Replenish Settings -->
+          <div class="cu-card cu-auto-replenish-section">
+            <h3 class="cu-section-title">
+              <ion-icon name="refresh-outline"></ion-icon>
+              Auto-Replenish Credits
+            </h3>
+
+            @if (autoReplenishLoading()) {
+              <div class="cu-ar-loading"><ion-spinner name="dots"></ion-spinner></div>
+            } @else {
+              <div class="cu-ar-content">
+                <div class="cu-ar-toggle-row">
+                  <div class="cu-ar-toggle-info">
+                    <span class="cu-ar-toggle-label">Enable Auto-Replenish</span>
+                    <span class="cu-ar-toggle-desc">Automatically buy credits when balance drops below threshold</span>
+                  </div>
+                  <ion-toggle
+                    [checked]="arEnabled"
+                    (ionChange)="onArToggle($event)"
+                    [disabled]="arSaving() || (!arSettings()?.has_payment_method && !arEnabled)"
+                  ></ion-toggle>
+                </div>
+
+                @if (!arSettings()?.has_payment_method) {
+                  <div class="cu-ar-warning">
+                    <ion-icon name="warning-outline" color="warning"></ion-icon>
+                    <span>No payment method on file. Please add a card via the billing portal before enabling auto-replenish.</span>
+                  </div>
+                }
+
+                @if (arEnabled) {
+                  <div class="cu-ar-fields">
+                    <div class="cu-ar-field">
+                      <label class="cu-ar-field-label">Replenish when balance drops below</label>
+                      <div class="cu-ar-field-input">
+                        <input type="number" class="cu-ar-input" [value]="arThreshold" (change)="onArFieldChange('threshold', $event)" min="1" max="10000" />
+                        <span class="cu-ar-field-unit">credits</span>
+                      </div>
+                    </div>
+
+                    <div class="cu-ar-field">
+                      <label class="cu-ar-field-label">Buy this many credits each time</label>
+                      <div class="cu-ar-field-input">
+                        <input type="number" class="cu-ar-input" [value]="arAmount" (change)="onArFieldChange('amount', $event)" min="100" max="10000" step="100" />
+                        <span class="cu-ar-field-unit">credits</span>
+                        <span class="cu-ar-field-price">({{ formatCreditPrice(arAmount) }})</span>
+                      </div>
+                    </div>
+
+                    <div class="cu-ar-field">
+                      <label class="cu-ar-field-label">Maximum auto-spend per month</label>
+                      <div class="cu-ar-field-input">
+                        <input type="number" class="cu-ar-input" [value]="arMaxMonthly" (change)="onArFieldChange('max_monthly', $event)" min="100" max="100000" step="100" />
+                        <span class="cu-ar-field-unit">credits</span>
+                        <span class="cu-ar-field-price">({{ formatCreditPrice(arMaxMonthly) }})</span>
+                      </div>
+                    </div>
+
+                    <div class="cu-ar-actions">
+                      <ion-button fill="solid" color="primary" size="small" (click)="saveAutoReplenish()" [disabled]="arSaving()">
+                        @if (arSaving()) {
+                          <ion-spinner name="dots" slot="start"></ion-spinner>
+                        }
+                        Save Settings
+                      </ion-button>
+                    </div>
+
+                    @if (arSettings()?.monthly_auto_replenished) {
+                      <div class="cu-ar-stats">
+                        <ion-icon name="shield-checkmark-outline" color="success"></ion-icon>
+                        <span>This month: {{ arSettings()!.monthly_auto_replenished }} credits auto-replenished</span>
+                        @if (arSettings()!.last_charged_at) {
+                          <span class="cu-ar-stats-date">Last charged: {{ arSettings()!.last_charged_at | date:'MMM d, y h:mm a' }}</span>
+                        }
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
           </div>
 
           <!-- Usage Chart -->
@@ -407,6 +492,75 @@ addIcons({
       letter-spacing: 0.03em; color: var(--ion-color-medium);
     }
 
+    /* Auto-Replenish Section */
+    .cu-auto-replenish-section { margin-bottom: 1rem; }
+    .cu-ar-loading {
+      display: flex; align-items: center; justify-content: center; padding: 1rem;
+    }
+    .cu-ar-content {
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    .cu-ar-toggle-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    }
+    .cu-ar-toggle-info {
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .cu-ar-toggle-label {
+      font-size: 0.9rem; font-weight: 600; color: var(--ion-text-color);
+    }
+    .cu-ar-toggle-desc {
+      font-size: 0.75rem; color: var(--ion-color-medium);
+    }
+    .cu-ar-warning {
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(251,188,4,0.08); padding: 10px 14px; border-radius: 8px;
+      font-size: 0.8rem; color: var(--ion-color-medium);
+    }
+    .cu-ar-fields {
+      display: flex; flex-direction: column; gap: 14px;
+      padding-top: 4px;
+    }
+    .cu-ar-field {
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .cu-ar-field-label {
+      font-size: 0.78rem; font-weight: 600; color: var(--ion-text-color);
+    }
+    .cu-ar-field-input {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .cu-ar-input {
+      width: 120px; padding: 6px 10px; border-radius: 8px;
+      border: 1px solid var(--ion-border-color, rgba(0,0,0,0.15));
+      background: var(--ion-background-color, #fff);
+      color: var(--ion-text-color);
+      font-size: 0.9rem; font-weight: 600;
+      font-family: 'DM Sans', system-ui, sans-serif;
+    }
+    .cu-ar-input:focus {
+      outline: none; border-color: var(--ion-color-primary);
+      box-shadow: 0 0 0 2px rgba(41,121,255,0.15);
+    }
+    .cu-ar-field-unit {
+      font-size: 0.8rem; color: var(--ion-color-medium);
+    }
+    .cu-ar-field-price {
+      font-size: 0.78rem; font-weight: 600; color: var(--ion-color-primary);
+    }
+    .cu-ar-actions {
+      padding-top: 4px;
+    }
+    .cu-ar-stats {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+      background: rgba(52,168,83,0.06); padding: 10px 14px; border-radius: 8px;
+      font-size: 0.8rem; color: var(--ion-text-color);
+    }
+    .cu-ar-stats-date {
+      font-size: 0.75rem; color: var(--ion-color-medium);
+      margin-left: auto;
+    }
+
     /* Chart */
     .cu-chart-section { margin-bottom: 1rem; }
     .cu-section-title {
@@ -607,6 +761,15 @@ export class CreditUsageComponent implements OnInit {
   voiceCallLogs = signal<VoiceCallLog[]>([]);
   voiceCallPagination = signal<{ page: number; limit: number; total: number; pages: number } | null>(null);
 
+  // Auto-replenish state
+  autoReplenishLoading = signal(true);
+  arSettings = signal<AutoReplenishSettings | null>(null);
+  arSaving = signal(false);
+  arEnabled = false;
+  arThreshold = 10;
+  arAmount = 100;
+  arMaxMonthly = 500;
+
   activeTab: string = 'transactions';
   channelFilter: string = '';
   currentPage = 1;
@@ -627,6 +790,7 @@ export class CreditUsageComponent implements OnInit {
     this.loading.set(true);
     this.loadCreditUsage();
     this.loadVoiceCallLogs();
+    this.loadAutoReplenishSettings();
   }
 
   loadCreditUsage(): void {
@@ -725,6 +889,79 @@ export class CreditUsageComponent implements OnInit {
     if (result === 'Acknowledged') return 'ack';
     if (result === 'Escalated') return 'esc';
     return 'none';
+  }
+
+  loadAutoReplenishSettings(): void {
+    this.autoReplenishLoading.set(true);
+    this.service.getAutoReplenishSettings().subscribe({
+      next: (settings) => {
+        this.arSettings.set(settings);
+        this.arEnabled = settings.enabled;
+        this.arThreshold = settings.threshold;
+        this.arAmount = settings.amount;
+        this.arMaxMonthly = settings.max_monthly;
+        this.autoReplenishLoading.set(false);
+      },
+      error: () => {
+        this.autoReplenishLoading.set(false);
+      },
+    });
+  }
+
+  onArToggle(event: any): void {
+    this.arEnabled = event.detail.checked;
+    if (!this.arEnabled) {
+      // Immediately save when disabling
+      this.saveAutoReplenish();
+    }
+  }
+
+  onArFieldChange(field: string, event: Event): void {
+    const value = parseInt((event.target as HTMLInputElement).value, 10);
+    if (isNaN(value)) return;
+    switch (field) {
+      case 'threshold': this.arThreshold = value; break;
+      case 'amount': this.arAmount = value; break;
+      case 'max_monthly': this.arMaxMonthly = value; break;
+    }
+  }
+
+  async saveAutoReplenish(): Promise<void> {
+    this.arSaving.set(true);
+    this.service.updateAutoReplenishSettings({
+      enabled: this.arEnabled,
+      threshold: this.arThreshold,
+      amount: this.arAmount,
+      max_monthly: this.arMaxMonthly,
+    }).subscribe({
+      next: async (settings) => {
+        this.arSettings.set(settings);
+        this.arEnabled = settings.enabled;
+        this.arThreshold = settings.threshold;
+        this.arAmount = settings.amount;
+        this.arMaxMonthly = settings.max_monthly;
+        this.arSaving.set(false);
+        const toast = await this.toastCtrl.create({
+          message: 'Auto-replenish settings saved', color: 'success', duration: 2000, position: 'bottom',
+        });
+        await toast.present();
+      },
+      error: async (err: any) => {
+        this.arSaving.set(false);
+        const msg = err.message || 'Failed to save auto-replenish settings';
+        const toast = await this.toastCtrl.create({
+          message: msg, color: 'danger', duration: 3000, position: 'bottom',
+        });
+        await toast.present();
+      },
+    });
+  }
+
+  formatCreditPrice(credits: number): string {
+    const priceCents = this.arSettings()?.price_per_100_credits ?? 500;
+    const packs = Math.ceil(credits / 100);
+    const totalCents = packs * priceCents;
+    return '$' + (totalCents / 100).toFixed(2);
   }
 
   async onBuyCredits(): Promise<void> {

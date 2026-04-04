@@ -731,6 +731,8 @@ return function (RouteBuilder $routes): void {
         $builder->connect('/billing/credits/buy', ['controller' => 'Billing', 'action' => 'buyCredits', 'prefix' => 'Api/V2', '_method' => 'POST']);
         $builder->connect('/billing/credit-usage', ['controller' => 'Billing', 'action' => 'creditUsage', 'prefix' => 'Api/V2', '_method' => 'GET']);
         $builder->connect('/billing/voice-call-logs', ['controller' => 'Billing', 'action' => 'voiceCallLogs', 'prefix' => 'Api/V2', '_method' => 'GET']);
+        $builder->connect('/billing/auto-replenish', ['controller' => 'Billing', 'action' => 'autoReplenish', 'prefix' => 'Api/V2', '_method' => 'GET']);
+        $builder->connect('/billing/auto-replenish', ['controller' => 'Billing', 'action' => 'updateAutoReplenish', 'prefix' => 'Api/V2', '_method' => 'PUT']);
 
         // Users (Team)
         $builder->connect('/users', ['controller' => 'Users', 'action' => 'index', 'prefix' => 'Api/V2', '_method' => 'GET']);
