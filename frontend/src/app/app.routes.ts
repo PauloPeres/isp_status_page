@@ -333,6 +333,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'billing/credits',
+        loadComponent: () =>
+          import('./features/billing/credit-usage.component').then(
+            (m) => m.CreditUsageComponent,
+          ),
+      },
+      {
         path: 'activity-log',
         loadComponent: () =>
           import('./features/activity-log/activity-log.component').then(

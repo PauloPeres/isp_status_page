@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ApiService } from '../../core/services/api.service';
 import { Observable, map } from 'rxjs';
+import { HttpParams } from '@angular/common/http';
 
 export interface Plan {
   id: number;
@@ -47,6 +48,69 @@ export interface BillingPlansResponse {
   current_plan: string;
 }
 
+export interface CreditTransaction {
+  id: number;
+  type: string;
+  amount: number;
+  balance_after: number;
+  channel: string | null;
+  description: string | null;
+  reference_id: string | null;
+  created: string;
+}
+
+export interface DailyUsage {
+  date: string;
+  credits: number;
+}
+
+export interface TopConsumer {
+  description: string;
+  channel: string;
+  total_credits: number;
+  count: number;
+}
+
+export interface CreditUsageSummary {
+  total_used_30d: number;
+  by_channel: { sms: number; whatsapp: number; voice_call: number };
+  daily_usage: DailyUsage[];
+  avg_per_day: number;
+  projected_monthly: number;
+  depletion_date: string | null;
+  top_consumers: TopConsumer[];
+  channel_costs: { sms: number; whatsapp: number; voice_call: number };
+}
+
+export interface CreditUsageResponse {
+  balance: number;
+  transactions: CreditTransaction[];
+  summary: CreditUsageSummary;
+  pagination: { page: number; limit: number; total: number; pages: number };
+}
+
+export interface VoiceCallLog {
+  id: number;
+  public_id: string;
+  phone_number: string;
+  status: string;
+  dtmf_input: string | null;
+  dtmf_result: string;
+  duration_seconds: number;
+  cost_credits: number;
+  tts_language: string;
+  sip_provider: string;
+  escalation_position: number;
+  monitor_id: number;
+  incident_id: number;
+  created: string;
+}
+
+export interface VoiceCallLogsResponse {
+  voice_call_logs: VoiceCallLog[];
+  pagination: { page: number; limit: number; total: number; pages: number };
+}
+
 @Injectable({ providedIn: 'root' })
 export class BillingService {
   constructor(private api: ApiService) {}
@@ -89,6 +153,25 @@ export class BillingService {
 
   buyCredits(amount: number): Observable<any> {
     return this.api.post('/billing/credits/buy', { amount });
+  }
+
+  getCreditUsage(params: { from?: string; to?: string; channel?: string; page?: number; limit?: number } = {}): Observable<CreditUsageResponse> {
+    const queryParts: string[] = [];
+    if (params.from) queryParts.push(`from=${params.from}`);
+    if (params.to) queryParts.push(`to=${params.to}`);
+    if (params.channel) queryParts.push(`channel=${params.channel}`);
+    if (params.page) queryParts.push(`page=${params.page}`);
+    if (params.limit) queryParts.push(`limit=${params.limit}`);
+    const qs = queryParts.length > 0 ? '?' + queryParts.join('&') : '';
+    return this.api.get<CreditUsageResponse>(`/billing/credit-usage${qs}`);
+  }
+
+  getVoiceCallLogs(params: { page?: number; limit?: number } = {}): Observable<VoiceCallLogsResponse> {
+    const queryParts: string[] = [];
+    if (params.page) queryParts.push(`page=${params.page}`);
+    if (params.limit) queryParts.push(`limit=${params.limit}`);
+    const qs = queryParts.length > 0 ? '?' + queryParts.join('&') : '';
+    return this.api.get<VoiceCallLogsResponse>(`/billing/voice-call-logs${qs}`);
   }
 
   private formatPrice(plan: Plan): string {

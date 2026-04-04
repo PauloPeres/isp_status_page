@@ -209,6 +209,7 @@ export class ChannelListComponent implements OnInit, ViewWillEnter {
       case 'pagerduty': return 'danger';
       case 'opsgenie': return 'tertiary';
       case 'webhook': return 'medium';
+      case 'voice_call': return 'warning';
       default: return 'medium';
     }
   }

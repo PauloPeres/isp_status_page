@@ -1,5 +1,6 @@
 import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonButton,
   IonLabel, IonBadge, IonCard, IonCardHeader, IonCardTitle,
@@ -7,27 +8,31 @@ import {
   IonRefresher, IonRefresherContent, IonProgressBar,
   ToastController,
 } from '@ionic/angular/standalone';
-import { BillingService, Plan, CreditBalance, Usage } from './billing.service';
+import { BillingService, Plan, CreditBalance, Usage, CreditUsageSummary } from './billing.service';
 import { addIcons } from 'ionicons';
 import {
   walletOutline, checkmarkCircleOutline, starOutline, rocketOutline,
   speedometerOutline, peopleOutline, layersOutline, pulseOutline,
   serverOutline, shieldCheckmarkOutline, openOutline, diamondOutline,
-  closeCircleOutline, analyticsOutline,
+  closeCircleOutline, analyticsOutline, arrowForwardOutline,
+  callOutline, chatbubbleOutline, mailOutline, trendingDownOutline,
+  calendarOutline, warningOutline,
 } from 'ionicons/icons';
 
 addIcons({
   walletOutline, checkmarkCircleOutline, starOutline, rocketOutline,
   speedometerOutline, peopleOutline, layersOutline, pulseOutline,
   serverOutline, shieldCheckmarkOutline, openOutline, diamondOutline,
-  closeCircleOutline, analyticsOutline,
+  closeCircleOutline, analyticsOutline, arrowForwardOutline,
+  callOutline, chatbubbleOutline, mailOutline, trendingDownOutline,
+  calendarOutline, warningOutline,
 });
 
 @Component({
   selector: 'app-billing',
   standalone: true,
   imports: [
-    CommonModule,
+    CommonModule, RouterLink,
     IonHeader, IonToolbar, IonTitle, IonContent, IonMenuButton, IonButtons, IonButton,
     IonLabel, IonBadge, IonCard, IonCardHeader, IonCardTitle,
     IonCardContent, IonIcon, IonSpinner,
@@ -217,6 +222,68 @@ addIcons({
                   Buy Credits
                 </ion-button>
               </div>
+            </div>
+
+            <!-- Credit Metrics Row -->
+            @if (creditSummary()) {
+              <div class="credit-metrics-row">
+                <div class="credit-metric">
+                  <ion-icon name="trending-down-outline" color="danger"></ion-icon>
+                  <div class="credit-metric-info">
+                    <span class="credit-metric-value">{{ creditSummary()!.total_used_30d }}</span>
+                    <span class="credit-metric-label">used (30d)</span>
+                  </div>
+                </div>
+                <div class="credit-metric">
+                  <ion-icon name="analytics-outline" color="primary"></ion-icon>
+                  <div class="credit-metric-info">
+                    <span class="credit-metric-value">{{ creditSummary()!.avg_per_day }}</span>
+                    <span class="credit-metric-label">avg/day</span>
+                  </div>
+                </div>
+                <div class="credit-metric">
+                  <ion-icon name="calendar-outline" color="warning"></ion-icon>
+                  <div class="credit-metric-info">
+                    <span class="credit-metric-value">{{ creditSummary()!.projected_monthly }}</span>
+                    <span class="credit-metric-label">projected/mo</span>
+                  </div>
+                </div>
+                @if (creditSummary()!.depletion_date) {
+                  <div class="credit-metric credit-metric--warning">
+                    <ion-icon name="warning-outline" color="warning"></ion-icon>
+                    <div class="credit-metric-info">
+                      <span class="credit-metric-value credit-metric-value--sm">{{ creditSummary()!.depletion_date }}</span>
+                      <span class="credit-metric-label">depletion date</span>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Channel Cost Comparison -->
+            <div class="channel-cost-row">
+              <div class="channel-cost-item">
+                <ion-icon name="mail-outline" style="color: #1976d2"></ion-icon>
+                <span class="channel-cost-name">SMS</span>
+                <ion-badge color="primary">1 credit</ion-badge>
+              </div>
+              <div class="channel-cost-item">
+                <ion-icon name="chatbubble-outline" style="color: #388e3c"></ion-icon>
+                <span class="channel-cost-name">WhatsApp</span>
+                <ion-badge color="success">1 credit</ion-badge>
+              </div>
+              <div class="channel-cost-item">
+                <ion-icon name="call-outline" style="color: #e65100"></ion-icon>
+                <span class="channel-cost-name">Voice Call</span>
+                <ion-badge color="warning">3 credits</ion-badge>
+              </div>
+            </div>
+
+            <div class="credits-detail-link">
+              <ion-button fill="clear" size="small" routerLink="/billing/credits">
+                View Detailed Usage
+                <ion-icon name="arrow-forward-outline" slot="end"></ion-icon>
+              </ion-button>
             </div>
           </div>
 
@@ -461,6 +528,55 @@ addIcons({
       display: flex; align-items: center;
     }
 
+    /* Credit Metrics */
+    .credit-metrics-row {
+      display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;
+      padding-top: 1rem;
+      border-top: 1px solid var(--ion-border-color, rgba(0,0,0,0.06));
+    }
+    .credit-metric {
+      display: flex; align-items: center; gap: 8px;
+      flex: 1; min-width: 140px;
+    }
+    .credit-metric ion-icon { font-size: 1.2rem; }
+    .credit-metric-info { display: flex; flex-direction: column; }
+    .credit-metric-value {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 1.1rem; font-weight: 800;
+      color: var(--ion-text-color); line-height: 1.2;
+    }
+    .credit-metric-value--sm { font-size: 0.85rem; }
+    .credit-metric-label {
+      font-size: 0.65rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.04em; color: var(--ion-color-medium);
+    }
+    .credit-metric--warning {
+      background: rgba(251,188,4,0.06); padding: 6px 10px; border-radius: 8px;
+    }
+
+    /* Channel Cost Row */
+    .channel-cost-row {
+      display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;
+      padding-top: 1rem;
+      border-top: 1px solid var(--ion-border-color, rgba(0,0,0,0.06));
+    }
+    .channel-cost-item {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.8rem;
+    }
+    .channel-cost-item ion-icon { font-size: 1rem; }
+    .channel-cost-name {
+      font-weight: 600; color: var(--ion-text-color);
+    }
+
+    /* Detail Link */
+    .credits-detail-link {
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--ion-border-color, rgba(0,0,0,0.06));
+      text-align: right;
+    }
+
     /* === Plans Grid === */
     .plans-section { margin-bottom: 1rem; }
     .plans-section-title { margin-bottom: 4px; }
@@ -594,6 +710,7 @@ export class BillingComponent implements OnInit {
   plans = signal<Plan[]>([]);
   credits = signal<CreditBalance | null>(null);
   usage = signal<Usage | null>(null);
+  creditSummary = signal<CreditUsageSummary | null>(null);
   loading = signal(true);
 
   currentPlan = computed(() => this.plans().find(p => p.is_current) || null);
@@ -614,6 +731,10 @@ export class BillingComponent implements OnInit {
     });
     this.service.getUsage().subscribe({
       next: (u) => this.usage.set(u),
+      error: () => {},
+    });
+    this.service.getCreditUsage({ limit: 1 }).subscribe({
+      next: (data) => this.creditSummary.set(data.summary),
       error: () => {},
     });
   }

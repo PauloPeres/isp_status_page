@@ -165,6 +165,266 @@ class BillingController extends AppController
     }
 
     /**
+     * GET /api/v2/billing/credit-usage
+     *
+     * Return credit usage data with transactions, summary, and daily breakdown.
+     *
+     * Query params: from, to, channel, page, limit
+     *
+     * @return void
+     */
+    public function creditUsage(): void
+    {
+        $this->request->allowMethod(['get']);
+
+        if (!$this->requireRole(['owner', 'admin'])) {
+            return;
+        }
+
+        try {
+            $creditService = new \App\Service\Billing\NotificationCreditService();
+            $credits = $creditService->getCredits($this->currentOrgId);
+
+            $transactionsTable = $this->fetchTable('NotificationCreditTransactions');
+
+            $page = max(1, (int)$this->request->getQuery('page', 1));
+            $limit = min(100, max(1, (int)$this->request->getQuery('limit', 25)));
+            $channel = $this->request->getQuery('channel', '');
+            $from = $this->request->getQuery('from', '');
+            $to = $this->request->getQuery('to', '');
+
+            // Build transaction query
+            $conditions = ['organization_id' => $this->currentOrgId];
+            if (!empty($channel)) {
+                $conditions['channel'] = $channel;
+            }
+            if (!empty($from)) {
+                $conditions['created >='] = $from;
+            }
+            if (!empty($to)) {
+                $conditions['created <='] = $to . ' 23:59:59';
+            }
+
+            $total = $transactionsTable->find()
+                ->where($conditions)
+                ->count();
+
+            $transactions = $transactionsTable->find()
+                ->where($conditions)
+                ->orderBy(['created' => 'DESC'])
+                ->limit($limit)
+                ->offset(($page - 1) * $limit)
+                ->all()
+                ->toArray();
+
+            // Format transactions
+            $formattedTransactions = [];
+            foreach ($transactions as $tx) {
+                $formattedTransactions[] = [
+                    'id' => $tx->id,
+                    'type' => $tx->type,
+                    'amount' => $tx->amount,
+                    'balance_after' => $tx->balance_after,
+                    'channel' => $tx->channel,
+                    'description' => $tx->description,
+                    'reference_id' => $tx->reference_id,
+                    'created' => $tx->created ? $tx->created->format('Y-m-d H:i:s') : null,
+                ];
+            }
+
+            // Summary: last 30 days
+            $thirtyDaysAgo = \Cake\I18n\DateTime::now()->subDays(30);
+
+            $usageTransactions = $transactionsTable->find()
+                ->where([
+                    'organization_id' => $this->currentOrgId,
+                    'type' => 'usage',
+                    'created >=' => $thirtyDaysAgo,
+                ])
+                ->all();
+
+            $totalUsed30d = 0;
+            $byChannel = ['sms' => 0, 'whatsapp' => 0, 'voice_call' => 0];
+            $dailyUsage = [];
+
+            foreach ($usageTransactions as $tx) {
+                $amount = abs($tx->amount);
+                $totalUsed30d += $amount;
+                $ch = $tx->channel ?: 'unknown';
+                if (isset($byChannel[$ch])) {
+                    $byChannel[$ch] += $amount;
+                }
+                $day = $tx->created ? $tx->created->format('Y-m-d') : 'unknown';
+                if (!isset($dailyUsage[$day])) {
+                    $dailyUsage[$day] = 0;
+                }
+                $dailyUsage[$day] += $amount;
+            }
+
+            // Fill in missing days in the last 30 days
+            $dailyUsageFormatted = [];
+            for ($i = 29; $i >= 0; $i--) {
+                $date = \Cake\I18n\DateTime::now()->subDays($i)->format('Y-m-d');
+                $dailyUsageFormatted[] = [
+                    'date' => $date,
+                    'credits' => $dailyUsage[$date] ?? 0,
+                ];
+            }
+
+            // Top consumers (monitors using most credits)
+            $topConsumers = $transactionsTable->find()
+                ->select([
+                    'description',
+                    'channel',
+                    'total_credits' => $transactionsTable->find()->func()->sum(
+                        $transactionsTable->find()->func()->abs(['amount' => 'identifier'])
+                    ),
+                    'count' => $transactionsTable->find()->func()->count('*'),
+                ])
+                ->where([
+                    'organization_id' => $this->currentOrgId,
+                    'type' => 'usage',
+                    'created >=' => $thirtyDaysAgo,
+                ])
+                ->groupBy(['description', 'channel'])
+                ->orderBy(['total_credits' => 'DESC'])
+                ->limit(10)
+                ->all()
+                ->toArray();
+
+            $formattedTopConsumers = [];
+            foreach ($topConsumers as $tc) {
+                $formattedTopConsumers[] = [
+                    'description' => $tc->description,
+                    'channel' => $tc->channel,
+                    'total_credits' => (int)$tc->total_credits,
+                    'count' => (int)$tc->count,
+                ];
+            }
+
+            // Monthly burn rate and projected depletion
+            $daysInRange = max(1, min(30, (int)\Cake\I18n\DateTime::now()->diff($thirtyDaysAgo)->days));
+            $avgPerDay = $daysInRange > 0 ? round($totalUsed30d / $daysInRange, 1) : 0;
+            $projectedMonthly = round($avgPerDay * 30, 0);
+            $depletionDays = $avgPerDay > 0 ? (int)ceil($credits->balance / $avgPerDay) : null;
+            $depletionDate = $depletionDays !== null
+                ? \Cake\I18n\DateTime::now()->addDays($depletionDays)->format('Y-m-d')
+                : null;
+
+            $this->success([
+                'balance' => $credits->balance,
+                'transactions' => $formattedTransactions,
+                'summary' => [
+                    'total_used_30d' => $totalUsed30d,
+                    'by_channel' => $byChannel,
+                    'daily_usage' => $dailyUsageFormatted,
+                    'avg_per_day' => $avgPerDay,
+                    'projected_monthly' => $projectedMonthly,
+                    'depletion_date' => $depletionDate,
+                    'top_consumers' => $formattedTopConsumers,
+                    'channel_costs' => ['sms' => 1, 'whatsapp' => 1, 'voice_call' => 3],
+                ],
+                'pagination' => [
+                    'page' => $page,
+                    'limit' => $limit,
+                    'total' => $total,
+                    'pages' => (int)ceil($total / $limit),
+                ],
+            ]);
+        } catch (\Exception $e) {
+            $this->error('Failed to fetch credit usage: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * GET /api/v2/billing/voice-call-logs
+     *
+     * Return voice call logs with status, DTMF, and duration data.
+     *
+     * Query params: page, limit
+     *
+     * @return void
+     */
+    public function voiceCallLogs(): void
+    {
+        $this->request->allowMethod(['get']);
+
+        if (!$this->requireRole(['owner', 'admin'])) {
+            return;
+        }
+
+        try {
+            $voiceCallLogsTable = $this->fetchTable('VoiceCallLogs');
+
+            $page = max(1, (int)$this->request->getQuery('page', 1));
+            $limit = min(100, max(1, (int)$this->request->getQuery('limit', 25)));
+
+            $conditions = ['VoiceCallLogs.organization_id' => $this->currentOrgId];
+
+            $total = $voiceCallLogsTable->find()
+                ->where($conditions)
+                ->count();
+
+            $logs = $voiceCallLogsTable->find()
+                ->where($conditions)
+                ->orderBy(['VoiceCallLogs.created' => 'DESC'])
+                ->limit($limit)
+                ->offset(($page - 1) * $limit)
+                ->all()
+                ->toArray();
+
+            $formattedLogs = [];
+            foreach ($logs as $log) {
+                // Mask phone number: +55••••9999
+                $phone = $log->phone_number ?? '';
+                $maskedPhone = $phone;
+                if (strlen($phone) > 6) {
+                    $maskedPhone = substr($phone, 0, 3) . str_repeat('*', strlen($phone) - 7) . substr($phone, -4);
+                }
+
+                // Map DTMF result
+                $dtmfResult = 'No input';
+                if ($log->dtmf_input === '1') {
+                    $dtmfResult = 'Acknowledged';
+                } elseif ($log->dtmf_input === '2') {
+                    $dtmfResult = 'Escalated';
+                } elseif (!empty($log->dtmf_input)) {
+                    $dtmfResult = 'Input: ' . $log->dtmf_input;
+                }
+
+                $formattedLogs[] = [
+                    'id' => $log->id,
+                    'public_id' => $log->public_id,
+                    'phone_number' => $maskedPhone,
+                    'status' => $log->status ?? 'unknown',
+                    'dtmf_input' => $log->dtmf_input,
+                    'dtmf_result' => $dtmfResult,
+                    'duration_seconds' => $log->duration_seconds,
+                    'cost_credits' => $log->cost_credits,
+                    'tts_language' => $log->tts_language,
+                    'sip_provider' => $log->sip_provider,
+                    'escalation_position' => $log->escalation_position,
+                    'monitor_id' => $log->monitor_id,
+                    'incident_id' => $log->incident_id,
+                    'created' => $log->created ? $log->created->format('Y-m-d H:i:s') : null,
+                ];
+            }
+
+            $this->success([
+                'voice_call_logs' => $formattedLogs,
+                'pagination' => [
+                    'page' => $page,
+                    'limit' => $limit,
+                    'total' => $total,
+                    'pages' => (int)ceil($total / $limit),
+                ],
+            ]);
+        } catch (\Exception $e) {
+            $this->error('Failed to fetch voice call logs: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /**
      * POST /api/v2/billing/credits/buy
      *
      * Create a Stripe checkout session for purchasing notification credits.

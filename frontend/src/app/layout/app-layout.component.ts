@@ -306,9 +306,16 @@ addIcons({
               </ion-menu-toggle>
 
               <ion-menu-toggle auto-hide="false">
-                <ion-item routerLink="/billing" routerLinkActive="selected">
+                <ion-item routerLink="/billing" routerLinkActive="selected" [routerLinkActiveOptions]="{exact: true}">
                   <ion-icon name="card-outline" slot="start"></ion-icon>
                   <ion-label>Billing</ion-label>
+                </ion-item>
+              </ion-menu-toggle>
+
+              <ion-menu-toggle auto-hide="false">
+                <ion-item routerLink="/billing/credits" routerLinkActive="selected">
+                  <ion-icon name="wallet-outline" slot="start"></ion-icon>
+                  <ion-label>Credit Usage</ion-label>
                 </ion-item>
               </ion-menu-toggle>
 

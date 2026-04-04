@@ -16,6 +16,7 @@ import { ChannelService } from './channel.service';
 import { ApiService } from '../../core/services/api.service';
 import { FieldErrorComponent } from '../../shared/components/field-error.component';
 import { showApiError } from '../../core/services/plan-error.helper';
+import { RouterLink } from '@angular/router';
 
 interface ChannelTypeConfig {
   label: string;
@@ -83,6 +84,8 @@ const CHANNEL_TYPE_CONFIGS: Record<string, ChannelTypeConfig> = {
     label: 'Voice Call',
     fields: [
       { key: 'phone_numbers', label: 'Phone Numbers', placeholder: '+1234567890 (E.164 format)', multi: true },
+      { key: 'ring_timeout', label: 'Ring Timeout (seconds)', placeholder: '30' },
+      { key: 'max_escalation_attempts', label: 'Max Escalation Attempts', placeholder: '3' },
     ],
   },
 };
@@ -91,7 +94,7 @@ const CHANNEL_TYPE_CONFIGS: Record<string, ChannelTypeConfig> = {
   selector: 'app-channel-form',
   standalone: true,
   imports: [
-    CommonModule, ReactiveFormsModule, FieldErrorComponent,
+    CommonModule, ReactiveFormsModule, FieldErrorComponent, RouterLink,
     IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonBackButton, IonButton,
     IonList, IonItem, IonInput, IonSelect, IonSelectOption, IonToggle, IonNote, IonSpinner,
     IonChip, IonLabel, IonIcon,
@@ -147,6 +150,31 @@ const CHANNEL_TYPE_CONFIGS: Record<string, ChannelTypeConfig> = {
                 {{ member.email }}
               </ion-chip>
             }
+          </div>
+        }
+
+        <!-- Team member selection for Voice Call -->
+        @if (form.get('type')?.value === 'voice_call' && teamMembersWithPhone().length > 0) {
+          <div style="padding: 8px 0">
+            <ion-label style="font-size: 0.85rem; font-weight: 600; padding: 0 0 4px">Team Members</ion-label>
+            @for (member of teamMembersWithPhone(); track member.id) {
+              <ion-chip [color]="member.selected ? 'primary' : 'medium'" [outline]="!member.selected"
+                (click)="toggleMember(member)" style="height: 32px; cursor: pointer">
+                {{ member.username }} ({{ member.phone_number }})
+              </ion-chip>
+            }
+          </div>
+        }
+
+        <!-- Voice Call info box -->
+        @if (form.get('type')?.value === 'voice_call') {
+          <div class="voice-call-info">
+            <p style="font-size: 0.8rem; color: var(--ion-color-medium); margin: 8px 0 4px">
+              Voice calls cost <strong>3 credits</strong> per call. Requires SIP provider configuration.
+            </p>
+            <ion-button fill="clear" size="small" routerLink="/settings/sip" style="--padding-start: 0">
+              Configure SIP Provider
+            </ion-button>
           </div>
         }
 
@@ -356,7 +384,7 @@ export class ChannelFormComponent implements OnInit {
       const memberEmails = this.teamMembers().map(m => m.email);
       const final = combined.filter(r => !memberEmails.includes(r) || selectedEmails.includes(r));
       this.chipValues['recipients'] = final;
-    } else if (type === 'sms' || type === 'whatsapp') {
+    } else if (type === 'sms' || type === 'whatsapp' || type === 'voice_call') {
       const selectedPhones = this.teamMembers().filter(m => m.selected && m.phone_number).map(m => m.phone_number);
       const currentPhones = this.chipValues['phone_numbers'] || [];
       const combined = [...new Set([...currentPhones, ...selectedPhones])];
@@ -372,7 +400,7 @@ export class ChannelFormComponent implements OnInit {
       this.teamMembers().forEach(m => {
         m.selected = recipients.includes(m.email);
       });
-    } else if (type === 'sms' || type === 'whatsapp') {
+    } else if (type === 'sms' || type === 'whatsapp' || type === 'voice_call') {
       const phones: string[] = Array.isArray(configuration.phone_numbers) ? configuration.phone_numbers : [];
       this.teamMembers().forEach(m => {
         m.selected = m.phone_number && phones.includes(m.phone_number);
