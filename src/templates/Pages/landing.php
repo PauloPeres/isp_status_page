@@ -3,8 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><?= \Cake\Core\Configure::read('Brand.name', 'ISP Status') ?> - Monitor Your Infrastructure</title>
-    <meta name="description" content="Real-time uptime monitoring, beautiful status pages, and instant alerts. Free to start.">
+    <title><?= \Cake\Core\Configure::read('Brand.name', 'ISP Status') ?> - AI-Powered Infrastructure Monitoring</title>
+    <meta name="description" content="AI-powered uptime monitoring, beautiful status pages, and instant alerts. Set up monitoring in seconds with AI. Free to start.">
     <link rel="icon" type="image/png" href="/img/icon_isp_status_page.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/img/icon_isp_status_page.png">
     <meta name="theme-color" content="#2979FF">
@@ -24,6 +24,7 @@
             <div class="nav-dropdown">
                 <a href="#features" class="nav-dropdown-trigger">Features &#9662;</a>
                 <div class="nav-dropdown-menu">
+                    <a href="/features/ai">AI Assistant</a>
                     <a href="/features/status-page">Status Pages</a>
                     <a href="/features/alerting">Alerting</a>
                     <a href="/use-cases/isp">For ISPs</a>
@@ -45,13 +46,14 @@
 <!-- Hero Section -->
 <section class="hero">
     <div class="hero-container">
-        <h1>Monitor Your Infrastructure.<br>Know When Things Go Down.</h1>
-        <p class="hero-subtitle">Real-time uptime monitoring, beautiful status pages, and instant alerts. Free to start.</p>
+        <p class="hero-badge">Introducing AI-Powered Monitoring</p>
+        <h1>Monitor Smarter with AI.<br>Know Before Things Go Down.</h1>
+        <p class="hero-subtitle">Set up monitoring in seconds with AI. Just tell KeepUp what to monitor. Real-time uptime checks, beautiful status pages, and instant alerts — powered by intelligence.</p>
         <div class="hero-actions">
             <a href="/app/register" class="btn btn-hero-primary">Start Free</a>
             <a href="/status" class="btn btn-hero-secondary">View Demo</a>
         </div>
-        <p class="hero-note">No credit card required. Start monitoring free.</p>
+        <p class="hero-note">No credit card required. AI included on Pro and Business plans.</p>
     </div>
 </section>
 
@@ -59,9 +61,26 @@
 <section id="features" class="features">
     <div class="section-container">
         <h2 class="section-title">Everything You Need to Stay Online</h2>
-        <p class="section-subtitle">Comprehensive monitoring tools built for teams that care about uptime.</p>
+        <p class="section-subtitle">Comprehensive monitoring tools built for teams that care about uptime — now supercharged with AI.</p>
 
-        <div class="features-grid">
+        <div class="features-grid features-grid-3">
+            <div class="feature-card feature-card-highlight">
+                <div class="feature-icon feature-icon-ai">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"></path>
+                    </svg>
+                </div>
+                <span class="feature-badge">New</span>
+                <h3>AI Configuration Assistant</h3>
+                <p>Set up your entire monitoring stack through natural conversation. Create monitors, configure alerts, and diagnose issues — just by chatting.</p>
+                <ul class="feature-bullets">
+                    <li>Natural language setup</li>
+                    <li>Smart incident diagnosis</li>
+                    <li>Automated escalation configuration</li>
+                </ul>
+                <a href="/features/ai" class="feature-link">Learn more &rarr;</a>
+            </div>
+
             <div class="feature-card">
                 <div class="feature-icon feature-icon-blue">
                     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -81,6 +100,16 @@
                 </div>
                 <h3>Instant Alerts</h3>
                 <p>Get notified the moment something goes wrong via Email, Slack, Discord, Telegram, or Webhooks. Configurable escalation policies.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon feature-icon-red">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                    </svg>
+                </div>
+                <h3>Voice Call Alerts</h3>
+                <p>Get called when critical systems go down. Press 1 to acknowledge, Press 2 to escalate. Never miss a critical outage again, even at 3am.</p>
             </div>
 
             <div class="feature-card">
@@ -156,6 +185,7 @@
             </div>
             <div class="footer-links">
                 <h4>Product</h4>
+                <a href="/features/ai">AI Assistant</a>
                 <a href="/features/status-page">Status Pages</a>
                 <a href="/features/alerting">Alerting</a>
                 <a href="#pricing">Pricing</a>

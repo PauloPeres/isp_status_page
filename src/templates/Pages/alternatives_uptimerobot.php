@@ -96,6 +96,16 @@ $this->assign('og_url', 'https://usekeeup.com/alternatives/uptimerobot');
                 <td class="check-yes">Native PT-BR UI, alerts, and status pages</td>
                 <td class="check-no">English only</td>
             </tr>
+            <tr>
+                <td><strong>AI-Powered Setup &amp; Diagnostics</strong></td>
+                <td class="check-yes">AI assistant for configuration, troubleshooting, and incident diagnosis</td>
+                <td class="check-no">Manual configuration only</td>
+            </tr>
+            <tr>
+                <td><strong>Voice Call Alerts</strong></td>
+                <td class="check-yes">Automated voice calls with acknowledge/escalate via keypad</td>
+                <td class="check-no">Not available</td>
+            </tr>
         </tbody>
     </table>
 </div>

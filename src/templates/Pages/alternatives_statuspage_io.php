@@ -91,6 +91,16 @@ $this->assign('og_url', 'https://usekeeup.com/alternatives/statuspage-io');
                 <td class="check-yes">One subscription covers everything</td>
                 <td>StatusPage.io + UptimeRobot/Pingdom = 2 subscriptions</td>
             </tr>
+            <tr>
+                <td><strong>AI-Powered Incident Diagnosis</strong></td>
+                <td class="check-yes">AI assistant for auto-setup, diagnosis, and smart recommendations</td>
+                <td class="check-no">Manual only</td>
+            </tr>
+            <tr>
+                <td><strong>Voice Call Alerts</strong></td>
+                <td class="check-yes">Automated voice calls with acknowledge/escalate</td>
+                <td class="check-no">Not available</td>
+            </tr>
         </tbody>
     </table>
 </div>

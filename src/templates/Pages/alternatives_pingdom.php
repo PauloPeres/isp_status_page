@@ -91,6 +91,16 @@ $this->assign('og_url', 'https://usekeeup.com/alternatives/pingdom');
                 <td class="check-yes">Native PT-BR</td>
                 <td class="check-no">English only</td>
             </tr>
+            <tr>
+                <td><strong>AI Assistant</strong></td>
+                <td class="check-yes">AI-powered configuration + troubleshooting + incident diagnosis</td>
+                <td class="check-no">No AI features</td>
+            </tr>
+            <tr>
+                <td><strong>Voice Call Alerts</strong></td>
+                <td class="check-yes">Automated calls with keypad acknowledge/escalate</td>
+                <td class="check-no">Not available</td>
+            </tr>
         </tbody>
     </table>
 </div>

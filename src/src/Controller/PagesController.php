@@ -183,7 +183,7 @@ class PagesController extends AppController
     {
         $this->viewBuilder()->setLayout('marketing');
 
-        $allowed = ['status-page', 'alerting'];
+        $allowed = ['status-page', 'alerting', 'ai'];
         if (!in_array($feature, $allowed, true)) {
             throw new NotFoundException(__('Page not found.'));
         }

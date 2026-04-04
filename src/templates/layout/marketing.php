@@ -176,6 +176,7 @@ $canonicalUrl = $this->fetch('canonical') ?: $ogUrl;
             <div class="nav-dropdown">
                 <a href="/#features">Features</a>
                 <div class="nav-dropdown-menu">
+                    <a href="/features/ai">AI Assistant</a>
                     <a href="/features/status-page">Status Pages</a>
                     <a href="/features/alerting">Alerting</a>
                     <a href="/use-cases/saas">For SaaS</a>
@@ -209,6 +210,7 @@ $canonicalUrl = $this->fetch('canonical') ?: $ogUrl;
             </div>
             <div class="footer-links">
                 <h4>Product</h4>
+                <a href="/features/ai">AI Assistant</a>
                 <a href="/features/status-page">Status Pages</a>
                 <a href="/features/alerting">Alerting</a>
                 <a href="/#pricing">Pricing</a>
