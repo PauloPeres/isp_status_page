@@ -12,7 +12,7 @@
 # Run backup daily at 2 AM
 0 2 * * * www-data /usr/local/bin/backup-cron.sh >> /var/www/html/logs/backup.log 2>&1
 
-# Process expired trials daily at 4 AM
-0 4 * * * www-data cd /var/www/html && bin/cake trial_expiration >> /var/www/html/logs/trial_expiration.log 2>&1
+# Trial expiration, cleanup, and other daily tasks are handled by the scheduler daemon
+# via the queue system (TrialExpirationJob, etc.)
 
 # Empty line required at end of file

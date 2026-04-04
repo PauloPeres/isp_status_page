@@ -5,6 +5,7 @@ namespace App\Command;
 
 use App\Job\EscalationJob;
 use App\Job\MonitorCheckJob;
+use App\Job\TrialExpirationJob;
 use App\Service\RedisLockService;
 use Cake\Command\Command;
 use Cake\Console\Arguments;
@@ -148,6 +149,9 @@ class SchedulerCommand extends Command
 
             // Step 2: Schedule escalation processing
             $escalationsScheduled = $this->scheduleEscalations($io);
+
+            // Step 3: Schedule daily tasks (trial expiration, cleanup, etc.)
+            $this->scheduleDailyTasks($io);
 
             $elapsed = round((microtime(true) - $cycleStart) * 1000);
             $io->verbose("Cycle complete: {$monitorsScheduled} monitors, {$escalationsScheduled} escalations ({$elapsed}ms)");
@@ -312,6 +316,56 @@ class SchedulerCommand extends Command
         } catch (\Exception $e) {
             // Non-fatal — the scheduler keeps running even if heartbeat fails
             Log::warning("Scheduler: Failed to record heartbeat: {$e->getMessage()}");
+        }
+    }
+
+    /**
+     * Schedule daily tasks (trial expiration, etc.) via the queue.
+     *
+     * Uses a Redis key to ensure daily tasks only run once per day.
+     *
+     * @param \Cake\Console\ConsoleIo $io The console io
+     * @return void
+     */
+    protected function scheduleDailyTasks(ConsoleIo $io): void
+    {
+        try {
+            $redis = new \Redis();
+            $redisUrl = getenv('REDIS_URL') ?: '';
+            $host = '127.0.0.1';
+            $port = 6379;
+            $password = '';
+
+            if ($redisUrl) {
+                $parsed = parse_url($redisUrl);
+                $host = $parsed['host'] ?? '127.0.0.1';
+                $port = $parsed['port'] ?? 6379;
+                $password = $parsed['pass'] ?? '';
+            }
+
+            $redis->connect($host, $port, 2.0);
+            if ($password !== '') {
+                $redis->auth($password);
+            }
+            $redis->select(6);
+
+            $today = (new DateTime())->format('Y-m-d');
+            $key = 'keepup:daily_tasks:' . $today;
+
+            // Only run daily tasks once per day (SET NX with 25-hour TTL)
+            if (!$redis->set($key, '1', ['nx', 'ex' => 90000])) {
+                $redis->close();
+                return; // Already ran today
+            }
+
+            $redis->close();
+
+            // Push daily jobs to the queue
+            QueueManager::push(TrialExpirationJob::class, [], ['config' => 'default']);
+            $io->verbose('Daily tasks scheduled: trial expiration');
+            Log::info('Scheduler: daily tasks pushed (trial expiration)');
+        } catch (\Exception $e) {
+            Log::warning("Scheduler: Failed to schedule daily tasks: {$e->getMessage()}");
         }
     }
 
