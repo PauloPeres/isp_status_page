@@ -210,7 +210,7 @@ export class NotificationPolicyFormComponent implements OnInit {
             repeat_interval_minutes: policy.repeat_interval_minutes,
             active: policy.active,
           });
-          (policy.steps || []).forEach((step, index) => {
+          (policy.notification_policy_steps || policy.steps || []).forEach((step: any, index: number) => {
             this.stepsArray.push(this.fb.group({
               delay_minutes: [step.delay_minutes, index > 0 ? [Validators.required, Validators.min(1)] : []],
               notification_channel_id: [step.notification_channel_id, Validators.required],

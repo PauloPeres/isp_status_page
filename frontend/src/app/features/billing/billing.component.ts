@@ -210,8 +210,9 @@ addIcons({
                   Notification Credits
                 </h3>
                 <div class="credits-balance-row">
-                  <span class="credits-balance">{{ credits()?.balance ?? 0 }}</span>
+                  <span class="credits-balance" [class]="'credits-balance--' + creditsHealthLevel()">{{ credits()?.balance ?? 0 }}</span>
                   <span class="credits-label">credits remaining</span>
+                  <span class="credits-health-badge" [class]="'credits-health--' + creditsHealthLevel()">{{ creditsHealthLabel() }}</span>
                 </div>
                 @if (credits()?.monthly_grant) {
                   <p class="credits-grant">{{ credits()!.monthly_grant }} credits/month included in your plan</p>
@@ -521,6 +522,18 @@ addIcons({
     .credits-label {
       font-size: 0.9rem; color: var(--ion-color-medium);
     }
+    .credits-balance--green { color: #34a853; }
+    .credits-balance--yellow { color: #f9a825; }
+    .credits-balance--red { color: #ea4335; }
+    .credits-health-badge {
+      display: inline-block; font-size: 0.6rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.04em;
+      padding: 2px 8px; border-radius: 10px; margin-left: 8px;
+      vertical-align: middle;
+    }
+    .credits-health--green { background: rgba(52,168,83,0.12); color: #34a853; }
+    .credits-health--yellow { background: rgba(251,188,4,0.15); color: #f9a825; }
+    .credits-health--red { background: rgba(234,67,53,0.12); color: #ea4335; }
     .credits-grant {
       font-size: 0.8rem; color: var(--ion-color-medium); margin: 4px 0 0;
     }
@@ -715,6 +728,22 @@ export class BillingComponent implements OnInit {
 
   currentPlan = computed(() => this.plans().find(p => p.is_current) || null);
 
+  creditsHealthLevel = computed(() => {
+    const balance = this.credits()?.balance ?? 0;
+    const projected = this.creditSummary()?.projected_monthly ?? 0;
+    if (balance <= 0 || (projected > 0 && balance < projected * 0.25)) return 'red';
+    if (projected > 0 && balance < projected * 0.75) return 'yellow';
+    return 'green';
+  });
+
+  creditsHealthLabel = computed(() => {
+    switch (this.creditsHealthLevel()) {
+      case 'red': return 'Low';
+      case 'yellow': return 'Getting Low';
+      default: return 'Healthy';
+    }
+  });
+
   constructor(private service: BillingService, private toastCtrl: ToastController) {}
 
   ngOnInit(): void { this.loadAll(); }
@@ -723,11 +752,24 @@ export class BillingComponent implements OnInit {
     this.loading.set(true);
     this.service.getPlans().subscribe({
       next: (plans) => { this.plans.set(plans); this.loading.set(false); },
-      error: () => this.loading.set(false),
+      error: async () => {
+        this.loading.set(false);
+        const toast = await this.toastCtrl.create({
+          message: 'Failed to load billing plans. Pull down to retry.',
+          color: 'danger', duration: 4000, position: 'bottom',
+        });
+        await toast.present();
+      },
     });
     this.service.getCredits().subscribe({
       next: (c) => this.credits.set(c),
-      error: () => {},
+      error: async () => {
+        const toast = await this.toastCtrl.create({
+          message: 'Unable to load credit balance.',
+          color: 'warning', duration: 3000, position: 'bottom',
+        });
+        await toast.present();
+      },
     });
     this.service.getUsage().subscribe({
       next: (u) => this.usage.set(u),

@@ -24,6 +24,7 @@ export interface NotificationPolicy {
   step_count?: number;
   monitor_count?: number;
   steps?: NotificationPolicyStep[];
+  notification_policy_steps?: NotificationPolicyStep[];
   created_at?: string;
   updated_at?: string;
 }

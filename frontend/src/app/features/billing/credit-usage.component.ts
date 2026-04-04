@@ -7,7 +7,8 @@ import {
   IonLabel, IonBadge, IonIcon, IonSpinner, IonSegment, IonSegmentButton,
   IonRefresher, IonRefresherContent, IonSelect, IonSelectOption, IonItem, IonNote,
   IonInfiniteScroll, IonInfiniteScrollContent, IonToggle, IonInput,
-  ToastController,
+  ToastController, AlertController,
+  IonBackButton,
 } from '@ionic/angular/standalone';
 import {
   BillingService, CreditUsageResponse, CreditTransaction, VoiceCallLog, VoiceCallLogsResponse,
@@ -20,7 +21,8 @@ import {
   arrowForwardOutline, warningOutline, checkmarkCircleOutline,
   closeCircleOutline, arrowUpOutline, removeOutline, timeOutline,
   statsChartOutline, cardOutline, refreshOutline, settingsOutline,
-  shieldCheckmarkOutline,
+  shieldCheckmarkOutline, arrowBackOutline, alertCircleOutline,
+  receiptOutline, megaphoneOutline,
 } from 'ionicons/icons';
 
 addIcons({
@@ -29,7 +31,8 @@ addIcons({
   arrowForwardOutline, warningOutline, checkmarkCircleOutline,
   closeCircleOutline, arrowUpOutline, removeOutline, timeOutline,
   statsChartOutline, cardOutline, refreshOutline, settingsOutline,
-  shieldCheckmarkOutline,
+  shieldCheckmarkOutline, arrowBackOutline, alertCircleOutline,
+  receiptOutline, megaphoneOutline,
 });
 
 @Component({
@@ -41,12 +44,16 @@ addIcons({
     IonLabel, IonBadge, IonIcon, IonSpinner, IonSegment, IonSegmentButton,
     IonRefresher, IonRefresherContent, IonSelect, IonSelectOption, IonItem, IonNote,
     IonInfiniteScroll, IonInfiniteScrollContent, IonToggle, IonInput,
+    IonBackButton,
   ],
   template: `
     <ion-header>
       <ion-toolbar>
-        <ion-buttons slot="start"><ion-menu-button></ion-menu-button></ion-buttons>
-        <ion-title>Credit Usage</ion-title>
+        <ion-buttons slot="start">
+          <ion-back-button defaultHref="/billing" text="Billing"></ion-back-button>
+          <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+        <ion-title>Credit Usage & History</ion-title>
         <ion-buttons slot="end">
           <ion-button (click)="onBuyCredits()" fill="solid" color="primary" size="small">
             <ion-icon name="wallet-outline" slot="start"></ion-icon>
@@ -64,23 +71,44 @@ addIcons({
       @if (loading()) {
         <div class="cu-loader">
           <ion-spinner name="crescent"></ion-spinner>
+          <p class="cu-loader-text">Loading credit usage data...</p>
+        </div>
+      } @else if (loadError()) {
+        <div class="cu-error-state">
+          <ion-icon name="alert-circle-outline" color="danger"></ion-icon>
+          <h3>Unable to load credit usage</h3>
+          <p>We couldn't fetch your credit data. This may be a temporary issue.</p>
+          <ion-button fill="outline" color="primary" (click)="loadAll()">
+            <ion-icon name="refresh-outline" slot="start"></ion-icon>
+            Try Again
+          </ion-button>
         </div>
       } @else {
         <div class="cu-page">
 
           <!-- Balance + Summary Cards Row -->
           <div class="cu-summary-row">
-            <div class="cu-card cu-balance-card">
+            <div class="cu-card cu-balance-card" [class]="'cu-balance-card--' + balanceHealthLevel()">
               <div class="cu-balance-top">
-                <div class="cu-balance-icon-wrap">
+                <div class="cu-balance-icon-wrap" [class]="'cu-balance-icon--' + balanceHealthLevel()">
                   <ion-icon name="wallet-outline"></ion-icon>
                 </div>
                 <div class="cu-balance-info">
                   <span class="cu-balance-label">Credit Balance</span>
                   <span class="cu-balance-amount">{{ data()?.balance ?? 0 }}</span>
+                  <span class="cu-balance-health-tag" [class]="'cu-health--' + balanceHealthLevel()">{{ balanceHealthLabel() }}</span>
                 </div>
               </div>
-              @if (data()?.summary?.depletion_date) {
+              @if (balanceHealthLevel() === 'red') {
+                <div class="cu-depletion cu-depletion--critical">
+                  <ion-icon name="alert-circle-outline" color="danger"></ion-icon>
+                  <span><strong>Low balance!</strong> You may miss notifications if credits run out.
+                    @if (data()?.summary?.depletion_date) {
+                      At current rate, credits deplete by <strong>{{ data()!.summary.depletion_date }}</strong>.
+                    }
+                  </span>
+                </div>
+              } @else if (data()?.summary?.depletion_date) {
                 <div class="cu-depletion">
                   <ion-icon name="warning-outline" color="warning"></ion-icon>
                   <span>At current rate, credits deplete by <strong>{{ data()!.summary.depletion_date }}</strong></span>
@@ -119,6 +147,10 @@ addIcons({
               <ion-icon name="refresh-outline"></ion-icon>
               Auto-Replenish Credits
             </h3>
+            <p class="cu-ar-explainer">
+              Never miss a notification. Auto-replenish automatically purchases credits using your saved payment method when your balance gets low.
+              You set the rules -- we handle the rest.
+            </p>
 
             @if (autoReplenishLoading()) {
               <div class="cu-ar-loading"><ion-spinner name="dots"></ion-spinner></div>
@@ -127,7 +159,7 @@ addIcons({
                 <div class="cu-ar-toggle-row">
                   <div class="cu-ar-toggle-info">
                     <span class="cu-ar-toggle-label">Enable Auto-Replenish</span>
-                    <span class="cu-ar-toggle-desc">Automatically buy credits when balance drops below threshold</span>
+                    <span class="cu-ar-toggle-desc">Your payment method will be charged automatically when your credit balance drops below the threshold you set.</span>
                   </div>
                   <ion-toggle
                     [checked]="arEnabled"
@@ -139,14 +171,15 @@ addIcons({
                 @if (!arSettings()?.has_payment_method) {
                   <div class="cu-ar-warning">
                     <ion-icon name="warning-outline" color="warning"></ion-icon>
-                    <span>No payment method on file. Please add a card via the billing portal before enabling auto-replenish.</span>
+                    <span><strong>Payment method required.</strong> Please add a credit card via the billing portal before enabling auto-replenish.</span>
                   </div>
                 }
 
                 @if (arEnabled) {
                   <div class="cu-ar-fields">
                     <div class="cu-ar-field">
-                      <label class="cu-ar-field-label">Replenish when balance drops below</label>
+                      <label class="cu-ar-field-label">Low balance threshold</label>
+                      <span class="cu-ar-field-hint">We'll buy more credits when your balance drops below this number.</span>
                       <div class="cu-ar-field-input">
                         <input type="number" class="cu-ar-input" [value]="arThreshold" (change)="onArFieldChange('threshold', $event)" min="1" max="10000" />
                         <span class="cu-ar-field-unit">credits</span>
@@ -154,25 +187,37 @@ addIcons({
                     </div>
 
                     <div class="cu-ar-field">
-                      <label class="cu-ar-field-label">Buy this many credits each time</label>
+                      <label class="cu-ar-field-label">Credits to purchase each time</label>
+                      <span class="cu-ar-field-hint">How many credits to buy in each automatic purchase.</span>
                       <div class="cu-ar-field-input">
                         <input type="number" class="cu-ar-input" [value]="arAmount" (change)="onArFieldChange('amount', $event)" min="100" max="10000" step="100" />
                         <span class="cu-ar-field-unit">credits</span>
-                        <span class="cu-ar-field-price">({{ formatCreditPrice(arAmount) }})</span>
+                        <span class="cu-ar-field-price">({{ formatCreditPrice(arAmount) }} per purchase)</span>
                       </div>
                     </div>
 
                     <div class="cu-ar-field">
-                      <label class="cu-ar-field-label">Maximum auto-spend per month</label>
+                      <label class="cu-ar-field-label">Monthly spending cap</label>
+                      <span class="cu-ar-field-hint">Auto-replenish will stop once this limit is reached each month, protecting you from unexpected charges.</span>
                       <div class="cu-ar-field-input">
                         <input type="number" class="cu-ar-input" [value]="arMaxMonthly" (change)="onArFieldChange('max_monthly', $event)" min="100" max="100000" step="100" />
                         <span class="cu-ar-field-unit">credits</span>
-                        <span class="cu-ar-field-price">({{ formatCreditPrice(arMaxMonthly) }})</span>
+                        <span class="cu-ar-field-price">(up to {{ formatCreditPrice(arMaxMonthly) }}/month)</span>
                       </div>
                     </div>
 
+                    <!-- Cost Summary Box -->
+                    <div class="cu-ar-summary-box">
+                      <h4 class="cu-ar-summary-title">How it works</h4>
+                      <ul class="cu-ar-summary-list">
+                        <li>When balance falls below <strong>{{ arThreshold }} credits</strong>, we charge your card <strong>{{ formatCreditPrice(arAmount) }}</strong> for {{ arAmount }} credits.</li>
+                        <li>Maximum monthly auto-spend: <strong>{{ formatCreditPrice(arMaxMonthly) }}</strong> ({{ arMaxMonthly }} credits).</li>
+                        <li>You can disable auto-replenish at any time.</li>
+                      </ul>
+                    </div>
+
                     <div class="cu-ar-actions">
-                      <ion-button fill="solid" color="primary" size="small" (click)="saveAutoReplenish()" [disabled]="arSaving()">
+                      <ion-button fill="solid" color="primary" size="small" (click)="confirmSaveAutoReplenish()" [disabled]="arSaving()">
                         @if (arSaving()) {
                           <ion-spinner name="dots" slot="start"></ion-spinner>
                         }
@@ -183,7 +228,7 @@ addIcons({
                     @if (arSettings()?.monthly_auto_replenished) {
                       <div class="cu-ar-stats">
                         <ion-icon name="shield-checkmark-outline" color="success"></ion-icon>
-                        <span>This month: {{ arSettings()!.monthly_auto_replenished }} credits auto-replenished</span>
+                        <span>This month: <strong>{{ arSettings()!.monthly_auto_replenished }}</strong> credits auto-replenished ({{ formatCreditPrice(arSettings()!.monthly_auto_replenished) }})</span>
                         @if (arSettings()!.last_charged_at) {
                           <span class="cu-ar-stats-date">Last charged: {{ arSettings()!.last_charged_at | date:'MMM d, y h:mm a' }}</span>
                         }
@@ -201,16 +246,29 @@ addIcons({
               <ion-icon name="stats-chart-outline"></ion-icon>
               Daily Credit Usage (Last 30 Days)
             </h3>
-            <div class="cu-chart">
-              @for (day of data()?.summary?.daily_usage ?? []; track day.date) {
-                <div class="cu-bar-col" [title]="day.date + ': ' + day.credits + ' credits'">
-                  <div class="cu-bar" [style.height.%]="getBarHeight(day.credits)"></div>
-                  @if ($index % 5 === 0 || $index === 29) {
-                    <span class="cu-bar-label">{{ day.date.substring(5) }}</span>
-                  }
-                </div>
-              }
-            </div>
+            @if ((data()?.summary?.daily_usage ?? []).length === 0) {
+              <div class="cu-chart-empty">
+                <ion-icon name="stats-chart-outline" color="medium"></ion-icon>
+                <p>No usage data available yet. Usage will appear here once notifications are sent.</p>
+              </div>
+            } @else {
+              <div class="cu-chart">
+                @for (day of data()?.summary?.daily_usage ?? []; track day.date) {
+                  <div class="cu-bar-col"
+                       (mouseenter)="hoveredDay = day"
+                       (mouseleave)="hoveredDay = null">
+                    <div class="cu-bar-tooltip" *ngIf="hoveredDay === day">
+                      <strong>{{ day.date | date:'MMM d, y' }}</strong><br/>
+                      {{ day.credits }} credits used
+                    </div>
+                    <div class="cu-bar" [style.height.%]="getBarHeight(day.credits)"></div>
+                    @if ($index % 5 === 0 || $index === (data()!.summary.daily_usage.length - 1)) {
+                      <span class="cu-bar-label">{{ day.date.substring(5) }}</span>
+                    }
+                  </div>
+                }
+              </div>
+            }
           </div>
 
           <!-- Channel Breakdown + Channel Costs -->
@@ -338,7 +396,13 @@ addIcons({
                         </td>
                       </tr>
                     } @empty {
-                      <tr><td colspan="4" class="cu-empty-row">No transactions found</td></tr>
+                      <tr><td colspan="4" class="cu-empty-row">
+                        <div class="cu-empty-state">
+                          <ion-icon name="receipt-outline" color="medium" class="cu-empty-icon"></ion-icon>
+                          <p class="cu-empty-title">No transactions yet</p>
+                          <p class="cu-empty-desc">Credit transactions will appear here when notifications are sent via SMS, WhatsApp, or voice calls.</p>
+                        </div>
+                      </td></tr>
                     }
                   </tbody>
                 </table>
@@ -363,7 +427,7 @@ addIcons({
                       <th>Date</th>
                       <th>Phone</th>
                       <th>Status</th>
-                      <th>DTMF Result</th>
+                      <th>Response</th>
                       <th>Duration</th>
                       <th>Language</th>
                       <th class="cu-th-right">Credits</th>
@@ -375,18 +439,20 @@ addIcons({
                         <td class="cu-td-date">{{ log.created | date:'MMM d, y h:mm a' }}</td>
                         <td class="cu-td-phone">{{ log.phone_number }}</td>
                         <td>
-                          <ion-badge [color]="getStatusColor(log.status)" class="cu-status-badge">{{ log.status }}</ion-badge>
+                          <ion-badge [color]="getStatusColor(log.status)" class="cu-status-badge">{{ formatCallStatus(log.status) }}</ion-badge>
                         </td>
                         <td>
                           <span class="cu-dtmf" [class]="'cu-dtmf--' + getDtmfClass(log.dtmf_result)">
                             @if (log.dtmf_result === 'Acknowledged') {
                               <ion-icon name="checkmark-circle-outline" color="success"></ion-icon>
+                              <span>Confirmed (pressed 1)</span>
                             } @else if (log.dtmf_result === 'Escalated') {
                               <ion-icon name="arrow-up-outline" color="warning"></ion-icon>
+                              <span>Escalated to next contact</span>
                             } @else {
                               <ion-icon name="remove-outline" color="medium"></ion-icon>
+                              <span>No response</span>
                             }
-                            {{ log.dtmf_result }}
                           </span>
                         </td>
                         <td>{{ log.duration_seconds ? log.duration_seconds + 's' : '--' }}</td>
@@ -394,7 +460,13 @@ addIcons({
                         <td class="cu-td-credits cu-credit-negative">-{{ log.cost_credits }}</td>
                       </tr>
                     } @empty {
-                      <tr><td colspan="7" class="cu-empty-row">No voice call logs found</td></tr>
+                      <tr><td colspan="7" class="cu-empty-row">
+                        <div class="cu-empty-state">
+                          <ion-icon name="call-outline" color="medium" class="cu-empty-icon"></ion-icon>
+                          <p class="cu-empty-title">No voice calls yet</p>
+                          <p class="cu-empty-desc">Voice call logs will appear here when voice call alerts are triggered for your monitors.</p>
+                        </div>
+                      </td></tr>
                     }
                   </tbody>
                 </table>
@@ -416,8 +488,25 @@ addIcons({
   `,
   styles: [`
     .cu-loader {
-      display: flex; align-items: center; justify-content: center;
-      padding: 3rem; min-height: 200px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 3rem; min-height: 200px; gap: 12px;
+    }
+    .cu-loader-text {
+      font-size: 0.85rem; color: var(--ion-color-medium); margin: 0;
+    }
+
+    /* Error State */
+    .cu-error-state {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 3rem 1rem; min-height: 300px; text-align: center; gap: 8px;
+    }
+    .cu-error-state ion-icon { font-size: 3rem; }
+    .cu-error-state h3 {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 1.1rem; font-weight: 700; color: var(--ion-text-color); margin: 8px 0 0;
+    }
+    .cu-error-state p {
+      font-size: 0.85rem; color: var(--ion-color-medium); margin: 0 0 12px; max-width: 400px;
     }
     .cu-page {
       max-width: 1100px; margin: 0 auto;
@@ -444,6 +533,16 @@ addIcons({
     .cu-balance-card {
       display: flex; flex-direction: column; gap: 12px;
     }
+    .cu-balance-card--green {
+      border-left: 4px solid #34a853;
+    }
+    .cu-balance-card--yellow {
+      border-left: 4px solid #fbbc04;
+    }
+    .cu-balance-card--red {
+      border-left: 4px solid #ea4335;
+      background: rgba(234,67,53,0.03);
+    }
     .cu-balance-top {
       display: flex; align-items: center; gap: 16px;
     }
@@ -453,6 +552,9 @@ addIcons({
       display: flex; align-items: center; justify-content: center;
       font-size: 1.5rem; color: var(--ion-color-primary);
     }
+    .cu-balance-icon--green { background: rgba(52,168,83,0.1); color: #34a853; }
+    .cu-balance-icon--yellow { background: rgba(251,188,4,0.1); color: #f9a825; }
+    .cu-balance-icon--red { background: rgba(234,67,53,0.1); color: #ea4335; }
     .cu-balance-info {
       display: flex; flex-direction: column;
     }
@@ -471,6 +573,18 @@ addIcons({
       background: rgba(251,188,4,0.08); padding: 8px 12px; border-radius: 8px;
     }
     .cu-depletion strong { color: var(--ion-text-color); }
+    .cu-depletion--critical {
+      background: rgba(234,67,53,0.08);
+    }
+    .cu-depletion--critical ion-icon { color: #ea4335 !important; }
+    .cu-balance-health-tag {
+      display: inline-block; font-size: 0.65rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.04em;
+      padding: 2px 8px; border-radius: 10px; margin-top: 4px; width: fit-content;
+    }
+    .cu-health--green { background: rgba(52,168,83,0.12); color: #34a853; }
+    .cu-health--yellow { background: rgba(251,188,4,0.15); color: #f9a825; }
+    .cu-health--red { background: rgba(234,67,53,0.12); color: #ea4335; }
 
     /* Stat Cards */
     .cu-stat-card {
@@ -494,6 +608,10 @@ addIcons({
 
     /* Auto-Replenish Section */
     .cu-auto-replenish-section { margin-bottom: 1rem; }
+    .cu-ar-explainer {
+      font-size: 0.82rem; color: var(--ion-color-medium);
+      margin: -0.5rem 0 1rem; line-height: 1.5;
+    }
     .cu-ar-loading {
       display: flex; align-items: center; justify-content: center; padding: 1rem;
     }
@@ -527,6 +645,9 @@ addIcons({
     .cu-ar-field-label {
       font-size: 0.78rem; font-weight: 600; color: var(--ion-text-color);
     }
+    .cu-ar-field-hint {
+      font-size: 0.7rem; color: var(--ion-color-medium); line-height: 1.4;
+    }
     .cu-ar-field-input {
       display: flex; align-items: center; gap: 8px;
     }
@@ -556,6 +677,19 @@ addIcons({
       background: rgba(52,168,83,0.06); padding: 10px 14px; border-radius: 8px;
       font-size: 0.8rem; color: var(--ion-text-color);
     }
+    .cu-ar-summary-box {
+      background: var(--ion-color-light, #f4f5f8); border-radius: 10px;
+      padding: 14px 16px; border: 1px solid var(--ion-border-color, rgba(0,0,0,0.06));
+    }
+    .cu-ar-summary-title {
+      font-size: 0.8rem; font-weight: 700; margin: 0 0 8px;
+      color: var(--ion-text-color);
+    }
+    .cu-ar-summary-list {
+      margin: 0; padding: 0 0 0 18px; font-size: 0.78rem;
+      color: var(--ion-color-medium); line-height: 1.7;
+    }
+    .cu-ar-summary-list strong { color: var(--ion-text-color); }
     .cu-ar-stats-date {
       font-size: 0.75rem; color: var(--ion-color-medium);
       margin-left: auto;
@@ -591,11 +725,25 @@ addIcons({
     .cu-bar-col:hover .cu-bar {
       opacity: 1; background: var(--ion-color-primary-shade);
     }
+    .cu-bar-tooltip {
+      position: absolute; top: -44px; left: 50%; transform: translateX(-50%);
+      background: var(--ion-text-color, #333); color: var(--ion-background-color, #fff);
+      padding: 4px 10px; border-radius: 6px;
+      font-size: 0.65rem; white-space: nowrap; z-index: 10;
+      pointer-events: none; line-height: 1.4; text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
     .cu-bar-label {
       position: absolute; bottom: -18px;
       font-size: 0.55rem; color: var(--ion-color-medium);
       white-space: nowrap;
     }
+    .cu-chart-empty {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 2rem; text-align: center; min-height: 120px;
+    }
+    .cu-chart-empty ion-icon { font-size: 2rem; margin-bottom: 8px; }
+    .cu-chart-empty p { font-size: 0.82rem; color: var(--ion-color-medium); margin: 0; max-width: 350px; }
 
     /* Two Column */
     .cu-two-col {
@@ -734,6 +882,18 @@ addIcons({
       text-align: center; padding: 2rem !important;
       color: var(--ion-color-medium);
     }
+    .cu-empty-state {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      padding: 1rem 0;
+    }
+    .cu-empty-icon { font-size: 2.5rem; margin-bottom: 4px; }
+    .cu-empty-title {
+      font-size: 0.9rem; font-weight: 700; color: var(--ion-text-color); margin: 0;
+    }
+    .cu-empty-desc {
+      font-size: 0.78rem; color: var(--ion-color-medium); margin: 0;
+      max-width: 350px; line-height: 1.5;
+    }
 
     /* Pagination */
     .cu-pagination {
@@ -757,6 +917,7 @@ addIcons({
 })
 export class CreditUsageComponent implements OnInit {
   loading = signal(true);
+  loadError = signal(false);
   data = signal<CreditUsageResponse | null>(null);
   voiceCallLogs = signal<VoiceCallLog[]>([]);
   voiceCallPagination = signal<{ page: number; limit: number; total: number; pages: number } | null>(null);
@@ -774,12 +935,31 @@ export class CreditUsageComponent implements OnInit {
   channelFilter: string = '';
   currentPage = 1;
   vcPage = 1;
+  hoveredDay: any = null;
 
   private maxDailyCredits = 1;
+
+  // Computed balance health
+  balanceHealthLevel = computed(() => {
+    const balance = this.data()?.balance ?? 0;
+    const projected = this.data()?.summary?.projected_monthly ?? 0;
+    if (balance <= 0 || (projected > 0 && balance < projected * 0.25)) return 'red';
+    if (projected > 0 && balance < projected * 0.75) return 'yellow';
+    return 'green';
+  });
+
+  balanceHealthLabel = computed(() => {
+    switch (this.balanceHealthLevel()) {
+      case 'red': return 'Low Balance';
+      case 'yellow': return 'Getting Low';
+      default: return 'Healthy';
+    }
+  });
 
   constructor(
     private service: BillingService,
     private toastCtrl: ToastController,
+    private alertCtrl: AlertController,
   ) {}
 
   ngOnInit(): void {
@@ -788,6 +968,7 @@ export class CreditUsageComponent implements OnInit {
 
   loadAll(): void {
     this.loading.set(true);
+    this.loadError.set(false);
     this.loadCreditUsage();
     this.loadVoiceCallLogs();
     this.loadAutoReplenishSettings();
@@ -803,9 +984,16 @@ export class CreditUsageComponent implements OnInit {
         this.data.set(data);
         this.maxDailyCredits = Math.max(1, ...data.summary.daily_usage.map(d => d.credits));
         this.loading.set(false);
+        this.loadError.set(false);
       },
-      error: () => {
+      error: async () => {
         this.loading.set(false);
+        this.loadError.set(true);
+        const toast = await this.toastCtrl.create({
+          message: 'Failed to load credit usage data. Pull down to retry.',
+          color: 'danger', duration: 4000, position: 'bottom',
+        });
+        await toast.present();
       },
     });
   }
@@ -816,7 +1004,13 @@ export class CreditUsageComponent implements OnInit {
         this.voiceCallLogs.set(data.voice_call_logs);
         this.voiceCallPagination.set(data.pagination);
       },
-      error: () => {},
+      error: async () => {
+        const toast = await this.toastCtrl.create({
+          message: 'Failed to load voice call logs.',
+          color: 'warning', duration: 3000, position: 'bottom',
+        });
+        await toast.present();
+      },
     });
   }
 
@@ -885,6 +1079,18 @@ export class CreditUsageComponent implements OnInit {
     }
   }
 
+  formatCallStatus(status: string): string {
+    switch (status) {
+      case 'completed': return 'Answered';
+      case 'no-answer': return 'No Answer';
+      case 'busy': return 'Busy';
+      case 'failed': return 'Failed';
+      case 'ringing': return 'Ringing';
+      case 'in-progress': return 'In Progress';
+      default: return status.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    }
+  }
+
   getDtmfClass(result: string): string {
     if (result === 'Acknowledged') return 'ack';
     if (result === 'Escalated') return 'esc';
@@ -908,9 +1114,37 @@ export class CreditUsageComponent implements OnInit {
     });
   }
 
-  onArToggle(event: any): void {
-    this.arEnabled = event.detail.checked;
-    if (!this.arEnabled) {
+  async onArToggle(event: any): Promise<void> {
+    const newValue = event.detail.checked;
+    if (newValue) {
+      // Show confirmation dialog before enabling auto-charge
+      const alert = await this.alertCtrl.create({
+        header: 'Enable Auto-Replenish?',
+        message: `Your payment method will be charged automatically when your credit balance drops below the threshold. You can adjust the settings and disable this at any time.`,
+        buttons: [
+          {
+            text: 'Cancel',
+            role: 'cancel',
+            handler: () => {
+              this.arEnabled = false;
+            },
+          },
+          {
+            text: 'Enable',
+            role: 'confirm',
+            handler: () => {
+              this.arEnabled = true;
+            },
+          },
+        ],
+      });
+      await alert.present();
+      const { role } = await alert.onDidDismiss();
+      if (role !== 'confirm') {
+        this.arEnabled = false;
+      }
+    } else {
+      this.arEnabled = false;
       // Immediately save when disabling
       this.saveAutoReplenish();
     }
@@ -924,6 +1158,18 @@ export class CreditUsageComponent implements OnInit {
       case 'amount': this.arAmount = value; break;
       case 'max_monthly': this.arMaxMonthly = value; break;
     }
+  }
+
+  async confirmSaveAutoReplenish(): Promise<void> {
+    const alert = await this.alertCtrl.create({
+      header: 'Confirm Auto-Replenish Settings',
+      message: `When your balance drops below ${this.arThreshold} credits, we will charge your card ${this.formatCreditPrice(this.arAmount)} for ${this.arAmount} credits. Monthly cap: ${this.formatCreditPrice(this.arMaxMonthly)}.`,
+      buttons: [
+        { text: 'Cancel', role: 'cancel' },
+        { text: 'Save', role: 'confirm', handler: () => this.saveAutoReplenish() },
+      ],
+    });
+    await alert.present();
   }
 
   async saveAutoReplenish(): Promise<void> {
