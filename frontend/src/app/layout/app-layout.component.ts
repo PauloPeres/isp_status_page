@@ -23,6 +23,7 @@ import { AuthService } from '../core/services/auth.service';
 import { BRAND } from '../core/config/brand.config';
 import { ApiService } from '../core/services/api.service';
 import { ThemeService } from '../core/services/theme.service';
+import { ChatWidgetComponent } from '../features/chat/chat-widget.component';
 import { addIcons } from 'ionicons';
 import {
   gridOutline,
@@ -121,6 +122,7 @@ addIcons({
     IonButton,
     RouterLink,
     RouterLinkActive,
+    ChatWidgetComponent,
   ],
   template: `
     <ion-app>
@@ -394,6 +396,8 @@ addIcons({
 
         <ion-router-outlet id="main-content"></ion-router-outlet>
       </ion-split-pane>
+
+      <app-chat-widget></app-chat-widget>
     </ion-app>
   `,
   styles: [

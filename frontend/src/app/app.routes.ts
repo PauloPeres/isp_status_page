@@ -340,6 +340,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'chat',
+        loadComponent: () =>
+          import('./features/chat/chat-page.component').then(
+            (m) => m.ChatPageComponent,
+          ),
+      },
+      {
         path: 'activity-log',
         loadComponent: () =>
           import('./features/activity-log/activity-log.component').then(
