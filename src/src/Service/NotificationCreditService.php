@@ -72,7 +72,7 @@ class NotificationCreditService
             'auto_recharge' => false,
             'auto_recharge_threshold' => 10,
             'auto_recharge_amount' => 100,
-        ]);
+        ], ['accessibleFields' => ['organization_id' => true]]);
 
         $saved = $table->save($credits);
         if (!$saved) {

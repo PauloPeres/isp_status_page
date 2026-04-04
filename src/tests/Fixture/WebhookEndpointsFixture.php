@@ -18,6 +18,7 @@ class WebhookEndpointsFixture extends TestFixture
     public array $records = [
         [
             'id' => 1,
+            'public_id' => '7a8b9c0d-1e2f-4a3b-4c5d-6e7f8a9b0c1d',
             'organization_id' => 1,
             'url' => 'https://hooks.example.com/webhook',
             'secret' => 'test-webhook-secret-123',

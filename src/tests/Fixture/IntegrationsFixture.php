@@ -18,6 +18,7 @@ class IntegrationsFixture extends TestFixture
     public array $records = [
         [
             'id' => 1,
+            'public_id' => 'e5c6d7f8-a9b0-4c1d-2e3f-4a5b6c7d8e9f',
             'organization_id' => 1,
             'name' => 'Test REST API',
             'type' => 'rest_api',
@@ -30,6 +31,7 @@ class IntegrationsFixture extends TestFixture
         ],
         [
             'id' => 2,
+            'public_id' => 'f6d7e8a9-b0c1-4d2e-3f4a-5b6c7d8e9f0a',
             'organization_id' => 1,
             'name' => 'Test IXC',
             'type' => 'ixc',

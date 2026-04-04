@@ -24,6 +24,8 @@ class NotificationCreditsFixture extends TestFixture
             'auto_recharge' => false,
             'auto_recharge_threshold' => 10,
             'auto_recharge_amount' => 100,
+            'auto_replenish_max_monthly' => 500,
+            'auto_replenish_last_charged_at' => null,
             'low_balance_notified_at' => null,
             'last_grant_at' => null,
             'created' => '2024-01-01 00:00:00',

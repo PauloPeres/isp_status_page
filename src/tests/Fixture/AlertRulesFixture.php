@@ -23,6 +23,7 @@ class AlertRulesFixture extends TestFixture
         $this->records = [
             [
                 'id' => 1,
+                'public_id' => 'a1e2f3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b',
                 'organization_id' => 1,
                 'monitor_id' => 1,
                 'channel' => 'email',
@@ -36,6 +37,7 @@ class AlertRulesFixture extends TestFixture
             ],
             [
                 'id' => 2,
+                'public_id' => 'b2f3a4c5-d6e7-4f8a-9b0c-1d2e3f4a5b6c',
                 'organization_id' => 1,
                 'monitor_id' => 1,
                 'channel' => 'email',
@@ -49,6 +51,7 @@ class AlertRulesFixture extends TestFixture
             ],
             [
                 'id' => 3,
+                'public_id' => 'c3a4b5d6-e7f8-4a9b-0c1d-2e3f4a5b6c7d',
                 'organization_id' => 1,
                 'monitor_id' => 2,
                 'channel' => 'email',
@@ -62,6 +65,7 @@ class AlertRulesFixture extends TestFixture
             ],
             [
                 'id' => 4,
+                'public_id' => 'd4b5c6e7-f8a9-4b0c-1d2e-3f4a5b6c7d8e',
                 'organization_id' => 1,
                 'monitor_id' => 1,
                 'channel' => 'whatsapp',

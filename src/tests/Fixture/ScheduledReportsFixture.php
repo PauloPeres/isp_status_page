@@ -18,6 +18,7 @@ class ScheduledReportsFixture extends TestFixture
     public array $records = [
         [
             'id' => 1,
+            'public_id' => '3c4d5e6f-7a8b-4c9d-0e1f-2a3b4c5d6e7f',
             'organization_id' => 1,
             'name' => 'Weekly Status Report',
             'frequency' => 'weekly',
@@ -34,6 +35,7 @@ class ScheduledReportsFixture extends TestFixture
         ],
         [
             'id' => 2,
+            'public_id' => '4d5e6f7a-8b9c-4d0e-1f2a-3b4c5d6e7f8a',
             'organization_id' => 1,
             'name' => 'Monthly Summary',
             'frequency' => 'monthly',
