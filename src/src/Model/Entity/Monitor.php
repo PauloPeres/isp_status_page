@@ -21,6 +21,7 @@ use Cake\ORM\Entity;
  * @property \Cake\I18n\DateTime|null $next_check_at
  * @property string|null $uptime_percentage
  * @property bool $active
+ * @property string|null $pause_reason
  * @property bool $visible_on_status_page
  * @property int $display_order
  * @property \Cake\I18n\DateTime $created
@@ -85,6 +86,7 @@ class Monitor extends Entity
         'next_check_at' => true,
         'uptime_percentage' => true,
         'active' => true,
+        'pause_reason' => true,
         'visible_on_status_page' => true,
         'display_order' => true,
         'created' => true,

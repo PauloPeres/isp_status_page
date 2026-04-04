@@ -1,4 +1,5 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import {
   IonApp,
   IonSplitPane,
@@ -103,6 +104,7 @@ addIcons({
   selector: 'app-layout',
   standalone: true,
   imports: [
+    CommonModule,
     IonApp,
     IonSplitPane,
     IonRouterOutlet,
@@ -394,7 +396,19 @@ addIcons({
           </ion-content>
         </ion-menu>
 
-        <ion-router-outlet id="main-content"></ion-router-outlet>
+        <div id="main-content">
+          <!-- Trial Banner -->
+          @if (showTrialBanner() && !trialBannerDismissed) {
+            <div class="trial-banner" [class]="trialBannerClass()">
+              <span class="trial-banner-text">{{ trialBannerMessage() }}</span>
+              <a routerLink="/billing" class="trial-banner-cta">Upgrade Now</a>
+              @if (!trialExpired()) {
+                <button class="trial-banner-close" (click)="dismissTrialBanner()">&times;</button>
+              }
+            </div>
+          }
+          <ion-router-outlet></ion-router-outlet>
+        </div>
       </ion-split-pane>
 
       <app-chat-widget></app-chat-widget>
@@ -423,6 +437,56 @@ addIcons({
       ion-icon {
         font-size: 1.2rem;
       }
+      .trial-banner {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        padding: 10px 16px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        z-index: 100;
+      }
+      .trial-banner-info {
+        background: #E3F2FD;
+        color: #1565C0;
+        border-bottom: 1px solid #90CAF9;
+      }
+      .trial-banner-warning {
+        background: #FFF8E1;
+        color: #F57F17;
+        border-bottom: 1px solid #FFE082;
+      }
+      .trial-banner-danger {
+        background: #FFEBEE;
+        color: #C62828;
+        border-bottom: 1px solid #EF9A9A;
+      }
+      .trial-banner-cta {
+        display: inline-block;
+        padding: 4px 14px;
+        border-radius: 4px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-decoration: none;
+        background: var(--ion-color-primary, #2979FF);
+        color: #fff;
+      }
+      .trial-banner-cta:hover {
+        opacity: 0.9;
+      }
+      .trial-banner-close {
+        background: none;
+        border: none;
+        font-size: 1.2rem;
+        cursor: pointer;
+        padding: 0 4px;
+        opacity: 0.6;
+        color: inherit;
+      }
+      .trial-banner-close:hover {
+        opacity: 1;
+      }
     `,
   ],
 })
@@ -431,6 +495,35 @@ export class AppLayoutComponent implements OnInit {
   activeIncidentCount = signal(0);
   reportsExpanded = false;
   subscribersExpanded = false;
+  trialBannerDismissed = false;
+
+  // Trial-aware computed properties
+  isTrial = computed(() => this.auth.currentOrg()?.is_trial ?? false);
+  trialExpired = computed(() => this.auth.currentOrg()?.trial_expired ?? false);
+  trialDaysRemaining = computed(() => this.auth.currentOrg()?.trial_days_remaining ?? 0);
+
+  showTrialBanner = computed(() => {
+    const org = this.auth.currentOrg();
+    if (!org) return false;
+    return org.is_trial || org.trial_expired;
+  });
+
+  trialBannerClass = computed(() => {
+    if (this.trialExpired()) return 'trial-banner-danger';
+    if (this.trialDaysRemaining() <= 7) return 'trial-banner-warning';
+    return 'trial-banner-info';
+  });
+
+  trialBannerMessage = computed(() => {
+    if (this.trialExpired()) {
+      return 'Your free trial has ended. Upgrade to reactivate your paused monitors.';
+    }
+    const days = this.trialDaysRemaining();
+    if (days <= 7) {
+      return `Your trial ends in ${days} day${days !== 1 ? 's' : ''}. Upgrade to keep all features.`;
+    }
+    return `${days} day${days !== 1 ? 's' : ''} left in your Business trial.`;
+  });
 
   constructor(
     public auth: AuthService,
@@ -442,6 +535,12 @@ export class AppLayoutComponent implements OnInit {
     this.loadIncidentCount();
     // Refresh every 60 seconds
     setInterval(() => this.loadIncidentCount(), 60000);
+    // Fetch fresh user/org data (including trial info)
+    this.auth.fetchMe().catch(() => {});
+  }
+
+  dismissTrialBanner(): void {
+    this.trialBannerDismissed = true;
   }
 
   private loadIncidentCount(): void {

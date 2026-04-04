@@ -21,7 +21,7 @@ class BillingController extends AppController
     /**
      * GET /api/v2/billing/plans
      *
-     * List available billing plans.
+     * List available billing plans with trial information.
      *
      * @return void
      */
@@ -33,8 +33,16 @@ class BillingController extends AppController
             $service = $this->billingService;
             $plans = $service->getPlans();
 
-            // Include current plan slug for the authenticated organization
+            // Include current plan slug and trial info for the authenticated organization
             $currentPlan = 'free';
+            $trialInfo = [
+                'is_trial' => false,
+                'trial_expired' => false,
+                'trial_days_remaining' => 0,
+                'trial_ends_at' => null,
+                'effective_plan' => 'free',
+            ];
+
             if ($this->currentOrgId > 0) {
                 $orgsTable = $this->fetchTable('Organizations');
                 $org = $orgsTable->find()
@@ -43,9 +51,16 @@ class BillingController extends AppController
                 if ($org && !empty($org->plan)) {
                     $currentPlan = $org->plan;
                 }
+
+                $planService = new \App\Service\PlanService();
+                $trialInfo = $planService->getTrialInfo($this->currentOrgId);
             }
 
-            $this->success(['plans' => $plans, 'current_plan' => $currentPlan]);
+            $this->success([
+                'plans' => $plans,
+                'current_plan' => $currentPlan,
+                'trial' => $trialInfo,
+            ]);
         } catch (\Exception $e) {
             $this->error('Failed to fetch plans: ' . $e->getMessage(), 500);
         }

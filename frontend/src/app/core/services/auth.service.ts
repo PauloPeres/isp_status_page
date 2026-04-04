@@ -14,6 +14,12 @@ export interface AuthUser {
 export interface AuthOrganization {
   id: number;
   role: string;
+  plan?: string;
+  effective_plan?: string;
+  is_trial?: boolean;
+  trial_expired?: boolean;
+  trial_days_remaining?: number;
+  trial_ends_at?: string | null;
 }
 
 export interface LoginResponse {
@@ -120,13 +126,14 @@ export class AuthService {
     );
     if (response?.success) {
       this.currentUser.set(response.data.user);
-      this.currentOrg.set(response.data.organizations?.[0] || null);
+      // Find the current organization (the one marked is_current, or the first one)
+      const currentOrg = response.data.organizations?.find((o: any) => o.is_current)
+        || response.data.organizations?.[0]
+        || null;
+      this.currentOrg.set(currentOrg);
       localStorage.setItem('user', JSON.stringify(response.data.user));
-      if (response.data.organizations?.[0]) {
-        localStorage.setItem(
-          'organization',
-          JSON.stringify(response.data.organizations[0]),
-        );
+      if (currentOrg) {
+        localStorage.setItem('organization', JSON.stringify(currentOrg));
       }
     }
   }

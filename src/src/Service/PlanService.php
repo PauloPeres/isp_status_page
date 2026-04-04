@@ -3,11 +3,13 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Model\Entity\Organization;
 use App\Model\Entity\Plan;
 use App\Model\Table\MonitorsTable;
 use App\Model\Table\OrganizationUsersTable;
 use App\Model\Table\OrganizationsTable;
 use App\Model\Table\PlansTable;
+use Cake\I18n\DateTime;
 use Cake\ORM\Locator\LocatorAwareTrait;
 use Psr\Log\LoggerAwareTrait;
 use RuntimeException;
@@ -18,6 +20,10 @@ use RuntimeException;
  * Manages plan-based limit enforcement and feature access checks.
  * Provides methods to verify whether an organization can perform
  * specific actions based on their subscription plan.
+ *
+ * Trial-aware: during an active trial period, organizations are treated
+ * as Business plan regardless of the stored plan column. When the trial
+ * expires and no Stripe subscription exists, the free plan applies.
  */
 class PlanService
 {
@@ -60,6 +66,13 @@ class PlanService
     private array $planCache = [];
 
     /**
+     * In-memory cache for organization lookups
+     *
+     * @var array<int, \App\Model\Entity\Organization>
+     */
+    private array $orgCache = [];
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -71,9 +84,161 @@ class PlanService
     }
 
     /**
+     * Get the organization entity (cached).
+     *
+     * @param int $orgId Organization ID
+     * @return \App\Model\Entity\Organization
+     * @throws \RuntimeException If the organization is not found
+     */
+    private function getOrganization(int $orgId): Organization
+    {
+        if (isset($this->orgCache[$orgId])) {
+            return $this->orgCache[$orgId];
+        }
+
+        $organization = $this->Organizations->find()
+            ->where(['Organizations.id' => $orgId])
+            ->first();
+
+        if (!$organization) {
+            throw new RuntimeException(sprintf('Organization with ID %d not found', $orgId));
+        }
+
+        $this->orgCache[$orgId] = $organization;
+
+        return $organization;
+    }
+
+    /**
+     * Check if an organization has an active Stripe subscription.
+     *
+     * @param \App\Model\Entity\Organization $org Organization entity
+     * @return bool
+     */
+    private function hasActiveStripeSubscription(Organization $org): bool
+    {
+        return !empty($org->stripe_subscription_id);
+    }
+
+    /**
+     * Check if an organization is currently in an active trial period.
+     *
+     * An org is on trial when:
+     * - trial_ends_at is set
+     * - trial_ends_at > NOW()
+     * - No active Stripe subscription
+     *
+     * @param int $orgId Organization ID
+     * @return bool
+     */
+    public function isOnTrial(int $orgId): bool
+    {
+        $org = $this->getOrganization($orgId);
+
+        if ($org->trial_ends_at === null) {
+            return false;
+        }
+
+        if ($this->hasActiveStripeSubscription($org)) {
+            return false;
+        }
+
+        return $org->trial_ends_at->greaterThan(new DateTime());
+    }
+
+    /**
+     * Get the number of days remaining in the trial.
+     *
+     * Returns 0 if not on trial or trial has expired.
+     *
+     * @param int $orgId Organization ID
+     * @return int Days remaining
+     */
+    public function getTrialDaysRemaining(int $orgId): int
+    {
+        $org = $this->getOrganization($orgId);
+
+        if ($org->trial_ends_at === null) {
+            return 0;
+        }
+
+        $now = new DateTime();
+        if ($org->trial_ends_at->lessThanOrEquals($now)) {
+            return 0;
+        }
+
+        return (int)$now->diffInDays($org->trial_ends_at);
+    }
+
+    /**
+     * Check if an organization's trial has expired (was set but is now past).
+     *
+     * @param int $orgId Organization ID
+     * @return bool
+     */
+    public function isTrialExpired(int $orgId): bool
+    {
+        $org = $this->getOrganization($orgId);
+
+        if ($org->trial_ends_at === null) {
+            return false;
+        }
+
+        if ($this->hasActiveStripeSubscription($org)) {
+            return false;
+        }
+
+        return $org->trial_ends_at->lessThanOrEquals(new DateTime());
+    }
+
+    /**
+     * Get the effective plan for an organization, accounting for trial status.
+     *
+     * During an active trial, returns the Business plan regardless of stored plan.
+     * After trial expiry with no subscription, returns the Free plan.
+     *
+     * @param int $orgId Organization ID
+     * @return \App\Model\Entity\Plan
+     */
+    public function getEffectivePlan(int $orgId): Plan
+    {
+        if ($this->isOnTrial($orgId)) {
+            $businessPlan = $this->Plans->find('bySlug', slug: Plan::SLUG_BUSINESS)->first();
+            if ($businessPlan) {
+                return $businessPlan;
+            }
+        }
+
+        // Fall through to stored plan
+        return $this->getPlanForOrganization($orgId);
+    }
+
+    /**
+     * Get trial information for an organization (for API responses).
+     *
+     * @param int $orgId Organization ID
+     * @return array{is_trial: bool, trial_expired: bool, trial_days_remaining: int, trial_ends_at: string|null, effective_plan: string}
+     */
+    public function getTrialInfo(int $orgId): array
+    {
+        $org = $this->getOrganization($orgId);
+        $effectivePlan = $this->getEffectivePlan($orgId);
+
+        return [
+            'is_trial' => $this->isOnTrial($orgId),
+            'trial_expired' => $this->isTrialExpired($orgId),
+            'trial_days_remaining' => $this->getTrialDaysRemaining($orgId),
+            'trial_ends_at' => $org->trial_ends_at ? $org->trial_ends_at->toIso8601String() : null,
+            'effective_plan' => $effectivePlan->slug,
+        ];
+    }
+
+    /**
      * Get the plan entity for an organization
      *
      * Looks up the organization's plan slug and returns the corresponding Plan entity.
+     * This returns the STORED plan, not the effective plan. For trial-aware lookups,
+     * use getEffectivePlan() instead.
      *
      * @param int $orgId Organization ID
      * @return \App\Model\Entity\Plan
@@ -85,13 +250,7 @@ class PlanService
             return $this->planCache[$orgId];
         }
 
-        $organization = $this->Organizations->find()
-            ->where(['Organizations.id' => $orgId])
-            ->first();
-
-        if (!$organization) {
-            throw new RuntimeException(sprintf('Organization with ID %d not found', $orgId));
-        }
+        $organization = $this->getOrganization($orgId);
 
         $plan = $this->Plans->find('bySlug', slug: $organization->plan)->first();
 
@@ -119,7 +278,7 @@ class PlanService
      */
     public function canAddMonitor(int $orgId): bool
     {
-        $plan = $this->getPlanForOrganization($orgId);
+        $plan = $this->getEffectivePlan($orgId);
 
         if ($plan->isUnlimited('monitor_limit')) {
             return true;
@@ -143,7 +302,7 @@ class PlanService
      */
     public function canAddTeamMember(int $orgId): bool
     {
-        $plan = $this->getPlanForOrganization($orgId);
+        $plan = $this->getEffectivePlan($orgId);
 
         if ($plan->isUnlimited('team_member_limit')) {
             return true;
@@ -167,7 +326,7 @@ class PlanService
      */
     public function canUseFeature(int $orgId, string $feature): bool
     {
-        $plan = $this->getPlanForOrganization($orgId);
+        $plan = $this->getEffectivePlan($orgId);
 
         return $plan->hasFeature($feature);
     }
@@ -182,7 +341,7 @@ class PlanService
      */
     public function getMinCheckInterval(int $orgId): int
     {
-        $plan = $this->getPlanForOrganization($orgId);
+        $plan = $this->getEffectivePlan($orgId);
 
         return $plan->check_interval_min;
     }
@@ -206,7 +365,7 @@ class PlanService
         };
 
         if (!$allowed) {
-            $plan = $this->getPlanForOrganization($orgId);
+            $plan = $this->getEffectivePlan($orgId);
 
             $limitValue = match ($limitType) {
                 'monitor' => $plan->monitor_limit,
@@ -236,7 +395,7 @@ class PlanService
      */
     public function canAddStatusPage(int $orgId): bool
     {
-        $plan = $this->getPlanForOrganization($orgId);
+        $plan = $this->getEffectivePlan($orgId);
 
         if ($plan->isUnlimited('status_page_limit')) {
             return true;
@@ -265,7 +424,7 @@ class PlanService
      */
     public function checkLimit(int $orgId, string $limitType): array
     {
-        $plan = $this->getPlanForOrganization($orgId);
+        $plan = $this->getEffectivePlan($orgId);
 
         $current = 0;
         $limit = 0;
@@ -344,7 +503,7 @@ class PlanService
      */
     public function checkFeature(int $orgId, string $feature): array
     {
-        $plan = $this->getPlanForOrganization($orgId);
+        $plan = $this->getEffectivePlan($orgId);
         $allowed = $plan->hasFeature($feature);
 
         $upgradeTo = null;
@@ -375,7 +534,7 @@ class PlanService
      */
     public function getUsageSummary(int $orgId): array
     {
-        $plan = $this->getPlanForOrganization($orgId);
+        $plan = $this->getEffectivePlan($orgId);
 
         $monitorCount = $this->Monitors->find()
             ->where(['Monitors.organization_id' => $orgId])
@@ -392,11 +551,14 @@ class PlanService
                 ->count();
         } catch (\Exception $e) {}
 
+        $trialInfo = $this->getTrialInfo($orgId);
+
         return [
             'plan' => [
                 'slug' => $plan->slug,
                 'name' => $plan->name,
             ],
+            'trial' => $trialInfo,
             'monitors' => [
                 'current' => $monitorCount,
                 'limit' => $plan->isUnlimited('monitor_limit') ? 'unlimited' : $plan->monitor_limit,
@@ -427,8 +589,10 @@ class PlanService
     {
         if ($orgId === null) {
             $this->planCache = [];
+            $this->orgCache = [];
         } else {
             unset($this->planCache[$orgId]);
+            unset($this->orgCache[$orgId]);
         }
     }
 }

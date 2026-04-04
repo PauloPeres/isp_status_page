@@ -391,6 +391,52 @@ class EmailService
     }
 
     /**
+     * Send trial expiration notification email.
+     *
+     * @param object $user User entity (org owner)
+     * @param object $org Organization entity
+     * @param bool $monitorsPaused Whether monitors were paused
+     * @return array Result with 'success' (bool) and 'message' (string)
+     */
+    public function sendTrialExpired($user, $org, bool $monitorsPaused = false): array
+    {
+        try {
+            $mailer = new Mailer();
+            $this->configureSMTP($mailer);
+
+            $siteName = $this->settingService->get('site_name', Configure::read('Brand.name', 'KeepUp'));
+            $fromEmail = $this->settingService->get('email_from', 'noreply@localhost');
+            $fromName = $this->settingService->get('email_from_name', $siteName);
+
+            $mailer
+                ->setEmailFormat('html')
+                ->setFrom([$fromEmail => $fromName])
+                ->setTo($user->email)
+                ->setSubject("Your {$siteName} trial has ended")
+                ->setViewVars([
+                    'user' => $user,
+                    'org' => $org,
+                    'monitorsPaused' => $monitorsPaused,
+                    'siteName' => $siteName,
+                    'upgradeUrl' => Router::url('/app/billing', true),
+                ])
+                ->viewBuilder()
+                    ->setTemplate('trial_expired')
+                    ->setLayout('default');
+
+            $mailer->deliver();
+
+            return ['success' => true, 'message' => 'Trial expiration email sent.'];
+        } catch (\Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Failed to send trial expiration email.',
+                'technical_error' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
      * Test email configuration by sending a test email
      *
      * @param string $toEmail Email address to send test to

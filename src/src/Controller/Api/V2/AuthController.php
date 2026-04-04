@@ -116,13 +116,16 @@ class AuthController extends AppController
             return;
         }
 
-        // Create organization
+        // Create organization with 30-day free trial
+        // Plan stays 'free' in DB; PlanService treats it as 'business' while trial is active
         $orgsTable = $this->fetchTable('Organizations');
         $slug = strtolower(preg_replace('/[^a-z0-9]/', '-', $username));
+        $trialEndsAt = DateTime::now()->addDays(30);
         $org = $orgsTable->newEntity([
             'name' => $username . "'s Organization",
             'slug' => $slug . '-' . substr(bin2hex(random_bytes(3)), 0, 6),
             'plan' => 'free',
+            'trial_ends_at' => $trialEndsAt,
             'active' => true,
         ]);
 
@@ -143,6 +146,20 @@ class AuthController extends AppController
             'accepted_at' => DateTime::now(),
         ]);
         $orgUsersTable->save($orgUser);
+
+        // Grant 50 trial notification credits for testing SMS/Voice
+        try {
+            $creditService = new \App\Service\Billing\NotificationCreditService();
+            $creditService->addCredits(
+                (int)$org->id,
+                50,
+                'trial_grant',
+                'Trial credits: 50 credits to test SMS & Voice notifications'
+            );
+            \Cake\Log\Log::info("Granted 50 trial credits to org {$org->id} ({$org->name})");
+        } catch (\Exception $e) {
+            \Cake\Log\Log::warning('Failed to grant trial credits for new org: ' . $e->getMessage());
+        }
 
         // Auto-create weekly status report for new organizations
         try {
@@ -203,6 +220,12 @@ class AuthController extends AppController
             'organization' => [
                 'id' => $org->id,
                 'role' => 'owner',
+                'plan' => 'free',
+                'effective_plan' => 'business',
+                'is_trial' => true,
+                'trial_expired' => false,
+                'trial_days_remaining' => 30,
+                'trial_ends_at' => $trialEndsAt->toIso8601String(),
             ],
         ], 201);
     }
@@ -507,14 +530,29 @@ class AuthController extends AppController
             ->where(['OrganizationUsers.user_id' => $user->id])
             ->all();
 
+        $planService = new \App\Service\PlanService();
+
         $organizations = [];
         foreach ($orgUsers as $ou) {
-            $organizations[] = [
+            $orgData = [
                 'id' => $ou->organization_id,
                 'name' => $ou->organization->name ?? '',
                 'role' => $ou->role,
                 'is_current' => ($ou->organization_id === $this->currentOrgId),
             ];
+
+            // Include trial info for the current organization
+            if ($ou->organization_id === $this->currentOrgId) {
+                $trialInfo = $planService->getTrialInfo($ou->organization_id);
+                $orgData['plan'] = $ou->organization->plan ?? 'free';
+                $orgData['effective_plan'] = $trialInfo['effective_plan'];
+                $orgData['is_trial'] = $trialInfo['is_trial'];
+                $orgData['trial_expired'] = $trialInfo['trial_expired'];
+                $orgData['trial_days_remaining'] = $trialInfo['trial_days_remaining'];
+                $orgData['trial_ends_at'] = $trialInfo['trial_ends_at'];
+            }
+
+            $organizations[] = $orgData;
         }
 
         $this->success([
