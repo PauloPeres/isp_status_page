@@ -142,7 +142,7 @@ class VoiceWebhookController extends AppController
             $incidentsTable = $this->fetchTable('Incidents');
             try {
                 $incident = $incidentsTable->get($callLog->incident_id);
-                $incident->acknowledgeBy(null, 'voice_call');
+                $incident->acknowledgeBy($callLog->user_id, 'voice_call');
                 $incidentsTable->save($incident);
             } catch (\Exception $e) {
                 Log::error("VoiceWebhook: Failed to acknowledge incident {$callLog->incident_id}: {$e->getMessage()}");

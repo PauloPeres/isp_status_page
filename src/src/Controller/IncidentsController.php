@@ -189,17 +189,45 @@ class IncidentsController extends AppController
             return;
         }
 
+        // Resolve acknowledging user from `u` query parameter (added to ack URLs)
+        $userId = null;
+        $userName = 'Email link';
+        $uParam = $this->request->getQuery('u');
+        if (!empty($uParam)) {
+            try {
+                $usersTable = $this->fetchTable('Users');
+                $ackUser = $usersTable->get((int)$uParam);
+
+                // Verify user belongs to the incident's organization
+                $orgUsersTable = $this->fetchTable('OrganizationUsers');
+                $membership = $orgUsersTable->find()
+                    ->where([
+                        'OrganizationUsers.user_id' => $ackUser->id,
+                        'OrganizationUsers.organization_id' => $incident->organization_id,
+                    ])
+                    ->first();
+
+                if ($membership) {
+                    $userId = (int)$ackUser->id;
+                    $userName = $ackUser->username ?? 'Email link';
+                }
+            } catch (\Exception $e) {
+                // Invalid user ID — proceed without user attribution
+                Log::warning("Acknowledge: invalid user ID '{$uParam}' in query param: {$e->getMessage()}");
+            }
+        }
+
         // Perform acknowledgement
-        $incident->acknowledgeBy(null, \App\Model\Entity\Incident::ACK_VIA_EMAIL);
+        $incident->acknowledgeBy($userId, \App\Model\Entity\Incident::ACK_VIA_EMAIL);
 
         if ($this->Incidents->save($incident)) {
             $this->Flash->success(__d('incidents', 'Incident acknowledged successfully.'));
 
             // Create timeline entry for acknowledgement
-            $this->incidentService->createAcknowledgementUpdate($incident, 'Email link', 'email');
+            $this->incidentService->createAcknowledgementUpdate($incident, $userName, 'email');
 
             // Notify other recipients
-            $this->notifyAcknowledgement($incident, 'Email link');
+            $this->notifyAcknowledgement($incident, $userName);
 
             $this->set('error', null);
             $this->set('incident', $incident);

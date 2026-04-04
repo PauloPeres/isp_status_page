@@ -140,30 +140,49 @@ const CHANNEL_TYPE_CONFIGS: Record<string, ChannelTypeConfig> = {
           </ion-item>
         </ion-list>
 
-        <!-- Team member selection for email -->
-        @if (form.get('type')?.value === 'email' && teamMembers().length > 0) {
-          <div style="padding: 8px 0">
-            <ion-label style="font-size: 0.85rem; font-weight: 600; padding: 0 0 4px">Team Members</ion-label>
-            @for (member of teamMembers(); track member.id) {
-              <ion-chip [color]="member.selected ? 'primary' : 'medium'" [outline]="!member.selected"
-                (click)="toggleMember(member)" style="height: 32px; cursor: pointer">
-                {{ member.email }}
-              </ion-chip>
+        <!-- Team member selection for person-to-person channels -->
+        @if (isPersonToPersonChannel()) {
+          @if (form.get('type')?.value === 'email') {
+            @if (teamMembers().length > 0) {
+              <div style="padding: 8px 0">
+                <ion-label style="font-size: 0.85rem; font-weight: 600; padding: 0 0 4px">Team Members to Notify</ion-label>
+                @for (member of teamMembers(); track member.id) {
+                  <ion-chip [color]="member.selected ? 'primary' : 'medium'" [outline]="!member.selected"
+                    (click)="toggleMember(member)" style="height: 32px; cursor: pointer">
+                    {{ member.email }}
+                  </ion-chip>
+                }
+              </div>
+            } @else {
+              <div style="padding: 12px 0">
+                <ion-note color="medium">
+                  Add team members to notify them.
+                  <a routerLink="/settings/team" style="color: var(--ion-color-primary)">Go to Team Settings</a>
+                </ion-note>
+              </div>
             }
-          </div>
-        }
+          }
 
-        <!-- Team member selection for Voice Call -->
-        @if (form.get('type')?.value === 'voice_call' && teamMembersWithPhone().length > 0) {
-          <div style="padding: 8px 0">
-            <ion-label style="font-size: 0.85rem; font-weight: 600; padding: 0 0 4px">Team Members</ion-label>
-            @for (member of teamMembersWithPhone(); track member.id) {
-              <ion-chip [color]="member.selected ? 'primary' : 'medium'" [outline]="!member.selected"
-                (click)="toggleMember(member)" style="height: 32px; cursor: pointer">
-                {{ member.username }} ({{ member.phone_number }})
-              </ion-chip>
+          @if (form.get('type')?.value === 'voice_call' || form.get('type')?.value === 'sms' || form.get('type')?.value === 'whatsapp') {
+            @if (teamMembersWithPhone().length > 0) {
+              <div style="padding: 8px 0">
+                <ion-label style="font-size: 0.85rem; font-weight: 600; padding: 0 0 4px">Team Members to Notify</ion-label>
+                @for (member of teamMembersWithPhone(); track member.id) {
+                  <ion-chip [color]="member.selected ? 'primary' : 'medium'" [outline]="!member.selected"
+                    (click)="toggleMember(member)" style="height: 32px; cursor: pointer">
+                    {{ member.username }} ({{ member.phone_number }})
+                  </ion-chip>
+                }
+              </div>
+            } @else {
+              <div style="padding: 12px 0">
+                <ion-note color="medium">
+                  Add team members with phone numbers to notify them.
+                  <a routerLink="/settings/team" style="color: var(--ion-color-primary)">Go to Team Settings</a>
+                </ion-note>
+              </div>
             }
-          </div>
+          }
         }
 
         <!-- Voice Call info box -->
@@ -178,23 +197,12 @@ const CHANNEL_TYPE_CONFIGS: Record<string, ChannelTypeConfig> = {
           </div>
         }
 
-        <!-- Team member selection for SMS/WhatsApp -->
-        @if ((form.get('type')?.value === 'sms' || form.get('type')?.value === 'whatsapp') && teamMembersWithPhone().length > 0) {
-          <div style="padding: 8px 0">
-            <ion-label style="font-size: 0.85rem; font-weight: 600; padding: 0 0 4px">Team Members</ion-label>
-            @for (member of teamMembersWithPhone(); track member.id) {
-              <ion-chip [color]="member.selected ? 'primary' : 'medium'" [outline]="!member.selected"
-                (click)="toggleMember(member)" style="height: 32px; cursor: pointer">
-                {{ member.username }} ({{ member.phone_number }})
-              </ion-chip>
-            }
-          </div>
-        }
-
-        <!-- Dynamic configuration fields -->
+        <!-- Dynamic configuration fields (only non-recipient fields for person-to-person channels) -->
         <ion-list>
           @for (field of currentFields(); track field.key) {
-            @if (field.multi) {
+            @if (isPersonToPersonChannel() && isRecipientField(field.key)) {
+              <!-- Skip raw text input for recipients on person-to-person channels -->
+            } @else if (field.multi) {
               <ion-item>
                 <ion-label position="stacked">{{ field.label }}</ion-label>
                 <div class="recipient-chips">
@@ -373,6 +381,17 @@ export class ChannelFormComponent implements OnInit {
     return this.teamMembers().filter(m => m.phone_number);
   }
 
+  /** Whether the current channel type is a person-to-person channel */
+  isPersonToPersonChannel(): boolean {
+    const type = this.form.get('type')?.value;
+    return ['email', 'sms', 'whatsapp', 'voice_call'].includes(type);
+  }
+
+  /** Whether a field key is a recipient/phone field that should be hidden for p2p channels */
+  isRecipientField(key: string): boolean {
+    return ['recipients', 'phone_numbers'].includes(key);
+  }
+
   syncMembersToConfig(): void {
     const type = this.form.get('type')?.value;
     if (type === 'email') {
@@ -396,21 +415,33 @@ export class ChannelFormComponent implements OnInit {
 
   private preselectMembers(type: string, configuration: any): void {
     if (type === 'email') {
-      const recipients: string[] = Array.isArray(configuration.recipients) ? configuration.recipients : [];
+      const recipients: any[] = Array.isArray(configuration.recipients) ? configuration.recipients : [];
       this.teamMembers().forEach(m => {
-        m.selected = recipients.includes(m.email);
+        // Handle new format (user_id objects) and old format (plain strings)
+        m.selected = recipients.some((r: any) =>
+          typeof r === 'object' && r !== null
+            ? r.user_id === m.id
+            : r === m.email
+        );
       });
     } else if (type === 'sms' || type === 'whatsapp' || type === 'voice_call') {
-      const phones: string[] = Array.isArray(configuration.phone_numbers) ? configuration.phone_numbers : [];
+      const phones: any[] = Array.isArray(configuration.phone_numbers) ? configuration.phone_numbers : [];
       this.teamMembers().forEach(m => {
-        m.selected = m.phone_number && phones.includes(m.phone_number);
+        // Handle new format (user_id objects) and old format (plain strings)
+        m.selected = m.phone_number && phones.some((p: any) =>
+          typeof p === 'object' && p !== null
+            ? p.user_id === m.id
+            : p === m.phone_number
+        );
       });
     }
   }
 
   private buildConfiguration(): any {
     const config: any = {};
+    const type = this.form.get('type')?.value;
     const fields = this.currentFields();
+
     for (const field of fields) {
       if (field.multi) {
         config[field.key] = this.chipValues[field.key] || [];
@@ -418,6 +449,19 @@ export class ChannelFormComponent implements OnInit {
         config[field.key] = this.configValues[field.key] || '';
       }
     }
+
+    // For person-to-person channels, emit user_id references from selected members
+    if (this.isPersonToPersonChannel()) {
+      const selectedMembers = this.teamMembers().filter(m => m.selected);
+      const recipients = selectedMembers.map((m: any) => ({ user_id: m.id, type: 'member' }));
+
+      if (type === 'email') {
+        config['recipients'] = recipients;
+      } else if (type === 'sms' || type === 'whatsapp' || type === 'voice_call') {
+        config['phone_numbers'] = recipients;
+      }
+    }
+
     return config;
   }
 

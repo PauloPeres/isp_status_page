@@ -146,10 +146,54 @@ class IncidentsController extends AppController
         // Build a structured timeline
         $timeline = $this->buildTimeline($incident);
 
+        // Enrich with notification history from alert_logs
+        $alertLogs = $this->fetchTable('AlertLogs')->find()
+            ->where(['AlertLogs.incident_id' => $incident->id])
+            ->contain(['Users' => ['fields' => ['id', 'username', 'email']]])
+            ->orderBy(['AlertLogs.created' => 'ASC'])
+            ->all();
+
+        $notificationTimeline = [];
+        foreach ($alertLogs as $log) {
+            $notificationTimeline[] = [
+                'timestamp' => $log->created,
+                'type' => 'notification_sent',
+                'channel' => $log->channel,
+                'recipient' => $log->recipient,
+                'user' => $log->user ? ['id' => $log->user->id, 'username' => $log->user->username] : null,
+                'status' => $log->status,
+            ];
+        }
+
+        // Include voice call logs if any exist for this incident
+        $voiceCallLogs = [];
+        try {
+            $voiceCallLogsResult = $this->fetchTable('VoiceCallLogs')->find()
+                ->where(['VoiceCallLogs.incident_id' => $incident->id])
+                ->orderBy(['VoiceCallLogs.created' => 'ASC'])
+                ->all();
+
+            foreach ($voiceCallLogsResult as $vcl) {
+                $voiceCallLogs[] = [
+                    'timestamp' => $vcl->created,
+                    'type' => 'voice_call',
+                    'phone_number' => $vcl->phone_number,
+                    'status' => $vcl->status,
+                    'dtmf_input' => $vcl->dtmf_input,
+                    'duration_seconds' => $vcl->duration_seconds,
+                    'user_id' => $vcl->user_id,
+                ];
+            }
+        } catch (\Exception $e) {
+            // VoiceCallLogs table may not exist in all deployments
+        }
+
         $this->success([
             'incident' => $incident,
             'updates' => $incidentUpdates,
             'timeline' => $timeline,
+            'notification_timeline' => $notificationTimeline,
+            'voice_call_logs' => $voiceCallLogs,
         ]);
     }
 

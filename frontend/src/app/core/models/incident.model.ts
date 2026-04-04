@@ -13,12 +13,16 @@ export interface Incident {
   resolved_at?: string;
   acknowledged_by_user_id?: number;
   acknowledged_at?: string;
-  acknowledged_via?: 'email' | 'web' | 'telegram' | 'sms';
+  acknowledged_via?: 'email' | 'web' | 'telegram' | 'sms' | 'voice_call';
+  acknowledged_by_user?: { id: number; username: string };
+  auto_created?: boolean;
   organization_id: number;
   created: string;
   modified: string;
   monitor?: { id: number; name: string };
   timeline?: IncidentTimelineEntry[];
+  notification_timeline?: NotificationTimelineEntry[];
+  voice_call_logs?: VoiceCallLogEntry[];
 }
 
 export interface IncidentTimelineEntry {
@@ -32,4 +36,23 @@ export interface IncidentTimelineEntry {
   user_id?: number;
   user?: { id: number; name: string };
   created: string;
+}
+
+export interface NotificationTimelineEntry {
+  timestamp: string;
+  type: 'notification_sent';
+  channel: string;
+  recipient: string;
+  user?: { id: number; username: string } | null;
+  status: string;
+}
+
+export interface VoiceCallLogEntry {
+  timestamp: string;
+  type: 'voice_call';
+  phone_number: string;
+  status: string;
+  dtmf_input?: string | null;
+  duration_seconds?: number | null;
+  user_id?: number | null;
 }

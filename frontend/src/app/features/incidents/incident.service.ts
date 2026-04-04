@@ -27,7 +27,12 @@ export class IncidentService {
 
   getIncident(id: string): Observable<Incident> {
     return this.api.get<any>(`/incidents/${id}`).pipe(
-      map(data => ({ ...(data.incident || data), timeline: data.updates || data.timeline || (data.incident || data).timeline || [] })),
+      map(data => ({
+        ...(data.incident || data),
+        timeline: data.updates || data.timeline || (data.incident || data).timeline || [],
+        notification_timeline: data.notification_timeline || [],
+        voice_call_logs: data.voice_call_logs || [],
+      })),
     );
   }
 

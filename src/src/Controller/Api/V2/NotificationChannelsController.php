@@ -111,6 +111,17 @@ class NotificationChannelsController extends AppController
             }
         }
 
+        // Validate person-to-person channel recipients
+        $validationError = $this->validatePersonToPersonRecipients(
+            $type,
+            $this->request->getData('configuration') ?? []
+        );
+        if ($validationError) {
+            $this->error($validationError, 422);
+
+            return;
+        }
+
         $table = $this->fetchTable('NotificationChannels');
         $channel = $table->newEntity($this->request->getData());
         $channel->set('organization_id', $this->currentOrgId);
@@ -145,6 +156,16 @@ class NotificationChannelsController extends AppController
 
         if (!$channel) {
             $this->error('Notification channel not found', 404);
+
+            return;
+        }
+
+        // Validate person-to-person channel recipients
+        $editType = $this->request->getData('type') ?? $channel->type;
+        $editConfig = $this->request->getData('configuration') ?? [];
+        $validationError = $this->validatePersonToPersonRecipients($editType, $editConfig);
+        if ($validationError) {
+            $this->error($validationError, 422);
 
             return;
         }
@@ -244,6 +265,84 @@ class NotificationChannelsController extends AppController
             Log::error("Test notification failed for channel {$id}: {$e->getMessage()}");
             $this->error('Test notification failed. Check logs for details.', 500);
         }
+    }
+
+    /**
+     * Validate person-to-person channel recipients.
+     *
+     * For email/sms/whatsapp/voice_call channels with new-format recipients
+     * (user_id objects), verify that all user_ids belong to the current org
+     * and have the required contact info.
+     *
+     * @param string $type Channel type.
+     * @param array|string $configuration Channel configuration.
+     * @return string|null Error message, or null if valid.
+     */
+    private function validatePersonToPersonRecipients(string $type, array|string $configuration): ?string
+    {
+        $personToPersonTypes = ['email', 'sms', 'whatsapp', 'voice_call'];
+        if (!in_array($type, $personToPersonTypes, true)) {
+            return null;
+        }
+
+        if (is_string($configuration)) {
+            $configuration = json_decode($configuration, true) ?: [];
+        }
+
+        // Determine the recipient key
+        $recipientKey = $type === 'email' ? 'recipients' : 'phone_numbers';
+        $recipients = $configuration[$recipientKey] ?? [];
+
+        if (!is_array($recipients)) {
+            return null;
+        }
+
+        // Check if any recipients use the new user_id format
+        $userIds = [];
+        foreach ($recipients as $recipient) {
+            if (is_array($recipient) && isset($recipient['user_id'])) {
+                $userIds[] = (int)$recipient['user_id'];
+            }
+            // Old format (plain strings) — skip validation, backward compatible
+        }
+
+        if (empty($userIds)) {
+            return null;
+        }
+
+        // Verify all user_ids belong to the current organization
+        $orgUsersTable = $this->fetchTable('OrganizationUsers');
+        $usersTable = $this->fetchTable('Users');
+
+        foreach ($userIds as $userId) {
+            $membership = $orgUsersTable->find()
+                ->where([
+                    'OrganizationUsers.user_id' => $userId,
+                    'OrganizationUsers.organization_id' => $this->currentOrgId,
+                ])
+                ->first();
+
+            if (!$membership) {
+                return "User ID {$userId} does not belong to your organization.";
+            }
+
+            // Verify user has required contact info
+            try {
+                $user = $usersTable->get($userId);
+            } catch (\Exception $e) {
+                return "User ID {$userId} not found.";
+            }
+
+            if ($type === 'email' && empty($user->email)) {
+                return "User '{$user->username}' does not have an email address configured.";
+            }
+
+            if (in_array($type, ['sms', 'whatsapp', 'voice_call'], true) && empty($user->phone_number)) {
+                return "User '{$user->username}' does not have a phone number configured.";
+            }
+        }
+
+        return null;
     }
 
     /**
