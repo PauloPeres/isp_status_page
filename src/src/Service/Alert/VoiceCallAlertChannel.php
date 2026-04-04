@@ -103,6 +103,18 @@ class VoiceCallAlertChannel implements ChannelInterface
                 continue;
             }
 
+            // Validate E.164 phone number format to prevent toll fraud / SSRF
+            if (!preg_match('/^\+[1-9]\d{1,14}$/', $phoneNumber)) {
+                Log::warning("VoiceCallAlertChannel: Invalid phone number format for org {$orgId}: " . substr($phoneNumber, 0, 6) . '...');
+                $results[] = [
+                    'recipient' => $phoneNumber,
+                    'status' => 'failed',
+                    'error' => 'Invalid phone number format (must be E.164)',
+                ];
+                $allSuccess = false;
+                continue;
+            }
+
             // Check credits before initiating call
             if (!$this->creditService->hasCredits($orgId, self::CREDITS_PER_CALL)) {
                 Log::warning("VoiceCallAlertChannel: Insufficient credits for org {$orgId} to call {$phoneNumber}");
@@ -121,7 +133,6 @@ class VoiceCallAlertChannel implements ChannelInterface
                 $voiceCallLogsTable = $this->fetchTable('VoiceCallLogs');
 
                 $callLog = $voiceCallLogsTable->newEntity([
-                    'organization_id' => $orgId,
                     'incident_id' => $incident->id,
                     'monitor_id' => $monitor->id,
                     'notification_channel_id' => null,
@@ -133,6 +144,7 @@ class VoiceCallAlertChannel implements ChannelInterface
                     'sip_provider' => 'keepup',
                     'escalation_position' => $position,
                 ]);
+                $callLog->set('organization_id', $orgId);
 
                 $saved = $voiceCallLogsTable->save($callLog);
 

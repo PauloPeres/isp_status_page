@@ -63,13 +63,13 @@ class NotificationCreditService
             $monthlyGrant = self::PLAN_GRANTS[$org->plan] ?? 0;
 
             $credits = $creditsTable->newEntity([
-                'organization_id' => $orgId,
                 'balance' => 0,
                 'monthly_grant' => $monthlyGrant,
                 'auto_recharge' => false,
                 'auto_recharge_threshold' => 10,
                 'auto_recharge_amount' => 100,
             ]);
+            $credits->set('organization_id', $orgId);
             $creditsTable->save($credits);
         }
 
@@ -107,13 +107,13 @@ class NotificationCreditService
         }
 
         $transaction = $transactionsTable->newEntity([
-            'organization_id' => $orgId,
             'type' => $type,
             'amount' => $amount,
             'balance_after' => $newBalance,
             'description' => $description,
             'reference_id' => $referenceId,
         ]);
+        $transaction->set('organization_id', $orgId);
         $transactionsTable->save($transaction);
 
         return true;
@@ -130,44 +130,61 @@ class NotificationCreditService
      */
     public function deductCredits(int $orgId, int $amount, string $channel, ?string $description = null): bool
     {
-        $credits = $this->getCredits($orgId);
-
-        if ($credits->balance < $amount) {
-            return false;
-        }
-
         $creditsTable = $this->fetchTable('NotificationCredits');
         $transactionsTable = $this->fetchTable('NotificationCreditTransactions');
+        $connection = $creditsTable->getConnection();
 
-        $newBalance = $credits->balance - $amount;
-        $credits->balance = $newBalance;
-        $credits->modified = DateTime::now();
+        // Use a transaction with SELECT ... FOR UPDATE to prevent race conditions
+        // where concurrent requests could deduct below zero.
+        $result = $connection->transactional(function () use ($creditsTable, $transactionsTable, $orgId, $amount, $channel, $description) {
+            // Acquire a row-level lock to prevent concurrent deductions
+            $credits = $creditsTable->find()
+                ->where(['organization_id' => $orgId])
+                ->epilog('FOR UPDATE')
+                ->first();
 
-        if (!$creditsTable->save($credits)) {
-            return false;
+            if (!$credits) {
+                return false;
+            }
+
+            if ($credits->balance < $amount) {
+                return false;
+            }
+
+            $newBalance = $credits->balance - $amount;
+            $credits->balance = $newBalance;
+            $credits->modified = DateTime::now();
+
+            if (!$creditsTable->save($credits)) {
+                return false;
+            }
+
+            $transaction = $transactionsTable->newEntity([
+                'type' => 'usage',
+                'amount' => -$amount,
+                'balance_after' => $newBalance,
+                'channel' => $channel,
+                'description' => $description ?? "Sent {$channel} notification",
+            ]);
+            $transaction->set('organization_id', $orgId);
+            $transactionsTable->save($transaction);
+
+            return true;
+        });
+
+        if ($result) {
+            // Push auto-replenish check to queue so it doesn't block the notification flow
+            try {
+                QueueManager::push(AutoReplenishCheckJob::class, [
+                    'data' => ['organization_id' => $orgId],
+                ], ['config' => 'default']);
+            } catch (\Exception $e) {
+                // Queue push failure should never block credit deduction
+                Log::warning("Failed to push AutoReplenishCheckJob for org {$orgId}: {$e->getMessage()}");
+            }
         }
 
-        $transaction = $transactionsTable->newEntity([
-            'organization_id' => $orgId,
-            'type' => 'usage',
-            'amount' => -$amount,
-            'balance_after' => $newBalance,
-            'channel' => $channel,
-            'description' => $description ?? "Sent {$channel} notification",
-        ]);
-        $transactionsTable->save($transaction);
-
-        // Push auto-replenish check to queue so it doesn't block the notification flow
-        try {
-            QueueManager::push(AutoReplenishCheckJob::class, [
-                'data' => ['organization_id' => $orgId],
-            ], ['config' => 'default']);
-        } catch (\Exception $e) {
-            // Queue push failure should never block credit deduction
-            Log::warning("Failed to push AutoReplenishCheckJob for org {$orgId}: {$e->getMessage()}");
-        }
-
-        return true;
+        return (bool)$result;
     }
 
     /**
@@ -346,7 +363,19 @@ class NotificationCreditService
      */
     public function checkAndAutoReplenish(int $orgId): bool
     {
-        $credits = $this->getCredits($orgId);
+        $creditsTable = $this->fetchTable('NotificationCredits');
+        $connection = $creditsTable->getConnection();
+
+        // Acquire a row-level lock to prevent concurrent auto-replenish triggers
+        // (e.g., two rapid deductions both triggering this check).
+        $credits = $creditsTable->find()
+            ->where(['organization_id' => $orgId])
+            ->epilog('FOR UPDATE')
+            ->first();
+
+        if (!$credits) {
+            return false;
+        }
 
         // Check if auto-recharge is enabled
         if (!$credits->auto_recharge) {

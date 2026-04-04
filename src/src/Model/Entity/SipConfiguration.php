@@ -46,7 +46,7 @@ class SipConfiguration extends Entity
      * @var array<string, bool>
      */
     protected array $_accessible = [
-        'organization_id' => true,
+        'organization_id' => false,
         'provider' => true,
         'sip_host' => true,
         'sip_port' => true,
@@ -58,9 +58,9 @@ class SipConfiguration extends Entity
         'active' => true,
         'last_tested_at' => true,
         'last_test_result' => true,
-        'public_id' => true,
-        'created' => true,
-        'modified' => true,
+        'public_id' => false,
+        'created' => false,
+        'modified' => false,
     ];
 
     /**

@@ -60,7 +60,7 @@ class NotificationCreditTransactionsTable extends Table
             ->scalar('type')
             ->maxLength('type', 20)
             ->notEmptyString('type')
-            ->inList('type', ['usage', 'purchase', 'monthly_grant', 'manual_adjustment', 'refund']);
+            ->inList('type', ['usage', 'purchase', 'monthly_grant', 'manual_adjustment', 'refund', 'auto_replenish']);
 
         $validator
             ->integer('amount')

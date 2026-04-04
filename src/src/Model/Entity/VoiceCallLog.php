@@ -83,7 +83,7 @@ class VoiceCallLog extends Entity
      * @var array<string, bool>
      */
     protected array $_accessible = [
-        'organization_id' => true,
+        'organization_id' => false,
         'incident_id' => true,
         'monitor_id' => true,
         'notification_channel_id' => true,
@@ -97,9 +97,9 @@ class VoiceCallLog extends Entity
         'cost_credits' => true,
         'sip_provider' => true,
         'escalation_position' => true,
-        'public_id' => true,
-        'created' => true,
-        'modified' => true,
+        'public_id' => false,
+        'created' => false,
+        'modified' => false,
     ];
 
     /**

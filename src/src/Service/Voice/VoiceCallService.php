@@ -112,9 +112,20 @@ class VoiceCallService
                 continue;
             }
 
+            // Validate E.164 phone number format to prevent toll fraud / SSRF
+            if (!preg_match('/^\+[1-9]\d{1,14}$/', $phoneNumber)) {
+                Log::warning("VoiceCallService: Invalid phone number format: " . substr($phoneNumber, 0, 6) . '...');
+                $results[] = [
+                    'phone_number' => $phoneNumber,
+                    'call_log_id' => null,
+                    'status' => 'failed',
+                    'error' => 'Invalid phone number format (must be E.164)',
+                ];
+                continue;
+            }
+
             // Create VoiceCallLog record
             $callLog = $voiceCallLogsTable->newEntity([
-                'organization_id' => $orgId,
                 'incident_id' => $incidentId,
                 'monitor_id' => $monitorId,
                 'notification_channel_id' => $channelId,
@@ -126,6 +137,7 @@ class VoiceCallService
                 'sip_provider' => $provider->getProviderName(),
                 'escalation_position' => $position,
             ]);
+            $callLog->set('organization_id', $orgId);
 
             $saved = $voiceCallLogsTable->save($callLog);
 
@@ -221,15 +233,29 @@ class VoiceCallService
      */
     public function handleCallCompleted(VoiceCallLog $callLog): void
     {
+        // Idempotency guard: if credits were already charged, do not charge again.
+        // This prevents double-charging if the webhook fires more than once.
+        if ($callLog->cost_credits > 0) {
+            Log::debug("VoiceCallService: Credits already charged for call log {$callLog->id}, skipping");
+
+            return;
+        }
+
         $creditService = new NotificationCreditService();
 
         // Charge credits for answered calls
         if ($callLog->wasAnswered()) {
+            // Mask phone number in transaction description to avoid storing PII
+            $phone = $callLog->phone_number;
+            $maskedPhone = strlen($phone) > 6
+                ? substr($phone, 0, 3) . str_repeat('*', strlen($phone) - 7) . substr($phone, -4)
+                : '***';
+
             $deducted = $creditService->deductCredits(
                 $callLog->organization_id,
                 VoiceCallLog::CREDITS_PER_CALL,
                 'voice_call',
-                "Voice call to {$callLog->phone_number} for incident #{$callLog->incident_id}"
+                "Voice call to {$maskedPhone} for incident #{$callLog->incident_id}"
             );
 
             if ($deducted) {

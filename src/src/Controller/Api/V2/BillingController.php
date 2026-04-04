@@ -537,8 +537,8 @@ class BillingController extends AppController
         }
 
         $amount = (int)$this->request->getData('amount', 100);
-        if ($amount <= 0) {
-            $this->error('Amount must be greater than 0', 400);
+        if ($amount <= 0 || $amount > 10000) {
+            $this->error('Amount must be between 1 and 10,000', 400);
 
             return;
         }

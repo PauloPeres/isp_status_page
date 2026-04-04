@@ -30,6 +30,7 @@ class NotificationCreditTransaction extends Entity
     public const TYPE_MONTHLY_GRANT = 'monthly_grant';
     public const TYPE_MANUAL_ADJUSTMENT = 'manual_adjustment';
     public const TYPE_REFUND = 'refund';
+    public const TYPE_AUTO_REPLENISH = 'auto_replenish';
 
     /**
      * Valid transaction types
@@ -40,6 +41,7 @@ class NotificationCreditTransaction extends Entity
         self::TYPE_MONTHLY_GRANT,
         self::TYPE_MANUAL_ADJUSTMENT,
         self::TYPE_REFUND,
+        self::TYPE_AUTO_REPLENISH,
     ];
 
     /**
@@ -48,13 +50,13 @@ class NotificationCreditTransaction extends Entity
      * @var array<string, bool>
      */
     protected array $_accessible = [
-        'organization_id' => true,
+        'organization_id' => false,
         'type' => true,
         'amount' => true,
         'balance_after' => true,
         'channel' => true,
         'description' => true,
         'reference_id' => true,
-        'created' => true,
+        'created' => false,
     ];
 }

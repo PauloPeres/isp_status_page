@@ -272,8 +272,13 @@ class VoiceWebhookController extends AppController
      */
     private function validateTwilioSignature(): bool
     {
-        // Skip validation in debug mode
-        if (env('APP_DEBUG', false)) {
+        // Skip validation only if explicitly opted in via a dedicated flag.
+        // APP_DEBUG alone must NOT bypass signature validation — a misconfigured
+        // production instance with APP_DEBUG=true would be fully open to forged
+        // webhooks that can acknowledge incidents and manipulate credits.
+        if (env('TWILIO_SKIP_SIGNATURE_VALIDATION', false)) {
+            Log::warning('VoiceWebhook: Twilio signature validation is DISABLED via TWILIO_SKIP_SIGNATURE_VALIDATION');
+
             return true;
         }
 

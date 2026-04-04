@@ -81,8 +81,23 @@ class SipConfigurationController extends AppController
 
         $data = $this->request->getData();
 
-        // If provider is keepup_default, clear custom SIP fields
+        // Validate provider value
+        $validProviders = [
+            SipConfiguration::PROVIDER_KEEPUP_DEFAULT,
+            SipConfiguration::PROVIDER_TWILIO_TRUNK,
+            SipConfiguration::PROVIDER_CUSTOM_SIP,
+        ];
         $provider = $data['provider'] ?? SipConfiguration::PROVIDER_KEEPUP_DEFAULT;
+        if (!in_array($provider, $validProviders, true)) {
+            $this->error('Invalid provider. Must be one of: ' . implode(', ', $validProviders), 400);
+
+            return;
+        }
+
+        // Strip any fields that should not be mass-assigned via API
+        unset($data['id'], $data['organization_id'], $data['public_id'], $data['created'], $data['modified']);
+
+        // If provider is keepup_default, clear custom SIP fields
         if ($provider === SipConfiguration::PROVIDER_KEEPUP_DEFAULT) {
             $data['sip_host'] = null;
             $data['sip_port'] = null;
